@@ -28,10 +28,10 @@ Dashboard untitled_dashboard_of_user_growth_rate_by_country_lnpla {
       x_axis: VizFieldFull {
         label: 'Sign Up Month'
         ref: r(ecommerce_users.sign_up_at)
-        transformation: 'datetrunc month'
+        transformation: 'datetrunc year'
         format {
           type: 'date'
-          pattern: 'LLL yyyy'
+          pattern: 'yyyy'
         }
       }
       legend: VizFieldFull {
@@ -109,7 +109,7 @@ Dashboard untitled_dashboard_of_user_growth_rate_by_country_lnpla {
     grid_size: 20
     auto_expand_vertically: true
     block v_m69a {
-      position: pos(20, 20, 620, 420)
+      position: pos(20, 20, 980, 580)
       layer: 1
     }
     mobile {
