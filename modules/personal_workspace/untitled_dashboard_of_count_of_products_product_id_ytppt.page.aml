@@ -1,0 +1,49 @@
+Dashboard untitled_dashboard_of_count_of_products_product_id_ytppt {
+  title: 'Untitled Dashboard of Count of Products Product ID'
+  owner: 'chukwudi@holistics.io'
+  block v_btcn: VizBlock {
+    label: 'Count of Products Product ID'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation metric_5f0147c {
+        label: 'Count of Products Product ID'
+        formula: @aql count(ecommerce_products.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: 'metric_5f0147c'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_btcn {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.vanilla
+}
