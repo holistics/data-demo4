@@ -1,0 +1,86 @@
+Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
+  title: 'Untitled Dashboard of Total Users, Female Users and 2 more'
+  owner: 'vincent@holistics.io'
+  block v_4mie: VizBlock {
+    label: 'Total Users, Female Users and 2 more'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation metric_25472cf {
+        label: 'Female Users'
+        formula: @aql total_users
+| where(ecommerce_users.gender == "Female");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_aea2b3d {
+        label: 'Male Users'
+        formula: @aql total_users
+| where(ecommerce_users.gender == "Male");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_30de1b2 {
+        label: 'Untitled Metric'
+        formula: @aql metric_aea2b3d/metric_25472cf;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_25472cf'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_aea2b3d'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Ratio of M:F Users'
+          ref: 'metric_30de1b2'
+          format {
+            type: 'number'
+            pattern: '#,###%'
+          }
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_4mie {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.vanilla
+}
