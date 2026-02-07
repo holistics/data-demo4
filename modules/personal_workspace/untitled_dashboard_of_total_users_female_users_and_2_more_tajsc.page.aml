@@ -67,6 +67,32 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_5euh: VizBlock {
+    label: 'Total Orders'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      theme {
+
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -76,6 +102,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     auto_expand_vertically: true
     block v_4mie {
       position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    block v_5euh {
+      position: pos(640, 20, 620, 420)
       layer: 1
     }
     mobile {
