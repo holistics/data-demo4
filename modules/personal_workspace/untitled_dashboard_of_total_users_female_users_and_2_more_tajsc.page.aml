@@ -98,7 +98,6 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     viz: DataTable {
       dataset: demo_ecommerce_version_2
       theme {
-
       }
       fields: [
         VizFieldFull {
@@ -149,11 +148,99 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_uuh3: VizBlock {
+    label: 'Total Orders, Orders from Female Users and 4 more'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation metric_175a1ec {
+        label: 'Orders from Female Users'
+        formula: @aql total_orders
+| where(ecommerce_users.gender == "Female");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_4463d10 {
+        label: 'Orders from Asia'
+        formula: @aql total_orders
+| where(ecommerce_countries.continent_name == "Asia");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_cd4ce13 {
+        label: 'Ratio of Asia Orders to Female Orders'
+        formula: @aql metric_4463d10/metric_175a1ec;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_0f2cf34 {
+        label: 'Mobile Phone Orders'
+        formula: @aql total_users
+| where(map_categories.parent_category == "Mobiles & Tablets");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      theme {
+
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_175a1ec'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_4463d10'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_cd4ce13'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_0f2cf34'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 800
+    height: 880
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
@@ -166,6 +253,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     }
     block v_j5tp {
       position: pos(20, 180, 620, 420)
+      layer: 2
+    }
+    block v_uuh3 {
+      position: pos(660, 180, 620, 420)
       layer: 2
     }
     mobile {
