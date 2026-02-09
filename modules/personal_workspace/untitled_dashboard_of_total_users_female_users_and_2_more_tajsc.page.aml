@@ -92,6 +92,63 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_j5tp: VizBlock {
+    label: '''Top 5 products by GMV (sales)
+'''
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      theme {
+
+      }
+      fields: [
+        VizFieldFull {
+          label: 'Product Id'
+          ref: r(ecommerce_products.id)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'ecommerce_products_id_1'
+        },
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(ecommerce_products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Gmv'
+          ref: r(demo_ecommerce_version_2.gmv)
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'custom_gmv_1'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'custom_gmv_1'
+            direction: 'desc'
+          },
+          SortSetting {
+            key: 'ecommerce_products_id_1'
+            direction: 'asc'
+          }
+        ]
+        row_limit: 5
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -106,6 +163,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_5euh {
       position: pos(640, 20, 240, 140)
       layer: 1
+    }
+    block v_j5tp {
+      position: pos(20, 180, 620, 420)
+      layer: 2
     }
     mobile {
       mode: 'auto'
