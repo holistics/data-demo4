@@ -1,5 +1,5 @@
 Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
-  title: 'Untitled Dashboard of Total Users, Female Users and 2 more'
+  title: 'Vincent Personal Dashboard'
   owner: 'vincent@holistics.io'
   block v_4mie: VizBlock {
     label: 'Total Users, Female Users and 2 more'
@@ -72,7 +72,6 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     viz: DataTable {
       dataset: demo_ecommerce_version_2
       theme {
-
       }
       fields: [
         VizFieldFull {
@@ -101,11 +100,11 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
-      position: pos(20, 20, 620, 420)
+      position: pos(20, 20, 620, 140)
       layer: 1
     }
     block v_5euh {
-      position: pos(640, 20, 620, 420)
+      position: pos(640, 20, 240, 140)
       layer: 1
     }
     mobile {
