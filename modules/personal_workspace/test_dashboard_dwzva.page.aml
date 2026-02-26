@@ -1,0 +1,82 @@
+Dashboard test_dashboard_dwzva {
+  title: 'Test Dashboard'
+  owner: 'vincent@holistics.io'
+  block v_pzrl: VizBlock {
+    label: 'Top Female Customers'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      filter {
+        field: r(ecommerce_countries.name)
+        operator: 'is'
+        value: 'Australia'
+      }
+      filter {
+        field: r(ecommerce_users.gender)
+        operator: 'is'
+        value: 'Female'
+      }
+      filter {
+        field: r(ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'last 24 months'
+      }
+      filter {
+        field: r(param_model_demo.metric_selections_currency)
+        operator: 'is'
+        value: 'platform revenue'
+      }
+      filter {
+        field: r(ecommerce_users.age_group)
+        operator: 'is'
+        value: '2. From 20 to 29'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_users.id)
+          format {
+            type: 'number'
+          }
+        },
+        r(ecommerce_users.full_name),
+        r(ecommerce_users.gender),
+        r(ecommerce_cities.name),
+        VizFieldFull {
+          ref: r(ecommerce_products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_order_items.quantity)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_pzrl {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.vanilla
+}
