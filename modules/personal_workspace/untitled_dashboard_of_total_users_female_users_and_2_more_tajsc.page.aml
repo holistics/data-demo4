@@ -394,7 +394,6 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
         }
       ]
       theme {
-
       }
       fields: [
         VizFieldFull {
@@ -459,6 +458,105 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_9ika: VizBlock {
+    label: 'GMV (Gross Merchandise Value) by City Name'
+    viz: BarChart {
+      dataset: demo_ecommerce_version_2
+      filter {
+        field: r(ecommerce_countries.name)
+        operator: 'is'
+        value: 'France'
+      }
+      filter {
+        field: r(ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'last 24 months'
+      }
+      filter {
+        field: r(param_model_demo.metric_selections_currency)
+        operator: 'is'
+        value: 'platform revenue'
+      }
+      theme {
+
+      }
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_cities.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_total_in_tooltip: true
+          show_data_label_by: 'value'
+          hidden: true
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#05264CFF'
+            point {
+              value: 'India'
+              color: '#AF7DED'
+            }
+            point {
+              value: 'Korea'
+              color: '#F2B602'
+            }
+            point {
+              value: 'France'
+              color: '#18A59E'
+            }
+            point {
+              value: 'Germany'
+              color: '#07326C'
+            }
+            point {
+              value: 'Vietnam'
+              color: '#07326C'
+            }
+            point {
+              value: 'Australia'
+              color: '#255DD4'
+            }
+            point {
+              value: 'Indonesia'
+              color: '#A50E43'
+            }
+            point {
+              value: 'Singapore'
+              color: '#E27712'
+            }
+            point {
+              value: 'United States'
+              color: '#18A59E'
+            }
+            point {
+              value: 'United Kingdom'
+              color: '#255DD4'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        legend_label: 'hidden'
+        x_axis_label: 'Cities.City Name'
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -489,6 +587,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_zudj {
       position: pos(660, 620, 620, 420)
       layer: 4
+    }
+    block v_9ika {
+      position: pos(20, 1060, 620, 420)
+      layer: 5
     }
     mobile {
       mode: 'auto'
