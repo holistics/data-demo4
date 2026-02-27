@@ -478,7 +478,6 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
         value: 'platform revenue'
       }
       theme {
-
       }
       x_axis: VizFieldFull {
         ref: r(ecommerce_cities.name)
@@ -557,6 +556,69 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_uyom: VizBlock {
+    label: '''Top 5 products by order volume last quarter
+'''
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      calculation total_order_quantity {
+        label: 'Total Order Quantity'
+        formula: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      filter {
+        field: r(ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'last quarter'
+      }
+      theme {
+
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(ecommerce_products.name)
+          format {
+            type: 'text'
+          }
+          uname: 'ecommerce_products_name'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Total Order Quantity'
+          ref: 'total_order_quantity'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'custom_total_order_quantity_1'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_total: true
+        show_column_total: true
+        show_sub_total: true
+        sorts: [
+          SortSetting {
+            key: 'custom_total_order_quantity_1'
+            direction: 'desc'
+          },
+          SortSetting {
+            key: 'ecommerce_products_name'
+            direction: 'asc'
+          }
+        ]
+        row_limit: 5
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -591,6 +653,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_9ika {
       position: pos(20, 1060, 620, 420)
       layer: 5
+    }
+    block v_uyom {
+      position: pos(660, 1060, 620, 420)
+      layer: 6
     }
     mobile {
       mode: 'auto'
