@@ -573,6 +573,73 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
         value: 'last quarter'
       }
       theme {
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(ecommerce_products.name)
+          format {
+            type: 'text'
+          }
+          uname: 'ecommerce_products_name'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Total Order Quantity'
+          ref: 'total_order_quantity'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'custom_total_order_quantity_1'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_total: true
+        show_column_total: true
+        show_sub_total: true
+        sorts: [
+          SortSetting {
+            key: 'custom_total_order_quantity_1'
+            direction: 'desc'
+          },
+          SortSetting {
+            key: 'ecommerce_products_name'
+            direction: 'asc'
+          }
+        ]
+        row_limit: 5
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_z8ed: VizBlock {
+    label: 'Total Order Quantity and Percent of total of Total Order Quantity by Product Name'
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      calculation total_order_quantity {
+        label: 'Total Order Quantity'
+        formula: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_7a41194 {
+        label: 'Percent of total of Total Order Quantity'
+        formula: @aql total_order_quantity | percent_of_total('column_total');;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      filter {
+        field: r(ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'last quarter'
+      }
+      theme {
 
       }
       rows: [
@@ -594,6 +661,13 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
             pattern: '#,###0.00'
           }
           uname: 'custom_total_order_quantity_1'
+        },
+        VizFieldFull {
+          ref: 'metric_7a41194'
+          format {
+            type: 'number'
+            pattern: '#,###%'
+          }
         }
       ]
       settings {
@@ -657,6 +731,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_uyom {
       position: pos(660, 1060, 620, 420)
       layer: 6
+    }
+    block v_z8ed {
+      position: pos(20, 1500, 620, 420)
+      layer: 7
     }
     mobile {
       mode: 'auto'
