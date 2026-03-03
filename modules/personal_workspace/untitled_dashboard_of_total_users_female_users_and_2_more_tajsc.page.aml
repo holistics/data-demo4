@@ -640,7 +640,6 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
         value: 'last quarter'
       }
       theme {
-
       }
       rows: [
         VizFieldFull {
@@ -693,11 +692,142 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_rauk: VizBlock {
+    label: 'Total Users, Female Users and 5 more by Sign Up Quarter'
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      calculation female_users {
+        label: 'Female Users'
+        formula: @aql total_users | where(ecommerce_users.gender == "Female");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation female_ratio {
+        label: 'Female Ratio'
+        formula: @aql female_users / total_users;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation cumulative_female_users {
+        label: 'Cumulative Female Users'
+        formula: @aql female_users | running_total();;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation last_quarter_cumulative_female {
+        label: 'Last Quarter Cumulative Female'
+        formula: @aql cumulative_female_users | relative_period(ecommerce_users.sign_up_date, interval(-1 quarter), strict: true);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation male_users {
+        label: 'Male Users'
+        formula: @aql total_users | where(ecommerce_users.gender == "Male");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation male_ratio {
+        label: 'Male Ratio'
+        formula: @aql male_users / total_users;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      theme {
+
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Sign Up Quarter'
+          ref: r(ecommerce_users.sign_up_date)
+          transformation: 'datetrunc quarter'
+          format {
+            type: 'date'
+            pattern: 'yyyy Qq'
+          }
+          uname: 'datetrunc_quarter_sign_up_date'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Total Users'
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Female Users'
+          ref: 'female_users'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Cumulative Female Users'
+          ref: 'cumulative_female_users'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Last Quarter Cumulative Female'
+          ref: 'last_quarter_cumulative_female'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Female Ratio'
+          ref: 'female_ratio'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Male Users'
+          ref: 'male_users'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Male Ratio'
+          ref: 'male_ratio'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_total: true
+        show_column_total: true
+        show_sub_total: true
+        sorts: [
+          SortSetting {
+            key: 'datetrunc_quarter_sign_up_date'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 880
+    height: 1940
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
@@ -735,6 +865,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_z8ed {
       position: pos(20, 1500, 620, 420)
       layer: 7
+    }
+    block v_rauk {
+      position: pos(660, 1500, 620, 420)
+      layer: 8
     }
     mobile {
       mode: 'auto'
