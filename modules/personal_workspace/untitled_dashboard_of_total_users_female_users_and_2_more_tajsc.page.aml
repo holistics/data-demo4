@@ -733,7 +733,6 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
         data_type: 'number'
       }
       theme {
-
       }
       rows: [
         VizFieldFull {
@@ -823,11 +822,136 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_1hno: VizBlock {
+    label: 'Test Report 01'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation female_users {
+        label: 'Female Users'
+        formula: @aql total_users
+| where(ecommerce_users.gender == "Female");;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation ratio_of_female_users {
+        label: 'Ratio Of Female Users'
+        formula: @aql female_users/total_users;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation last_period_female_users {
+        label: 'Last Period Female Users'
+        formula: @aql female_users | relative_period(ecommerce_users.sign_up_date, interval(-1 quarter), strict: true);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation percent_change_quarter {
+        label: 'Percent Change over Quarter'
+        formula: @aql safe_divide(female_users, female_users | relative_period(ecommerce_users.sign_up_date, interval(-1 quarter), strict: true)) - 1;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation metric_f9271ad {
+        label: 'Classification of Growth'
+        formula: @aql case(
+  when: percent_change_quarter > 1,
+  then: "Great",
+  else: "Normal"
+);;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      theme {
+
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_users.sign_up_date)
+          transformation: 'datetrunc quarter'
+          format {
+            type: 'date'
+            pattern: 'yyyy Qq'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_countries.continent_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'last_period_female_users'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'female_users'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'metric_f9271ad'
+          format {
+            type: 'text'
+            pattern: '#,###%'
+          }
+          uname: 'custom_metric_f9271ad'
+        },
+        VizFieldFull {
+          ref: 'percent_change_quarter'
+          format {
+            type: 'number'
+            pattern: '#,###%'
+          }
+        },
+        VizFieldFull {
+          ref: 'ratio_of_female_users'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'custom_metric_f9271ad'
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Great'
+              }
+              text_color: '#328159'
+              background_color: '#B5E3CD'
+            }
+          }
+        ]
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        frozen_columns: 0
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 1940
+    height: 2380
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
@@ -869,6 +993,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_rauk {
       position: pos(660, 1500, 620, 420)
       layer: 8
+    }
+    block v_1hno {
+      position: pos(20, 1940, 620, 420)
+      layer: 9
     }
     mobile {
       mode: 'auto'
