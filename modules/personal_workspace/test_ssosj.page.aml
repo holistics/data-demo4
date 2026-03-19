@@ -1,0 +1,82 @@
+Dashboard test_ssosj {
+  title: 'test'
+  owner: 'nam.tran@holistics.io'
+  block v_zaxs: VizBlock {
+    label: 'GMV (Gross Merchandise Value), Id and 4 more'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      filter {
+        field: r(ecommerce_countries.name)
+        operator: 'is'
+        value: 'Germany'
+      }
+      filter {
+        field: r(ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'last 24 months'
+      }
+      filter {
+        field: r(param_model_demo.metric_selections_currency)
+        operator: 'is'
+        value: 'platform revenue'
+      }
+      filter {
+        field: r(ecommerce_products.name)
+        operator: 'is'
+        value: 'Bh "Schwarz"'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.gmv)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_orders.id)
+          format {
+            type: 'number'
+          }
+        },
+        r(ecommerce_orders.status),
+        r(ecommerce_orders.created_at),
+        VizFieldFull {
+          ref: r(ecommerce_orders.discount)
+          format {
+            type: 'number'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_orders.delivery_attempts)
+          format {
+            type: 'number'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_zaxs {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.vanilla
+}
