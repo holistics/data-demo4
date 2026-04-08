@@ -38,7 +38,7 @@ Dashboard untitled_dashboard_of_count_of_products_product_id_ytppt {
     grid_size: 20
     auto_expand_vertically: true
     block v_btcn {
-      position: pos(20, 20, 620, 420)
+      position: pos(440, 180, 620, 420)
       layer: 1
     }
     mobile {
