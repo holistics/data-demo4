@@ -188,6 +188,115 @@ Dashboard demo_ai_bknqx {
       }
     }
   }
+  block v_75nx: VizBlock {
+    label: 'Absolute GMV Growth, Current Month GMV and 2 more by Parent Category'
+    viz: BarChart {
+      dataset: demo_ecommerce_version_2
+      calculation current_month_gmv {
+        label: 'Current Month Gmv'
+        formula: @aql gmv | where(ecommerce_orders.created_at is @(last month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation previous_month_gmv {
+        label: 'Previous Month Gmv'
+        formula: @aql gmv | where(ecommerce_orders.created_at is @(2 months ago));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation absolute_gmv_growth {
+        label: 'Absolute Gmv Growth'
+        formula: @aql current_month_gmv - previous_month_gmv;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_absolute_gmv_growth {
+        label: 'Total Absolute Gmv Growth'
+        formula: @aql absolute_gmv_growth | keep_grains();;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation growth_contribution_percentage {
+        label: 'Growth Contribution Percentage'
+        formula: @aql absolute_gmv_growth * 100.0 / total_absolute_gmv_growth;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      theme {
+
+      }
+      x_axis: VizFieldFull {
+        label: 'Parent Category'
+        ref: r(map_categories.parent_category)
+        format {
+          type: 'text'
+        }
+        uname: 'map_categories_parent_category'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Absolute GMV Growth'
+            ref: 'absolute_gmv_growth'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+            uname: 'custom_absolute_gmv_growth_1'
+          }
+          settings {
+            color: '#07326C'
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Current Month GMV'
+            ref: 'current_month_gmv'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        },
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Previous Month GMV'
+            ref: 'previous_month_gmv'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        },
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Growth Contribution %'
+            ref: 'growth_contribution_percentage'
+            format {
+              type: 'number'
+              pattern: '#,###0.00\\%'
+            }
+          }
+        }
+      ]
+      settings {
+        row_limit: 5
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Parent Category'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -198,6 +307,10 @@ Dashboard demo_ai_bknqx {
     block v_fq7v {
       position: pos(20, 20, 620, 420)
       layer: 1
+    }
+    block v_75nx {
+      position: pos(660, 20, 620, 420)
+      layer: 2
     }
     mobile {
       mode: 'auto'
