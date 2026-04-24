@@ -223,7 +223,6 @@ Dashboard demo_ai_bknqx {
         data_type: 'number'
       }
       theme {
-
       }
       x_axis: VizFieldFull {
         label: 'Parent Category'
@@ -301,7 +300,7 @@ Dashboard demo_ai_bknqx {
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 800
+    height: 900
     grid_size: 20
     auto_expand_vertically: true
     block v_fq7v {
@@ -309,7 +308,7 @@ Dashboard demo_ai_bknqx {
       layer: 1
     }
     block v_75nx {
-      position: pos(660, 20, 620, 420)
+      position: pos(20, 460, 720, 420)
       layer: 2
     }
     mobile {
