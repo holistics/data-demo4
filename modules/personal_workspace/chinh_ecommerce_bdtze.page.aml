@@ -1,0 +1,74 @@
+Dashboard chinh_ecommerce_bdtze {
+  title: '[Chinh] Ecommerce'
+  owner: 'chinh.dm+demo4@holistics.io'
+  block v_fkbe: VizBlock {
+    label: 'Country Name, Total Orders, and Total Users'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_countries.name)
+          format {
+            type: 'text'
+          }
+          uname: 'ecommerce_countries_name'
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: '#,###0.000000'
+            group_separator: ' '
+            decimal_separator: ','
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: '#,###0.000000'
+            group_separator: ' '
+            decimal_separator: ','
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'ecommerce_countries_name'
+            format: SingleFormat {
+              condition {
+                operator: 'is_not'
+                value: ' '
+              }
+              text_color: '#328159'
+              background_color: '#B5E3CD'
+            }
+          }
+        ]
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_fkbe {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.vanilla
+}
