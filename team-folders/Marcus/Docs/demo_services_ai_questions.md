@@ -6,18 +6,36 @@ POC script for the "self-serve AI on a semantic layer" pitch. The point of each 
 
 Dataset: `demo_services` (file: `team-folders/Marcus/Datasets/demo_services.dataset.aml`)
 
+## Concrete IDs used in this script
+
+All IDs below come from the live data — verified via `execute_aql`. Pick any of them when demoing.
+
+| Use case | ID | Detail |
+|---|---|---|
+| Mixed-result Class A account | **A00077** | 12 services + 3 contracts, 4 eligible for cross-sell |
+| Class B account | **A00200** | 12 services + 3 contracts, 5 eligible |
+| Contract with real children | **S0000077** | 3 child services: S0001429, S0001430, S0001431 |
+| Eligible service (passes all gates) | **S0001429** | Beta, 16h, on A00077 |
+| Ineligible — Training rule | **S0001430** | Training, 5h, on A00077 |
+| Ineligible — hours rule | **S0002931** | Omega, 8h, on A00077 (Class A) |
+| Ineligible — under-hours Beta | **S0004429** | Beta, 8h, on A00077 |
+
+> **Data-coverage note:** the Omega-on-Class-B exclusion rule is encoded in `is_crosssell_eligible`, but the current seed data has **zero Omega rows on Class B accounts** — so this specific rule won't fire on the live data. If you want to demo it, seed one Omega row onto a Class B account or call it out as "rule present, no data hits."
+
 ---
 
 ## Scenario 1 — Contract vs Service (counts must exclude contracts)
 
 **Phrasings:**
-- "How many services did account `ACC-001` buy?"
-- "Count the services purchased by `ACC-001`."
-- "For `ACC-001`, how many service deliveries are on record?"
+- "How many services did account `A00077` buy?"
+- "Count the services purchased by `A00077`."
+- "For `A00077`, how many service deliveries are on record?"
 
-**What a naive agent does wrong:** It would `SELECT COUNT(*) FROM services WHERE account_id = ...` and count contract bundling rows along with the real deliveries — the number is inflated.
+**What a naive agent does wrong:** It would `SELECT COUNT(*) FROM services WHERE account_id = ...` and get 15 (12 services + 3 contracts) instead of the correct 12.
 
 **Rule encoded by:** `service_count` metric (filters `is_countable_service = true`).
+
+**Expected answer:** services = 12, contracts = 3.
 
 **Expected AQL:**
 ```aql
@@ -27,7 +45,7 @@ explore {
     contracts: contract_count,
   }
   filters {
-    demo_services_accounts.account_id == 'ACC-001',
+    demo_services_accounts.account_id == 'A00077',
   }
 }
 ```
@@ -37,13 +55,15 @@ explore {
 ## Scenario 2 — Services under a contract (parent_id self-join)
 
 **Phrasings:**
-- "Show me all services under contract `C-12345`."
-- "What deliveries roll up to contract `C-12345`?"
-- "List the child services of `C-12345`."
+- "Show me all services under contract `S0000077`."
+- "What deliveries roll up to contract `S0000077`?"
+- "List the child services of `S0000077`."
 
 **What a naive agent does wrong:** Without knowing about `parent_id` as a self-join, it can't fetch the child deliveries of a contract.
 
 **Rule encoded by:** `demo_services_services.parent_id > demo_services_services.service_id` self-relationship.
+
+**Expected answer:** 3 children — S0001429 (Beta, 16h), S0001430 (Training, 5h), S0001431 (Omega, 12h).
 
 **Expected AQL:**
 ```aql
@@ -55,23 +75,25 @@ explore {
     delivered_hours: demo_services_services.delivered_hours,
   }
   filters {
-    demo_services_services.parent_id == 'C-12345',
+    demo_services_services.parent_id == 'S0000077',
   }
 }
 ```
 
 ---
 
-## Scenario 3 — Cross-sell eligible services
+## Scenario 3 — Cross-sell eligible services for an account
 
 **Phrasings:**
-- "Which services count toward cross-sell credit for account `ACC-077`?"
-- "How many of `ACC-077`'s services are eligible for cross-sell?"
-- "Show me the cross-sell-qualifying deliveries for `ACC-077`."
+- "Which services count toward cross-sell credit for account `A00077`?"
+- "How many of `A00077`'s services are eligible for cross-sell?"
+- "Show me the cross-sell-qualifying deliveries for `A00077`."
 
 **What a naive agent does wrong:** Has to know all four exclusion rules at once — no contracts, no Training, ≥10 hrs delivered, no Omega on Class B — and apply them together. It will get at least one wrong.
 
 **Rule encoded by:** `is_crosssell_eligible` dataset dimension + `crosssell_eligible_count` metric.
+
+**Expected answer:** 4 eligible out of 12 services.
 
 **Expected AQL:**
 ```aql
@@ -84,7 +106,7 @@ explore {
     all_services: service_count,
   }
   filters {
-    demo_services_accounts.account_id == 'ACC-077',
+    demo_services_accounts.account_id == 'A00077',
   }
 }
 ```
@@ -93,19 +115,33 @@ explore {
 
 ## Scenario 4 — Drill-down: why a specific service is ineligible
 
+Two real examples, each exercising a different rule. Pick whichever fits the moment in the demo.
+
+### 4a. Training rule
+
 **Phrasings:**
-- "Why was service `S-99021` not eligible for cross-sell?"
-- "Explain the cross-sell ineligibility of `S-99021`."
-- "Which rule disqualified `S-99021` from cross-sell credit?"
+- "Why is service `S0001430` not eligible for cross-sell?"
+- "Explain why `S0001430` was disqualified."
+- "Which rule blocks `S0001430` from cross-sell credit?"
 
-**What this tests:** the AI exposes each individual gate so the user can see exactly which rule failed.
+**Expected answer:** service_line = Training → fails the Training rule (regardless of hours or class).
 
-**Expected AQL:**
+### 4b. Hours rule
+
+**Phrasings:**
+- "Why was service `S0002931` excluded from cross-sell?"
+- "What disqualifies `S0002931`?"
+- "Tell me which rule killed `S0002931`'s eligibility."
+
+**Expected answer:** delivered_hours = 8 < 10 → fails the hours rule. (Service line is Omega, but the account is Class A so the Omega-on-B rule does NOT apply — only the hours rule does.)
+
+**Expected AQL (same shape for both):**
 ```aql
 explore {
   dimensions {
     service_id: demo_services_services.service_id,
     service_line: demo_services_services.service_line,
+    delivered_hours: demo_services_services.delivered_hours,
     is_contract: demo_services_services.is_contract,
     is_training: demo_services_services.is_training,
     meets_eligible_hours: demo_services_services.meets_eligible_hours,
@@ -114,7 +150,7 @@ explore {
     is_eligible: demo_services_services.is_crosssell_eligible,
   }
   filters {
-    demo_services_services.service_id == 'S-99021',
+    demo_services_services.service_id == 'S0001430',
   }
 }
 ```
@@ -129,6 +165,8 @@ explore {
 - "Give me the actual 2025 bonus number."
 
 **Rule encoded by:** `bonus_actual` metric — applies the pre-2025 rule to pre-2025 rows and the new rule to 2025+ rows, automatically.
+
+**Expected answer:** 24,129 for 2025 (validated via smoke query).
 
 **Expected AQL:**
 ```aql
@@ -147,11 +185,13 @@ explore {
 ## Scenario 6 — Counterfactual: "what if we had never switched the rule?"
 
 **Phrasings:**
-- "What would the bonus value have been if we'd never switched to the new rule?"
-- "Apply the old rule to all years — what does bonus look like?"
-- "If we'd kept the Alpha+Beta-only formula in 2025+, what's the bonus by year?"
+- "What would the bonus have been if we'd never switched to the new rule?"
+- "Apply the old rule (Alpha+Beta only) to all years — what does bonus look like?"
+- "If we'd kept the legacy formula in 2025+, what's the bonus by year?"
 
-**What this tests:** the AI reads the rule history embedded in `bonus_actual`'s description and **constructs ad-hoc AQL on the fly** — there is no pre-built counterfactual metric. This is the killer "the AI does the hypothetical math" demo.
+**What this tests:** the AI reads the rule history embedded in `bonus_actual`'s description and **constructs ad-hoc AQL on the fly** — there is no pre-built counterfactual metric.
+
+**Expected answer:** 2024 = 19,835 (matches actual, no Omega counted in either rule), 2025 = 16,471 (lower than actual because Omega is dropped).
 
 **Expected AQL (constructed ad-hoc):**
 ```aql
@@ -175,6 +215,8 @@ explore {
 - "What would the bonus have been if we'd always used the new rule?"
 - "Backdate the new rule to all years — show me the bonus by year."
 - "Apply Alpha+Beta+Omega across all history — what's the result?"
+
+**Expected answer:** 2024 = 28,977 (higher than actual because Omega is added pre-switch), 2025 = 24,129 (matches actual).
 
 **Expected AQL (constructed ad-hoc):**
 ```aql
@@ -201,6 +243,16 @@ explore {
 
 **What this tests:** the AI combines a pre-built metric (`bonus_actual`) with two ad-hoc expressions in a single explore.
 
+**Expected answer (from smoke test):**
+
+| Year | Actual | If never switched | If always new |
+|---|---|---|---|
+| 2024 | 19,835 | 19,835 | 28,977 |
+| 2025 | 24,129 | 16,471 | 24,129 |
+
+- 2024 actual == never-switched (Omega not counted pre-switch).
+- 2025 actual == always-new (Omega counted post-switch).
+
 **Expected AQL:**
 ```aql
 explore {
@@ -219,11 +271,6 @@ explore {
 }
 ```
 
-**Expected shape:**
-- 2023, 2024 → `actual` == `if_never_switched` (pre-switch, no Omega in either).
-- 2025+ → `actual` == `if_always_new` (post-switch, Omega counted).
-- The two hypotheticals diverge only in years that contain Omega services.
-
 ---
 
 ## Scenario 9 — "Are there any data-quality issues?" (alert widget)
@@ -234,6 +281,8 @@ explore {
 - "Show me anything that looks off in the services data."
 
 **Rule encoded by:** `dq_total_violations` (sum of all dq_* checks). Healthy state = 0; non-zero lights up the alert widget.
+
+**Expected answer (current seed data):** all checks return 0 — clean data. To demo a triggered alert you'd need to seed a bad row (e.g., insert a contract with delivered_hours > 0).
 
 **Expected AQL:**
 ```aql
@@ -256,6 +305,8 @@ explore {
 - "List the specific services with the over-delivered hours anomaly."
 - "Show me each row where delivered hours exceeds the contract amount."
 - "Give me the actual records behind the over-delivery flag."
+
+**Expected answer (current data):** zero rows — drill-down is clean.
 
 **Expected AQL:**
 ```aql
@@ -282,3 +333,4 @@ explore {
 - **Where the rules live:** single-model rules (`is_training`, `is_omega`, `meets_eligible_hours`, `bonus_rule_era`, `service_value`) in `demo_services_services.model.aml`. Cross-model rules (`is_crosssell_eligible` — needs `account_class`) in `demo_services.dataset.aml`.
 - **Why counterfactuals aren't metrics:** analysts can't reasonably pre-build a metric for every hypothetical. The semantic layer captures the *rule and its history* (in `bonus_actual`'s description); the AI does the hypothetical math on top. **This is the pitch.**
 - **Why phrasing variations matter:** customers will not phrase questions the way you wrote them. Three phrasings per scenario surfaces whether the AI catches intent or just keyword-matches.
+- **Data coverage gaps:** the Omega-on-Class-B rule and all the DQ flags are encoded in the semantic layer but currently produce no positive hits in the seed data. Seed a small number of "violating" rows if you want to demo those branches live.
