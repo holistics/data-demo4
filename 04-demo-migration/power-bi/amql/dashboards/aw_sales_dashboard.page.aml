@@ -224,8 +224,28 @@ Dashboard aw_sales_dashboard {
       }
     }
   }
-  block t_37s8: TextBlock {
-    content: @md <a href="?_t=page_3">Go to Page 2</a>;;
+  block t_5qvz: TextBlock {
+    content: @md <style>
+  .btn-white {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-white:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+
+<a href="?_t=page_2" class="btn-white">Page 2</a>;;
   }
 
   view: TabLayout {
@@ -253,8 +273,8 @@ Dashboard aw_sales_dashboard {
       block area_sales_vs_due {
         position: pos(0, 80, 630, 380)
       }
-      block t_37s8 {
-        position: pos(620, 0, 140, 70)
+      block t_5qvz {
+        position: pos(620, 10, 90, 50)
       }
       default_zoom: 'fit_to_page'
     }
