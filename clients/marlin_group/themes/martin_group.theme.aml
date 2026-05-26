@@ -1,0 +1,104 @@
+PageTheme marlin_group {
+  title: "Marlin Group"
+  background {
+    bg_color: "#FAF9F5"
+  }
+  canvas {
+    background {
+      bg_color: "#FAF9F5"
+    }
+    border {
+      border_radius: 5
+      border_color: "#DDD9D0"
+    }
+  }
+  block {
+    background {
+      bg_color: "#ffffff"
+    }
+    label {
+      font_family: "Roboto, sans-serif"
+      font_size: 10
+      font_color: "#1A2156"
+      font_weight: "bold"
+      letter_spacing: 0.8
+      text_transform: "uppercase"
+    }
+    text {
+      font_family: "Roboto, sans-serif"
+      font_size: 11
+      font_color: "#5A5A5A"
+    }
+    border {
+      border_radius: 6
+      border_width: 1
+      border_color: "#DDD9D0"
+      border_style: "solid"
+    }
+    padding: 16
+  }
+  viz {
+    table {
+      general {
+        hover_color: "#F4F3EE"
+        banding_color: "#FFFFFF"
+        font_color: "#141413"
+        font_size: 13
+        font_family: "Roboto, sans-serif"
+        border_color: "transparent"
+        border_width: 0
+        grid_color: "#E8E7E3"
+      }
+      header {
+        bg_color: "#FFFFFF"
+        font_color: "#5A5A5A"
+        font_size: 10
+        font_weight: "bold"
+      }
+      sub_header {
+        bg_color: "#F8F8F5"
+        font_color: "#1A2156"
+        font_size: 10
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: "#7A7A7A"
+        font_size: 10
+      }
+    }
+  }
+  custom_css: @css
+    @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap");
+        .h-kpi-metric-kpi	{
+      font-size: 22px;
+      line-height: 1;
+      margin-block: 8px;
+      color: #1A2156;
+      font-weight: 300;
+    }
+    
+    .h-kpi-metric-label {
+      font-size: 10px;
+      line-height: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8;
+      color: #5A5A5A;
+    }
+
+    /* KPI styles */
+    .h-kpi-metric-diff {
+      font-size: 11px;
+    }
+    
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: #EAF4DC;
+      color: #3a7d0a;
+    }
+    
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: #FDECEA;
+      color: #c0392b;
+    }
+  ;;
+}
