@@ -897,7 +897,7 @@ ecommerce_users.sign_up_date
       input_type: 'nullable-single'
     }
   }
-  block t_nd8b: TextBlock {
+  block t_ba84: TextBlock {
     content: @md <style>
   .btn-white {
     display: inline-block;
@@ -1030,8 +1030,8 @@ ecommerce_users.sign_up_date
       block f_merchants_name {
         position: pos(270, 90, 300, 80)
       }
-      block t_nd8b {
-        position: pos(1300, 180, 140, 40)
+      block t_ba84 {
+        position: pos(1300, 190, 130, 40)
         layer: 1
       }
       default_zoom: 'fit_to_width'
@@ -1123,11 +1123,11 @@ ecommerce_users.sign_up_date
       to: [
         CustomMapping {
           block: 'v8'
-          field: ref('ecommerce_users', 'sign_up_date')
+          field: r(ecommerce_users.sign_up_date)
         },
         CustomMapping {
           block: 'v11'
-          field: ref('dim_dates', 'date_key')
+          field: r(dim_dates.date_key)
         }
       ]
     },
@@ -1136,11 +1136,11 @@ ecommerce_users.sign_up_date
       to: [
         CustomMapping {
           block: 'v11'
-          field: ref('dim_dates', 'date_key')
+          field: r(dim_dates.date_key)
         },
         CustomMapping {
           block: 'v8'
-          field: ref('ecommerce_users', 'sign_up_date')
+          field: r(ecommerce_users.sign_up_date)
         }
       ]
     },
@@ -1155,7 +1155,7 @@ ecommerce_users.sign_up_date
             'v7',
             'v12'
           ]
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         }
       ]
     },
@@ -1169,7 +1169,7 @@ ecommerce_users.sign_up_date
             'v8',
             'v12'
           ]
-          field: ref('ecommerce_users', 'sign_up_date')
+          field: r(ecommerce_users.sign_up_date)
         },
         CustomMapping {
           block: [
@@ -1177,11 +1177,11 @@ ecommerce_users.sign_up_date
             'v6',
             'v7'
           ]
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         },
         CustomMapping {
           block: 'v11'
-          field: ref('dim_dates', 'date_key')
+          field: r(dim_dates.date_key)
         }
       ]
     }
