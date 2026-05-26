@@ -26,6 +26,11 @@ Dashboard aw_sales_dashboard {
     label: 'Sales Amount by Product Category x Reseller Business Type'
     viz: PivotTable {
       dataset: aw_sales
+      filter {
+        field: r(reseller.business_type)
+        operator: 'is_not'
+        value: '[Not Applicable]'
+      }
       rows: [
         VizFieldFull {
           label: 'Product Category'
@@ -124,43 +129,6 @@ Dashboard aw_sales_dashboard {
       }
     }
   }
-  block pie_sales_city: VizBlock {
-    label: 'Sales Amount by Reseller City'
-    viz: PieChart {
-      dataset: aw_sales
-      legend: VizFieldFull {
-        label: 'City'
-        ref: r(reseller.city)
-        format {
-          type: 'text'
-        }
-      }
-      series {
-        field: VizFieldFull {
-          label: 'Sales Amount'
-          ref: r(sales.total_sales_amount)
-          format {
-            type: 'number'
-            pattern: '[$$]#,###0.00'
-          }
-        }
-      }
-      settings {
-        display_as_donut: true
-        row_limit: 10
-        sort: 'desc'
-        legend_label: 'right'
-        show_data_label: true
-        show_percentage: true
-        group_values_into: 5
-        data_label_position: 'outside'
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
   block area_sales_vs_due: VizBlock {
     label: 'Sales Amount vs Sales Amount by Due Date (by Month)'
     viz: AreaChart {
@@ -224,29 +192,6 @@ Dashboard aw_sales_dashboard {
       }
     }
   }
-  block t_5qvz: TextBlock {
-    content: @md <style>
-  .btn-white {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #ffffff;
-    color: #333333;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    text-decoration: none;
-    font-family: sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-
-  .btn-white:hover {
-    background-color: #f0f0f0;
-  }
-</style>
-
-<a href="?_t=page_2" class="btn-white">Page 2</a>;;
-  }
 
   view: TabLayout {
     label: 'AW Sales'
@@ -255,16 +200,14 @@ Dashboard aw_sales_dashboard {
       label: 'Page 1'
       width: 1280
       height: 800
-
       block filter_fiscal_year {
-        position: pos(0, 0, 300, 70)
+        position: pos(0, 0, 300, 80)
       }
-
       block filter_month {
-        position: pos(310, 0, 300, 70)
+        position: pos(310, 0, 300, 80)
       }
       block pivot_category_business_type {
-        position: pos(10, 460, 1260, 330)
+        position: pos(10, 470, 1260, 330)
       }
 
       block map_quantity_country {
@@ -272,9 +215,6 @@ Dashboard aw_sales_dashboard {
       }
       block area_sales_vs_due {
         position: pos(0, 80, 630, 380)
-      }
-      block t_5qvz {
-        position: pos(620, 10, 90, 50)
       }
       default_zoom: 'fit_to_page'
     }
@@ -308,21 +248,6 @@ Dashboard aw_sales_dashboard {
       }
       default_zoom: 'fit_to_page'
     }
-
-    tab page_4: CanvasLayout {
-      label: 'Page 4'
-      width: 1280
-      height: 800
-
-      block filter_fiscal_year {
-        position: pos(0, 0, 300, 70)
-      }
-
-      block pie_sales_city {
-        position: pos(0, 80, 1270, 700)
-      }
-      default_zoom: 'fit_to_page'
-    }
   }
   settings {
     timezone: 'America/Los_Angeles'
@@ -341,4 +266,5 @@ Dashboard aw_sales_dashboard {
       ]
     }
   ]
+  theme: H.themes.classic
 }
