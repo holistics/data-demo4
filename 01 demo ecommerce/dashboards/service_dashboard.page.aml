@@ -1,0 +1,67 @@
+Dashboard service_dashboard {
+  title: 'service_dashboard'
+  description: ''
+  owner: 'nam.tran@holistics.io'
+  block title: TextBlock {
+    content: @md # Alert Sample;;
+  }
+  block v_e19a: VizBlock {
+    label: 'Account Id, Account Name and 2 more'
+    viz: DataTable {
+      dataset: demo_services
+      fields: [
+        VizFieldFull {
+          ref: r(demo_services_accounts.account_id)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_services_accounts.account_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_services_services.service_id)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_services_services.service_line)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 60)
+    }
+    block v_e19a {
+      position: pos(20, 80, 620, 420)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: H.themes.vanilla
+}
