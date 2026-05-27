@@ -6,22 +6,10 @@ Dashboard service_dashboard {
     content: @md # Alert Sample;;
   }
   block v_e19a: VizBlock {
-    label: 'Account Id, Account Name and 2 more'
+    label: 'Service Id and CountD of Account Id'
     viz: DataTable {
       dataset: demo_services
       fields: [
-        VizFieldFull {
-          ref: r(demo_services_accounts.account_id)
-          format {
-            type: 'text'
-          }
-        },
-        VizFieldFull {
-          ref: r(demo_services_accounts.account_name)
-          format {
-            type: 'text'
-          }
-        },
         VizFieldFull {
           ref: r(demo_services_services.service_id)
           format {
@@ -29,13 +17,16 @@ Dashboard service_dashboard {
           }
         },
         VizFieldFull {
-          ref: r(demo_services_services.service_line)
+          ref: r(demo_services_accounts.account_id)
+          aggregation: 'count distinct'
           format {
-            type: 'text'
+            type: 'number'
+            pattern: 'inherited'
           }
         }
       ]
       settings {
+        pagination_size: 1000
         show_row_number: true
         row_limit: 5000
         aggregate_awareness {
@@ -45,7 +36,6 @@ Dashboard service_dashboard {
       }
     }
   }
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -62,6 +52,5 @@ Dashboard service_dashboard {
       mode: 'auto'
     }
   }
-
   theme: H.themes.vanilla
 }
