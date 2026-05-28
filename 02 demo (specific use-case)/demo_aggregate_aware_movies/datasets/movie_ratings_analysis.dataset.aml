@@ -23,7 +23,7 @@ PreAggregate aggr_movie_ratings_daily {
     aggregation_type: 'count'
   }
   persistence: IncrementalPersistence {
-    schema: 'persisted'
+    schema: 'persisted_movie_ratings'
     incremental_column: 'timestamp'
   }
 }
@@ -42,7 +42,7 @@ PreAggregate aggr_movie_ratings_counts_daily {
     aggregation_type: 'count distinct'
   }
   persistence: IncrementalPersistence {
-    schema: 'persisted'
+    schema: 'persisted_movie_ratings'
     incremental_column: 'timestamp'
   }
 }
@@ -77,7 +77,7 @@ Dataset movie_ratings_analysis {
         aggregation_type: 'count'
       }
       persistence: FullPersistence {
-        schema: 'persisted'
+        schema: 'persisted_movie_ratings'
       }
     }
 
