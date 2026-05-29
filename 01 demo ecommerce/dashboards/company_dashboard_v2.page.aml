@@ -253,26 +253,6 @@ Dashboard company_dashboard_v2 {
           }
         }
       }
-      y_axis {
-        settings {
-          alignment: 'right'
-          hidden: true
-        }
-        series {
-          mark_type: 'line'
-          field: VizFieldFull {
-            ref: 'total_cumulative_users'
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#00767B'
-            line_interpolation: 'smooth'
-          }
-        }
-      }
       settings {
         row_limit: 5000
         legend_label: 'hidden'
