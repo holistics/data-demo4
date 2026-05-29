@@ -1052,6 +1052,53 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_lyh4: VizBlock {
+    label: 'Total Revenue by Quarter Created At and Gender'
+    viz: ColumnChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(ecommerce_users.gender)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_total_in_tooltip: true
+          show_data_label_by: 'percentage'
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -1110,6 +1157,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_g99o {
       position: pos(20, 2380, 620, 420)
       layer: 11
+    }
+    block v_lyh4 {
+      position: pos(660, 2380, 620, 420)
+      layer: 12
     }
     mobile {
       mode: 'auto'
