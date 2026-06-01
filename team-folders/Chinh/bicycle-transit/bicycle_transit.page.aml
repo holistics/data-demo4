@@ -1,4 +1,3 @@
-@tag('Endorsed')
 Dashboard bicycle_transit_overview_dashboard {
   title: 'Overview Dashboard'
   description: 'Hero demo replicating the Tableau Overview Dashboard. Trips, fleet, revenue + MoM, by region/passholder.'
@@ -11,7 +10,6 @@ Dashboard bicycle_transit_overview_dashboard {
       value: '$H_NIL$'
     }
   }
-
   block f_city: FilterBlock {
     label: 'City'
     type: 'field'
@@ -192,7 +190,6 @@ Dashboard bicycle_transit_overview_dashboard {
       hide_label: true
     }
   }
-
   block kpi_stations: VizBlock {
     label: 'Active Stations'
     viz: MetricKpi {
@@ -213,7 +210,6 @@ Dashboard bicycle_transit_overview_dashboard {
       hide_label: true
     }
   }
-
   block kpi_bikes: VizBlock {
     label: 'Active Bikes'
     viz: MetricKpi {
@@ -234,7 +230,6 @@ Dashboard bicycle_transit_overview_dashboard {
       hide_label: true
     }
   }
-
   block kpi_revenue: VizBlock {
     label: 'Net Revenue'
     viz: MetricKpi {
@@ -422,10 +417,6 @@ Dashboard bicycle_transit_overview_dashboard {
       }
     }
   }
-
-  // ----------------------------------------------------------------------
-  // Point Map: stations with trip volume
-  // ----------------------------------------------------------------------
   block station_map: VizBlock {
     label: 'Stations Map (User Trips by location)'
     viz: PointMap {
@@ -452,10 +443,6 @@ Dashboard bicycle_transit_overview_dashboard {
       }
     }
   }
-
-  // ----------------------------------------------------------------------
-  // Layout
-  // ----------------------------------------------------------------------
   view: CanvasLayout {
     label: 'Overview'
     width: 1300
@@ -498,7 +485,6 @@ Dashboard bicycle_transit_overview_dashboard {
     block station_map {
       position: pos(860, 520, 420, 320)
     }
-
     mobile {
       mode: 'auto'
     }

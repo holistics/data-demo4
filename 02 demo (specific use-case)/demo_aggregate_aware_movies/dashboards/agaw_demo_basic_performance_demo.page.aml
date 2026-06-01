@@ -138,7 +138,7 @@ Dashboard aggregate_awareness_demo_dashboard_lite {
     viz: LineChart {
       dataset: movie_ratings_analysis
       x_axis: VizFieldFull {
-        ref: ref('public_ratings', 'timestamp')
+        ref: r(public_ratings.timestamp)
         transformation: 'datetrunc year'
         format {
           type: 'date'
@@ -150,7 +150,7 @@ Dashboard aggregate_awareness_demo_dashboard_lite {
         }
         series {
           field: VizFieldFull {
-            ref: ref('public_ratings', 'count_all_ratings')
+            ref: r(public_ratings.count_all_ratings)
             format {
               type: 'number'
               pattern: 'inherited'
@@ -159,6 +159,7 @@ Dashboard aggregate_awareness_demo_dashboard_lite {
         }
       }
       settings {
+        x_axis_show_null_datetime: true
         aggregate_awareness {
           enabled: true
           debug_comments: true
