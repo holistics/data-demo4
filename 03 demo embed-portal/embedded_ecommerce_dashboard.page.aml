@@ -897,9 +897,32 @@ ecommerce_users.sign_up_date
       input_type: 'nullable-single'
     }
   }
+  block t_ba84: TextBlock {
+    content: @md <style>
+  .btn-white {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-white:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+
+<a href="?_t=sales_metrics" class="btn-white">Sales Metrics</a>;;
+  }
   view: TabLayout {
     label: 'View 1'
-    tab view_1: CanvasLayout {
+    tab overview: CanvasLayout {
       label: 'Overview'
       width: 1440
       height: 2030
@@ -910,106 +933,110 @@ ecommerce_users.sign_up_date
         position: pos(850, 10, 280, 80)
       }
       block hr {
-        position: pos(-20, 190, 1480, 20)
+        position: pos(-20, 230, 1480, 20)
       }
       block t2 {
-        position: pos(750, 430, 650, 40)
+        position: pos(750, 470, 650, 40)
       }
       block t5 {
         position: pos(30, 10, 170, 90)
       }
       block t9 {
-        position: pos(40, 430, 650, 40)
+        position: pos(40, 470, 650, 40)
       }
       block v1 {
         position: pos(240, 20, 360, 60)
       }
       block v2 {
-        position: pos(750, 1300, 650, 240)
+        position: pos(750, 1340, 650, 240)
       }
       block v3 {
-        position: pos(40, 1300, 650, 240)
+        position: pos(40, 1340, 650, 240)
       }
       block v4 {
-        position: pos(40, 230, 240, 140)
+        position: pos(40, 270, 240, 140)
       }
       block v5 {
-        position: pos(610, 230, 240, 140)
+        position: pos(610, 270, 240, 140)
       }
       block v6 {
-        position: pos(880, 230, 240, 140)
+        position: pos(880, 270, 240, 140)
       }
       block v7 {
-        position: pos(1160, 230, 240, 140)
+        position: pos(1160, 270, 240, 140)
       }
       block v8 {
-        position: pos(40, 480, 650, 370)
+        position: pos(40, 520, 650, 370)
       }
       block t10 {
-        position: pos(300, 210, 10, 180)
+        position: pos(300, 250, 10, 180)
       }
       block t11 {
-        position: pos(580, 210, 10, 180)
+        position: pos(580, 250, 10, 180)
         layer: 1
       }
       block t12 {
-        position: pos(860, 210, 10, 180)
+        position: pos(860, 250, 10, 180)
       }
       block t13 {
-        position: pos(1140, 210, 10, 180)
+        position: pos(1140, 250, 10, 180)
       }
       block t14 {
-        position: pos(20, 410, 690, 1150)
+        position: pos(20, 450, 690, 1150)
         layer: -2
       }
       block t15 {
-        position: pos(730, 410, 690, 1150)
+        position: pos(730, 450, 690, 1150)
         layer: -2
       }
       block v11 {
-        position: pos(750, 480, 650, 370)
+        position: pos(750, 520, 650, 370)
       }
       block v12 {
-        position: pos(320, 230, 240, 140)
+        position: pos(320, 270, 240, 140)
       }
       block v13 {
-        position: pos(730, 1570, 690, 450)
+        position: pos(730, 1610, 690, 450)
       }
       block v14 {
-        position: pos(20, 1570, 690, 450)
+        position: pos(20, 1610, 690, 450)
       }
       block box1 {
-        position: pos(20, 210, 1400, 180)
+        position: pos(20, 250, 1400, 180)
         layer: -1
       }
       block divider {
         position: pos(230, 30, 10, 40)
       }
       block d1 {
-        position: pos(520, 420, 170, 100)
+        position: pos(520, 460, 170, 100)
       }
       block p1 {
-        position: pos(1190, 420, 210, 80)
+        position: pos(1190, 460, 210, 80)
       }
       block p_06vn {
         position: pos(1140, 90, 280, 80)
         layer: 2
       }
       block v_4ujx {
-        position: pos(750, 870, 650, 420)
+        position: pos(750, 910, 650, 420)
       }
       block f_country_name {
         position: pos(850, 90, 280, 80)
       }
       block v_et7r {
-        position: pos(40, 870, 650, 420)
+        position: pos(40, 910, 650, 420)
       }
       block f_merchants_name {
         position: pos(270, 90, 300, 80)
       }
+      block t_ba84 {
+        position: pos(1300, 190, 130, 40)
+        layer: 1
+      }
       default_zoom: 'fit_to_width'
     }
-    tab tab_1ds6: CanvasLayout {
+    tab sales_metrics: CanvasLayout {
       label: 'Sales Metrics'
       width: 1300
       height: 610
@@ -1096,11 +1123,11 @@ ecommerce_users.sign_up_date
       to: [
         CustomMapping {
           block: 'v8'
-          field: ref('ecommerce_users', 'sign_up_date')
+          field: r(ecommerce_users.sign_up_date)
         },
         CustomMapping {
           block: 'v11'
-          field: ref('dim_dates', 'date_key')
+          field: r(dim_dates.date_key)
         }
       ]
     },
@@ -1109,11 +1136,11 @@ ecommerce_users.sign_up_date
       to: [
         CustomMapping {
           block: 'v11'
-          field: ref('dim_dates', 'date_key')
+          field: r(dim_dates.date_key)
         },
         CustomMapping {
           block: 'v8'
-          field: ref('ecommerce_users', 'sign_up_date')
+          field: r(ecommerce_users.sign_up_date)
         }
       ]
     },
@@ -1128,7 +1155,7 @@ ecommerce_users.sign_up_date
             'v7',
             'v12'
           ]
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         }
       ]
     },
@@ -1142,7 +1169,7 @@ ecommerce_users.sign_up_date
             'v8',
             'v12'
           ]
-          field: ref('ecommerce_users', 'sign_up_date')
+          field: r(ecommerce_users.sign_up_date)
         },
         CustomMapping {
           block: [
@@ -1150,11 +1177,11 @@ ecommerce_users.sign_up_date
             'v6',
             'v7'
           ]
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         },
         CustomMapping {
           block: 'v11'
-          field: ref('dim_dates', 'date_key')
+          field: r(dim_dates.date_key)
         }
       ]
     }
