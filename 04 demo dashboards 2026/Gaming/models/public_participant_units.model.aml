@@ -2,10 +2,10 @@ Model public_participant_units {
   type: 'table'
   label: 'Participant Units'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   dimension participant_id {
     label: 'Participant Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.participant_id }};;
   }
@@ -29,7 +29,7 @@ Model public_participant_units {
   }
   dimension id {
     label: 'Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.id }};;
     primary_key: true
@@ -50,5 +50,5 @@ Model public_participant_units {
   }
 
   owner: 'hung.dd@holistics.io'
-  table_name: '"public"."participant_units"'
+  table_name: '"demo_teamfight_tactics"."participant_units"'
 }

@@ -2,7 +2,7 @@ Model dim_product_taxonomy {
   type: 'query'
   label: 'Dim Product Taxonomy'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'

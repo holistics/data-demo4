@@ -8,7 +8,7 @@ Model mou_subscription_events {
   type: 'table'
   label: 'Subscription Events'
   description: 'Event log of all MRR movements. 4 active event types: new_logo (+), expansion (+), contraction (-), churn (-). Reactivation events exist in data but are excluded from dashboard formulas. Net New MRR = sum of all mrr_delta.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   // ── Dimensions ──────────────────────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ Model mou_subscription_events {
     description: 'Dollar change in MRR. Positive for new_logo/expansion. Negative for contraction/churn. Example: +$799 (new Business), -$299 (churn Standard)'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.mrr_delta }};;
+    definition: @sql CAST({{ #SOURCE.mrr_delta }} AS NUMERIC);;
   }
   dimension previous_plan_id {
     label: 'Previous Plan'
@@ -99,10 +99,22 @@ Model mou_subscription_events {
   }
   dimension churn_reason {
     label: 'Churn Reason'
-    description: 'Why the customer churned. Only populated for churn events. Values: "too_expensive", "switched_competitor", "no_longer_needed", "poor_support", "missing_features"'
+    description: 'Why the customer churned. Only populated for churn events. Values: "too_expensive", "switched_competitor", "no_longer_needed", "poor_support", "missing_features". NOTE: synthesized deterministically from the event id for demo purposes — the demodb source table has no churn_reason column.'
     type: 'text'
     hidden: false
-    definition: @sql INITCAP(REPLACE({{ #SOURCE.churn_reason }}, '_', ' '));;
+    definition: @sql
+      CASE WHEN {{ #SOURCE.event_type }} = 'churn' THEN
+        INITCAP(REPLACE(
+          CASE (ABS(HASHTEXT({{ #SOURCE.id }})::BIGINT) % 5)
+            WHEN 0 THEN 'too_expensive'
+            WHEN 1 THEN 'switched_competitor'
+            WHEN 2 THEN 'no_longer_needed'
+            WHEN 3 THEN 'poor_support'
+            ELSE 'missing_features'
+          END
+        , '_', ' '))
+      ELSE NULL END
+    ;;
   }
 
   dimension mrr_delta_bar {
@@ -120,12 +132,12 @@ Model mou_subscription_events {
            ELSE '#CCC'
          END
       || ';height:8px;border-radius:4px;width:'
-      || CAST(LEAST(ROUND(ABS({{ #SOURCE.mrr_delta }})::numeric / 500.0 * 100), 100) AS TEXT)
+      || CAST(LEAST(ROUND(ABS({{ #SOURCE.mrr_delta }}::numeric) / 500.0 * 100), 100) AS TEXT)
       || '%"></div></div>'
       || '<span style="white-space:nowrap;font-weight:500;font-size:16px;color:#423935">'
-      || CASE WHEN {{ #SOURCE.mrr_delta }} < 0 THEN '-' ELSE '' END
+      || CASE WHEN {{ #SOURCE.mrr_delta }}::numeric < 0 THEN '-' ELSE '' END
       || '&#36;'
-      || TO_CHAR(ABS({{ #SOURCE.mrr_delta }}), 'FM999,999.00')
+      || TO_CHAR(ABS({{ #SOURCE.mrr_delta }}::numeric), 'FM999,999.00')
       || '</span></div>'
     ;;
   }
@@ -208,5 +220,5 @@ Model mou_subscription_events {
     ]
   }
   owner: 'nhi.ty+staging@holistics.io'
-  table_name: '"public"."holistics_mou_subscript_3936c_202603100503"'
+  table_name: '"demo_saas_mrr"."subscription_events"'
 }

@@ -2,10 +2,10 @@ Model public_unit_items {
   type: 'table'
   label: 'Unit Items'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   dimension unit_id {
     label: 'Unit Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.unit_id }};;
   }
@@ -17,12 +17,12 @@ Model public_unit_items {
   }
   dimension id {
     label: 'Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.id }};;
     primary_key: true
   }
 
   owner: 'hung.dd@holistics.io'
-  table_name: '"public"."unit_items"'
+  table_name: '"demo_teamfight_tactics"."unit_items"'
 }

@@ -11,7 +11,7 @@ Model mou_mrr_by_segment {
   type: 'query'
   label: 'MRR by Segment'
   description: 'Monthly MRR and customer counts broken down by plan, billing cycle, and region. Each row = one month × one segment combination. Used for stacked area charts and segment analysis.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH active_subs AS (
@@ -26,14 +26,14 @@ Model mou_mrr_by_segment {
         pt.name AS plan_name
       FROM (
         SELECT DISTINCT DATE_TRUNC('month', CAST(occurred_at AS TIMESTAMP)) AS report_month
-        FROM "public"."holistics_mou_subscript_3936c_202603100503"
+        FROM "demo_saas_mrr"."subscription_events"
       ) m
-      JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+      JOIN "demo_saas_mrr"."subscriptions" sub
         ON CAST(sub.started_at AS TIMESTAMP) < (m.report_month + INTERVAL '1 month')
-        AND (NULLIF(sub.churned_at, '') IS NULL
+        AND (sub.churned_at IS NULL
              OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
-      JOIN "public"."holistics_mou_companies_f75dd_202603100503" c ON sub.company_id = c.id
-      JOIN "public"."holistics_mou_plan_tier_13939_202603100503" pt ON sub.plan_tier_id = pt.id
+      JOIN "demo_saas_mrr"."companies" c ON sub.company_id = c.id
+      JOIN "demo_saas_mrr"."plan_tiers" pt ON sub.plan_tier_id = pt.id
     )
     SELECT
       TO_CHAR(report_month, 'YYYY-MM') AS month_label,

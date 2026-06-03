@@ -8,7 +8,7 @@ Model mou_subscriptions {
   type: 'table'
   label: 'Subscriptions'
   description: 'Each row is one subscription linking a company to a plan tier. Contains current MRR, billing cycle, and lifecycle dates. A company may have multiple subscriptions.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   // ── Dimensions ──────────────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ Model mou_subscriptions {
     description: 'Monthly Recurring Revenue for this subscription. Example: $299 (Standard monthly), $666 (Business annual). Range: $0–$2,499.'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.mrr }};;
+    definition: @sql CAST({{ #SOURCE.mrr }} AS NUMERIC);;
   }
   dimension status {
     label: 'Status'
@@ -135,5 +135,5 @@ Model mou_subscriptions {
     ]
   }
   owner: 'nhi.ty+staging@holistics.io'
-  table_name: '"public"."holistics_mou_subscript_46062_202603100504"'
+  table_name: '"demo_saas_mrr"."subscriptions"'
 }

@@ -8,13 +8,13 @@ Model mou_metric_sheet {
   type: 'query'
   label: 'Metric Reference Sheet'
   description: '17 metrics across 4 sections, unpivoted to 1 row per metric per month for PivotTable.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH
     latest AS (
       SELECT MAX(DATE_TRUNC('month', CAST(occurred_at AS TIMESTAMP)))::DATE AS max_month
-      FROM "public"."holistics_mou_subscript_3936c_202603100503"
+      FROM "demo_saas_mrr"."subscription_events"
     ),
     months AS (
       SELECT generate_series(
@@ -37,7 +37,7 @@ Model mou_metric_sheet {
         SUM(CASE WHEN e.event_type='churn' THEN CAST(e.mrr_delta AS NUMERIC) ELSE 0 END) AS churn,
         SUM(CAST(e.mrr_delta AS NUMERIC)) AS net_new,
         COUNT(CASE WHEN e.event_type='churn' THEN 1 END) AS churn_cnt
-      FROM "public"."holistics_mou_subscript_3936c_202603100503" e
+      FROM "demo_saas_mrr"."subscription_events" e
       WHERE DATE_TRUNC('month', CAST(e.occurred_at AS TIMESTAMP))::DATE IN (SELECT report_month FROM months)
       GROUP BY 1
     ),
@@ -46,9 +46,9 @@ Model mou_metric_sheet {
         SUM(CAST(sub.mrr AS NUMERIC)) AS total_mrr,
         COUNT(DISTINCT sub.company_id) AS paid_cust
       FROM month_num m
-      JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+      JOIN "demo_saas_mrr"."subscriptions" sub
         ON CAST(sub.started_at AS TIMESTAMP) < (m.report_month + INTERVAL '1 month')
-        AND (NULLIF(sub.churned_at,'') IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
+        AND (sub.churned_at IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
       GROUP BY 1
     ),
     act_prev AS (
@@ -56,9 +56,9 @@ Model mou_metric_sheet {
         SUM(CAST(sub.mrr AS NUMERIC)) AS total_mrr,
         COUNT(DISTINCT sub.company_id) AS paid_cust
       FROM month_num m
-      JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+      JOIN "demo_saas_mrr"."subscriptions" sub
         ON CAST(sub.started_at AS TIMESTAMP) < m.report_month
-        AND (NULLIF(sub.churned_at,'') IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= m.report_month)
+        AND (sub.churned_at IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= m.report_month)
       GROUP BY 1
     ),
     hv AS (
@@ -66,9 +66,9 @@ Model mou_metric_sheet {
       FROM (
         SELECT m.report_month AS rm, sub.company_id
         FROM month_num m
-        JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+        JOIN "demo_saas_mrr"."subscriptions" sub
           ON CAST(sub.started_at AS TIMESTAMP) < (m.report_month + INTERVAL '1 month')
-          AND (NULLIF(sub.churned_at,'') IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
+          AND (sub.churned_at IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
         GROUP BY m.report_month, sub.company_id
         HAVING SUM(CAST(sub.mrr AS NUMERIC)) >= 1000
       ) x
@@ -79,9 +79,9 @@ Model mou_metric_sheet {
       FROM (
         SELECT m.report_month AS rm, sub.company_id, SUM(CAST(sub.mrr AS NUMERIC)) AS co_mrr
         FROM month_num m
-        JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+        JOIN "demo_saas_mrr"."subscriptions" sub
           ON CAST(sub.started_at AS TIMESTAMP) < (m.report_month + INTERVAL '1 month')
-          AND (NULLIF(sub.churned_at,'') IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
+          AND (sub.churned_at IS NULL OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
         GROUP BY m.report_month, sub.company_id
       ) x
       GROUP BY rm

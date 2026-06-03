@@ -2,7 +2,7 @@ Dataset sales_pipeline {
   __engine__: 'aql'
   label: 'sales_pipeline',
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   models: [
     dim_product_taxonomy,
     fct_satisfaction_scores,

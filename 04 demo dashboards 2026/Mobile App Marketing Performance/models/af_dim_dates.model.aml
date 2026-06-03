@@ -2,12 +2,12 @@ Model af_dim_dates {
   type: 'table'
   label: 'Dim Dates'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension date_key {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
     primary_key: true
   }
   dimension date {
@@ -62,9 +62,9 @@ Model af_dim_dates {
     label: 'Is Weekend'
     type: 'truefalse'
     hidden: false
-    definition: @sql {{ #SOURCE.is_weekend }};;
+    definition: @sql nullif({{ #SOURCE.is_weekend }}, '')::boolean;;
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."dim_dates"'
+  table_name: '"demo_mobile_marketing"."dim_dates"'
 }
