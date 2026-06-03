@@ -11,12 +11,12 @@ Model mou_customer_concentration {
   type: 'query'
   label: 'Customer Concentration'
   description: 'Top 15 customers ranked by MRR with their % of total. Used to assess revenue concentration risk. A healthy SaaS has no single customer >5% of total MRR.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH latest_month AS (
       SELECT MAX(DATE_TRUNC('month', CAST(occurred_at AS TIMESTAMP))) AS report_month
-      FROM "public"."holistics_mou_subscript_3936c_202603100503"
+      FROM "demo_saas_mrr"."subscription_events"
     ),
     active_subs AS (
       SELECT
@@ -27,12 +27,12 @@ Model mou_customer_concentration {
         SUM(CAST(sub.mrr AS NUMERIC)) AS mrr,
         COUNT(*) AS sub_count,
         MIN(CAST(sub.started_at AS TIMESTAMP)) AS earliest_start
-      FROM "public"."holistics_mou_subscript_46062_202603100504" sub
-      JOIN "public"."holistics_mou_companies_f75dd_202603100503" c ON sub.company_id = c.id
-      JOIN "public"."holistics_mou_plan_tier_13939_202603100503" pt ON sub.plan_tier_id = pt.id
+      FROM "demo_saas_mrr"."subscriptions" sub
+      JOIN "demo_saas_mrr"."companies" c ON sub.company_id = c.id
+      JOIN "demo_saas_mrr"."plan_tiers" pt ON sub.plan_tier_id = pt.id
       CROSS JOIN latest_month lm
       WHERE CAST(sub.started_at AS TIMESTAMP) < (lm.report_month + INTERVAL '1 month')
-        AND (NULLIF(sub.churned_at, '') IS NULL
+        AND (sub.churned_at IS NULL
              OR CAST(sub.churned_at AS TIMESTAMP) >= (lm.report_month + INTERVAL '1 month'))
       GROUP BY sub.company_id, c.name, pt.name, c.region
     ),

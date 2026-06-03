@@ -8,7 +8,7 @@ Model mou_plan_tiers {
   type: 'table'
   label: 'Plan Tiers'
   description: 'Lookup table of Mouka subscription plans. 4 tiers from Trial (free) to Enterprise ($2,499/mo). Annual billing applies a 10/12 discount (2 months free).'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   // ── Dimensions ──────────────────────────────────────────────────────────────
 
@@ -46,14 +46,14 @@ Model mou_plan_tiers {
     description: 'List price per month when billed monthly. Example: Trial=$0, Standard=$299, Business=$799, Enterprise=$2,499'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.monthly_price }};;
+    definition: @sql CAST({{ #SOURCE.monthly_price }} AS NUMERIC);;
   }
   dimension annual_price {
     label: 'Annual Price ($/mo)'
     description: 'Effective monthly price when billed annually (= monthly_price × 10/12). Example: Standard=$249, Business=$666, Enterprise=$2,083'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.annual_price }};;
+    definition: @sql CAST({{ #SOURCE.annual_price }} AS NUMERIC);;
   }
 
   import_source: ImportSource {
@@ -69,5 +69,5 @@ Model mou_plan_tiers {
     ]
   }
   owner: 'nhi.ty+staging@holistics.io'
-  table_name: '"public"."holistics_mou_plan_tier_13939_202603100503"'
+  table_name: '"demo_saas_mrr"."plan_tiers"'
 }
