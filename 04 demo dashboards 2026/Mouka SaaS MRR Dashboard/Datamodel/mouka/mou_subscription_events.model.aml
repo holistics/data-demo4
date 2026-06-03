@@ -99,10 +99,22 @@ Model mou_subscription_events {
   }
   dimension churn_reason {
     label: 'Churn Reason'
-    description: 'Why the customer churned. Only populated for churn events. Values: "too_expensive", "switched_competitor", "no_longer_needed", "poor_support", "missing_features"'
+    description: 'Why the customer churned. Only populated for churn events. Values: "too_expensive", "switched_competitor", "no_longer_needed", "poor_support", "missing_features". NOTE: synthesized deterministically from the event id for demo purposes — the demodb source table has no churn_reason column.'
     type: 'text'
     hidden: false
-    definition: @sql INITCAP(REPLACE({{ #SOURCE.churn_reason }}, '_', ' '));;
+    definition: @sql
+      CASE WHEN {{ #SOURCE.event_type }} = 'churn' THEN
+        INITCAP(REPLACE(
+          CASE (ABS(HASHTEXT({{ #SOURCE.id }})::BIGINT) % 5)
+            WHEN 0 THEN 'too_expensive'
+            WHEN 1 THEN 'switched_competitor'
+            WHEN 2 THEN 'no_longer_needed'
+            WHEN 3 THEN 'poor_support'
+            ELSE 'missing_features'
+          END
+        , '_', ' '))
+      ELSE NULL END
+    ;;
   }
 
   dimension mrr_delta_bar {
