@@ -14,7 +14,7 @@ Model af_fact_revenue {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
   }
   dimension app_key {
     label: 'App Key'
@@ -44,7 +44,7 @@ Model af_fact_revenue {
     label: 'Amount'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.amount }};;
+    definition: @sql nullif({{ #SOURCE.amount }}, '')::numeric;;
   }
   dimension currency {
     label: 'Currency'

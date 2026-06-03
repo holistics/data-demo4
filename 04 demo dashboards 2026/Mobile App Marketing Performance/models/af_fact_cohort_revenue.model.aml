@@ -7,7 +7,7 @@ Model af_fact_cohort_revenue {
     label: 'Install Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.install_date_key }};;
+    definition: @sql nullif({{ #SOURCE.install_date_key }}, '')::bigint;;
   }
   dimension app_key {
     label: 'App Key'
@@ -44,7 +44,7 @@ Model af_fact_cohort_revenue {
     label: 'Cumulative Revenue'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.cumulative_revenue }};;
+    definition: @sql nullif({{ #SOURCE.cumulative_revenue }}, '')::numeric;;
   }
   dimension retained_users {
     label: 'Retained Users'

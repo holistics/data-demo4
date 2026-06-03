@@ -7,7 +7,7 @@ Model af_dim_dates {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
     primary_key: true
   }
   dimension date {
@@ -62,7 +62,7 @@ Model af_dim_dates {
     label: 'Is Weekend'
     type: 'truefalse'
     hidden: false
-    definition: @sql {{ #SOURCE.is_weekend }};;
+    definition: @sql nullif({{ #SOURCE.is_weekend }}, '')::boolean;;
   }
 
   owner: 'tri.dvm@holistics.io'
