@@ -2,7 +2,7 @@ Model table_use_cases {
   type: 'table'
   label: 'Use Cases'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -30,5 +30,5 @@ Model table_use_cases {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."use_cases"'
+  table_name: '"demo_sales_pipeline"."use_cases"'
 }

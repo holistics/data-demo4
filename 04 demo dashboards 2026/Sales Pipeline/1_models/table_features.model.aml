@@ -2,7 +2,7 @@ Model table_features {
   type: 'table'
   label: 'Features'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -42,5 +42,5 @@ Model table_features {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."features"'
+  table_name: '"demo_sales_pipeline"."features"'
 }

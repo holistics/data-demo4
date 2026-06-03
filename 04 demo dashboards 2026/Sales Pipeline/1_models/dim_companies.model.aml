@@ -2,7 +2,7 @@ Model dim_companies {
   type: 'table'
   label: 'Companies'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -111,5 +111,5 @@ Model dim_companies {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."companies"'
+  table_name: '"demo_sales_pipeline"."companies"'
 }

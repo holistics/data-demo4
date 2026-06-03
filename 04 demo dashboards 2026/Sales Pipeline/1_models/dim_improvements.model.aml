@@ -2,7 +2,7 @@ Model dim_improvements {
   type: 'table'
   label: 'Improvements'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -66,5 +66,5 @@ Model dim_improvements {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."improvements"'
+  table_name: '"demo_sales_pipeline"."improvements"'
 }

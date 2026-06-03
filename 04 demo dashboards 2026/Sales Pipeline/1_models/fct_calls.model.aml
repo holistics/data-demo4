@@ -2,7 +2,7 @@ Model fct_calls {
   type: 'table'
   label: 'Calls'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -72,5 +72,5 @@ Model fct_calls {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."calls"'
+  table_name: '"demo_sales_pipeline"."calls"'
 }

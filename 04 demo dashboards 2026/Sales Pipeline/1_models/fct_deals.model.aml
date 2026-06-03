@@ -2,7 +2,7 @@ Model fct_deals {
   type: 'table'
   label: 'Deals'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -107,5 +107,5 @@ Model fct_deals {
       EXTRACT(EPOCH FROM ({{ #SOURCE.closed_at }} - {{ #SOURCE.created_at }})) / 86400;;
   }
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."deals"'
+  table_name: '"demo_sales_pipeline"."deals"'
 }

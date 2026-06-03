@@ -2,7 +2,7 @@ Model table_persons {
   type: 'table'
   label: 'Persons'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -48,5 +48,5 @@ Model table_persons {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."persons"'
+  table_name: '"demo_sales_pipeline"."persons"'
 }
