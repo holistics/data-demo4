@@ -2,7 +2,7 @@ Model public_ddragon_champions {
   type: 'table'
   label: 'Ddragon Champions'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   dimension character_id {
     label: 'Character Id'
     type: 'text'
@@ -37,5 +37,5 @@ Model public_ddragon_champions {
     primary_key: false
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"public"."ddragon_champions"'
+  table_name: '"demo_teamfight_tactics"."ddragon_champions"'
 }
