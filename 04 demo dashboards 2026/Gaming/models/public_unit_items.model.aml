@@ -5,7 +5,7 @@ Model public_unit_items {
   data_source_name: 'demodb'
   dimension unit_id {
     label: 'Unit Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.unit_id }};;
   }
@@ -17,7 +17,7 @@ Model public_unit_items {
   }
   dimension id {
     label: 'Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.id }};;
     primary_key: true

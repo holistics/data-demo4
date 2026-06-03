@@ -5,7 +5,7 @@ Model public_participant_units {
   data_source_name: 'demodb'
   dimension participant_id {
     label: 'Participant Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.participant_id }};;
   }
@@ -29,7 +29,7 @@ Model public_participant_units {
   }
   dimension id {
     label: 'Id'
-    type: 'number'
+    type: 'text'
     hidden: false
     definition: @sql {{ #SOURCE.id }};;
     primary_key: true
