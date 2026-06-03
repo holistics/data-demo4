@@ -45,7 +45,7 @@ Model af_dim_campaigns {
     label: 'Budget'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.budget }};;
+    definition: @sql nullif({{ #SOURCE.budget }}, '')::numeric;;
   }
   dimension start_date {
     label: 'Start Date'

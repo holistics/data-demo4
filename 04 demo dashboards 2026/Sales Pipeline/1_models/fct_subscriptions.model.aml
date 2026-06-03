@@ -32,7 +32,7 @@ Model fct_subscriptions {
     label: 'Mrr Usd'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.mrr_usd }};;
+    definition: @sql nullif({{ #SOURCE.mrr_usd }}, '')::numeric;;
   }
   dimension billing_cycle {
     label: 'Billing Cycle'

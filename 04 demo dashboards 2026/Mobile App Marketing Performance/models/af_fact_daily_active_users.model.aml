@@ -7,7 +7,7 @@ Model af_fact_daily_active_users {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
   }
   dimension app_key {
     label: 'App Key'

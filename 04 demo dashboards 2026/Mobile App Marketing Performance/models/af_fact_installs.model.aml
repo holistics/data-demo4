@@ -14,7 +14,7 @@ Model af_fact_installs {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
   }
   dimension app_key {
     label: 'App Key'
@@ -50,7 +50,7 @@ Model af_fact_installs {
     label: 'Is Organic'
     type: 'truefalse'
     hidden: false
-    definition: @sql {{ #SOURCE.is_organic }};;
+    definition: @sql nullif({{ #SOURCE.is_organic }}, '')::boolean;;
   }
 
   owner: 'tri.dvm@holistics.io'

@@ -20,7 +20,7 @@ Model fct_satisfaction_scores {
     label: 'Score'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.score }};;
+    definition: @sql nullif({{ #SOURCE.score }}, '')::numeric;;
   }
   dimension recorded_at {
     label: 'Recorded At'

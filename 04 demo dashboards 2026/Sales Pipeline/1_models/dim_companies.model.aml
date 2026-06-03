@@ -59,7 +59,7 @@ Model dim_companies {
     label: 'Created At'
     type: 'datetime'
     hidden: false
-    definition: @sql {{ #SOURCE.created_at }};;
+    definition: @sql nullif({{ #SOURCE.created_at }}, '')::timestamp;;
   }
 
   dimension company_size {
