@@ -2,7 +2,7 @@ Dataset heosaomai_tft {
   __engine__: 'aql'
   label: 'Heo Sao Mai TFT'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   models: [
     public_match_participants,
     public_participant_units,

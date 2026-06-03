@@ -2,7 +2,7 @@ Model public_league_entries {
   type: 'table'
   label: 'League Entries'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   dimension puuid {
     label: 'Puuid'
     type: 'text'
@@ -66,5 +66,5 @@ Model public_league_entries {
   }
 
   owner: 'hung.dd@holistics.io'
-  table_name: '"public"."league_entries"'
+  table_name: '"demo_teamfight_tactics"."league_entries"'
 }

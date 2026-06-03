@@ -2,7 +2,7 @@ Model public_ddragon_traits {
   type: 'table'
   label: 'Ddragon Traits'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   dimension trait_id {
     label: 'Trait Id'
     type: 'text'
@@ -32,5 +32,5 @@ Model public_ddragon_traits {
   }
 
   owner: 'hung.dd@holistics.io'
-  table_name: '"public"."ddragon_traits"'
+  table_name: '"demo_teamfight_tactics"."ddragon_traits"'
 }
