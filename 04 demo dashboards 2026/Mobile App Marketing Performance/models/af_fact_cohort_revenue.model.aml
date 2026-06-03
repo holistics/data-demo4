@@ -2,7 +2,7 @@ Model af_fact_cohort_revenue {
   type: 'table'
   label: 'Fact Cohort Revenue'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension install_date_key {
     label: 'Install Date Key'
     type: 'number'
@@ -54,5 +54,5 @@ Model af_fact_cohort_revenue {
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."fact_cohort_revenue"'
+  table_name: '"demo_mobile_marketing"."fact_cohort_revenue"'
 }

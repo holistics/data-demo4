@@ -2,7 +2,7 @@ Model af_dim_apps {
   type: 'table'
   label: 'Dim Apps'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension app_key {
     label: 'App Key'
     type: 'number'
@@ -43,5 +43,5 @@ Model af_dim_apps {
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."dim_apps"'
+  table_name: '"demo_mobile_marketing"."dim_apps"'
 }
