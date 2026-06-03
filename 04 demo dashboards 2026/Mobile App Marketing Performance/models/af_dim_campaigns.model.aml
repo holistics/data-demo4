@@ -2,7 +2,7 @@ Model af_dim_campaigns {
   type: 'table'
   label: 'Dim Campaigns'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension campaign_key {
     label: 'Campaign Key'
     type: 'number'
@@ -45,7 +45,7 @@ Model af_dim_campaigns {
     label: 'Budget'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.budget }};;
+    definition: @sql nullif({{ #SOURCE.budget }}, '')::numeric;;
   }
   dimension start_date {
     label: 'Start Date'
@@ -73,5 +73,5 @@ Model af_dim_campaigns {
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."dim_campaigns"'
+  table_name: '"demo_mobile_marketing"."dim_campaigns"'
 }

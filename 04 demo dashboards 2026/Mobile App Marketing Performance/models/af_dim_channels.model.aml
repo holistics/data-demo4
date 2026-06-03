@@ -2,7 +2,7 @@ Model af_dim_channels {
   type: 'table'
   label: 'Dim Channels'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension channel_key {
     label: 'Channel Key'
     type: 'number'
@@ -25,5 +25,5 @@ Model af_dim_channels {
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."dim_channels"'
+  table_name: '"demo_mobile_marketing"."dim_channels"'
 }

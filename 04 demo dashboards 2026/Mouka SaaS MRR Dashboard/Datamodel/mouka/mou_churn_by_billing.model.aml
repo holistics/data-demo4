@@ -11,14 +11,14 @@ Model mou_churn_by_billing {
   type: 'query'
   label: 'Churn by Billing Cycle'
   description: 'Monthly time series of gross MRR churn rate split by billing cycle (monthly vs annual). Formula: Churned MRR by billing type / Previous month total MRR × 100.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH monthly_billing AS (
       SELECT
         DATE_TRUNC('month', CAST(e.occurred_at AS TIMESTAMP)) AS report_month,
         SUM(ABS(CAST(e.mrr_delta AS NUMERIC))) AS churned_mrr
-      FROM "public"."holistics_mou_subscript_3936c_202603100503" e
+      FROM "demo_saas_mrr"."subscription_events" e
       WHERE e.event_type = 'churn'
         AND e.previous_billing_cycle = 'monthly'
       GROUP BY 1
@@ -27,7 +27,7 @@ Model mou_churn_by_billing {
       SELECT
         DATE_TRUNC('month', CAST(e.occurred_at AS TIMESTAMP)) AS report_month,
         SUM(ABS(CAST(e.mrr_delta AS NUMERIC))) AS churned_mrr
-      FROM "public"."holistics_mou_subscript_3936c_202603100503" e
+      FROM "demo_saas_mrr"."subscription_events" e
       WHERE e.event_type = 'churn'
         AND e.previous_billing_cycle = 'annual'
       GROUP BY 1
@@ -38,11 +38,11 @@ Model mou_churn_by_billing {
         SUM(CAST(sub.mrr AS NUMERIC)) AS total_mrr
       FROM (
         SELECT DISTINCT DATE_TRUNC('month', CAST(occurred_at AS TIMESTAMP)) AS report_month
-        FROM "public"."holistics_mou_subscript_3936c_202603100503"
+        FROM "demo_saas_mrr"."subscription_events"
       ) m
-      JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+      JOIN "demo_saas_mrr"."subscriptions" sub
         ON CAST(sub.started_at AS TIMESTAMP) < (m.report_month + INTERVAL '1 month')
-        AND (NULLIF(sub.churned_at, '') IS NULL
+        AND (sub.churned_at IS NULL
              OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
       GROUP BY 1
     ),

@@ -2,12 +2,12 @@ Model af_fact_daily_active_users {
   type: 'table'
   label: 'Fact Daily Active Users'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension date_key {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
   }
   dimension app_key {
     label: 'App Key'
@@ -36,5 +36,5 @@ Model af_fact_daily_active_users {
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."fact_daily_active_users"'
+  table_name: '"demo_mobile_marketing"."fact_daily_active_users"'
 }

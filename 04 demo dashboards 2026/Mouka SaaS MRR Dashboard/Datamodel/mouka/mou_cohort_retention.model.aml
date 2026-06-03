@@ -11,7 +11,7 @@ Model mou_cohort_retention {
   type: 'query'
   label: 'Cohort MRR Retention'
   description: 'Cohort retention matrix. Each row is a signup month cohort, each column is months since first subscription. Value = Cohort MRR at month N / Cohort MRR at month 0 (decimal 0-1, formatted as %).'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     -- Step 1: Identify each company's cohort month (first new_logo event)
@@ -19,7 +19,7 @@ Model mou_cohort_retention {
       SELECT
         company_id,
         DATE_TRUNC('month', MIN(CAST(occurred_at AS TIMESTAMP))) AS cohort_month
-      FROM "public"."holistics_mou_subscript_3936c_202603100503"
+      FROM "demo_saas_mrr"."subscription_events"
       WHERE event_type = 'new_logo'
       GROUP BY company_id
     ),
@@ -29,7 +29,7 @@ Model mou_cohort_retention {
         e.company_id,
         DATE_TRUNC('month', CAST(e.occurred_at AS TIMESTAMP)) AS event_month,
         SUM(CAST(e.mrr_delta AS NUMERIC)) AS mrr_delta
-      FROM "public"."holistics_mou_subscript_3936c_202603100503" e
+      FROM "demo_saas_mrr"."subscription_events" e
       GROUP BY 1, 2
     ),
     -- Step 3: Generate a month series for each company (cohort_month to cohort_month + 13 months)

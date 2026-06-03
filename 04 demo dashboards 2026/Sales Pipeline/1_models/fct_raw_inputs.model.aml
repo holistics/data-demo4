@@ -2,7 +2,7 @@ Model fct_raw_inputs {
   type: 'table'
   label: 'Raw Inputs'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -74,7 +74,7 @@ Model fct_raw_inputs {
     label: 'Resolved At'
     type: 'datetime'
     hidden: false
-    definition: @sql {{ #SOURCE.resolved_at }};;
+    definition: @sql nullif({{ #SOURCE.resolved_at }}, '')::timestamp;;
   }
   dimension created_at {
     label: 'Created At'
@@ -86,9 +86,9 @@ Model fct_raw_inputs {
     label: 'Is Blocking'
     type: 'truefalse'
     hidden: false
-    definition: @sql {{ #SOURCE.is_blocking }};;
+    definition: @sql nullif({{ #SOURCE.is_blocking }}, '')::boolean;;
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."raw_inputs"'
+  table_name: '"demo_sales_pipeline"."raw_inputs"'
 }

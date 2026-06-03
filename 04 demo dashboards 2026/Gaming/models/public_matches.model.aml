@@ -2,7 +2,7 @@ Model public_matches {
   type: 'table'
   label: 'Matches'
   description: ''
-  data_source_name: 'heo_sao_mai_tft'
+  data_source_name: 'demodb'
   dimension match_id {
     label: 'Match Id'
     type: 'text'
@@ -20,19 +20,19 @@ Model public_matches {
     label: 'Game Datetime'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.game_datetime }};;
+    definition: @sql nullif({{ #SOURCE.game_datetime }}, '')::bigint;;
   }
   dimension game_length {
     label: 'Game Length'
     type: 'number'
     hidden: true
-    definition: @sql {{ #SOURCE.game_length }};;
+    definition: @sql nullif({{ #SOURCE.game_length }}, '')::numeric;;
   }
   dimension queue_id {
     label: 'Queue Id'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.queue_id }};;
+    definition: @sql nullif({{ #SOURCE.queue_id }}, '')::integer;;
   }
   dimension tft_game_type {
     label: 'Tft Game Type'
@@ -44,7 +44,7 @@ Model public_matches {
     label: 'Tft Set Number'
     type: 'number'
     hidden: true
-    definition: @sql {{ #SOURCE.tft_set_number }};;
+    definition: @sql nullif({{ #SOURCE.tft_set_number }}, '')::integer;;
   }
   dimension region {
     label: 'Region'
@@ -97,5 +97,5 @@ Model public_matches {
     definition: @aql count(public_matches.match_id) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"public"."matches"'
+  table_name: '"demo_teamfight_tactics"."matches"'
 }

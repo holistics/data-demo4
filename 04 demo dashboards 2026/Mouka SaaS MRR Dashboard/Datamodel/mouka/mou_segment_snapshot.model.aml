@@ -11,12 +11,12 @@ Model mou_segment_snapshot {
   type: 'query'
   label: 'Segment Snapshot'
   description: 'Latest-month MRR broken down by 4 dimensions (plan, region, billing cycle, industry). Each row shows MRR, customer count, ARPA, and % of total for one segment category.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH latest_month AS (
       SELECT MAX(DATE_TRUNC('month', CAST(occurred_at AS TIMESTAMP))) AS report_month
-      FROM "public"."holistics_mou_subscript_3936c_202603100503"
+      FROM "demo_saas_mrr"."subscription_events"
     ),
     active_subs AS (
       SELECT
@@ -26,12 +26,12 @@ Model mou_segment_snapshot {
         sub.billing_cycle,
         c.region,
         c.industry
-      FROM "public"."holistics_mou_subscript_46062_202603100504" sub
-      JOIN "public"."holistics_mou_companies_f75dd_202603100503" c ON sub.company_id = c.id
-      JOIN "public"."holistics_mou_plan_tier_13939_202603100503" pt ON sub.plan_tier_id = pt.id
+      FROM "demo_saas_mrr"."subscriptions" sub
+      JOIN "demo_saas_mrr"."companies" c ON sub.company_id = c.id
+      JOIN "demo_saas_mrr"."plan_tiers" pt ON sub.plan_tier_id = pt.id
       CROSS JOIN latest_month lm
       WHERE CAST(sub.started_at AS TIMESTAMP) < (lm.report_month + INTERVAL '1 month')
-        AND (NULLIF(sub.churned_at, '') IS NULL
+        AND (sub.churned_at IS NULL
              OR CAST(sub.churned_at AS TIMESTAMP) >= (lm.report_month + INTERVAL '1 month'))
     ),
     total AS (SELECT SUM(mrr) AS total_mrr FROM active_subs)

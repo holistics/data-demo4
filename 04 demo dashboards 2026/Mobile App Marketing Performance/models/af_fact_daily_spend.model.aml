@@ -2,12 +2,12 @@ Model af_fact_daily_spend {
   type: 'table'
   label: 'Fact Daily Spend'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension date_key {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
   }
   dimension campaign_key {
     label: 'Campaign Key'
@@ -50,7 +50,7 @@ Model af_fact_daily_spend {
     label: 'Spend Amount'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.spend_amount }};;
+    definition: @sql nullif({{ #SOURCE.spend_amount }}, '')::numeric;;
   }
   dimension re_attributions {
     label: 'Re Attributions'
@@ -72,5 +72,5 @@ Model af_fact_daily_spend {
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."fact_daily_spend"'
+  table_name: '"demo_mobile_marketing"."fact_daily_spend"'
 }

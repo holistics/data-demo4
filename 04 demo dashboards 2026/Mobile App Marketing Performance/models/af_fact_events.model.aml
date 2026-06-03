@@ -2,12 +2,12 @@ Model af_fact_events {
   type: 'table'
   label: 'Fact Events'
   description: ''
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
   dimension date_key {
     label: 'Date Key'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.date_key }};;
+    definition: @sql nullif({{ #SOURCE.date_key }}, '')::bigint;;
   }
   dimension app_key {
     label: 'App Key'
@@ -50,9 +50,9 @@ Model af_fact_events {
     label: 'Event Revenue'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.event_revenue }};;
+    definition: @sql nullif({{ #SOURCE.event_revenue }}, '')::numeric;;
   }
 
   owner: 'tri.dvm@holistics.io'
-  table_name: '"public"."fact_events"'
+  table_name: '"demo_mobile_marketing"."fact_events"'
 }

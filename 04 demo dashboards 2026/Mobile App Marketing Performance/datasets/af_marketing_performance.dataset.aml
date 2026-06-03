@@ -6,7 +6,7 @@
 Dataset af_marketing_performance {
   label: 'Marketing Performance'
   description: 'Mobile app publisher analytics — galaxy schema with 6 dimensions and 6 fact tables'
-  data_source_name: 'tri_test_app_marketing_db'
+  data_source_name: 'demodb'
 
   models: [
     // Dimensions
