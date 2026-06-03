@@ -16,7 +16,7 @@ Dataset mouka_mrr {
   __engine__: 'aql'
   label: 'Mouka SaaS MRR'
   description: 'Complete SaaS MRR analytics dataset. Connects subscription data with customer segments, revenue movements, and churn analysis. Powers all 4 dashboard tabs.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
   models: [
     mou_subscription_events,
     mou_companies,

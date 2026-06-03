@@ -14,7 +14,7 @@ Model mou_metric_tree {
   type: 'query'
   label: 'Metric Tree'
   description: 'Single-row model with current, MoM%, and YoY% for key SaaS metrics. Powers the Metric Tree visualization in Tab 6.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH monthly_events AS (
@@ -25,7 +25,7 @@ Model mou_metric_tree {
         SUM(CASE WHEN event_type = 'expansion' THEN CAST(mrr_delta AS NUMERIC) ELSE 0 END) AS expansion_mrr,
         SUM(CASE WHEN event_type = 'contraction' THEN CAST(mrr_delta AS NUMERIC) ELSE 0 END) AS contraction_mrr,
         SUM(CASE WHEN event_type = 'churn' THEN CAST(mrr_delta AS NUMERIC) ELSE 0 END) AS churn_mrr
-      FROM "public"."holistics_mou_subscript_3936c_202603100503"
+      FROM "demo_saas_mrr"."subscription_events"
       GROUP BY 1
     ),
     monthly_active AS (
@@ -40,11 +40,11 @@ Model mou_metric_tree {
           SUM(CAST(sub.mrr AS NUMERIC)) AS company_mrr
         FROM (
           SELECT DISTINCT DATE_TRUNC('month', CAST(occurred_at AS TIMESTAMP)) AS report_month
-          FROM "public"."holistics_mou_subscript_3936c_202603100503"
+          FROM "demo_saas_mrr"."subscription_events"
         ) m
-        JOIN "public"."holistics_mou_subscript_46062_202603100504" sub
+        JOIN "demo_saas_mrr"."subscriptions" sub
           ON CAST(sub.started_at AS TIMESTAMP) < (m.report_month + INTERVAL '1 month')
-          AND (NULLIF(sub.churned_at, '') IS NULL
+          AND (sub.churned_at IS NULL
                OR CAST(sub.churned_at AS TIMESTAMP) >= (m.report_month + INTERVAL '1 month'))
         GROUP BY 1, 2
       ) company_level

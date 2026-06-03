@@ -8,14 +8,14 @@ Model mou_churn_reason {
   type: 'query'
   label: 'Churn Reason Breakdown'
   description: 'Aggregates churned MRR by reason. Each row = one churn reason with its total churned MRR and % of all churn. Helps prioritize retention efforts.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH churn_events AS (
       SELECT
         churn_reason,
-        ABS(mrr_delta) AS churned_mrr
-      FROM "public"."holistics_mou_subscript_3936c_202603100503"
+        ABS(CAST(mrr_delta AS NUMERIC)) AS churned_mrr
+      FROM "demo_saas_mrr"."subscription_events"
       WHERE event_type = 'churn'
         AND churn_reason IS NOT NULL
         AND churn_reason != ''

@@ -8,17 +8,17 @@ Model mou_mrr_by_industry {
   type: 'query'
   label: 'MRR by Industry'
   description: 'Active MRR grouped into top 4 industries + Others. Powers the donut chart in Tab 4.'
-  data_source_name: 'saas_mrr'
+  data_source_name: 'demodb'
 
   query: @sql
     WITH active_subs AS (
       SELECT
         c.industry,
         CAST(sub.mrr AS NUMERIC) AS mrr
-      FROM "public"."holistics_mou_subscript_46062_202603100504" sub
-      JOIN "public"."holistics_mou_companies_f75dd_202603100503" c
+      FROM "demo_saas_mrr"."subscriptions" sub
+      JOIN "demo_saas_mrr"."companies" c
         ON sub.company_id = c.id
-      WHERE NULLIF(sub.churned_at, '') IS NULL
+      WHERE sub.churned_at IS NULL
          OR CAST(sub.churned_at AS TIMESTAMP) >= DATE_TRUNC('month', NOW())
     ),
     ranked AS (
