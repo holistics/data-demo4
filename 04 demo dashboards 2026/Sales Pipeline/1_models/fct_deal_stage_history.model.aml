@@ -2,7 +2,7 @@ Model fct_deal_stage_history {
   type: 'table'
   label: 'Deal Stage History'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -36,5 +36,5 @@ Model fct_deal_stage_history {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."deal_stage_history"'
+  table_name: '"demo_sales_pipeline"."deal_stage_history"'
 }

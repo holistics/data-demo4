@@ -2,7 +2,7 @@ Model fct_call_attendees {
   type: 'table'
   label: 'Call Attendees'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension call_id {
     label: 'Call Id'
     type: 'text'
@@ -23,5 +23,5 @@ Model fct_call_attendees {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."call_attendees"'
+  table_name: '"demo_sales_pipeline"."call_attendees"'
 }

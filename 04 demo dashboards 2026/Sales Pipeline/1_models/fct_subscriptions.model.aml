@@ -2,7 +2,7 @@ Model fct_subscriptions {
   type: 'table'
   label: 'Subscriptions'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -78,5 +78,5 @@ Model fct_subscriptions {
   }
   
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."subscriptions"'
+  table_name: '"demo_sales_pipeline"."subscriptions"'
 }

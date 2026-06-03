@@ -2,7 +2,7 @@ Model dim_contacts {
   type: 'query'
   label: 'Dim Contacts'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'

@@ -2,7 +2,7 @@ Model fct_satisfaction_scores {
   type: 'table'
   label: 'Satisfaction Scores'
   description: ''
-  data_source_name: 'amyra_holistics'
+  data_source_name: 'demodb'
   dimension id {
     label: 'Id'
     type: 'text'
@@ -30,5 +30,5 @@ Model fct_satisfaction_scores {
   }
 
   owner: 'hien.nt@holistics.io'
-  table_name: '"public"."satisfaction_scores"'
+  table_name: '"demo_sales_pipeline"."satisfaction_scores"'
 }
