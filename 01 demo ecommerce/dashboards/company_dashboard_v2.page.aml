@@ -2696,7 +2696,7 @@ background: #EFF6FF;
         layer: 5
       }
       block t_f8rx {
-        position: pos(40, 270, 350, 50)
+        position: pos(40, 240, 350, 50)
         layer: 27
       }
       block t_vuka {
