@@ -1,4 +1,3 @@
-@tag('Endorsed')
 Dashboard pawductive_customer_support {
   title: 'Customer support & CSAT [Pawductive]'
   description: 'Customer support dashboard for tracking support ticket metrics & CSAT data'
