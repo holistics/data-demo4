@@ -1028,7 +1028,7 @@ ecommerce_users.sign_up_date
         position: pos(40, 910, 650, 420)
       }
       block f_merchants_name {
-        position: pos(270, 90, 300, 80)
+        position: pos(-350, 90, 300, 80)
       }
       block t_ba84 {
         position: pos(1300, 190, 130, 40)
