@@ -1,0 +1,352 @@
+@tag('Draft (WIP)')
+Dataset Claude_dataset {
+  label: 'Claude Dataset'
+  description: 'Ecommerce dataset containing the core table models (users, orders, order items, products, merchants, cities, countries) plus categories and employees, with logical relationships, business metrics, and analytical dimensions (cohort, RFM, customer type, bands) powering the Claude Dashboard.'
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_users,
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+    ecommerce_merchants,
+    ecommerce_cities,
+    ecommerce_countries,
+    map_categories,
+    ecommerce_employees,
+    claude_granularity,
+  ]
+
+  relationships: [
+    // Order line items roll up to orders and products
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+
+    // Orders belong to a user
+    relationship(ecommerce_orders.user_id > ecommerce_users.id, true),
+
+    // Products are sold by a merchant and belong to a category
+    relationship(ecommerce_products.merchant_id > ecommerce_merchants.id, true),
+    relationship(ecommerce_products.category_id > map_categories.category_id, true),
+
+    // Users and merchants are located in a city
+    relationship(ecommerce_users.city_id > ecommerce_cities.id, true),
+    relationship(ecommerce_merchants.city_id > ecommerce_cities.id, false), // optional: not all analyses need merchant location
+
+    // Cities belong to a country
+    relationship(ecommerce_cities.country_code > ecommerce_countries.code, true),
+
+    // Employees work for a merchant (team size)
+    relationship(ecommerce_employees.merchant_id > ecommerce_merchants.id, true),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PER-USER BEHAVIOR DIMENSIONS (orders, RFM, cohort)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  dimension total_orders_all_time {
+    model: ecommerce_users
+    label: 'Total Orders (All Time)'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | dimensionalize(ecommerce_users.id) ;;
+    description: "Lifetime number of orders placed by each user (RFM Frequency)."
+  }
+
+  dimension is_buyer {
+    model: ecommerce_users
+    label: 'Is Buyer'
+    type: 'truefalse'
+    definition: @aql ecommerce_users.total_orders_all_time > 0 ;;
+    description: "True if the user has placed at least one order."
+  }
+
+  dimension is_repeated_buyer {
+    model: ecommerce_users
+    label: 'Is Repeated Buyer'
+    type: 'truefalse'
+    definition: @aql ecommerce_users.total_orders_all_time > 1 ;;
+    description: "True if the user has placed more than one order."
+  }
+
+  dimension monetary_value {
+    model: ecommerce_users
+    label: 'Lifetime Spend'
+    type: 'number'
+    definition: @aql gmv | dimensionalize(ecommerce_users.id) ;;
+    format: "[\$\$]#,###0"
+    description: "Lifetime gross spend per user (RFM Monetary)."
+  }
+
+  dimension recency_days {
+    model: ecommerce_users
+    label: 'Recency (Days Since Last Order)'
+    type: 'number'
+    definition: @aql date_diff('day', (max(ecommerce_orders.created_at) | dimensionalize(ecommerce_users.id)), @now) ;;
+    description: "Days since the user's most recent order (RFM Recency)."
+  }
+
+  dimension customer_type {
+    model: ecommerce_users
+    label: 'Customer Type'
+    type: 'text'
+    definition: @aql
+      case(
+        when: ecommerce_users.total_orders_all_time >= 3, then: '3. Repeat',
+        when: ecommerce_users.total_orders_all_time >= 2, then: '2. Returning',
+        when: ecommerce_users.total_orders_all_time >= 1, then: '1. New',
+        else: '0. Prospect (no orders)'
+      )
+    ;;
+    description: "New (1 order) / Returning (2 orders) / Repeat (3+ orders), based on lifetime order count."
+  }
+
+  dimension rfm_segment {
+    model: ecommerce_users
+    label: 'RFM Segment'
+    type: 'text'
+    definition: @aql
+      case(
+        when: ecommerce_users.total_orders_all_time >= 3 and ecommerce_users.recency_days <= 90, then: 'Champions',
+        when: ecommerce_users.total_orders_all_time >= 2 and ecommerce_users.recency_days <= 180, then: 'Loyal',
+        when: ecommerce_users.total_orders_all_time >= 2 and ecommerce_users.recency_days > 180, then: 'At-Risk',
+        when: ecommerce_users.total_orders_all_time >= 1 and ecommerce_users.recency_days > 180, then: 'Hibernating',
+        when: ecommerce_users.total_orders_all_time >= 1, then: 'New/Recent',
+        else: 'Prospect'
+      )
+    ;;
+    description: "Heuristic RFM segment from Recency + Frequency thresholds (approximation of quintile-based scoring)."
+  }
+
+  dimension cohort_month {
+    model: ecommerce_users
+    label: 'Acquisition Cohort (Month)'
+    type: 'date'
+    definition: @aql min(ecommerce_orders.created_at | month()) | dimensionalize(ecommerce_users.id) ;;
+    description: "Month of each user's first order — their acquisition cohort."
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ORDER-LEVEL DIMENSIONS (cohort timing, bands, promo, dynamic period)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  dimension month_number {
+    model: ecommerce_orders
+    label: 'Months Since Signup'
+    type: 'number'
+    definition: @aql date_diff('month', ecommerce_users.cohort_month, (ecommerce_orders.created_at | month())) ;;
+    description: "Number of months between a user's acquisition cohort and the order month."
+  }
+
+  dimension cohort_size {
+    model: ecommerce_orders
+    label: 'Cohort Size'
+    type: 'number'
+    definition: @aql count_distinct(ecommerce_orders.user_id) | exact_grains(ecommerce_users.cohort_month) ;;
+    description: "Number of distinct users in each acquisition cohort."
+  }
+
+  dimension promo_applied {
+    model: ecommerce_orders
+    label: 'Promo Applied'
+    type: 'text'
+    definition: @aql
+      case(
+        when: ecommerce_orders.applied_promo_codes like '%,%', then: 'Stacked Promo (2+ codes)',
+        else: 'Single Promo (1 code)'
+      )
+    ;;
+    description: "Promo intensity per order. NOTE: every order in this dataset carries at least one promo code, so a literal promo-vs-no-promo split is not possible; this splits stacked (multiple codes) vs single-code orders instead — the closest available treatment/control proxy for promo effectiveness."
+  }
+
+  dimension delivery_band {
+    model: ecommerce_orders
+    label: 'Delivery-Attempts Band'
+    type: 'text'
+    definition: @aql
+      case(
+        when: ecommerce_orders.delivery_attempts >= 3, then: '3. 3+ attempts',
+        when: ecommerce_orders.delivery_attempts >= 2, then: '2. 2 attempts',
+        else: '1. 1 attempt'
+      )
+    ;;
+    description: "Banded number of delivery attempts."
+  }
+
+  dimension order_period {
+    model: ecommerce_orders
+    label: 'Order Period (Dynamic)'
+    type: 'date'
+    definition: @aql
+      case(
+        when: first(claude_granularity.period) == 'Day', then: ecommerce_orders.created_at | day(),
+        when: first(claude_granularity.period) == 'Week', then: ecommerce_orders.created_at | week(),
+        when: first(claude_granularity.period) == 'Quarter', then: ecommerce_orders.created_at | quarter(),
+        when: first(claude_granularity.period) == 'Year', then: ecommerce_orders.created_at | year(),
+        else: ecommerce_orders.created_at | month()
+      )
+    ;;
+    description: "Order date truncated to the granularity selected in the F2 Time Granularity filter."
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PRODUCT-LEVEL DIMENSIONS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  dimension price_band {
+    model: ecommerce_products
+    label: 'Price Band'
+    type: 'text'
+    definition: @aql
+      case(
+        when: ecommerce_products.price >= 500, then: '4. \$500+',
+        when: ecommerce_products.price >= 200, then: '3. \$200-\$499',
+        when: ecommerce_products.price >= 50, then: '2. \$50-\$199',
+        else: '1. < \$50'
+      )
+    ;;
+    description: "Product list-price band."
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // METRICS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric gmv {
+    label: "GMV (Total Revenue)"
+    type: "number"
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: "[\$\$]#,###0"
+    description: "Gross Merchandise Value — total monetary value of goods sold (quantity x product price across all order items)."
+  }
+
+  metric cogs {
+    label: "COGS (Cost of Goods Sold)"
+    type: "number"
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.cost) ;;
+    format: "[\$\$]#,###0"
+    description: "Total product cost of goods sold (quantity x product cost)."
+  }
+
+  metric gross_profit {
+    label: "Gross Profit"
+    type: "number"
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * (ecommerce_products.price - ecommerce_products.cost)) ;;
+    format: "[\$\$]#,###0"
+    description: "GMV minus COGS — profit after product cost."
+  }
+
+  metric gross_margin_pct {
+    label: "Gross Margin %"
+    type: "number"
+    definition: @aql gross_profit / gmv ;;
+    format: "#,###0.00%"
+    description: "Profitability after product cost: Gross Profit / GMV."
+  }
+
+  metric discount_amount {
+    label: "Discount Amount"
+    type: "number"
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price * ecommerce_orders.discount) ;;
+    format: "[\$\$]#,###0"
+    description: "Total monetary value of order-level discounts applied (GMV x order discount rate)."
+  }
+
+  metric total_orders {
+    label: "Total Orders"
+    type: "number"
+    definition: @aql count(ecommerce_orders.id) ;;
+    format: "#,###0"
+    description: "Count of orders."
+  }
+
+  metric aov {
+    label: "AOV (Average Order Value)"
+    type: "number"
+    definition: @aql gmv / total_orders ;;
+    format: "[\$\$]#,###0"
+    description: "Average spend per order — GMV divided by the number of orders."
+  }
+
+  metric total_users {
+    label: "Total Users"
+    type: "number"
+    definition: @aql count(ecommerce_users.id) ;;
+    format: "#,###0"
+    description: "Count of users."
+  }
+
+  metric total_buyers {
+    label: "Total Buyers"
+    type: "number"
+    definition: @aql count(ecommerce_users.id) | where(ecommerce_users.is_buyer is true) ;;
+    format: "#,###0"
+    description: "Count of users with at least one order."
+  }
+
+  metric total_repeated_buyers {
+    label: "Total Repeat Buyers"
+    type: "number"
+    definition: @aql count(ecommerce_users.id) | where(ecommerce_users.is_repeated_buyer is true) ;;
+    format: "#,###0"
+    description: "Count of users with two or more orders."
+  }
+
+  metric repeat_purchase_rate {
+    label: "Repeat Purchase Rate"
+    type: "number"
+    definition: @aql total_repeated_buyers / total_buyers ;;
+    format: "#,###0.00%"
+    description: "Share of buyers who ordered more than once — repeat buyers / all buyers. A core retention/loyalty signal."
+  }
+
+  metric total_products {
+    label: "Active Product Count"
+    type: "number"
+    definition: @aql count(ecommerce_products.id) ;;
+    format: "#,###0"
+    description: "Count of distinct products."
+  }
+
+  metric team_size {
+    label: "Team Size (Employees)"
+    type: "number"
+    definition: @aql count(ecommerce_employees.id) ;;
+    format: "#,###0"
+    description: "Number of employees associated with the merchant."
+  }
+
+  metric delivery_success_rate {
+    label: "Delivery Success Rate"
+    type: "number"
+    definition: @aql
+      (count(ecommerce_orders.id) | where(ecommerce_orders.status is 'delivered' and ecommerce_orders.delivery_attempts == 1))
+      / count(ecommerce_orders.id)
+    ;;
+    format: "#,###0.00%"
+    description: "Fulfillment quality — share of all orders delivered on the first attempt (status 'delivered' with delivery_attempts = 1)."
+  }
+
+  metric cohort_active_users {
+    label: "Active Users (Cohort)"
+    type: "number"
+    definition: @aql count_distinct(ecommerce_orders.user_id) ;;
+    format: "#,###0"
+    description: "Distinct users placing an order in a given cohort x month-number cell."
+  }
+
+  metric retention {
+    label: "Cohort Retention"
+    type: "number"
+    definition: @aql (cohort_active_users * 1.0) / (cohort_active_users | of_all(ecommerce_orders.month_number)) ;;
+    format: "#,###0.00%"
+    description: "Share of an acquisition cohort active in a given month-since-signup."
+  }
+
+  metric ltv_per_customer {
+    label: "Cumulative Gross Profit / Customer"
+    type: "number"
+    definition: @aql running_total(gross_profit, ecommerce_orders.month_number) / (cohort_active_users | of_all(ecommerce_orders.month_number)) ;;
+    format: "[\$\$]#,###0"
+    description: "Cumulative gross profit per acquired customer over months-since-first-order (LTV curve)."
+  }
+}
