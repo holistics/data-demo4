@@ -1,8 +1,8 @@
+@tag('Archived')
 Dashboard edulpulse_drill {
   title: 'edulpulse_drill'
   description: ''
   owner: 'minh.ntn@holistics.io'
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -19,7 +19,6 @@ Dashboard edulpulse_drill {
       position: pos(80, 180, 620, 420)
     }
   }
-
   theme: H.themes.vanilla
   block f_courses_category: FilterBlock {
     label: 'Courses Category'
