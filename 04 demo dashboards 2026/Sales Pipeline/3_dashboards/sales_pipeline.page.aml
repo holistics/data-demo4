@@ -5,7 +5,7 @@ const C3 = 469
 const C2 = 712
 const U = 352
 const U21 = 475
-@tag('Endorsed', 'Owner/Finance', 'Status/Active')
+@tag('Owner/Finance', 'Status/Active')
 Dashboard sales_dashboard {
   title: 'Sales Pipeline & Performance'
   theme: neon_dark
