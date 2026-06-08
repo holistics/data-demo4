@@ -33,7 +33,8 @@ Dataset aw_sales {
     label: 'Sales Amount by Due Date'
     type: 'number'
     description: 'Sum of Sales Amount using DueDateKey relationship to Date. Migrated from DAX: CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(Sales[DueDateKey], Date[DateKey])).'
-    definition: @aql sum(sales.sales_amount)
+    definition: @aql
+      sum(sales.sales_amount)
       | with_relationships(sales.due_date_key > date.date_key);;
   }
 }
