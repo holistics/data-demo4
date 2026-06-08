@@ -62,5 +62,5 @@ Model public_ratings_yearly {
   }
 
   owner: 'huong.le+demo4@holistics.io'
-  table_name: '"persisted"."HPA_3391f121e50b0e959f2f"'
+  table_name: '"persisted_movie_ratings"."HPA_daadf85b231a8dc560a1"'
 }

@@ -4,8 +4,8 @@ const schedules = [
   Schedule { models: [order_master], cron: '15 20 * * *' },
   // Schedule { models: [cancelled_orders], cron: '0 * * * *' }asdasdasdasd ? How to save? How to commit?asd
 
-  PreAggregateSchedule  {
-    cron: '15 20 * * *'
+  PreAggregateSchedule {
+    cron: '46 14 * * *' // 14:46 GMT+7 daily
     object: movie_ratings_analysis
   }
 ]
