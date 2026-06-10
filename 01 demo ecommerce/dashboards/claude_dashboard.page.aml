@@ -1,0 +1,1089 @@
+Dashboard claude_dashboard {
+  title: 'Claude Dashboard'
+  description: 'Ecommerce analytics dashboard with 10 reports (cohort retention, LTV, RFM, market basket, revenue bridge, merchant scorecard, category profitability, promo effectiveness, fulfillment, and geographic/demographic mix) and 14 cross-filtering controls, all powered by Claude_dataset.'
+  owner: 'janice@holistics.io'
+
+  // ════════════════════════════════════════════════════════════════════════
+  // HEADER
+  // ════════════════════════════════════════════════════════════════════════
+  block title: TextBlock {
+    content: @md # 🧠 Claude Dashboard
+A unified ecommerce analytics workspace — 10 reports spanning retention, lifetime value, segmentation, merchandising, fulfillment, and geography, with 14 shared filters. Filters apply only to the reports where they are analytically meaningful.;;
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // FILTERS  (F1–F14)
+  // ════════════════════════════════════════════════════════════════════════
+  block f1: FilterBlock {
+    label: 'Date Range'
+    type: 'date'
+    default {
+      operator: 'matches'
+      value: '18 months ago till now'
+    }
+  }
+  block f2: FilterBlock {
+    label: 'Time Granularity'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('claude_granularity', 'period')
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block f3: FilterBlock {
+    label: 'Acquisition Cohort'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_users', 'cohort_month')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f4: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_countries', 'name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f5: FilterBlock {
+    label: 'City'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_cities', 'name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f6: FilterBlock {
+    label: 'Gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_users', 'gender')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f7: FilterBlock {
+    label: 'Age Group'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_users', 'age_group')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f8: FilterBlock {
+    label: 'Parent Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('map_categories', 'parent_category')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f9: FilterBlock {
+    label: 'Merchant'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_merchants', 'name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f10: FilterBlock {
+    label: 'Order Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_orders', 'status')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f11: FilterBlock {
+    label: 'Promo Applied'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_orders', 'promo_applied')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f12: FilterBlock {
+    label: 'Customer Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_users', 'customer_type')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f13: FilterBlock {
+    label: 'Delivery-Attempts Band'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_orders', 'delivery_band')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f14: FilterBlock {
+    label: 'Price Band'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: Claude_dataset
+      field: ref('ecommerce_products', 'price_band')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R1 — Cohort Retention Matrix
+  // ════════════════════════════════════════════════════════════════════════
+  block tr1: TextBlock {
+    content: @md ## Cohort Retention Matrix
+Share of each signup cohort that places an order in each subsequent month — a triangular retention heatmap.;;
+  }
+  block r1: VizBlock {
+    label: 'Cohort Retention Matrix'
+    viz: RetentionHeatmap {
+      dataset: Claude_dataset
+      cohort: VizFieldFull {
+        label: 'Acquisition Cohort'
+        ref: ref('ecommerce_users', 'cohort_month')
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'yyyy-MM'
+        }
+      }
+      cohort_size: VizFieldFull {
+        ref: ref('ecommerce_orders', 'cohort_size')
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      cohort_duration: VizFieldFull {
+        label: 'Months Since Signup'
+        ref: ref('ecommerce_orders', 'month_number')
+        format {
+          type: 'number'
+        }
+      }
+      cohort_value: VizFieldFull {
+        ref: 'cohort_active_users'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R2 — Customer Lifetime Value by Acquisition Cohort
+  // ════════════════════════════════════════════════════════════════════════
+  block tr2: TextBlock {
+    content: @md ## Customer Lifetime Value by Acquisition Cohort
+Cumulative gross profit per acquired customer, plotted over months-since-first-order, one curve per cohort.;;
+  }
+  block r2: VizBlock {
+    label: 'CLV by Acquisition Cohort'
+    viz: LineChart {
+      dataset: Claude_dataset
+      x_axis: VizFieldFull {
+        label: 'Months Since Signup'
+        ref: ref('ecommerce_orders', 'month_number')
+        format {
+          type: 'number'
+        }
+      }
+      legend: VizFieldFull {
+        label: 'Cohort'
+        ref: ref('ecommerce_users', 'cohort_month')
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'yyyy-MM'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: 'ltv_per_customer'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R3 — RFM Customer Segmentation
+  // ════════════════════════════════════════════════════════════════════════
+  block tr3: TextBlock {
+    content: @md ## RFM Customer Segmentation
+Every customer scored on Recency, Frequency, and Monetary value and mapped to a named segment (Champions, Loyal, At-Risk, Hibernating…).
+> _Note: segments use heuristic R/F thresholds rather than true NTILE quintiles._;;
+  }
+  block r3: VizBlock {
+    label: 'RFM Customer Segmentation'
+    viz: DataTable {
+      dataset: Claude_dataset
+      fields: [
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'full_name')
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'rfm_segment')
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'customer_type')
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'recency_days')
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'total_orders_all_time')
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'monetary_value')
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        row_limit: 1000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R4 — Market Basket / Product Affinity (simplified)
+  // ════════════════════════════════════════════════════════════════════════
+  block tr4: TextBlock {
+    content: @md ## Market Basket / Product Affinity
+Products ranked by basket reach — how many distinct orders contain each product, units sold, and GMV.
+> _Note: simplified affinity view; a full pairwise self-join (support/confidence/lift) isn't expressible in the semantic layer._;;
+  }
+  block r4: VizBlock {
+    label: 'Product Affinity'
+    viz: DataTable {
+      dataset: Claude_dataset
+      calculation orders_with_product {
+        label: 'Orders Containing Product'
+        formula: @aql count_distinct(ecommerce_orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation units_sold {
+        label: 'Units Sold'
+        formula: @aql sum(ecommerce_order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: ref('ecommerce_products', 'name')
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('map_categories', 'parent_category')
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: 'orders_with_product'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'units_sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'gmv'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        row_limit: 100
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R5 — Revenue Bridge (New / Returning / Repeat)
+  // ════════════════════════════════════════════════════════════════════════
+  block tr5: TextBlock {
+    content: @md ## Revenue Bridge (New / Returning / Repeat)
+GMV decomposed by customer type over time, showing how much revenue comes from new vs returning vs repeat buyers each period.
+> _Note: customer-type decomposition proxy for a full new/returning/reactivated/churned MRR-style bridge._;;
+  }
+  block r5: VizBlock {
+    label: 'Revenue Bridge'
+    viz: ColumnChart {
+      dataset: Claude_dataset
+      x_axis: VizFieldFull {
+        label: 'Period'
+        ref: ref('ecommerce_orders', 'order_period')
+        format {
+          type: 'date'
+        }
+      }
+      legend: VizFieldFull {
+        ref: ref('ecommerce_users', 'customer_type')
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_stack_total: true
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: 'gmv'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R6 — Merchant Performance Scorecard
+  // ════════════════════════════════════════════════════════════════════════
+  block tr6: TextBlock {
+    content: @md ## Merchant Performance Scorecard
+Ranked scorecard per merchant: GMV, gross margin, order volume, fulfillment quality, active products, and team size.;;
+  }
+  block r6: VizBlock {
+    label: 'Merchant Scorecard'
+    viz: PivotTable {
+      dataset: Claude_dataset
+      rows: [
+        VizFieldFull {
+          ref: ref('ecommerce_merchants', 'name')
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: 'gmv'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'gross_margin_pct'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'total_orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'delivery_success_rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'total_products'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'team_size'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: false
+        show_column_total: false
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R7 — Category Profitability Waterfall
+  // ════════════════════════════════════════════════════════════════════════
+  block tr7: TextBlock {
+    content: @md ## Category Profitability Breakdown
+Walks from GMV → discounts → COGS → gross profit across the parent-category hierarchy.
+> _Note: rendered as a grouped breakdown (no native waterfall viz)._;;
+  }
+  block r7: VizBlock {
+    label: 'Category Profitability'
+    viz: ColumnChart {
+      dataset: Claude_dataset
+      x_axis: VizFieldFull {
+        ref: ref('map_categories', 'parent_category')
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: 'gmv'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: 'discount_amount'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: 'cogs'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: 'gross_profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R8 — Promo Code Effectiveness
+  // ════════════════════════════════════════════════════════════════════════
+  block tr8: TextBlock {
+    content: @md ## Promo Code Effectiveness
+Compares stacked-promo vs single-promo orders on AOV, margin, order volume, and repeat-purchase behavior.
+> _Note: every order in this dataset carries a promo, so this splits promo intensity (stacked vs single) instead of promo-vs-control._;;
+  }
+  block r8: VizBlock {
+    label: 'Promo Effectiveness'
+    viz: PivotTable {
+      dataset: Claude_dataset
+      rows: [
+        VizFieldFull {
+          ref: ref('ecommerce_orders', 'promo_applied')
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: 'total_orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'aov'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'gross_margin_pct'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'repeat_purchase_rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: false
+        show_column_total: false
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R9 — Fulfillment & Delivery Performance
+  // ════════════════════════════════════════════════════════════════════════
+  block tr9: TextBlock {
+    content: @md ## Fulfillment & Delivery Performance
+Distribution of delivery attempts crossed with order status — separating logistics failures from cancellations.;;
+  }
+  block r9: VizBlock {
+    label: 'Fulfillment & Delivery'
+    viz: ColumnChart {
+      dataset: Claude_dataset
+      x_axis: VizFieldFull {
+        ref: ref('ecommerce_orders', 'delivery_band')
+        format {
+          type: 'text'
+        }
+      }
+      legend: VizFieldFull {
+        ref: ref('ecommerce_orders', 'status')
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_stack_total: true
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: 'total_orders'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // R10 — Geographic Penetration & Demographic Mix
+  // ════════════════════════════════════════════════════════════════════════
+  block tr10: TextBlock {
+    content: @md ## Geographic Penetration & Demographic Mix
+Sales and buyer penetration by continent → country, crossed with gender and age demographics.;;
+  }
+  block r10: VizBlock {
+    label: 'Geographic & Demographic Mix'
+    viz: PivotTable {
+      dataset: Claude_dataset
+      rows: [
+        VizFieldFull {
+          ref: ref('ecommerce_countries', 'continent_name')
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('ecommerce_countries', 'name')
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: ref('ecommerce_users', 'age_group')
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: 'gmv'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'total_buyers'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: true
+        show_column_total: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // LAYOUT
+  // ════════════════════════════════════════════════════════════════════════
+  view: TabLayout {
+    label: 'Claude Dashboard'
+    tab tab_customer: CanvasLayout {
+      label: 'Customer & Retention'
+      width: 1300
+      height: 1900
+      grid_size: 20
+      auto_expand_vertically: true
+      block title {
+        position: pos(20, 20, 1260, 70)
+      }
+      block f1 {
+        position: pos(20, 100, 170, 60)
+      }
+      block f4 {
+        position: pos(200, 100, 170, 60)
+      }
+      block f5 {
+        position: pos(380, 100, 170, 60)
+      }
+      block f6 {
+        position: pos(560, 100, 170, 60)
+      }
+      block f7 {
+        position: pos(740, 100, 170, 60)
+      }
+      block f10 {
+        position: pos(920, 100, 170, 60)
+      }
+      block f3 {
+        position: pos(20, 190, 170, 60)
+      }
+      block f8 {
+        position: pos(200, 190, 170, 60)
+      }
+      block tr1 {
+        position: pos(20, 260, 1260, 50)
+      }
+      block r1 {
+        position: pos(20, 315, 1260, 420)
+      }
+      block f2 {
+        position: pos(20, 760, 170, 60)
+      }
+      block f9 {
+        position: pos(200, 760, 170, 60)
+      }
+      block f14 {
+        position: pos(380, 760, 170, 60)
+      }
+      block tr2 {
+        position: pos(20, 830, 1260, 50)
+      }
+      block r2 {
+        position: pos(20, 885, 1260, 420)
+      }
+      block f12 {
+        position: pos(20, 1330, 170, 60)
+      }
+      block tr3 {
+        position: pos(20, 1400, 1260, 50)
+      }
+      block r3 {
+        position: pos(20, 1455, 1260, 420)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_revenue: CanvasLayout {
+      label: 'Revenue & Merchandising'
+      width: 1300
+      height: 2970
+      grid_size: 20
+      auto_expand_vertically: true
+      block title {
+        position: pos(20, 20, 1260, 70)
+      }
+      block f1 {
+        position: pos(20, 100, 170, 60)
+      }
+      block f4 {
+        position: pos(200, 100, 170, 60)
+      }
+      block f5 {
+        position: pos(380, 100, 170, 60)
+      }
+      block f8 {
+        position: pos(560, 100, 170, 60)
+      }
+      block f9 {
+        position: pos(740, 100, 170, 60)
+      }
+      block f10 {
+        position: pos(920, 100, 170, 60)
+      }
+      block f14 {
+        position: pos(20, 190, 170, 60)
+      }
+      block tr4 {
+        position: pos(20, 260, 1260, 50)
+      }
+      block r4 {
+        position: pos(20, 315, 1260, 420)
+      }
+      block f2 {
+        position: pos(20, 760, 170, 60)
+      }
+      block f11 {
+        position: pos(200, 760, 170, 60)
+      }
+      block f12 {
+        position: pos(380, 760, 170, 60)
+      }
+      block tr5 {
+        position: pos(20, 830, 1260, 50)
+      }
+      block r5 {
+        position: pos(20, 885, 1260, 420)
+      }
+      block f13 {
+        position: pos(20, 1330, 170, 60)
+      }
+      block tr6 {
+        position: pos(20, 1400, 1260, 50)
+      }
+      block r6 {
+        position: pos(20, 1455, 1260, 420)
+      }
+      block tr7 {
+        position: pos(20, 1900, 1260, 50)
+      }
+      block r7 {
+        position: pos(20, 1955, 1260, 420)
+      }
+      block f3 {
+        position: pos(20, 2400, 170, 60)
+      }
+      block tr8 {
+        position: pos(20, 2470, 1260, 50)
+      }
+      block r8 {
+        position: pos(20, 2525, 1260, 420)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_ops: CanvasLayout {
+      label: 'Operations & Geography'
+      width: 1300
+      height: 1370
+      grid_size: 20
+      auto_expand_vertically: true
+      block title {
+        position: pos(20, 20, 1260, 70)
+      }
+      block f1 {
+        position: pos(20, 100, 170, 60)
+      }
+      block f2 {
+        position: pos(200, 100, 170, 60)
+      }
+      block f4 {
+        position: pos(380, 100, 170, 60)
+      }
+      block f5 {
+        position: pos(560, 100, 170, 60)
+      }
+      block f9 {
+        position: pos(740, 100, 170, 60)
+      }
+      block f10 {
+        position: pos(920, 100, 170, 60)
+      }
+      block f13 {
+        position: pos(20, 190, 170, 60)
+      }
+      block tr9 {
+        position: pos(20, 260, 1260, 50)
+      }
+      block r9 {
+        position: pos(20, 315, 1260, 420)
+      }
+      block f6 {
+        position: pos(20, 760, 170, 60)
+      }
+      block f7 {
+        position: pos(200, 760, 170, 60)
+      }
+      block f8 {
+        position: pos(380, 760, 170, 60)
+      }
+      block f12 {
+        position: pos(560, 760, 170, 60)
+      }
+      block tr10 {
+        position: pos(20, 830, 1260, 50)
+      }
+      block r10 {
+        position: pos(20, 885, 1260, 460)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // FILTER → REPORT WIRING
+  // Filters apply to every block by default; each mapping DISABLES a filter on
+  // the reports left blank in the spec matrix. (F1, F4, F5, F10 apply to all.)
+  // ════════════════════════════════════════════════════════════════════════
+  interactions: [
+    FilterInteraction {
+      from: 'f2'
+      to: [
+        CustomMapping {
+          block: ['r1', 'r3', 'r4']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f3'
+      to: [
+        CustomMapping {
+          block: ['r3', 'r4', 'r5', 'r6', 'r7', 'r9', 'r10']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f6'
+      to: [
+        CustomMapping {
+          block: ['r4', 'r5', 'r6', 'r7', 'r8', 'r9']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f7'
+      to: [
+        CustomMapping {
+          block: ['r4', 'r5', 'r6', 'r7', 'r8', 'r9']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f8'
+      to: [
+        CustomMapping {
+          block: ['r3', 'r9']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f9'
+      to: [
+        CustomMapping {
+          block: ['r1', 'r3']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f11'
+      to: [
+        CustomMapping {
+          block: ['r1', 'r2', 'r3', 'r4', 'r9', 'r10']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f12'
+      to: [
+        CustomMapping {
+          block: ['r1', 'r2', 'r4', 'r6', 'r7', 'r9']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f13'
+      to: [
+        CustomMapping {
+          block: ['r1', 'r2', 'r3', 'r4', 'r5', 'r7', 'r8', 'r10']
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f14'
+      to: [
+        CustomMapping {
+          block: ['r1', 'r3', 'r5', 'r6', 'r8', 'r9', 'r10']
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  theme: H.themes.vanilla
+}
