@@ -1,0 +1,155 @@
+// =====================================================================
+// Actual Group PoC — Client & Retention dataset
+// Supports: Sales / Client Account Management, Client Retention / Churn Risk.
+// Demand (job orders), fulfilment (fill rate), client revenue, activity,
+// new-client cohorts, and account-manager rollups.
+// =====================================================================
+Dataset ag_client_retention {
+  __engine__: 'aql'
+  label: '[AG] Client & Retention'
+  description: 'Client demand, fill rate, revenue, activity and retention/churn-risk metrics for account management.'
+  data_source_name: 'demo_actual_group_poc'
+
+  models: [
+    ag_client,
+    ag_client_contract,
+    ag_client_activity,
+    ag_job_order,
+    ag_job_family,
+    ag_placement,
+    ag_invoice,
+    ag_industry,
+    ag_employee,
+    ag_agency,
+    ag_region
+  ]
+  relationships: [
+    relationship(ag_agency_region_id, true),
+    relationship(ag_client_activity_client_id, true),
+    relationship(ag_client_activity_employee_id, true),
+    relationship(ag_client_contract_client_id, true),
+    relationship(ag_client_industry_id, true),
+    relationship(ag_client_owner_employee_id, true),
+    relationship(ag_employee_agency_id, true),
+    relationship(ag_invoice_client_id, true),
+    relationship(ag_job_order_agency_id, true),
+    relationship(ag_job_order_client_contract_id, true),
+    relationship(ag_job_order_client_id, true),
+    relationship(ag_job_order_job_family_id, true),
+    relationship(ag_job_order_owner_employee_id, true),
+    relationship(ag_placement_agency_id, true),
+    relationship(ag_placement_client_id, true),
+    relationship(ag_placement_job_order_id, true),
+    relationship(ag_placement_recruiter_employee_id, true),
+  ]
+
+  // ---- Cohort fields (native AQL: acquisition cohort x months-since) ----
+  dimension cohort_month {
+    model: ag_client
+    label: 'Acquisition Cohort (Month)'
+    type: 'date'
+    definition: @aql ag_client.first_contract_date | month();;
+  }
+  dimension months_since_acquisition {
+    model: ag_invoice
+    label: 'Months Since Acquisition'
+    type: 'number'
+    definition: @aql date_diff('month', ag_client.cohort_month, (ag_invoice.invoice_date | month()));;
+  }
+
+  // ---- Client base ----
+  metric total_clients {
+    label: 'Total Clients'
+    type: 'number'
+    definition: @aql count(ag_client.client_id);;
+  }
+  metric active_clients {
+    label: 'Active Clients'
+    type: 'number'
+    definition: @aql count(ag_client.client_id) | where(ag_client.client_status is 'active');;
+  }
+  metric at_risk_clients {
+    label: 'At-risk Clients'
+    type: 'number'
+    definition: @aql count(ag_client.client_id) | where(ag_client.client_status is 'at_risk');;
+  }
+  metric churned_clients {
+    label: 'Churned Clients'
+    type: 'number'
+    definition: @aql count(ag_client.client_id) | where(ag_client.client_status is 'churned');;
+  }
+  metric strategic_accounts {
+    label: 'Strategic Accounts'
+    type: 'number'
+    definition: @aql count(ag_client.client_id) | where(ag_client.strategic_account_flag is true);;
+  }
+
+  // ---- Demand & fulfilment ----
+  metric total_job_orders {
+    label: 'Total Job Orders'
+    type: 'number'
+    definition: @aql count(ag_job_order.job_order_id);;
+  }
+  metric total_openings {
+    label: 'Total Openings'
+    type: 'number'
+    definition: @aql sum(ag_job_order.number_of_openings);;
+  }
+  metric filled_job_orders {
+    label: 'Filled Job Orders'
+    type: 'number'
+    definition: @aql count(ag_job_order.job_order_id) | where(ag_job_order.status is 'filled');;
+  }
+  metric total_placements {
+    label: 'Total Placements'
+    type: 'number'
+    definition: @aql count(ag_placement.placement_id);;
+  }
+  metric fill_rate {
+    label: 'Fill Rate (placements / openings)'
+    type: 'number'
+    definition: @aql safe_divide(total_placements, total_openings);;
+    format: '0.0%'
+  }
+  metric order_fill_rate {
+    label: 'Order Fill Rate (filled / total orders)'
+    type: 'number'
+    definition: @aql safe_divide(filled_job_orders, total_job_orders);;
+    format: '0.0%'
+  }
+
+  // ---- Revenue per client ----
+  metric total_revenue {
+    label: 'Total Revenue'
+    type: 'number'
+    definition: @aql sum(ag_invoice.total_amount);;
+    format: '[$$]#,##0'
+  }
+  metric revenue_per_client {
+    label: 'Revenue per Client'
+    type: 'number'
+    definition: @aql safe_divide(total_revenue, total_clients);;
+    format: '[$$]#,##0'
+  }
+
+  // ---- Activity ----
+  metric total_activities {
+    label: 'Client Activities'
+    type: 'number'
+    definition: @aql count(ag_client_activity.client_activity_id);;
+  }
+
+  // ---- New-client cohort ----
+  // AQL has no "current date" function — by design, "new clients in the last N
+  // months" is expressed as a RELATIVE DATE FILTER on ag_client.first_contract_date
+  // at query/dashboard time (a date drill or filter control), not baked into a
+  // stored metric. Use total_clients / total_revenue with that filter applied, or
+  // add a date Param to this dataset if a fixed-window stored metric is required.
+
+  // ---- Period comparison ----
+  metric job_orders_prev_quarter {
+    label: 'Job Orders (Prev Quarter)'
+    type: 'number'
+    definition: @aql total_job_orders | relative_period(ag_job_order.opened_at, interval(-1 quarter));;
+  }
+}

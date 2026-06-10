@@ -1,0 +1,91 @@
+// =====================================================================
+// Actual Group — reusable brand theme (PageTheme)
+// Brand identity: Actual group ("trèfle rouge" / red clover) — red primary,
+// white surfaces, dark-neutral ink, Inter typeface. Tagline: "work is essential".
+// Reference it from a dashboard with:  theme: ag_actual_group
+// =====================================================================
+PageTheme ag_actual_group {
+  title: 'Actual Group'
+
+  background {
+    bg_color: '#F4F5F7'
+  }
+
+  canvas {
+    background {
+      bg_color: '#EAECEF'
+    }
+    border {
+      border_radius: 6
+      border_color: '#E3E6EA'
+    }
+    shadow: 'sm'
+  }
+
+  block {
+    background {
+      bg_color: '#FFFFFF'
+    }
+    label {
+      font_family: 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'
+      font_color: '#1F2429'
+      font_weight: 'bold'
+      font_size: 14
+    }
+    text {
+      font_family: 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'
+      font_color: '#5A6068'
+      font_size: 13
+    }
+    border {
+      border_width: 1
+      border_radius: 8
+      border_color: '#E3E6EA'
+      border_style: 'solid'
+    }
+    padding: 16
+    shadow: 'sm'
+  }
+
+  viz {
+    table {
+      general {
+        hover_color: '#FCECEA'
+        banding_color: '#FAFBFC'
+        font_color: '#1F2429'
+        font_size: 13
+        font_family: 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'
+        border_color: '#E3E6EA'
+        grid_color: '#ECEEF1'
+      }
+      header {
+        bg_color: '#A01410'
+        font_color: '#FFFFFF'
+        font_weight: 'bold'
+      }
+      sub_header {
+        bg_color: '#FCECEA'
+        font_color: '#A01410'
+        font_weight: 'semibold'
+      }
+      sub_title {
+        font_color: '#889096'
+        font_size: 11
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    /* KPI period-over-period diff chips in brand colors */
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: #EAF7F0;
+      color: #1B7A4B;
+    }
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: #FCECEA;
+      color: #A01410;
+    }
+  ;;
+}

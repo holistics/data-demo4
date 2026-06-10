@@ -1,0 +1,81 @@
+Model ag_timesheet {
+  type: 'table'
+  label: 'Timesheet'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension timesheet_id {
+    label: 'Timesheet Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.timesheet_id }};;
+  }
+  dimension assignment_id {
+    label: 'Assignment Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.assignment_id }};;
+  }
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension work_week_start_date {
+    label: 'Work Week Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.work_week_start_date }};;
+  }
+  dimension regular_hours {
+    label: 'Regular Hours'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.regular_hours }};;
+  }
+  dimension overtime_hours {
+    label: 'Overtime Hours'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.overtime_hours }};;
+  }
+  dimension billable_hours {
+    label: 'Billable Hours'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.billable_hours }};;
+  }
+  dimension approved_at {
+    label: 'Approved At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.approved_at }};;
+  }
+  dimension approved_by_employee_id {
+    label: 'Approved By Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.approved_by_employee_id }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."timesheet"'
+}

@@ -1,0 +1,105 @@
+Model ag_candidate {
+  type: 'table'
+  label: 'Candidate'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension source_channel_id {
+    label: 'Source Channel Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_channel_id }};;
+  }
+  dimension candidate_code {
+    label: 'Candidate Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_code }};;
+  }
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension phone {
+    label: 'Phone'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.phone }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension country_code {
+    label: 'Country Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+  dimension date_of_birth {
+    label: 'Date Of Birth'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.date_of_birth }};;
+  }
+  dimension registration_date {
+    label: 'Registration Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.registration_date }};;
+  }
+  dimension current_status {
+    label: 'Current Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.current_status }}::text;;
+  }
+  dimension work_authorization_status {
+    label: 'Work Authorization Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.work_authorization_status }};;
+  }
+  dimension availability_date {
+    label: 'Availability Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.availability_date }};;
+  }
+  dimension preferred_employment_type {
+    label: 'Preferred Employment Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.preferred_employment_type }}::text;;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."candidate"'
+}

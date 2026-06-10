@@ -1,0 +1,69 @@
+Model ag_agency {
+  type: 'table'
+  label: 'Agency'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension region_id {
+    label: 'Region Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.region_id }};;
+  }
+  dimension agency_code {
+    label: 'Agency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_code }};;
+  }
+  dimension agency_name {
+    label: 'Agency Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_name }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension country_code {
+    label: 'Country Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+  dimension opened_date {
+    label: 'Opened Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.opened_date }};;
+  }
+  dimension closed_date {
+    label: 'Closed Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.closed_date }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."agency"'
+}

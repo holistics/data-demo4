@@ -1,0 +1,33 @@
+Model ag_job_order_required_skill {
+  type: 'table'
+  label: 'Job Order Required Skill'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension job_order_id {
+    label: 'Job Order Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_order_id }};;
+  }
+  dimension skill_id {
+    label: 'Skill Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.skill_id }};;
+  }
+  dimension required_flag {
+    label: 'Required Flag'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.required_flag }};;
+  }
+  dimension minimum_proficiency_level {
+    label: 'Minimum Proficiency Level'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.minimum_proficiency_level }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."job_order_required_skill"'
+}

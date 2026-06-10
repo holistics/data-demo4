@@ -1,0 +1,149 @@
+// =====================================================================
+// Actual Group PoC — Revenue & Margin dataset
+// Supports: Executive/Management, Financial/Margin, Branch/Agency Ops
+// (revenue growth, gross margin, margin per hour, revenue per agency/recruiter,
+//  period-over-period). Relationships come from the global relationships.aml.
+// =====================================================================
+Dataset ag_revenue_margin {
+  __engine__: 'aql'
+  label: '[AG] Revenue & Margin'
+  description: 'Revenue, cost, gross margin and productivity metrics for the Actual Group staffing PoC.'
+  data_source_name: 'demo_actual_group_poc'
+
+  models: [
+    ag_invoice,
+    ag_invoice_line,
+    ag_payment,
+    ag_payroll_cost,
+    ag_timesheet,
+    ag_placement,
+    ag_assignment,
+    ag_client,
+    ag_client_contract,
+    ag_job_order,
+    ag_job_family,
+    ag_agency,
+    ag_region,
+    ag_industry,
+    ag_employee,
+    ag_margin_bridge
+  ]
+  relationships: []
+
+  // ---- Revenue ----
+  metric total_revenue {
+    label: 'Total Revenue'
+    type: 'number'
+    definition: @aql sum(ag_invoice.total_amount);;
+    format: '[$$]#,##0'
+    description: 'Invoiced revenue (subtotal + tax) across all invoices.'
+  }
+  metric billed_amount {
+    label: 'Billed Amount (lines)'
+    type: 'number'
+    definition: @aql sum(ag_invoice_line.line_amount);;
+    format: '[$$]#,##0'
+  }
+  metric collected_payments {
+    label: 'Collected Payments'
+    type: 'number'
+    definition: @aql sum(ag_payment.payment_amount);;
+    format: '[$$]#,##0'
+  }
+  metric outstanding_amount {
+    label: 'Outstanding Amount'
+    type: 'number'
+    definition: @aql total_revenue - collected_payments;;
+    format: '[$$]#,##0'
+  }
+
+  // ---- Cost & Margin ----
+  metric total_labor_cost {
+    label: 'Total Labor Cost'
+    type: 'number'
+    definition: @aql sum(ag_payroll_cost.total_cost_amount);;
+    format: '[$$]#,##0'
+  }
+  metric gross_margin {
+    label: 'Gross Margin'
+    type: 'number'
+    definition: @aql total_revenue - total_labor_cost;;
+    format: '[$$]#,##0'
+    description: 'Total Revenue minus total payroll/labor cost.'
+  }
+  metric gross_margin_rate {
+    label: 'Gross Margin Rate'
+    type: 'number'
+    definition: @aql safe_divide(gross_margin, total_revenue);;
+    format: '0.0%'
+  }
+
+  // ---- Hours & productivity ----
+  metric total_billable_hours {
+    label: 'Total Billable Hours'
+    type: 'number'
+    definition: @aql sum(ag_timesheet.billable_hours);;
+    format: '#,##0'
+  }
+  metric margin_per_hour {
+    label: 'Gross Margin per Worked Hour'
+    type: 'number'
+    definition: @aql safe_divide(gross_margin, total_billable_hours);;
+    format: '[$$]#,##0.00'
+  }
+  metric total_placements {
+    label: 'Total Placements'
+    type: 'number'
+    definition: @aql count(ag_placement.placement_id);;
+  }
+  metric gross_margin_per_placement {
+    label: 'Gross Margin per Placement'
+    type: 'number'
+    definition: @aql safe_divide(gross_margin, total_placements);;
+    format: '[$$]#,##0'
+  }
+
+  // ---- Capacity / denominators ----
+  metric active_agencies {
+    label: 'Active Agencies'
+    type: 'number'
+    definition: @aql count_distinct(ag_agency.agency_id) | where(ag_agency.is_active is true);;
+  }
+  metric revenue_per_agency {
+    label: 'Revenue per Active Agency'
+    type: 'number'
+    definition: @aql safe_divide(total_revenue, active_agencies);;
+    format: '[$$]#,##0'
+  }
+  metric recruiter_count {
+    label: 'Recruiter / Employee Count'
+    type: 'number'
+    definition: @aql count_distinct(ag_employee.employee_id) | where(ag_employee.is_active is true);;
+  }
+  metric revenue_per_recruiter {
+    label: 'Revenue per Recruiter'
+    type: 'number'
+    definition: @aql safe_divide(total_revenue, recruiter_count);;
+    format: '[$$]#,##0'
+  }
+
+  // ---- Period-over-period (quarter) ----
+  metric revenue_prev_quarter {
+    label: 'Revenue (Prev Quarter)'
+    type: 'number'
+    definition: @aql total_revenue | relative_period(ag_invoice.invoice_date, interval(-1 quarter));;
+    format: '[$$]#,##0'
+  }
+  metric revenue_qoq_growth {
+    label: 'Revenue QoQ Growth %'
+    type: 'number'
+    definition: @aql safe_divide(total_revenue - revenue_prev_quarter, revenue_prev_quarter);;
+    format: '0.0%'
+  }
+  metric margin_rate_prev_quarter {
+    label: 'Gross Margin Rate (Prev Quarter)'
+    type: 'number'
+    definition: @aql gross_margin_rate | relative_period(ag_invoice.invoice_date, interval(-1 quarter));;
+    format: '0.0%'
+  }
+}
