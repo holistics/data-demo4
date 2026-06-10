@@ -1,0 +1,153 @@
+Model ag_job_order {
+  type: 'table'
+  label: 'Job Order'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension job_order_id {
+    label: 'Job Order Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_order_id }};;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension client_site_id {
+    label: 'Client Site Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_site_id }};;
+  }
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension owner_employee_id {
+    label: 'Owner Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_employee_id }};;
+  }
+  dimension job_family_id {
+    label: 'Job Family Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_family_id }};;
+  }
+  dimension client_contract_id {
+    label: 'Client Contract Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_contract_id }};;
+  }
+  dimension job_order_code {
+    label: 'Job Order Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_order_code }};;
+  }
+  dimension job_title {
+    label: 'Job Title'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_title }};;
+  }
+  dimension employment_type {
+    label: 'Employment Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.employment_type }}::text;;
+  }
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.status }}::text;;
+  }
+  dimension opened_at {
+    label: 'Opened At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.opened_at }};;
+  }
+  dimension target_start_date {
+    label: 'Target Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.target_start_date }};;
+  }
+  dimension target_end_date {
+    label: 'Target End Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.target_end_date }};;
+  }
+  dimension number_of_openings {
+    label: 'Number Of Openings'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.number_of_openings }};;
+  }
+  dimension priority {
+    label: 'Priority'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.priority }};;
+  }
+  dimension bill_rate {
+    label: 'Bill Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.bill_rate }};;
+  }
+  dimension pay_rate {
+    label: 'Pay Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.pay_rate }};;
+  }
+  dimension expected_hours_per_week {
+    label: 'Expected Hours Per Week'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.expected_hours_per_week }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension cancelled_at {
+    label: 'Cancelled At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.cancelled_at }};;
+  }
+  dimension closed_at {
+    label: 'Closed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.closed_at }};;
+  }
+  dimension cancellation_reason {
+    label: 'Cancellation Reason'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.cancellation_reason }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."job_order"'
+}

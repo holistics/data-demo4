@@ -1,0 +1,57 @@
+Model ag_candidate_submission {
+  type: 'table'
+  label: 'Candidate Submission'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension submission_id {
+    label: 'Submission Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.submission_id }};;
+  }
+  dimension application_id {
+    label: 'Application Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.application_id }};;
+  }
+  dimension submitted_by_employee_id {
+    label: 'Submitted By Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.submitted_by_employee_id }};;
+  }
+  dimension submitted_to_client_at {
+    label: 'Submitted To Client At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.submitted_to_client_at }};;
+  }
+  dimension client_response {
+    label: 'Client Response'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_response }};;
+  }
+  dimension client_response_at {
+    label: 'Client Response At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_response_at }};;
+  }
+  dimension shortlisted_flag {
+    label: 'Shortlisted Flag'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.shortlisted_flag }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."candidate_submission"'
+}

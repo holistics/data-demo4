@@ -1,0 +1,33 @@
+Model ag_source_channel {
+  type: 'table'
+  label: 'Source Channel'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension source_channel_id {
+    label: 'Source Channel Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_channel_id }};;
+  }
+  dimension source_channel_code {
+    label: 'Source Channel Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_channel_code }};;
+  }
+  dimension source_channel_name {
+    label: 'Source Channel Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_channel_name }};;
+  }
+  dimension channel_group {
+    label: 'Channel Group'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.channel_group }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."source_channel"'
+}

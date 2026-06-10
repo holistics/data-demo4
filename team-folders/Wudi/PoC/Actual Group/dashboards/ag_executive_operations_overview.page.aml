@@ -1,0 +1,1743 @@
+Dashboard ag_executive_operations_overview {
+  title: 'Actual Group — Executive & Operations Overview'
+  description: 'Tabbed exec + operational analytics across revenue, margin, recruitment funnel, delivery, clients and training for the Actual Group staffing PoC.'
+  owner: 'chukwudi@holistics.io'
+
+  block b_title: TextBlock {
+    content: @md # Actual Group — Executive & Operations Overview\n_“Work is essential.” Multi-region staffing group — revenue, margin, funnel, delivery, clients & training._ ;;
+  }
+
+  block f_inv_date: FilterBlock {
+    label: 'Invoice Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_revenue_margin
+      field: ref('ag_invoice', 'invoice_date')
+    }
+    default {
+      operator: 'matches'
+      value: 'last quarter'
+    }
+  }
+
+  block f_region: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_client_retention
+      field: ref('ag_region', 'region_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_industry: FilterBlock {
+    label: 'Industry'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_revenue_margin
+      field: ref('ag_industry', 'industry_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_client_status: FilterBlock {
+    label: 'Client Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_client_retention
+      field: ref('ag_client', 'client_status')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block k_rev: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'total_revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_gm: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'gross_margin'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_gmr: VizBlock {
+    label: 'Gross Margin Rate'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'gross_margin_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_plc: VizBlock {
+    label: 'Total Placements'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'total_placements'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_ofr: VizBlock {
+    label: 'Order Fill Rate'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'order_fill_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_qoq: VizBlock {
+    label: 'Revenue QoQ Growth'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'revenue_qoq_growth'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block c_rev_month: VizBlock {
+    label: 'Revenue by Month'
+    viz: CombinationChart {
+      dataset: ag_revenue_margin
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(ag_invoice.invoice_date)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: 'total_revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+        show_data_points: true
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_rev_ind: VizBlock {
+    label: 'Revenue by Industry'
+    viz: CombinationChart {
+      dataset: ag_revenue_margin
+      x_axis: VizFieldFull {
+        label: 'Industry'
+        ref: r(ag_industry.industry_name)
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: 'total_revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_ofr_region_x: VizBlock {
+    label: 'Order Fill Rate by Region'
+    viz: CombinationChart {
+      dataset: ag_client_retention
+      x_axis: VizFieldFull {
+        label: 'Region'
+        ref: r(ag_region.region_name)
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Order Fill Rate'
+            ref: 'order_fill_rate'
+            format {
+              type: 'number'
+              pattern: '0.0%'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block k_rpa: VizBlock {
+    label: 'Revenue / Active Agency'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'revenue_per_agency'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_rpr: VizBlock {
+    label: 'Revenue / Recruiter'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'revenue_per_recruiter'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_mph: VizBlock {
+    label: 'Margin / Worked Hour'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'margin_per_hour'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_out: VizBlock {
+    label: 'Outstanding Amount'
+    viz: MetricKpi {
+      dataset: ag_revenue_margin
+      value: VizFieldFull {
+        ref: 'outstanding_amount'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block h_fun: TextBlock {
+    content: @md ## Recruitment Funnel — applications to placements ;;
+  }
+
+  block k_app: VizBlock {
+    label: 'Applications'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'total_applications'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_sub: VizBlock {
+    label: 'Submissions'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'total_submissions'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_int: VizBlock {
+    label: 'Interviews'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'total_interviews'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_off: VizBlock {
+    label: 'Offers'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'total_offers'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_fplc: VizBlock {
+    label: 'Placements'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'total_placements'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_a2s: VizBlock {
+    label: 'Application → Submission'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'application_to_submission_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_a2p: VizBlock {
+    label: 'Application → Placement'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'application_to_placement_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_o2p: VizBlock {
+    label: 'Offer → Placement'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'offer_to_placement_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_ppr: VizBlock {
+    label: 'Placements / Recruiter'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'placements_per_recruiter'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block c_plc_status: VizBlock {
+    label: 'Placements by Status'
+    viz: CombinationChart {
+      dataset: ag_recruitment_funnel
+      x_axis: VizFieldFull {
+        label: 'Status'
+        ref: r(ag_placement.placement_status)
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Placements'
+            ref: 'total_placements'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_plc_month: VizBlock {
+    label: 'Placements by Month'
+    viz: CombinationChart {
+      dataset: ag_recruitment_funnel
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(ag_placement.placed_at)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Placements'
+            ref: 'total_placements'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+        show_data_points: true
+        row_limit: 5000
+      }
+    }
+  }
+
+  block k_apd: VizBlock {
+    label: 'Avg Days: Placed → Start'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'avg_days_placed_to_start'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_chd: VizBlock {
+    label: 'Candidates Handled'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'candidates_handled'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_pcc: VizBlock {
+    label: 'Placement / Candidate'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'placement_conversion_per_candidate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_plq: VizBlock {
+    label: 'Placements (Prev Qtr)'
+    viz: MetricKpi {
+      dataset: ag_recruitment_funnel
+      value: VizFieldFull {
+        ref: 'placements_prev_quarter'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block h_sta: TextBlock {
+    content: @md ## Assignment delivery & quality ;;
+  }
+
+  block k_asg: VizBlock {
+    label: 'Total Assignments'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'total_assignments'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_aasg: VizBlock {
+    label: 'Active Assignments'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'active_assignments'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_cmp: VizBlock {
+    label: 'Completion Rate'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'completion_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_nos: VizBlock {
+    label: 'No-show Rate'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'no_show_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_eta: VizBlock {
+    label: 'Early Termination Rate'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'early_termination_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block c_asg_month: VizBlock {
+    label: 'Assignments Started by Month'
+    viz: CombinationChart {
+      dataset: ag_staffing_assignments
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(ag_assignment.start_date)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Assignments'
+            ref: 'total_assignments'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+        show_data_points: true
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_hours_week: VizBlock {
+    label: 'Billable Hours by Week'
+    viz: CombinationChart {
+      dataset: ag_staffing_assignments
+      x_axis: VizFieldFull {
+        label: 'Work Week'
+        ref: r(ag_timesheet.work_week_start_date)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Billable Hours'
+            ref: 'total_billable_hours'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block k_aal: VizBlock {
+    label: 'Avg Assignment Length (d)'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'avg_assignment_length_days'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_tbh: VizBlock {
+    label: 'Total Billable Hours'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'total_billable_hours'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_tsh: VizBlock {
+    label: 'Total Scheduled Hours'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'total_scheduled_hours'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_apw: VizBlock {
+    label: 'Assignments / Worker'
+    viz: MetricKpi {
+      dataset: ag_staffing_assignments
+      value: VizFieldFull {
+        ref: 'assignments_per_worker'
+        format {
+          type: 'number'
+          pattern: '#,##0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block h_cli: TextBlock {
+    content: @md ## Client base, demand & regional fulfilment ;;
+  }
+
+  block k_tcli: VizBlock {
+    label: 'Total Clients'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'total_clients'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_acli: VizBlock {
+    label: 'Active Clients'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'active_clients'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_rcli: VizBlock {
+    label: 'At-risk Clients'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'at_risk_clients'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_ccli: VizBlock {
+    label: 'Churned Clients'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'churned_clients'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_scli: VizBlock {
+    label: 'Strategic Accounts'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'strategic_accounts'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_rpc: VizBlock {
+    label: 'Revenue / Client'
+    viz: MetricKpi {
+      dataset: ag_client_retention
+      value: VizFieldFull {
+        ref: 'revenue_per_client'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block c_cli_status: VizBlock {
+    label: 'Clients by Status'
+    viz: CombinationChart {
+      dataset: ag_client_retention
+      x_axis: VizFieldFull {
+        label: 'Client Status'
+        ref: r(ag_client.client_status)
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Clients'
+            ref: 'total_clients'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_ofr_region2: VizBlock {
+    label: 'Order Fill Rate by Region'
+    viz: CombinationChart {
+      dataset: ag_client_retention
+      x_axis: VizFieldFull {
+        label: 'Region'
+        ref: r(ag_region.region_name)
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Order Fill Rate'
+            ref: 'order_fill_rate'
+            format {
+              type: 'number'
+              pattern: '0.0%'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block t_region: VizBlock {
+    label: 'Demand & Fulfilment by Region'
+    viz: DataTable {
+      dataset: ag_client_retention
+      fields: [
+        VizFieldFull {
+          label: 'Region'
+          ref: r(ag_region.region_name)
+          format { type: 'text' }
+        },
+        VizFieldFull {
+          label: 'Job Orders'
+          ref: 'total_job_orders'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Openings'
+          ref: 'total_openings'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Filled'
+          ref: 'filled_job_orders'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Order Fill Rate'
+          ref: 'order_fill_rate'
+          format {
+            type: 'number'
+            pattern: '0.0%'
+          }
+        }
+      ]
+      settings { show_row_number: true row_limit: 5000 }
+    }
+  }
+
+  block h_tra: TextBlock {
+    content: @md ## Training & skills development ;;
+  }
+
+  block k_enr: VizBlock {
+    label: 'Enrollments'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'total_enrollments'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_tcr: VizBlock {
+    label: 'Completion Rate'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'completion_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_ptp: VizBlock {
+    label: 'Post-training Placement'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'post_training_placement_rate'
+        format {
+          type: 'number'
+          pattern: '0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_tcost: VizBlock {
+    label: 'Training Cost'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'total_training_cost'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block c_enr_status: VizBlock {
+    label: 'Enrollments by Completion Status'
+    viz: CombinationChart {
+      dataset: ag_training
+      x_axis: VizFieldFull {
+        label: 'Completion Status'
+        ref: r(ag_candidate_training.completion_status)
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Enrollments'
+            ref: 'total_enrollments'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings { color: '#E2231A' }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block k_cert: VizBlock {
+    label: 'Certifications Issued'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'certifications_issued'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_tcpc: VizBlock {
+    label: 'Cost / Completion'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'training_cost_per_completion'
+        format {
+          type: 'number'
+          pattern: '[$$]#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_trc: VizBlock {
+    label: 'Trained Candidates'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'trained_candidates'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block k_avs: VizBlock {
+    label: 'Avg Training Score'
+    viz: MetricKpi {
+      dataset: ag_training
+      value: VizFieldFull {
+        ref: 'avg_training_score'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        metric_value { font_size: 30 }
+        label { font_size: 13 }
+        row_limit: 1
+      }
+    }
+  }
+
+  block h_adv: TextBlock {
+    content: @md ## Advanced analytics — conversion funnel, cohort retention & margin bridge ;;
+  }
+
+  block v_funnel: VizBlock {
+    label: 'Recruitment Conversion Funnel'
+    viz: ConversionFunnel {
+      dataset: ag_recruitment_funnel
+      values: [
+        VizFieldFull { ref: 'total_applications' label: 'Applications' format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { ref: 'total_submissions' label: 'Submissions' format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { ref: 'total_interviews' label: 'Interviews' format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { ref: 'total_offers' label: 'Offers' format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { ref: 'total_placements' label: 'Placements' format { type: 'number' pattern: '#,##0' } }
+      ]
+      settings { columns_color: '#E2231A' show_label: true show_table: true }
+    }
+  }
+
+  block v_cohort: VizBlock {
+    label: 'Client Revenue Cohort (by acquisition month)'
+    viz: RetentionHeatmap {
+      dataset: ag_client_retention
+      filter {
+        field: ref('ag_client', 'cohort_month')
+        operator: 'last'
+        value: 12
+        modifier: 'month'
+      }
+      filter {
+        field: ref('ag_invoice', 'months_since_acquisition')
+        operator: 'greater_than'
+        value: -1
+      }
+      filter {
+        field: ref('ag_invoice', 'months_since_acquisition')
+        operator: 'less_than'
+        value: 12
+      }
+      cohort: VizFieldFull {
+        ref: ref('ag_client', 'cohort_month')
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      cohort_duration: VizFieldFull { ref: ref('ag_invoice', 'months_since_acquisition') format { type: 'number' } }
+      cohort_value: VizFieldFull { ref: 'total_revenue' format { type: 'number' pattern: '[$$]#,##0' } }
+      settings { display_percentage_values: false convert_empty_to_zero: true }
+    }
+  }
+
+  block v_waterfall: VizBlock {
+    label: 'Margin Bridge (Revenue → Labor Cost → Gross Margin)'
+    viz: CombinationChart {
+      dataset: ag_revenue_margin
+      x_axis: VizFieldFull { ref: ref('ag_margin_bridge', 'step') format { type: 'text' } }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull { ref: ref('ag_margin_bridge', 'base_amount') }
+          settings { color: '#FFFFFF' }
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull { ref: ref('ag_margin_bridge', 'delta_amount') label: 'Amount' format { type: 'number' pattern: '[$$]#,##0' } }
+          settings { color: '#E2231A' }
+        }
+        settings { stack_series_by: 'value' }
+      }
+      settings { row_limit: 100 }
+    }
+  }
+
+  block h_adv_note: TextBlock {
+    content: @md ### How to read these\n**Funnel** — stage-to-stage drop-off from applications to placements.\n\n**Cohort** — each row is a client-acquisition month; columns are months since acquisition; cells show revenue (the post-acquisition revenue curve).\n\n**Margin bridge** — a waterfall from Revenue down through Labor Cost to Gross Margin (built from a query model; not affected by the Invoice Period filter). ;;
+  }
+
+  block f_region_rec: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_recruitment_funnel
+      field: ref('ag_region', 'region_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_cstatus_rec: FilterBlock {
+    label: 'Client Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_recruitment_funnel
+      field: ref('ag_client', 'client_status')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_region_del: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_staffing_assignments
+      field: ref('ag_region', 'region_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_cstatus_del: FilterBlock {
+    label: 'Client Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_staffing_assignments
+      field: ref('ag_client', 'client_status')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_inv_date_cli: FilterBlock {
+    label: 'Invoice Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_client_retention
+      field: ref('ag_invoice', 'invoice_date')
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_region_cli: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_client_retention
+      field: ref('ag_region', 'region_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_industry_cli: FilterBlock {
+    label: 'Industry'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_client_retention
+      field: ref('ag_industry', 'industry_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_cstatus_cli: FilterBlock {
+    label: 'Client Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_client_retention
+      field: ref('ag_client', 'client_status')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_region_adv: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_recruitment_funnel
+      field: ref('ag_region', 'region_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block f_cstatus_adv: FilterBlock {
+    label: 'Client Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ag_recruitment_funnel
+      field: ref('ag_client', 'client_status')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  view: TabLayout {
+    label: 'Actual Group'
+    tab tab1: CanvasLayout {
+      label: 'Executive'
+      width: 1320
+      height: 956
+      grid_size: 20
+      auto_expand_vertically: true
+      block b_title { position: pos(20, 20, 1280, 96) }
+      block f_inv_date { position: pos(20, 126, 305, 70) }
+      block f_region { position: pos(345, 126, 305, 70) }
+      block f_industry { position: pos(670, 126, 305, 70) }
+      block f_client_status { position: pos(995, 126, 305, 70) }
+      block k_rev { position: pos(20, 216, 200, 110) }
+      block k_gm { position: pos(236, 216, 200, 110) }
+      block k_gmr { position: pos(452, 216, 200, 110) }
+      block k_plc { position: pos(668, 216, 200, 110) }
+      block k_ofr { position: pos(884, 216, 200, 110) }
+      block k_qoq { position: pos(1100, 216, 200, 110) }
+      block c_rev_month { position: pos(20, 346, 630, 280) }
+      block c_rev_ind { position: pos(670, 346, 630, 280) }
+      block c_ofr_region_x { position: pos(20, 636, 630, 280) }
+      block k_rpa { position: pos(670, 636, 305, 130) }
+      block k_rpr { position: pos(985, 636, 315, 130) }
+      block k_mph { position: pos(670, 786, 305, 130) }
+      block k_out { position: pos(985, 786, 315, 130) }
+      mobile { mode: 'auto' }
+    }
+    tab tab2: CanvasLayout {
+      label: 'Recruitment'
+      width: 1320
+      height: 854
+      grid_size: 20
+      auto_expand_vertically: true
+      block h_fun { position: pos(20, 104, 1280, 30) }
+      block k_app { position: pos(20, 144, 240, 110) }
+      block k_sub { position: pos(280, 144, 240, 110) }
+      block k_int { position: pos(540, 144, 240, 110) }
+      block k_off { position: pos(800, 144, 240, 110) }
+      block k_fplc { position: pos(1060, 144, 240, 110) }
+      block k_a2s { position: pos(20, 274, 305, 110) }
+      block k_a2p { position: pos(345, 274, 305, 110) }
+      block k_o2p { position: pos(670, 274, 305, 110) }
+      block k_ppr { position: pos(995, 274, 305, 110) }
+      block c_plc_status { position: pos(20, 404, 630, 280) }
+      block c_plc_month { position: pos(670, 404, 630, 280) }
+      block k_apd { position: pos(20, 704, 305, 110) }
+      block k_chd { position: pos(345, 704, 305, 110) }
+      block k_pcc { position: pos(670, 704, 305, 110) }
+      block k_plq { position: pos(995, 704, 305, 110) }
+      block f_region_rec { position: pos(20, 20, 305, 64) }
+      block f_cstatus_rec { position: pos(345, 20, 305, 64) }
+      mobile { mode: 'auto' }
+    }
+    tab tab3: CanvasLayout {
+      label: 'Delivery & Staffing'
+      width: 1320
+      height: 724
+      grid_size: 20
+      auto_expand_vertically: true
+      block h_sta { position: pos(20, 104, 1280, 30) }
+      block k_asg { position: pos(20, 144, 240, 110) }
+      block k_aasg { position: pos(280, 144, 240, 110) }
+      block k_cmp { position: pos(540, 144, 240, 110) }
+      block k_nos { position: pos(800, 144, 240, 110) }
+      block k_eta { position: pos(1060, 144, 240, 110) }
+      block c_asg_month { position: pos(20, 274, 630, 280) }
+      block c_hours_week { position: pos(670, 274, 630, 280) }
+      block k_aal { position: pos(20, 574, 305, 110) }
+      block k_tbh { position: pos(345, 574, 305, 110) }
+      block k_tsh { position: pos(670, 574, 305, 110) }
+      block k_apw { position: pos(995, 574, 305, 110) }
+      block f_region_del { position: pos(20, 20, 305, 64) }
+      block f_cstatus_del { position: pos(345, 20, 305, 64) }
+      mobile { mode: 'auto' }
+    }
+    tab tab4: CanvasLayout {
+      label: 'Clients & Regions'
+      width: 1320
+      height: 854
+      grid_size: 20
+      auto_expand_vertically: true
+      block h_cli { position: pos(20, 104, 1280, 30) }
+      block k_tcli { position: pos(20, 144, 200, 110) }
+      block k_acli { position: pos(236, 144, 200, 110) }
+      block k_rcli { position: pos(452, 144, 200, 110) }
+      block k_ccli { position: pos(668, 144, 200, 110) }
+      block k_scli { position: pos(884, 144, 200, 110) }
+      block k_rpc { position: pos(1100, 144, 200, 110) }
+      block c_cli_status { position: pos(20, 274, 630, 280) }
+      block c_ofr_region2 { position: pos(670, 274, 630, 280) }
+      block t_region { position: pos(20, 574, 1280, 240) }
+      block f_inv_date_cli { position: pos(20, 20, 305, 64) }
+      block f_region_cli { position: pos(345, 20, 305, 64) }
+      block f_industry_cli { position: pos(670, 20, 305, 64) }
+      block f_cstatus_cli { position: pos(995, 20, 305, 64) }
+      mobile { mode: 'auto' }
+    }
+    tab tab5: CanvasLayout {
+      label: 'Training'
+      width: 1320
+      height: 510
+      grid_size: 20
+      auto_expand_vertically: true
+      block h_tra { position: pos(20, 20, 1280, 30) }
+      block k_enr { position: pos(20, 60, 305, 110) }
+      block k_tcr { position: pos(345, 60, 305, 110) }
+      block k_ptp { position: pos(670, 60, 305, 110) }
+      block k_tcost { position: pos(995, 60, 305, 110) }
+      block c_enr_status { position: pos(20, 190, 630, 280) }
+      block k_cert { position: pos(670, 190, 305, 130) }
+      block k_tcpc { position: pos(985, 190, 315, 130) }
+      block k_trc { position: pos(670, 340, 305, 130) }
+      block k_avs { position: pos(985, 340, 315, 130) }
+      mobile { mode: 'auto' }
+    }
+    tab tab6: CanvasLayout {
+      label: 'Advanced'
+      width: 1320
+      height: 924
+      grid_size: 20
+      auto_expand_vertically: true
+      block h_adv { position: pos(20, 104, 1280, 30) }
+      block v_funnel { position: pos(20, 144, 630, 380) }
+      block v_cohort { position: pos(670, 144, 630, 380) }
+      block v_waterfall { position: pos(20, 544, 630, 340) }
+      block h_adv_note { position: pos(670, 544, 630, 340) }
+      block f_region_adv { position: pos(20, 20, 305, 64) }
+      block f_cstatus_adv { position: pos(345, 20, 305, 64) }
+      mobile { mode: 'auto' }
+    }
+  }
+
+  theme: ag_actual_group
+}

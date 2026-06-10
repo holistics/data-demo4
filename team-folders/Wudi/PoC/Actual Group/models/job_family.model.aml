@@ -1,0 +1,33 @@
+Model ag_job_family {
+  type: 'table'
+  label: 'Job Family'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension job_family_id {
+    label: 'Job Family Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_family_id }};;
+  }
+  dimension parent_job_family_id {
+    label: 'Parent Job Family Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.parent_job_family_id }};;
+  }
+  dimension job_family_code {
+    label: 'Job Family Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_family_code }};;
+  }
+  dimension job_family_name {
+    label: 'Job Family Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_family_name }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."job_family"'
+}
