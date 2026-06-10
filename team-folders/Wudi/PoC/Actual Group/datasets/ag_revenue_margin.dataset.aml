@@ -28,7 +28,33 @@ Dataset ag_revenue_margin {
     ag_employee,
     ag_margin_bridge
   ]
-  relationships: []
+  relationships: [
+    relationship(ag_agency_region_id, true),
+    relationship(ag_assignment_placement_id, true),
+    relationship(ag_client_contract_client_id, true),
+    relationship(ag_client_industry_id, true),
+    relationship(ag_client_owner_employee_id, true),
+    relationship(ag_employee_agency_id, false),  // pinned off (redundant join path)
+    relationship(ag_invoice_client_id, true),
+    relationship(ag_invoice_line_invoice_id, true),
+    relationship(ag_invoice_line_placement_id, true),
+    relationship(ag_invoice_line_timesheet_id, true),
+    relationship(ag_job_order_agency_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_client_contract_id, true),
+    relationship(ag_job_order_client_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_job_family_id, true),
+    relationship(ag_job_order_owner_employee_id, true),
+    relationship(ag_payment_invoice_id, true),
+    relationship(ag_payroll_cost_timesheet_id, true),
+    relationship(ag_placement_agency_id, true),
+    relationship(ag_placement_client_id, true),
+    relationship(ag_placement_job_order_id, true),
+    relationship(ag_placement_recruiter_employee_id, true),
+    relationship(ag_timesheet_agency_id, true),
+    relationship(ag_timesheet_approved_by_employee_id, true),
+    relationship(ag_timesheet_assignment_id, false),  // pinned off (redundant join path)
+    relationship(ag_timesheet_client_id, true),
+  ]
 
   // ---- Revenue ----
   metric total_revenue {
