@@ -1,0 +1,270 @@
+Dashboard aw_sales_dashboard {
+  title: 'AW Sales'
+  description: 'Migrated from Power BI AW-Sales report. 3 PBI pages -> 3 tabs. Slicer (Fiscal Year / Month) lifted to page-level filters.'
+
+  block filter_fiscal_year: FilterBlock {
+    type: 'field'
+    label: 'Fiscal Year'
+    source: FieldFilterSource {
+      dataset: 'aw_sales'
+      field: r(date.fiscal_year)
+    }
+  }
+  block filter_month: FilterBlock {
+    label: 'Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: aw_sales
+      field: r(date.date)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block pivot_category_business_type: VizBlock {
+    label: 'Sales Amount by Product Category x Reseller Business Type'
+    viz: PivotTable {
+      dataset: aw_sales
+      filter {
+        field: r(reseller.business_type)
+        operator: 'is_not'
+        value: '[Not Applicable]'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Product Category'
+          ref: r(product.category)
+          format {
+            type: 'text'
+          }
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          label: 'Reseller Business Type'
+          ref: r(reseller.business_type)
+          format {
+            type: 'text'
+          }
+          uname: 'reseller_business_type'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Sales Amount'
+          ref: r(sales.total_sales_amount)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'custom_total_sales_amount'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        pagination_size: 100
+        show_row_total: true
+        show_sub_total: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'product_category'
+            width: 155
+          },
+          ColumnStyle {
+            key: 'reseller_business_type'
+            width: 187
+          },
+          ColumnStyle {
+            key: 'custom_total_sales_amount'
+            width: 133
+          }
+        ]
+      }
+    }
+  }
+
+  block map_quantity_country: VizBlock {
+    label: 'Order Quantity by Reseller Country'
+    viz: FilledMap {
+      dataset: aw_sales
+      location {
+        field: VizFieldFull {
+          ref: r(reseller.country_region)
+          label: 'Country'
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        ref: r(sales.total_order_quantity)
+        label: 'Order Quantity'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        map_background: 'light'
+        color_scale: 'vertical'
+        value_colors {
+          style: 'smooth'
+          min {
+            color: '#DBEAFE'
+          }
+          mid {
+            color: '#60A5FA'
+          }
+          max {
+            color: '#1D4ED8'
+          }
+        }
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block area_sales_vs_due: VizBlock {
+    label: 'Sales Amount vs Sales Amount by Due Date (by Month)'
+    viz: AreaChart {
+      dataset: aw_sales
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(date.date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Sales Amount'
+        series {
+          field: VizFieldFull {
+            label: 'Sales Amount'
+            ref: r(sales.total_sales_amount)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+          settings {
+            color: '#18A59E'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Sales Amount by Due Date'
+            ref: r(aw_sales.sales_amount_by_due_date)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+          settings {
+            color: '#A50E43'
+            line_style: 'dashed'
+            line_interpolation: 'smooth'
+          }
+        }
+      }
+      settings {
+        connect_discontinuous_points: false
+        row_limit: 1000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        legend_label: 'top'
+        x_axis_label: 'Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: TabLayout {
+    label: 'AW Sales'
+
+    tab page_1: CanvasLayout {
+      label: 'Page 1'
+      width: 1280
+      height: 800
+      block filter_fiscal_year {
+        position: pos(0, 0, 300, 80)
+      }
+      block filter_month {
+        position: pos(310, 0, 300, 80)
+      }
+      block pivot_category_business_type {
+        position: pos(10, 470, 1260, 330)
+      }
+
+      block map_quantity_country {
+        position: pos(630, 80, 640, 380)
+      }
+      block area_sales_vs_due {
+        position: pos(0, 80, 630, 380)
+      }
+      default_zoom: 'fit_to_page'
+    }
+
+    tab page_2: CanvasLayout {
+      label: 'Page 2'
+      width: 1280
+      height: 800
+
+      block filter_fiscal_year {
+        position: pos(0, 0, 300, 70)
+      }
+
+      block pivot_category_business_type {
+        position: pos(0, 80, 1270, 700)
+      }
+      default_zoom: 'fit_to_page'
+    }
+
+    tab page_3: CanvasLayout {
+      label: 'Page 3'
+      width: 1280
+      height: 800
+
+      block filter_fiscal_year {
+        position: pos(0, 0, 300, 70)
+      }
+
+      block area_sales_vs_due {
+        position: pos(0, 80, 1270, 700)
+      }
+      default_zoom: 'fit_to_page'
+    }
+  }
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'filter_month'
+      to: [
+        CustomMapping {
+          block: 'filter_fiscal_year'
+          disabled: true
+        }
+      ]
+    }
+  ]
+  theme: H.themes.classic
+}

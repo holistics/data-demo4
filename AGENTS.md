@@ -1,4 +1,4 @@
-# Rules
+# User's rules
 
-- When developing AMQL, look for CLI/MCP tools (usually `holistics` and `demo4-development`)
-- Must use `holistics aml validate` every time to validate AMQL syntax
+- When developing AMQL, use tools from the holistics cli (`holistics mcp ...`)
+- SUPER IMPORTANT: everytime, you must run `holistics aml validate` after new/edit AMQL files to validate syntax
