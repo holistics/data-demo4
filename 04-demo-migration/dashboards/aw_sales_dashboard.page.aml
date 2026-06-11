@@ -1,0 +1,351 @@
+Dashboard aw_sales_dashboard {
+  title: 'AdventureWorks Sales'
+  description: 'Migrated from Power BI AdventureWorksSales.Report.'
+
+  block title: TextBlock {
+    content: @md # AdventureWorks Sales ;;
+  }
+
+  block fy_filter: FilterBlock {
+    label: 'Fiscal Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: adventure_works_sales
+      field: r(aw_date.fiscal_year)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block month_filter: FilterBlock {
+    label: 'Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: adventure_works_sales
+      field: r(aw_date.month)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block v_sales_by_date: VizBlock {
+    label: 'Sales Amount by Order Date / Due Date'
+    viz: AreaChart {
+      dataset: adventure_works_sales
+      x_axis: VizFieldFull {
+        ref: r(aw_date.month)
+        label: 'Month'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(aw_sales.sales_amount)
+            label: 'Sales Amount (Order Date)'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#0891F2'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(adventure_works_sales.sales_amount_by_due_date)
+            label: 'Sales Amount by Due Date'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#F1434B'
+            line_interpolation: 'smooth'
+          }
+        }
+        settings {
+          alignment: 'left'
+          scale: 'linear'
+        }
+      }
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'bottom'
+        show_data_points: true
+        connect_discontinuous_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_order_qty_map: VizBlock {
+    label: 'Order Quantity by Reseller Country'
+    viz: FilledMap {
+      dataset: adventure_works_sales
+      location {
+        field: VizFieldFull {
+          label: 'Country Region'
+          ref: r(aw_reseller.country_region)
+          format {
+            type: 'text'
+          }
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        label: 'Order Quantity'
+        ref: r(aw_sales.order_quantity)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Order Quantity'
+            ref: r(aw_sales.order_quantity)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      ]
+      settings {
+        map_background: 'light'
+        color_scale: 'vertical'
+        value_colors {
+          style: 'smooth'
+          min {
+            type: 'percentage'
+            value: 0
+            color: '#E0F2FE'
+          }
+          mid {
+            type: 'percentage'
+            value: 50
+            color: '#38BDF8'
+          }
+          max {
+            type: 'percentage'
+            value: 100
+            color: '#075985'
+          }
+        }
+      }
+    }
+  }
+  block v_pivot_cat_bt: VizBlock {
+    label: 'Sales Amount by Category and Reseller Business Type'
+    viz: PivotTable {
+      dataset: adventure_works_sales
+      filter {
+        field: r(aw_reseller.business_type)
+        operator: 'is_not'
+        value: '[Not Applicable]'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Product Category'
+          ref: r(aw_product.category)
+          format {
+            type: 'text'
+          }
+          uname: 'aw_product_category'
+        },
+        VizFieldFull {
+          label: 'Reseller Business Type'
+          ref: r(aw_reseller.business_type)
+          format {
+            type: 'text'
+          }
+          uname: 'aw_reseller_business_type'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Sales Amount'
+          ref: r(aw_sales.sales_amount)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'custom_sales_amount'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        wrap_cell_text: true
+        pagination_size: 100
+        show_row_total: true
+        show_column_total: true
+        show_sub_total: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'aw_product_category'
+            width: 197
+          },
+          ColumnStyle {
+            key: 'aw_reseller_business_type'
+            width: 226
+          },
+          ColumnStyle {
+            key: 'custom_sales_amount'
+            width: 167
+          }
+        ]
+      }
+    }
+  }
+
+  block v_running_total_sales: VizBlock {
+    label: 'Running Total Sales'
+    viz: LineChart {
+      dataset: adventure_works_sales
+      x_axis: VizFieldFull {
+        ref: r(aw_date.month)
+        label: 'Month'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(adventure_works_sales.running_total_sales)
+            label: 'Running Total Sales'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            line_interpolation: 'smooth'
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+        show_data_points: true
+        connect_discontinuous_points: true
+      }
+    }
+  }
+
+  view: TabLayout {
+    tab page_1: CanvasLayout {
+      label: 'Page 1'
+      width: 1280
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block title {
+        position: pos(20, 0, 1240, 60)
+      }
+      block fy_filter {
+        position: pos(20, 80, 220, 80)
+      }
+      block month_filter {
+        position: pos(20, 180, 220, 80)
+      }
+      block v_sales_by_date {
+        position: pos(260, 80, 600, 280)
+      }
+      block v_order_qty_map {
+        position: pos(880, 80, 380, 280)
+      }
+      block v_pivot_cat_bt {
+        position: pos(20, 380, 1240, 360)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 'fit_to_page'
+    }
+
+    tab page_2: CanvasLayout {
+      label: 'Page 2'
+      width: 1280
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block v_pivot_cat_bt {
+        position: pos(20, 20, 1240, 720)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 'fit_to_page'
+    }
+
+    tab page_3: CanvasLayout {
+      label: 'Page 3'
+      width: 1280
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block v_sales_by_date {
+        position: pos(20, 20, 1240, 720)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 'fit_to_page'
+    }
+
+    tab page_4: CanvasLayout {
+      label: 'Page 4'
+      width: 1280
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block fy_filter {
+        position: pos(20, 20, 220, 80)
+      }
+      block month_filter {
+        position: pos(20, 120, 220, 80)
+      }
+      block v_running_total_sales {
+        position: pos(260, 20, 1000, 720)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 'fit_to_page'
+    }
+
+  }
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}
