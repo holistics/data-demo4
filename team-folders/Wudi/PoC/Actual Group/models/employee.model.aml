@@ -1,0 +1,81 @@
+Model ag_employee {
+  type: 'table'
+  label: 'Employee'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension employee_id {
+    label: 'Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.employee_id }};;
+  }
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension employee_code {
+    label: 'Employee Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.employee_code }};;
+  }
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension role_title {
+    label: 'Role Title'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.role_title }};;
+  }
+  dimension department {
+    label: 'Department'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.department }};;
+  }
+  dimension manager_employee_id {
+    label: 'Manager Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.manager_employee_id }};;
+  }
+  dimension hire_date {
+    label: 'Hire Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.hire_date }};;
+  }
+  dimension termination_date {
+    label: 'Termination Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.termination_date }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."employee"'
+}

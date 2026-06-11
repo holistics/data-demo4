@@ -1,0 +1,45 @@
+Model ag_exchange_rate {
+  type: 'table'
+  label: 'Exchange Rate'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension exchange_rate_id {
+    label: 'Exchange Rate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.exchange_rate_id }};;
+  }
+  dimension rate_date {
+    label: 'Rate Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.rate_date }};;
+  }
+  dimension from_currency_code {
+    label: 'From Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.from_currency_code }};;
+  }
+  dimension to_currency_code {
+    label: 'To Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.to_currency_code }};;
+  }
+  dimension exchange_rate {
+    label: 'Exchange Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.exchange_rate }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."exchange_rate"'
+}

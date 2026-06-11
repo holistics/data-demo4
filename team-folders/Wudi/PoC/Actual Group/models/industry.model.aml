@@ -1,0 +1,27 @@
+Model ag_industry {
+  type: 'table'
+  label: 'Industry'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension industry_id {
+    label: 'Industry Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.industry_id }};;
+  }
+  dimension industry_code {
+    label: 'Industry Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.industry_code }};;
+  }
+  dimension industry_name {
+    label: 'Industry Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.industry_name }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."industry"'
+}

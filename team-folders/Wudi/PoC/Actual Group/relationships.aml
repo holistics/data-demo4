@@ -1,0 +1,737 @@
+// Relationships for the Actual Group PoC models (auto-generated from FK constraints).
+// type: 'many_to_one' — FK column (many) -> referenced PK (one).
+
+Relationship ag_agency_region_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_agency'
+    field: 'region_id'
+  }
+  to: FieldRef {
+    model: 'ag_region'
+    field: 'region_id'
+  }
+}
+
+Relationship ag_assignment_client_site_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_assignment'
+    field: 'client_site_id'
+  }
+  to: FieldRef {
+    model: 'ag_client_site'
+    field: 'client_site_id'
+  }
+}
+
+Relationship ag_assignment_placement_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_assignment'
+    field: 'placement_id'
+  }
+  to: FieldRef {
+    model: 'ag_placement'
+    field: 'placement_id'
+  }
+}
+
+Relationship ag_candidate_source_channel_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate'
+    field: 'source_channel_id'
+  }
+  to: FieldRef {
+    model: 'ag_source_channel'
+    field: 'source_channel_id'
+  }
+}
+
+Relationship ag_candidate_application_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_application'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_candidate_application_job_order_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_application'
+    field: 'job_order_id'
+  }
+  to: FieldRef {
+    model: 'ag_job_order'
+    field: 'job_order_id'
+  }
+}
+
+Relationship ag_candidate_application_source_channel_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_application'
+    field: 'source_channel_id'
+  }
+  to: FieldRef {
+    model: 'ag_source_channel'
+    field: 'source_channel_id'
+  }
+}
+
+Relationship ag_candidate_skill_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_skill'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_candidate_skill_skill_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_skill'
+    field: 'skill_id'
+  }
+  to: FieldRef {
+    model: 'ag_skill'
+    field: 'skill_id'
+  }
+}
+
+Relationship ag_candidate_status_history_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_status_history'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_candidate_status_history_changed_by_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_status_history'
+    field: 'changed_by_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_candidate_submission_application_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_submission'
+    field: 'application_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate_application'
+    field: 'application_id'
+  }
+}
+
+Relationship ag_candidate_submission_submitted_by_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_submission'
+    field: 'submitted_by_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_candidate_training_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_training'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_candidate_training_training_program_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_candidate_training'
+    field: 'training_program_id'
+  }
+  to: FieldRef {
+    model: 'ag_training_program'
+    field: 'training_program_id'
+  }
+}
+
+Relationship ag_client_industry_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_client'
+    field: 'industry_id'
+  }
+  to: FieldRef {
+    model: 'ag_industry'
+    field: 'industry_id'
+  }
+}
+
+Relationship ag_client_owner_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_client'
+    field: 'owner_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_client_activity_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_client_activity'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_client_activity_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_client_activity'
+    field: 'employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_client_contract_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_client_contract'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_client_site_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_client_site'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_data_quality_event_owner_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_data_quality_event'
+    field: 'owner_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_employee_agency_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_employee'
+    field: 'agency_id'
+  }
+  to: FieldRef {
+    model: 'ag_agency'
+    field: 'agency_id'
+  }
+}
+
+Relationship ag_interview_submission_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_interview'
+    field: 'submission_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate_submission'
+    field: 'submission_id'
+  }
+}
+
+Relationship ag_invoice_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_invoice'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_invoice_line_invoice_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_invoice_line'
+    field: 'invoice_id'
+  }
+  to: FieldRef {
+    model: 'ag_invoice'
+    field: 'invoice_id'
+  }
+}
+
+Relationship ag_invoice_line_placement_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_invoice_line'
+    field: 'placement_id'
+  }
+  to: FieldRef {
+    model: 'ag_placement'
+    field: 'placement_id'
+  }
+}
+
+Relationship ag_invoice_line_timesheet_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_invoice_line'
+    field: 'timesheet_id'
+  }
+  to: FieldRef {
+    model: 'ag_timesheet'
+    field: 'timesheet_id'
+  }
+}
+
+Relationship ag_job_order_agency_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order'
+    field: 'agency_id'
+  }
+  to: FieldRef {
+    model: 'ag_agency'
+    field: 'agency_id'
+  }
+}
+
+Relationship ag_job_order_client_contract_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order'
+    field: 'client_contract_id'
+  }
+  to: FieldRef {
+    model: 'ag_client_contract'
+    field: 'client_contract_id'
+  }
+}
+
+Relationship ag_job_order_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_job_order_client_site_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order'
+    field: 'client_site_id'
+  }
+  to: FieldRef {
+    model: 'ag_client_site'
+    field: 'client_site_id'
+  }
+}
+
+Relationship ag_job_order_job_family_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order'
+    field: 'job_family_id'
+  }
+  to: FieldRef {
+    model: 'ag_job_family'
+    field: 'job_family_id'
+  }
+}
+
+Relationship ag_job_order_owner_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order'
+    field: 'owner_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_job_order_required_skill_job_order_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order_required_skill'
+    field: 'job_order_id'
+  }
+  to: FieldRef {
+    model: 'ag_job_order'
+    field: 'job_order_id'
+  }
+}
+
+Relationship ag_job_order_required_skill_skill_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_job_order_required_skill'
+    field: 'skill_id'
+  }
+  to: FieldRef {
+    model: 'ag_skill'
+    field: 'skill_id'
+  }
+}
+
+Relationship ag_offer_application_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_offer'
+    field: 'application_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate_application'
+    field: 'application_id'
+  }
+}
+
+Relationship ag_payment_invoice_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_payment'
+    field: 'invoice_id'
+  }
+  to: FieldRef {
+    model: 'ag_invoice'
+    field: 'invoice_id'
+  }
+}
+
+Relationship ag_payroll_cost_timesheet_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_payroll_cost'
+    field: 'timesheet_id'
+  }
+  to: FieldRef {
+    model: 'ag_timesheet'
+    field: 'timesheet_id'
+  }
+}
+
+Relationship ag_placement_agency_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_placement'
+    field: 'agency_id'
+  }
+  to: FieldRef {
+    model: 'ag_agency'
+    field: 'agency_id'
+  }
+}
+
+Relationship ag_placement_application_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_placement'
+    field: 'application_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate_application'
+    field: 'application_id'
+  }
+}
+
+Relationship ag_placement_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_placement'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_placement_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_placement'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_placement_job_order_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_placement'
+    field: 'job_order_id'
+  }
+  to: FieldRef {
+    model: 'ag_job_order'
+    field: 'job_order_id'
+  }
+}
+
+Relationship ag_placement_recruiter_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_placement'
+    field: 'recruiter_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_satisfaction_survey_agency_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_satisfaction_survey'
+    field: 'agency_id'
+  }
+  to: FieldRef {
+    model: 'ag_agency'
+    field: 'agency_id'
+  }
+}
+
+Relationship ag_satisfaction_survey_assignment_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_satisfaction_survey'
+    field: 'assignment_id'
+  }
+  to: FieldRef {
+    model: 'ag_assignment'
+    field: 'assignment_id'
+  }
+}
+
+Relationship ag_satisfaction_survey_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_satisfaction_survey'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_satisfaction_survey_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_satisfaction_survey'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_satisfaction_survey_placement_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_satisfaction_survey'
+    field: 'placement_id'
+  }
+  to: FieldRef {
+    model: 'ag_placement'
+    field: 'placement_id'
+  }
+}
+
+Relationship ag_target_plan_agency_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_target_plan'
+    field: 'agency_id'
+  }
+  to: FieldRef {
+    model: 'ag_agency'
+    field: 'agency_id'
+  }
+}
+
+Relationship ag_target_plan_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_target_plan'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_target_plan_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_target_plan'
+    field: 'employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_timesheet_agency_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_timesheet'
+    field: 'agency_id'
+  }
+  to: FieldRef {
+    model: 'ag_agency'
+    field: 'agency_id'
+  }
+}
+
+Relationship ag_timesheet_approved_by_employee_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_timesheet'
+    field: 'approved_by_employee_id'
+  }
+  to: FieldRef {
+    model: 'ag_employee'
+    field: 'employee_id'
+  }
+}
+
+Relationship ag_timesheet_assignment_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_timesheet'
+    field: 'assignment_id'
+  }
+  to: FieldRef {
+    model: 'ag_assignment'
+    field: 'assignment_id'
+  }
+}
+
+Relationship ag_timesheet_candidate_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_timesheet'
+    field: 'candidate_id'
+  }
+  to: FieldRef {
+    model: 'ag_candidate'
+    field: 'candidate_id'
+  }
+}
+
+Relationship ag_timesheet_client_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_timesheet'
+    field: 'client_id'
+  }
+  to: FieldRef {
+    model: 'ag_client'
+    field: 'client_id'
+  }
+}
+
+Relationship ag_training_program_job_family_id {
+  type: 'many_to_one'
+  from: FieldRef {
+    model: 'ag_training_program'
+    field: 'job_family_id'
+  }
+  to: FieldRef {
+    model: 'ag_job_family'
+    field: 'job_family_id'
+  }
+}
+
+// ---- Self-referencing FKs (employee->manager, job_family->parent) ----
+// Holistics cannot relate a model to itself directly; create an aliased
+// model (e.g. ag_employee_manager) and relate to that if you need these.
+// Relationship ag_employee_manager_employee_id {
+//   type: 'many_to_one'
+//   from: FieldRef {
+//     model: 'ag_employee'
+//     field: 'manager_employee_id'
+//   }
+//   to: FieldRef {
+//     model: 'ag_employee'
+//     field: 'employee_id'
+//   }
+// }
+
+// Relationship ag_job_family_parent_job_family_id {
+//   type: 'many_to_one'
+//   from: FieldRef {
+//     model: 'ag_job_family'
+//     field: 'parent_job_family_id'
+//   }
+//   to: FieldRef {
+//     model: 'ag_job_family'
+//     field: 'job_family_id'
+//   }
+// }

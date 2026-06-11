@@ -1,0 +1,51 @@
+Model ag_payment {
+  type: 'table'
+  label: 'Payment'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension payment_id {
+    label: 'Payment Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_id }};;
+  }
+  dimension invoice_id {
+    label: 'Invoice Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.invoice_id }};;
+  }
+  dimension payment_date {
+    label: 'Payment Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_date }};;
+  }
+  dimension payment_amount {
+    label: 'Payment Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_amount }};;
+  }
+  dimension payment_method {
+    label: 'Payment Method'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_method }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."payment"'
+}
