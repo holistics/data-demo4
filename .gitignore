@@ -1,2 +1,10 @@
 .claude/settings.local.json
 .envrc
+
+# Power BI project assets
+*.pbix
+*.pbit
+*.pbip
+*.Report/
+*.SemanticModel/
+.pbi/

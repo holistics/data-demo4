@@ -1,0 +1,98 @@
+// Sales fact model sourced from AdventureWorks
+Model aw_sales {
+  type: 'table'
+  label: 'Sales'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.sales'
+
+  dimension sales_order_line_key {
+    label: 'Sales Order Line Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.SalesOrderLineKey }};;
+  }
+  dimension reseller_key {
+    label: 'Reseller Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.ResellerKey }};;
+  }
+  dimension customer_key {
+    label: 'Customer Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.CustomerKey }};;
+  }
+  dimension product_key {
+    label: 'Product Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.ProductKey }};;
+  }
+  dimension order_date_key {
+    label: 'Order Date Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.OrderDateKey }};;
+  }
+  dimension due_date_key {
+    label: 'Due Date Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.DueDateKey }};;
+  }
+  dimension ship_date_key {
+    label: 'Ship Date Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.ShipDateKey }};;
+  }
+  dimension sales_territory_key {
+    label: 'Sales Territory Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.SalesTerritoryKey }};;
+  }
+  dimension unit_price {
+    label: 'Unit Price'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Unit Price }};;
+  }
+  dimension extended_amount {
+    label: 'Extended Amount'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Extended Amount }};;
+  }
+  dimension unit_price_discount_pct {
+    label: 'Unit Price Discount Pct'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Unit Price Discount Pct }};;
+  }
+  dimension product_standard_cost {
+    label: 'Product Standard Cost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Product Standard Cost }};;
+  }
+
+  measure sales_amount {
+    label: 'Sales Amount'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Sales Amount }};;
+    aggregation_type: 'sum'
+    description: 'SUM(Sales[Sales Amount])'
+  }
+  measure total_product_cost {
+    label: 'Total Product Cost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Total Product Cost }};;
+    aggregation_type: 'sum'
+    description: 'SUM(Sales[Total Product Cost])'
+  }
+  measure order_quantity {
+    label: 'Order Quantity'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Order Quantity }};;
+    aggregation_type: 'sum'
+  }
+}
