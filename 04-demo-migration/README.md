@@ -1,26 +1,29 @@
-# Power BI migration assets
+# Demo migration projects
 
-This folder contains the Holistics AMQL migration output for the AdventureWorks Sales Power BI sample.
+This folder contains Holistics AMQL migration examples grouped by source BI or analytics platform.
 
-## Download source Power BI file
-
-Go to the Microsoft Power BI Desktop samples repository and download the AdventureWorks Sales sample `.pbix` file:
-
-https://github.com/microsoft/powerbi-desktop-samples/blob/main/AdventureWorks%20Sales%20Sample/AdventureWorks%20Sales.pbix
-
-## Convert `.pbix` to Power BI Project format
-
-1. Open `AdventureWorks Sales.pbix` in Power BI Desktop.
-2. Use **File → Save As**.
-3. Choose **Power BI Project (`.pbip`)** format.
-4. Save the generated project under `04-demo-migration/power-bi/`.
-
-Expected generated assets:
+Use one subdirectory per source platform so future migration projects can follow the same shape.
 
 ```text
-04-demo-migration/power-bi/
-├── AdventureWorksSales.Report/
-└── AdventureWorksSales.SemanticModel/
+04-demo-migration/
+├── power-bi/
+│   ├── README.md
+│   └── amql/
+│       ├── dashboards/
+│       ├── datasets/
+│       ├── models/
+│       └── MIGRATION_NOTES.md
+└── superset/        # future migration project
+    ├── README.md
+    └── amql/
 ```
 
-These Power BI assets are source inputs for migration only. They are ignored by git and should not be committed.
+## Current projects
+
+- `power-bi/`: AdventureWorks Sales Power BI sample migrated to Holistics AMQL.
+
+## Project convention
+
+- Keep generated Holistics assets under `<source-platform>/amql/`.
+- Keep source-system setup notes in `<source-platform>/README.md`.
+- Do not commit bulky or generated source project files unless they are needed as reviewed fixtures.
