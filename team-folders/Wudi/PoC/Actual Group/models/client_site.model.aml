@@ -1,0 +1,57 @@
+Model ag_client_site {
+  type: 'table'
+  label: 'Client Site'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension client_site_id {
+    label: 'Client Site Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_site_id }};;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension site_name {
+    label: 'Site Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.site_name }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension country_code {
+    label: 'Country Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+  dimension postal_code {
+    label: 'Postal Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.postal_code }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."client_site"'
+}

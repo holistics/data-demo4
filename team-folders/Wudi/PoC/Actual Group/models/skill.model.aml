@@ -1,0 +1,33 @@
+Model ag_skill {
+  type: 'table'
+  label: 'Skill'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension skill_id {
+    label: 'Skill Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.skill_id }};;
+  }
+  dimension skill_code {
+    label: 'Skill Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.skill_code }};;
+  }
+  dimension skill_name {
+    label: 'Skill Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.skill_name }};;
+  }
+  dimension skill_category {
+    label: 'Skill Category'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.skill_category }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."skill"'
+}

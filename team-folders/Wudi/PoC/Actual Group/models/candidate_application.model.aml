@@ -1,0 +1,63 @@
+Model ag_candidate_application {
+  type: 'table'
+  label: 'Candidate Application'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension application_id {
+    label: 'Application Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.application_id }};;
+  }
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension job_order_id {
+    label: 'Job Order Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_order_id }};;
+  }
+  dimension source_channel_id {
+    label: 'Source Channel Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_channel_id }};;
+  }
+  dimension application_status {
+    label: 'Application Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.application_status }}::text;;
+  }
+  dimension applied_at {
+    label: 'Applied At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.applied_at }};;
+  }
+  dimension last_status_changed_at {
+    label: 'Last Status Changed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.last_status_changed_at }};;
+  }
+  dimension rejection_reason {
+    label: 'Rejection Reason'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.rejection_reason }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."candidate_application"'
+}

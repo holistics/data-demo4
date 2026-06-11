@@ -1,0 +1,51 @@
+Model ag_candidate_status_history {
+  type: 'table'
+  label: 'Candidate Status History'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension candidate_status_history_id {
+    label: 'Candidate Status History Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_status_history_id }};;
+  }
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension old_status {
+    label: 'Old Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.old_status }}::text;;
+  }
+  dimension new_status {
+    label: 'New Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.new_status }}::text;;
+  }
+  dimension changed_at {
+    label: 'Changed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.changed_at }};;
+  }
+  dimension changed_by_employee_id {
+    label: 'Changed By Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.changed_by_employee_id }};;
+  }
+  dimension reason {
+    label: 'Reason'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reason }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."candidate_status_history"'
+}

@@ -1,0 +1,81 @@
+Model ag_satisfaction_survey {
+  type: 'table'
+  label: 'Satisfaction Survey'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension survey_id {
+    label: 'Survey Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.survey_id }};;
+  }
+  dimension subject_type {
+    label: 'Subject Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.subject_type }}::text;;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension assignment_id {
+    label: 'Assignment Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.assignment_id }};;
+  }
+  dimension placement_id {
+    label: 'Placement Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_id }};;
+  }
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension submitted_at {
+    label: 'Submitted At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.submitted_at }};;
+  }
+  dimension nps_score {
+    label: 'Nps Score'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.nps_score }};;
+  }
+  dimension satisfaction_score {
+    label: 'Satisfaction Score'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.satisfaction_score }};;
+  }
+  dimension response_text {
+    label: 'Response Text'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.response_text }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."satisfaction_survey"'
+}
