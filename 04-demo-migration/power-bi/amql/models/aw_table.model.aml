@@ -1,0 +1,19 @@
+Model aw_table {
+  type: 'table'
+  label: 'Category Sort'
+  description: 'PBI Table[Category, Sorting] lookup for sorting Product categories.'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main."table"'
+
+  dimension category {
+    label: 'Category'
+    type: 'text'
+    primary_key: true
+    definition: @sql {{ #SOURCE.Category }};;
+  }
+  dimension sorting {
+    label: 'Sorting'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Sorting }};;
+  }
+}

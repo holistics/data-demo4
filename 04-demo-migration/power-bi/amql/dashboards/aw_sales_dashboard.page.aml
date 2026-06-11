@@ -1,69 +1,196 @@
 Dashboard aw_sales_dashboard {
-  title: 'AW Sales'
-  description: 'Migrated from Power BI AW-Sales report. 3 PBI pages -> 3 tabs. Slicer (Fiscal Year / Month) lifted to page-level filters.'
+  title: 'AdventureWorks Sales'
+  description: 'Migrated from Power BI AdventureWorksSales.Report.'
 
-  block filter_fiscal_year: FilterBlock {
-    type: 'field'
+  block title: TextBlock {
+    content: @md # AdventureWorks Sales ;;
+  }
+
+  block fy_filter: FilterBlock {
     label: 'Fiscal Year'
+    type: 'field'
     source: FieldFilterSource {
-      dataset: 'aw_sales'
-      field: r(date.fiscal_year)
+      dataset: adventure_works_sales
+      field: r(aw_date.fiscal_year)
+    }
+    settings {
+      input_type: 'multiple'
     }
   }
-  block filter_month: FilterBlock {
+
+  block month_filter: FilterBlock {
     label: 'Month'
     type: 'field'
     source: FieldFilterSource {
-      dataset: aw_sales
-      field: r(date.date)
+      dataset: adventure_works_sales
+      field: r(aw_date.month)
     }
-    default {
-      operator: 'matches'
-      value: '$H_NIL$'
+    settings {
+      input_type: 'multiple'
     }
   }
-  block pivot_category_business_type: VizBlock {
-    label: 'Sales Amount by Product Category x Reseller Business Type'
+
+  block v_sales_by_date: VizBlock {
+    label: 'Sales Amount by Order Date / Due Date'
+    viz: AreaChart {
+      dataset: adventure_works_sales
+      x_axis: VizFieldFull {
+        ref: r(aw_date.month)
+        label: 'Month'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(aw_sales.sales_amount)
+            label: 'Sales Amount (Order Date)'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#0891F2'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(adventure_works_sales.sales_amount_by_due_date)
+            label: 'Sales Amount by Due Date'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#F1434B'
+            line_interpolation: 'smooth'
+          }
+        }
+        settings {
+          alignment: 'left'
+          scale: 'linear'
+        }
+      }
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'bottom'
+        show_data_points: true
+        connect_discontinuous_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_order_qty_map: VizBlock {
+    label: 'Order Quantity by Reseller Country'
+    viz: FilledMap {
+      dataset: adventure_works_sales
+      location {
+        field: VizFieldFull {
+          label: 'Country Region'
+          ref: r(aw_reseller.country_region)
+          format {
+            type: 'text'
+          }
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        label: 'Order Quantity'
+        ref: r(aw_sales.order_quantity)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Order Quantity'
+            ref: r(aw_sales.order_quantity)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      ]
+      settings {
+        map_background: 'light'
+        color_scale: 'vertical'
+        value_colors {
+          style: 'smooth'
+          min {
+            type: 'percentage'
+            value: 0
+            color: '#E0F2FE'
+          }
+          mid {
+            type: 'percentage'
+            value: 50
+            color: '#38BDF8'
+          }
+          max {
+            type: 'percentage'
+            value: 100
+            color: '#075985'
+          }
+        }
+      }
+    }
+  }
+  block v_pivot_cat_bt: VizBlock {
+    label: 'Sales Amount by Category and Reseller Business Type'
     viz: PivotTable {
-      dataset: aw_sales
+      dataset: adventure_works_sales
       filter {
-        field: r(reseller.business_type)
+        field: r(aw_reseller.business_type)
         operator: 'is_not'
         value: '[Not Applicable]'
       }
       rows: [
         VizFieldFull {
           label: 'Product Category'
-          ref: r(product.category)
+          ref: r(aw_product.category)
           format {
             type: 'text'
           }
-          uname: 'product_category'
+          uname: 'aw_product_category'
         },
         VizFieldFull {
           label: 'Reseller Business Type'
-          ref: r(reseller.business_type)
+          ref: r(aw_reseller.business_type)
           format {
             type: 'text'
           }
-          uname: 'reseller_business_type'
+          uname: 'aw_reseller_business_type'
         }
       ]
       values: [
         VizFieldFull {
           label: 'Sales Amount'
-          ref: r(sales.total_sales_amount)
+          ref: r(aw_sales.sales_amount)
           format {
             type: 'number'
-            pattern: '[$$]#,###0.00'
+            pattern: '#,###0'
           }
-          uname: 'custom_total_sales_amount'
+          uname: 'custom_sales_amount'
         }
       ]
       settings {
         wrap_header_text: true
+        wrap_cell_text: true
         pagination_size: 100
         show_row_total: true
+        show_column_total: true
         show_sub_total: true
         aggregate_awareness {
           enabled: true
@@ -71,150 +198,88 @@ Dashboard aw_sales_dashboard {
         }
         column_styles: [
           ColumnStyle {
-            key: 'product_category'
-            width: 155
+            key: 'aw_product_category'
+            width: 197
           },
           ColumnStyle {
-            key: 'reseller_business_type'
-            width: 187
+            key: 'aw_reseller_business_type'
+            width: 226
           },
           ColumnStyle {
-            key: 'custom_total_sales_amount'
-            width: 133
+            key: 'custom_sales_amount'
+            width: 167
           }
         ]
       }
     }
   }
 
-  block map_quantity_country: VizBlock {
-    label: 'Order Quantity by Reseller Country'
-    viz: FilledMap {
-      dataset: aw_sales
-      location {
-        field: VizFieldFull {
-          ref: r(reseller.country_region)
-          label: 'Country'
-        }
-        location_type: 'country'
-        primary_field: true
-      }
-      value: VizFieldFull {
-        ref: r(sales.total_order_quantity)
-        label: 'Order Quantity'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      settings {
-        map_background: 'light'
-        color_scale: 'vertical'
-        value_colors {
-          style: 'smooth'
-          min {
-            color: '#DBEAFE'
-          }
-          mid {
-            color: '#60A5FA'
-          }
-          max {
-            color: '#1D4ED8'
-          }
-        }
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block area_sales_vs_due: VizBlock {
-    label: 'Sales Amount vs Sales Amount by Due Date (by Month)'
-    viz: AreaChart {
-      dataset: aw_sales
+  block v_running_total_sales: VizBlock {
+    label: 'Running Total Sales'
+    viz: LineChart {
+      dataset: adventure_works_sales
       x_axis: VizFieldFull {
+        ref: r(aw_date.month)
         label: 'Month'
-        ref: r(date.date)
-        transformation: 'datetrunc month'
         format {
-          type: 'date'
-          pattern: 'LLL yyyy'
+          type: 'text'
         }
       }
       y_axis {
-        label: 'Sales Amount'
         series {
           field: VizFieldFull {
-            label: 'Sales Amount'
-            ref: r(sales.total_sales_amount)
+            ref: r(adventure_works_sales.running_total_sales)
+            label: 'Running Total Sales'
             format {
               type: 'number'
-              pattern: '[$$]#,###0.00'
+              pattern: '#,###0'
             }
           }
           settings {
-            color: '#18A59E'
-            line_interpolation: 'smooth'
-          }
-        }
-        series {
-          field: VizFieldFull {
-            label: 'Sales Amount by Due Date'
-            ref: r(aw_sales.sales_amount_by_due_date)
-            format {
-              type: 'number'
-              pattern: '[$$]#,###0.00'
-            }
-          }
-          settings {
-            color: '#A50E43'
-            line_style: 'dashed'
             line_interpolation: 'smooth'
           }
         }
       }
       settings {
-        connect_discontinuous_points: false
-        row_limit: 1000
-        sort {
-          field_index: 0
-          direction: 'asc'
+        sort: LineFamilySort {
           type: 'xaxis'
+          direction: 'asc'
         }
-        legend_label: 'top'
-        x_axis_label: 'Month'
-        x_axis_show_null_datetime: true
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
+        show_data_points: true
+        connect_discontinuous_points: true
       }
     }
   }
 
   view: TabLayout {
-    label: 'AW Sales'
-
     tab page_1: CanvasLayout {
       label: 'Page 1'
       width: 1280
       height: 800
-      block filter_fiscal_year {
-        position: pos(0, 0, 300, 80)
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block title {
+        position: pos(20, 0, 1240, 60)
       }
-      block filter_month {
-        position: pos(310, 0, 300, 80)
+      block fy_filter {
+        position: pos(20, 80, 220, 80)
       }
-      block pivot_category_business_type {
-        position: pos(10, 470, 1260, 330)
+      block month_filter {
+        position: pos(20, 180, 220, 80)
+      }
+      block v_sales_by_date {
+        position: pos(260, 80, 600, 280)
+      }
+      block v_order_qty_map {
+        position: pos(880, 80, 380, 280)
+      }
+      block v_pivot_cat_bt {
+        position: pos(20, 380, 1240, 360)
       }
 
-      block map_quantity_country {
-        position: pos(630, 80, 640, 380)
-      }
-      block area_sales_vs_due {
-        position: pos(0, 80, 630, 380)
+      mobile {
+        mode: 'auto'
       }
       default_zoom: 'fit_to_page'
     }
@@ -223,13 +288,15 @@ Dashboard aw_sales_dashboard {
       label: 'Page 2'
       width: 1280
       height: 800
+      grid_size: 20
+      auto_expand_vertically: true
 
-      block filter_fiscal_year {
-        position: pos(0, 0, 300, 70)
+      block v_pivot_cat_bt {
+        position: pos(20, 20, 1240, 720)
       }
 
-      block pivot_category_business_type {
-        position: pos(0, 80, 1270, 700)
+      mobile {
+        mode: 'auto'
       }
       default_zoom: 'fit_to_page'
     }
@@ -238,16 +305,42 @@ Dashboard aw_sales_dashboard {
       label: 'Page 3'
       width: 1280
       height: 800
+      grid_size: 20
+      auto_expand_vertically: true
 
-      block filter_fiscal_year {
-        position: pos(0, 0, 300, 70)
+      block v_sales_by_date {
+        position: pos(20, 20, 1240, 720)
       }
 
-      block area_sales_vs_due {
-        position: pos(0, 80, 1270, 700)
+      mobile {
+        mode: 'auto'
       }
       default_zoom: 'fit_to_page'
     }
+
+    tab page_4: CanvasLayout {
+      label: 'Page 4'
+      width: 1280
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block fy_filter {
+        position: pos(20, 20, 220, 80)
+      }
+      block month_filter {
+        position: pos(20, 120, 220, 80)
+      }
+      block v_running_total_sales {
+        position: pos(260, 20, 1000, 720)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 'fit_to_page'
+    }
+
   }
   settings {
     timezone: 'America/Los_Angeles'
@@ -255,16 +348,4 @@ Dashboard aw_sales_dashboard {
     autorun_on_open: true
     autorun_on_changes: true
   }
-  interactions: [
-    FilterInteraction {
-      from: 'filter_month'
-      to: [
-        CustomMapping {
-          block: 'filter_fiscal_year'
-          disabled: true
-        }
-      ]
-    }
-  ]
-  theme: H.themes.classic
 }
