@@ -1,0 +1,49 @@
+// Customer dimension model migrated from Power BI
+Model aw_customer {
+  type: 'table'
+  label: 'Customer'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.customer'
+
+  // Surrogate key — hidden from end users, used for joins
+  dimension customer_key {
+    label: 'Customer Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.CustomerKey }};;
+  }
+  // Natural business key from source system
+  dimension customer_id {
+    label: 'Customer ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Customer ID }};;
+  }
+  dimension customer {
+    label: 'Customer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Customer }};;
+  }
+
+  // Geography attributes
+  dimension city {
+    label: 'City'
+    type: 'text'
+    definition: @sql {{ #SOURCE.City }};;
+  }
+  dimension state_province {
+    label: 'State-Province'
+    type: 'text'
+    definition: @sql {{ #SOURCE.State-Province }};;
+  }
+  dimension country_region {
+    label: 'Country-Region'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Country-Region }};;
+  }
+  dimension postal_code {
+    label: 'Postal Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Postal Code }};;
+  }
+}
