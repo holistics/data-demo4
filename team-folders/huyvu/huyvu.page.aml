@@ -1,0 +1,53 @@
+Dashboard huyvu {
+  title: 'huyvu'
+  description: ''
+  owner: 'huy.vu@holistics.io'
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    mobile {
+      mode: 'auto'
+    }
+    block v_qunu {
+      position: pos(80, 40, 620, 420)
+    }
+  }
+
+  theme: H.themes.vanilla
+  block v_qunu: VizBlock {
+    label: 'Count of Staff Id by Location Type'
+    viz: ColumnChart {
+      dataset: huyvu_dataset
+      x_axis: VizFieldFull {
+        ref: r(public_dim_staff.location_type)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(public_dim_staff.staff_id)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+}
