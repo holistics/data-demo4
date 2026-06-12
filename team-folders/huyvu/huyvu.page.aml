@@ -19,7 +19,7 @@ Dashboard huyvu {
 
   theme: H.themes.vanilla
   block v_qunu: VizBlock {
-    label: 'Count of Staff Id by Location Type'
+    label: 'HuyVu testing viz'
     viz: ColumnChart {
       dataset: huyvu_dataset
       x_axis: VizFieldFull {
