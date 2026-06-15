@@ -2,7 +2,6 @@ Dashboard huyvu {
   title: 'huyvu'
   description: ''
   owner: 'huy.vu@holistics.io'
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -16,7 +15,6 @@ Dashboard huyvu {
       position: pos(40, 20, 620, 420)
     }
   }
-
   theme: H.themes.vanilla
   block v_qunu: VizBlock {
     label: 'HuyVu testing viz'
@@ -25,12 +23,6 @@ Dashboard huyvu {
       fields: [
         VizFieldFull {
           ref: r(public_dim_staff.location_type)
-          format {
-            type: 'text'
-          }
-        },
-        VizFieldFull {
-          ref: r(public_dim_staff.eh_last_name222)
           format {
             type: 'text'
           }
