@@ -18,27 +18,32 @@ Dashboard huyvu {
   theme: H.themes.vanilla
   block v_qunu: VizBlock {
     label: 'HuyVu testing viz'
-    viz: DataTable {
+    viz: LineChart {
       dataset: huyvu_dataset
-      fields: [
-        VizFieldFull {
-          ref: r(public_dim_staff.location_type)
-          format {
-            type: 'text'
+      x_axis: VizFieldFull {
+        ref: r(public_dim_staff.location_type)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(public_dim_staff.staff_id)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
           }
-        },
-        VizFieldFull {
-          ref: r(public_dim_staff.staff_id)
-          aggregation: 'count'
-          format {
-            type: 'number'
-            pattern: 'inherited'
+          settings {
+            color_palette: 0
           }
         }
-      ]
+      }
       settings {
-        show_row_number: true
         row_limit: 5000
+        x_axis_show_null_datetime: false
         aggregate_awareness {
           enabled: true
           debug_comments: true
