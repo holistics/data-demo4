@@ -75,13 +75,7 @@ Model ecommerce_orders {
     hidden: true
     definition: @aql running_total(ecommerce_orders.total_order, ecommerce_orders.order_month) ;;
     aggregation_type: "custom"
-  }
-  measure delivered_orders_count {
-    label: "Delivered Orders Count"
-    type: "number"
-    definition: @sql count( case when {{#SOURCE.status}} = 'delivered' then 1 else null end);;
-    description: "The total number of orders we delivered this period."
-    aggregation_type: "custom"
+    format: "none"
   }
   measure cancelled_orders_count {
     label: 'Cancelled Orders Count'
@@ -139,5 +133,14 @@ Model ecommerce_orders {
     label: '2024'
     type: "number"
     definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.created_at matches @2024) ;;
+  }
+  measure delivered_orders_count_aql {
+    label: "Delivered Orders Count"
+    type: "number"
+    description: ""
+    hidden: false
+    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'delivered');;
+    aggregation_type: "custom"
+    format: "none"
   }
 }

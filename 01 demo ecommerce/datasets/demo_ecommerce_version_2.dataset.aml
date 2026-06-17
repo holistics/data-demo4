@@ -546,6 +546,14 @@ Note: this can pair with `total_buyers` or `total_users` for a ratio.
     definition: @aql ecommerce_order_items | sum(ecommerce_products.price * ecommerce_orders.discount);;
     format: '[$$]#,###'
   }
+  metric running_total_of_orders_delivered_orders_coun {
+    label: "Running total of Orders Delivered Orders Count AQL"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql ecommerce_orders.delivered_orders_count_aql | running_total();;
+    format: "none"
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CUSTOM VIEWS
