@@ -191,14 +191,6 @@ end;;
     description: "The **total_users** field represents the total count of unique users registered on the ecommerce platform.  \nIt provides the overall size of the buyer base, which is critical for measuring platform reach and tracking user growth.  \nThis metric supports analysis of buyer cohorts and long-term retention, informing strategies to enhance user loyalty and reduce churn."
     hidden: false
     definition: @aql count(ecommerce_users.id);;
-  }
-
-  measure total_users_aql {
-    label: "Total Users (AQL)"
-    type: "number"
-    description: "The **total_users_aql** field represents the total number of unique users registered on the ecommerce platform.  \nIt counts all distinct user IDs to provide the overall size of the user base.  \nThis metric reflects the total buyer population tracked for cohort analysis and retention measurement, supporting evaluation of user growth and loyalty trends."
-    hidden: false
-    definition: @aql count(ecommerce_users.id);;
     aggregation_type: "custom"
   }
 
