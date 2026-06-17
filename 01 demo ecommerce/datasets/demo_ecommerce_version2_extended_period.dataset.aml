@@ -12,6 +12,7 @@ Dataset demo_ecommerce_version_2_extended_with_time_period = demo_ecommerce_vers
     param_model_demo,
     dim_dates,
     ecommerce_employees,
+    ecommerce_product_images,
     date_period
   ]
 })
