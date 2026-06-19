@@ -1,0 +1,75 @@
+Model ag_training_program {
+  type: 'table'
+  label: 'Training Program'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension training_program_id {
+    label: 'Training Program Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.training_program_id }};;
+  }
+  dimension job_family_id {
+    label: 'Job Family Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_family_id }};;
+  }
+  dimension program_code {
+    label: 'Program Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.program_code }};;
+  }
+  dimension program_name {
+    label: 'Program Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.program_name }};;
+  }
+  dimension provider_name {
+    label: 'Provider Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.provider_name }};;
+  }
+  dimension training_category {
+    label: 'Training Category'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.training_category }};;
+  }
+  dimension standard_duration_hours {
+    label: 'Standard Duration Hours'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.standard_duration_hours }};;
+  }
+  dimension standard_cost_amount {
+    label: 'Standard Cost Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.standard_cost_amount }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."training_program"'
+}

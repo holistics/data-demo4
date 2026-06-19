@@ -1,0 +1,63 @@
+Model ag_invoice_line {
+  type: 'table'
+  label: 'Invoice Line'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension invoice_line_id {
+    label: 'Invoice Line Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.invoice_line_id }};;
+  }
+  dimension invoice_id {
+    label: 'Invoice Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.invoice_id }};;
+  }
+  dimension timesheet_id {
+    label: 'Timesheet Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.timesheet_id }};;
+  }
+  dimension placement_id {
+    label: 'Placement Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_id }};;
+  }
+  dimension description {
+    label: 'Description'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.description }};;
+  }
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.quantity }};;
+  }
+  dimension unit_price {
+    label: 'Unit Price'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.unit_price }};;
+  }
+  dimension line_amount {
+    label: 'Line Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.line_amount }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."invoice_line"'
+}

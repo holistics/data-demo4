@@ -1,0 +1,99 @@
+Model ag_client {
+  type: 'table'
+  label: 'Client'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension industry_id {
+    label: 'Industry Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.industry_id }};;
+  }
+  dimension owner_employee_id {
+    label: 'Owner Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_employee_id }};;
+  }
+  dimension client_code {
+    label: 'Client Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_code }};;
+  }
+  dimension client_name {
+    label: 'Client Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_name }};;
+  }
+  dimension client_status {
+    label: 'Client Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_status }}::text;;
+  }
+  dimension headquarters_city {
+    label: 'Headquarters City'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.headquarters_city }};;
+  }
+  dimension headquarters_country_code {
+    label: 'Headquarters Country Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.headquarters_country_code }};;
+  }
+  dimension first_contract_date {
+    label: 'First Contract Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.first_contract_date }};;
+  }
+  dimension acquisition_source {
+    label: 'Acquisition Source'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.acquisition_source }};;
+  }
+  dimension annual_revenue_band {
+    label: 'Annual Revenue Band'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.annual_revenue_band }};;
+  }
+  dimension employee_count_band {
+    label: 'Employee Count Band'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.employee_count_band }};;
+  }
+  dimension strategic_account_flag {
+    label: 'Strategic Account Flag'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.strategic_account_flag }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."client"'
+}

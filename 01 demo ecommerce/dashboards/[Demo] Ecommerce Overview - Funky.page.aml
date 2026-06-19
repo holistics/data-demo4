@@ -750,7 +750,7 @@ display: block;
       layer: 1
     }
     block t3 {
-      position: pos(15, 20, 295, 185)
+      position: pos(-60, 30, 295, 185)
       layer: 1
     }
     block t5 {
