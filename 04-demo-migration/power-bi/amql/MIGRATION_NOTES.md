@@ -1,51 +1,47 @@
-# AW-Sales Power BI → Holistics Migration Notes
+# AdventureWorks Sales Power BI → Holistics Migration Notes
 
-Source: `04-demo-migration/power-bi/AW-Sales.SemanticModel` + `AW-Sales.Report`
-Target: `04-demo-migration/powerbi/amql/` (data source `md_adventure_works_sales`, schema `main`)
+Source: `04-demo-migration/power-bi/AdventureWorksSales.SemanticModel` + `AdventureWorksSales.Report`
+Target: `04-demo-migration/power-bi/amql/` (data source `md_adventure_works_sales`, schema `main`)
 
 ## Artifacts produced
 
 | Kind | File | Source PBI artifact |
 |---|---|---|
-| Model | `models/sales.model.aml` | Sales table |
-| Model | `models/date.model.aml` | Date table |
-| Model | `models/customer.model.aml` | Customer table |
-| Model | `models/product.model.aml` | Product table |
-| Model | `models/reseller.model.aml` | Reseller table |
-| Model | `models/sales_order.model.aml` | Sales Order table |
-| Model | `models/sales_territory.model.aml` | Sales Territory table |
-| Dataset | `datasets/aw_sales.dataset.aml` | Semantic model |
-| Dashboard | `dashboards/aw_sales_dashboard.page.aml` | All 3 Report pages (combined as TabLayout tabs) |
+| Model | `models/aw_sales.model.aml` | Sales table |
+| Model | `models/aw_date.model.aml` | Date table |
+| Model | `models/aw_customer.model.aml` | Customer table |
+| Model | `models/aw_product.model.aml` | Product table |
+| Model | `models/aw_reseller.model.aml` | Reseller table |
+| Model | `models/aw_sales_order.model.aml` | Sales Order table |
+| Model | `models/aw_sales_territory.model.aml` | Sales Territory table |
+| Model | `models/aw_table.model.aml` | Category sort lookup |
+| Dataset | `datasets/adventure_works_sales.dataset.aml` | Semantic model |
+| Dashboard | `dashboards/aw_sales_dashboard.page.aml` | Report pages combined as `TabLayout` tabs |
 
-All files validated: `holistics aml validate 04-demo-migration/powerbi/amql/` → `No compilation errors found.`
+All files validated: `holistics aml validate 04-demo-migration/power-bi/amql/` → `No compilation errors found.`
 
 ## Mapping decisions
 
 ### Models
-- All models use `type: 'query'` with an explicit `SELECT … AS snake_case` to normalize the
-  Power BI source column names (which contain spaces and hyphens, e.g. `Sales Amount`,
-  `Country-Region`, `Order Quantity`) into clean snake_case dimensions. This avoids
-  double-quoting issues with `{{ #SOURCE."Quoted Name" }}` on DuckDB/MotherDuck.
-- All keys (`*Key` columns) kept as `hidden: true`, mirroring PBI `isHidden`.
-- `product.sorting` translated from DAX calc col
-  `Sorting = RELATED('Table'[Sorting])` into an inline CASE
-  (Bikes=1, Components=2, Clothing=3, Accessories=4) because the source
-  PBI `Table` lookup is not present in the warehouse; the values were decoded
-  from the inline TMDL base64 blob.
+- Models use `type: 'table'` and source table names from the `main` schema.
+- Field unames use the `aw_` prefix (`aw_sales`, `aw_date`, etc.) to avoid collisions with other demo projects.
+- Source columns with spaces or hyphens are referenced through `#SOURCE` fields, e.g. `{{ #SOURCE.Sales Amount }}` and `{{ #SOURCE.Country-Region }}`.
+- Keys (`*Key` columns) are kept as `hidden: true`, mirroring PBI `isHidden`.
+- The PBI `Table[Category, Sorting]` lookup is modeled as `aw_table` and related to `aw_product.category`.
 
 ### Relationships
 | PBI | Holistics |
 |---|---|
-| `Sales.CustomerKey → Customer.CustomerKey` (active) | `relationship(sales.customer_key > customer.customer_key, true)` |
-| `Sales.ProductKey → Product.ProductKey` (active) | `relationship(sales.product_key > product.product_key, true)` |
-| `Sales.ResellerKey → Reseller.ResellerKey` (active) | `relationship(sales.reseller_key > reseller.reseller_key, true)` |
-| `Sales.SalesTerritoryKey → SalesTerritory.SalesTerritoryKey` (active) | `relationship(sales.sales_territory_key > sales_territory.sales_territory_key, true)` |
-| `Sales.OrderDateKey → Date.DateKey` (active) | `relationship(sales.order_date_key > date.date_key, true)` |
-| `SalesOrder.SalesOrderLineKey ↔ Sales.SalesOrderLineKey` (active, 1:1 bidi) | `relationship(sales.sales_order_line_key - sales_order.sales_order_line_key, true)` |
-| `Sales.DueDateKey → Date.DateKey` (inactive) | `relationship(sales.due_date_key > date.date_key, false)` |
-| `Sales.ShipDateKey → Date.DateKey` (inactive) | `relationship(sales.ship_date_key > date.date_key, false)` |
-| `Product.Category → Table.Category` | inlined into `product.sorting` dimension (see above) |
-| `Date.Date → LocalDateTable_*.Date` (×3) | skipped (PBI auto date/time bloat — Holistics period fns work directly on `date.date`) |
+| `Sales.CustomerKey → Customer.CustomerKey` (active) | `relationship(aw_sales.customer_key > aw_customer.customer_key, true)` |
+| `Sales.ProductKey → Product.ProductKey` (active) | `relationship(aw_sales.product_key > aw_product.product_key, true)` |
+| `Sales.ResellerKey → Reseller.ResellerKey` (active) | `relationship(aw_sales.reseller_key > aw_reseller.reseller_key, true)` |
+| `Sales.SalesTerritoryKey → SalesTerritory.SalesTerritoryKey` (active) | `relationship(aw_sales.sales_territory_key > aw_sales_territory.sales_territory_key, true)` |
+| `Sales.OrderDateKey → Date.DateKey` (active) | `relationship(aw_sales.order_date_key > aw_date.date_key, true)` |
+| `SalesOrder.SalesOrderLineKey ↔ Sales.SalesOrderLineKey` (active, 1:1 bidi) | `relationship(aw_sales_order.sales_order_line_key - aw_sales.sales_order_line_key, true)` |
+| `Sales.DueDateKey → Date.DateKey` (inactive) | `relationship(aw_sales.due_date_key > aw_date.date_key, false)` |
+| `Sales.ShipDateKey → Date.DateKey` (inactive) | `relationship(aw_sales.ship_date_key > aw_date.date_key, false)` |
+| `Product.Category → Table.Category` | `relationship(aw_product.category > aw_table.category, true)` |
+| `Date.Date → LocalDateTable_*.Date` (×3) | skipped (PBI auto date/time bloat — Holistics period fns work directly on `aw_date.date`) |
 
 ### Measure
 PBI DAX:
@@ -54,13 +50,13 @@ Sales Amount by Due Date = CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(S
 ```
 Holistics AQL (dataset-level metric):
 ```aql
-sum(sales.sales_amount) | with_relationships(sales.due_date_key > date.date_key)
+aw_sales.sales_amount | with_relationships(aw_sales.due_date_key > aw_date.date_key)
 ```
 
 Implicit PBI sums (`SUM(Sales[Sales Amount])`, `SUM(Sales[Order Quantity])`)
-captured as model measures `sales.total_sales_amount` and `sales.total_order_quantity`.
+captured as model measures `aw_sales.sales_amount` and `aw_sales.order_quantity`.
 
-### Dashboard (single dashboard, 3 tabs via `TabLayout`)
+### Dashboard (single dashboard, 4 tabs via `TabLayout`)
 Dashboard uname: `aw_sales_dashboard`.
 
 | PBI page | Tab | Notes |
@@ -68,13 +64,12 @@ Dashboard uname: `aw_sales_dashboard`.
 | Page 1 (ReportSection) | `page_1` | Pivot (Category × Business Type × Sales Amount), FilledMap (Country × Order Quantity), AreaChart (Month × Sales Amount + Sales Amount by Due Date). Slicer (Fiscal Year + Month) lifted to page-level `FilterBlock`s. Textbox + basicShape skipped (decorative). |
 | Page 2 (350b6b5…) | `page_2` | Same pivot as Page 1, reused via shared block. |
 | Page 3 (a113e22…) | `page_3` | Same area chart as Page 1, reused via shared block. |
+| Holistics-only | `page_4` | Running total sales chart. |
 
 Blocks are declared once on the dashboard and referenced inside each `tab CanvasLayout { … }`,
-so Page 2/3 reuse the Page 1 viz definitions without duplication.
+so tabs reuse shared viz definitions without duplication.
 
-The area chart's X axis uses `date.date | datetrunc month` (not the source
-`Month` text column) so months sort chronologically — matching the PBI Fiscal
-hierarchy month behavior.
+The area chart's X axis uses `aw_date.month`, matching the source label from the PBI model.
 
 ## Parity validation (warehouse SQL ground truth)
 
@@ -84,12 +79,12 @@ representative slice are shown below.
 ### Grand total
 | Field | Holistics result |
 |---|---|
-| `sum(sales.sales_amount)` | 109,809,274.20 |
+| `aw_sales.sales_amount` | 109,809,274.20 |
 | `Sales Amount by Due Date` (full sum) | 109,809,274.20 |
-| `count(sales.sales_order_line_key)` | 121,253 |
+| `count(aw_sales.sales_order_line_key)` | 121,253 |
 
 ✓ Both measures sum to the same total — expected, since both use
-`SUM("Sales Amount")` but with different join keys to `date`. Different relationships
+`SUM("Sales Amount")` but with different join keys to `aw_date`. Different relationships
 do not change the *total* of an unconstrained sum.
 
 ### Sales Amount by Fiscal Year
@@ -141,19 +136,17 @@ and can be replayed in DuckDB/MotherDuck to confirm warehouse parity.
 | Page 1 Textbox visual | Decorative title text | If needed, replace with `MarkdownBlock` on canvas. |
 | Page 1 BasicShape visual | Decorative rectangle | Skip or recreate as image/background. |
 | PBI Fiscal hierarchy (Year → Quarter → Month → Date) | Holistics has no first-class drill hierarchy on Canvas Dashboards | Use individual dimensions in viz fields, or wire drill via dashboard interactions. |
-| PBI `LocalDateTable_*` auto date tables | Auto-generated by PBI Auto-date/time | Skipped intentionally — Holistics period functions operate directly on `date.date`. |
+| PBI `LocalDateTable_*` auto date tables | Auto-generated by PBI Auto-date/time | Skipped intentionally — Holistics period functions operate directly on `aw_date.date`. |
 | PBI `DateTableTemplate_*` | Auto-generated template | Skipped. |
 | Alerts / subscriptions / embeds | Not present in source `.pbip` | None needed. If added later: Holistics Alerts/Schedules UI or REST API. |
 
 ## Known follow-ups / open items
 
-1. `[Not Applicable]` rows in `reseller.country_region` and
-   `reseller.business_type` indicate Internet/customer sales that have no
+1. `[Not Applicable]` rows in `aw_reseller.country_region` and
+   `aw_reseller.business_type` indicate Internet/customer sales that have no
    reseller. Confirm with stakeholder whether to filter these out of the
    reseller-centric pivot (PBI shows them; current migration matches PBI).
 2. Date dimension `month` is a VARCHAR in the warehouse (`August 2017`-style).
-   Migration uses `date.date | datetrunc month` for chronological ordering;
-   if you must show the original `Month` label, sort by `date.month_key`.
-3. The "Sorting" calc column on Product is hard-coded to 4 known categories.
-   If the warehouse ever gains a 5th category, add a row to the CASE in
-   `product.sorting`.
+   Current dashboard uses the original `aw_date.month` label; if chronological
+   ordering becomes important, sort by `aw_date.month_key` or switch to
+   `aw_date.date | datetrunc month`.

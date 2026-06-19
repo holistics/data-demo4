@@ -1,0 +1,63 @@
+Model ag_interview {
+  type: 'table'
+  label: 'Interview'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension interview_id {
+    label: 'Interview Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.interview_id }};;
+  }
+  dimension submission_id {
+    label: 'Submission Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.submission_id }};;
+  }
+  dimension scheduled_at {
+    label: 'Scheduled At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.scheduled_at }};;
+  }
+  dimension completed_at {
+    label: 'Completed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.completed_at }};;
+  }
+  dimension interview_stage {
+    label: 'Interview Stage'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.interview_stage }};;
+  }
+  dimension interview_outcome {
+    label: 'Interview Outcome'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.interview_outcome }};;
+  }
+  dimension interviewer_name {
+    label: 'Interviewer Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.interviewer_name }};;
+  }
+  dimension feedback_score {
+    label: 'Feedback Score'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.feedback_score }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."interview"'
+}

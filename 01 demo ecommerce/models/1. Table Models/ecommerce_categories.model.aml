@@ -34,13 +34,6 @@ Model ecommerce_categories {
     definition: @sql {{ #SOURCE.parent_id }};;
   }
 
-  dimension parent_category_name {
-    label: 'Parent Category Name'
-    type: 'text'
-    hidden: false
-    definition: @aql  ;;
-  }
-
   dimension category_cost {
     label: "Category Cost"
     type: "number"
@@ -122,13 +115,12 @@ when {{ name }} in ('Skin Care'
   measure total_categories {
     label: "Total Categories"
     type: "number"
-    definition: @sql count({{ id }});;
+    definition: @aql count(ecommerce_categories.id);;
   }
   measure total_parent_id {
     label: "Count of Parent Ids"
     type: "number"
-    definition: @sql {{ parent_id }};;
+    definition: @aql count(ecommerce_categories.parent_id);;
     description: "This is the description"
-    aggregation_type: "count"
   }
 }

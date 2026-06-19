@@ -1,0 +1,44 @@
+// Query model powering the Margin Bridge waterfall (3 steps: Revenue, -Labor Cost, =Gross Margin).
+// Emits a transparent "base" + visible "delta" per step so a stacked column renders as a waterfall.
+Model ag_margin_bridge {
+  type: 'query'
+  label: 'Margin Bridge'
+  data_source_name: 'demo_actual_group_poc'
+  query: @sql
+    select step, ord, base, delta from (
+      select '1. Revenue'::text as step, 1 as ord, 0::numeric as base,
+        (select coalesce(sum(total_amount),0) from actual_group_poc.invoice) as delta
+      union all
+      select '2. Labor Cost', 2,
+        ((select coalesce(sum(total_amount),0) from actual_group_poc.invoice)
+         - (select coalesce(sum(total_cost_amount),0) from actual_group_poc.payroll_cost)) as base,
+        (select coalesce(sum(total_cost_amount),0) from actual_group_poc.payroll_cost) as delta
+      union all
+      select '3. Gross Margin', 3, 0::numeric,
+        ((select coalesce(sum(total_amount),0) from actual_group_poc.invoice)
+         - (select coalesce(sum(total_cost_amount),0) from actual_group_poc.payroll_cost)) as delta
+    ) t order by ord
+  ;;
+  dimension step {
+    label: 'Step'
+    type: 'text'
+    definition: @sql {{ #SOURCE.step }};;
+  }
+  dimension ord {
+    label: 'Order'
+    type: 'number'
+    definition: @sql {{ #SOURCE.ord }};;
+  }
+  measure base_amount {
+    label: 'Base'
+    type: 'number'
+    aggregation_type: 'sum'
+    definition: @sql {{ #SOURCE.base }};;
+  }
+  measure delta_amount {
+    label: 'Amount'
+    type: 'number'
+    aggregation_type: 'sum'
+    definition: @sql {{ #SOURCE.delta }};;
+  }
+}

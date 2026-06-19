@@ -1,0 +1,130 @@
+// =====================================================================
+// Actual Group PoC — Staffing & Assignments dataset
+// Supports: Temporary Staffing / Assignment Performance, and
+// assignment-quality questions (completion, no-show, early termination).
+// =====================================================================
+Dataset ag_staffing_assignments {
+  __engine__: 'aql'
+  label: '[AG] Staffing & Assignments'
+  description: 'Assignment volume and quality (completion, no-show, early termination), hours, and worker activity.'
+  data_source_name: 'demo_actual_group_poc'
+
+  models: [
+    ag_assignment,
+    ag_placement,
+    ag_timesheet,
+    ag_candidate,
+    ag_job_order,
+    ag_job_family,
+    ag_client,
+    ag_client_site,
+    ag_agency,
+    ag_region
+  ]
+  relationships: [
+    relationship(ag_agency_region_id, true),
+    relationship(ag_assignment_client_site_id, false),  // pinned off (redundant join path)
+    relationship(ag_assignment_placement_id, true),
+    relationship(ag_client_site_client_id, true),
+    relationship(ag_job_order_agency_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_client_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_client_site_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_job_family_id, true),
+    relationship(ag_placement_agency_id, true),
+    relationship(ag_placement_candidate_id, true),
+    relationship(ag_placement_client_id, true),
+    relationship(ag_placement_job_order_id, true),
+    relationship(ag_timesheet_agency_id, true),
+    relationship(ag_timesheet_assignment_id, false),  // pinned off (redundant join path)
+    relationship(ag_timesheet_candidate_id, true),
+    relationship(ag_timesheet_client_id, true),
+  ]
+
+  // ---- Assignment volumes ----
+  metric total_assignments {
+    label: 'Total Assignments'
+    type: 'number'
+    definition: @aql count(ag_assignment.assignment_id);;
+  }
+  metric active_assignments {
+    label: 'Active Assignments'
+    type: 'number'
+    definition: @aql count(ag_assignment.assignment_id) | where(ag_assignment.assignment_status is 'active');;
+  }
+  metric completed_assignments {
+    label: 'Completed Assignments'
+    type: 'number'
+    definition: @aql count(ag_assignment.assignment_id) | where(ag_assignment.completed_flag is true);;
+  }
+  metric no_show_assignments {
+    label: 'No-show Assignments'
+    type: 'number'
+    definition: @aql count(ag_assignment.assignment_id) | where(ag_assignment.no_show_flag is true);;
+  }
+  metric early_terminated_assignments {
+    label: 'Early-terminated Assignments'
+    type: 'number'
+    definition: @aql count(ag_assignment.assignment_id) | where(ag_assignment.early_termination_flag is true);;
+  }
+
+  // ---- Quality rates ----
+  metric completion_rate {
+    label: 'Assignment Completion Rate'
+    type: 'number'
+    definition: @aql safe_divide(completed_assignments, total_assignments);;
+    format: '0.0%'
+  }
+  metric no_show_rate {
+    label: 'No-show Rate'
+    type: 'number'
+    definition: @aql safe_divide(no_show_assignments, total_assignments);;
+    format: '0.0%'
+  }
+  metric early_termination_rate {
+    label: 'Early Termination Rate'
+    type: 'number'
+    definition: @aql safe_divide(early_terminated_assignments, total_assignments);;
+    format: '0.0%'
+  }
+
+  // ---- Duration & hours ----
+  metric avg_assignment_length_days {
+    label: 'Avg Assignment Length (days)'
+    type: 'number'
+    definition: @aql avg(date_diff('day', ag_assignment.start_date, ag_assignment.actual_end_date));;
+    format: '#,##0.0'
+  }
+  metric total_billable_hours {
+    label: 'Total Billable Hours'
+    type: 'number'
+    definition: @aql sum(ag_timesheet.billable_hours);;
+    format: '#,##0'
+  }
+  metric total_scheduled_hours {
+    label: 'Total Scheduled Hours'
+    type: 'number'
+    definition: @aql sum(ag_assignment.scheduled_hours);;
+    format: '#,##0'
+  }
+
+  // ---- Worker reach ----
+  metric distinct_workers {
+    label: 'Distinct Placed Workers'
+    type: 'number'
+    definition: @aql count_distinct(ag_placement.candidate_id);;
+  }
+  metric assignments_per_worker {
+    label: 'Assignments per Worker'
+    type: 'number'
+    definition: @aql safe_divide(total_assignments, distinct_workers);;
+    format: '#,##0.00'
+  }
+
+  // ---- Period comparison ----
+  metric no_show_rate_prev_quarter {
+    label: 'No-show Rate (Prev Quarter)'
+    type: 'number'
+    definition: @aql no_show_rate | relative_period(ag_assignment.start_date, interval(-1 quarter));;
+    format: '0.0%'
+  }
+}

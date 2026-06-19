@@ -1,0 +1,39 @@
+Model ag_region {
+  type: 'table'
+  label: 'Region'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension region_id {
+    label: 'Region Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.region_id }};;
+  }
+  dimension region_code {
+    label: 'Region Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.region_code }};;
+  }
+  dimension region_name {
+    label: 'Region Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.region_name }};;
+  }
+  dimension country_code {
+    label: 'Country Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."region"'
+}

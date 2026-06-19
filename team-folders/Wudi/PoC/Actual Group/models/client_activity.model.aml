@@ -1,0 +1,63 @@
+Model ag_client_activity {
+  type: 'table'
+  label: 'Client Activity'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension client_activity_id {
+    label: 'Client Activity Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_activity_id }};;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension employee_id {
+    label: 'Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.employee_id }};;
+  }
+  dimension activity_type {
+    label: 'Activity Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.activity_type }};;
+  }
+  dimension activity_at {
+    label: 'Activity At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.activity_at }};;
+  }
+  dimension activity_outcome {
+    label: 'Activity Outcome'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.activity_outcome }};;
+  }
+  dimension next_follow_up_at {
+    label: 'Next Follow Up At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.next_follow_up_at }};;
+  }
+  dimension notes {
+    label: 'Notes'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.notes }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."client_activity"'
+}
