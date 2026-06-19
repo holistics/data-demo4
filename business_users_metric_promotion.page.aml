@@ -1,0 +1,42 @@
+Dashboard business_users_metric_promotion {
+  title: 'Business Users Metric Promotion'
+  owner: 'nam.tran@holistics.io'
+  interactions: []
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'Submission'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_7zvv: CanvasLayout {
+      label: 'Approved'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_sl2x: CanvasLayout {
+      label: 'Denied'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+  theme: H.themes.vanilla
+  settings {
+    autorun_on_open: true
+  }
+}
