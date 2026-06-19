@@ -1,5 +1,5 @@
 Dashboard test_ljbnc {
-  title: 'test'
+  title: 'Business User Metrics'
   owner: 'nam.tran@holistics.io'
   block v_rq1a: VizBlock {
     label: 'Product Id, Product Name and 2 more'
@@ -85,4 +85,9 @@ Dashboard test_ljbnc {
     }
   }
   theme: H.themes.vanilla
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
+    autorun_on_open: true
+  }
 }
