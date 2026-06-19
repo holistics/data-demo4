@@ -73,12 +73,12 @@ Model public_matches {
   dimension patch {
     label: 'Patch'
     type: 'text'
-    definition: @aql regexp_extract(public_matches.game_version, 'Version (\\\\d+\\\\.\\\\d+)', 1, group: 1) ;;
+    definition: @aql regexp_extract(public_matches.game_version, '\\\\d+\\\\.\\\\d+', 1) ;;
   }
   dimension platform {
     label: 'Platform'
     type: 'text'
-    definition: @aql regexp_extract(public_matches.match_id, '^([^_]+)_', 1, group: 1) ;;
+    definition: @aql split_part(public_matches.match_id, '_', 1) ;;
   }
   dimension game_date {
     label: 'Game Date'
