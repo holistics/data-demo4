@@ -53,8 +53,8 @@ Model mou_churn_by_billing {
       FROM active_mrr
     )
     SELECT
-      TO_CHAR(b.report_month, 'YYYY-MM') AS month_label,
-      b.report_month::DATE AS report_month,
+      TO_CHAR(b.report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day', 'YYYY-MM') AS month_label,
+      (b.report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day')::DATE AS report_month,
       CASE WHEN b.prev_mrr > 0
         THEN ROUND((COALESCE(mb.churned_mrr, 0) / b.prev_mrr * 100)::NUMERIC, 2)
         ELSE 0 END AS monthly_churn_rate,

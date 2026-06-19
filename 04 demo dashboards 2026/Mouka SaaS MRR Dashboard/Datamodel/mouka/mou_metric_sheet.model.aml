@@ -196,7 +196,7 @@ Model mou_metric_sheet {
         FROM (
           SELECT
             sort_order, raw_val, fmt_val,
-            TO_CHAR(report_month, 'Mon YYYY') AS month_lbl,
+            TO_CHAR(report_month + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day', 'Mon YYYY') AS month_lbl,
             ROW_NUMBER() OVER (PARTITION BY sort_order ORDER BY report_month) AS rn,
             CASE WHEN MAX(raw_val) OVER (PARTITION BY sort_order) = MIN(raw_val) OVER (PARTITION BY sort_order) THEN 12
             ELSE 22 - (raw_val - MIN(raw_val) OVER (PARTITION BY sort_order)) / NULLIF(MAX(raw_val) OVER (PARTITION BY sort_order) - MIN(raw_val) OVER (PARTITION BY sort_order), 0) * 20
@@ -212,7 +212,7 @@ Model mou_metric_sheet {
     combined AS (
       -- Regular month rows — prefix "YYYYMM " for sort, hidden via sub_header row
       SELECT
-        EXTRACT(YEAR FROM report_month)::INT || '/' || EXTRACT(MONTH FROM report_month)::INT AS month_label,
+        EXTRACT(YEAR FROM (report_month + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day'))::INT || '/' || EXTRACT(MONTH FROM (report_month + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day'))::INT AS month_label,
         sort_order, section, metric_name,
         CHR(60)||'div style='||CHR(34)||'text-align:right'||CHR(34)||CHR(62)||fmt_val||CHR(60)||CHR(47)||'div'||CHR(62) AS fmt_val
       FROM flat

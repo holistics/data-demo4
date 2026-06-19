@@ -248,8 +248,8 @@ Model mou_monthly_mrr {
     FROM (
     -- Middle: rates, Tab 1/2 sparklines (from s raw data)
     SELECT
-      s.report_month::DATE AS report_month,
-      TO_CHAR(s.report_month, 'Mon YYYY') AS month_label,
+      (s.report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day')::DATE AS report_month,
+      TO_CHAR(s.report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day', 'Mon YYYY') AS month_label,
       s.total_mrr,
       s.total_mrr * 12 AS arr,
       s.net_new_mrr,
