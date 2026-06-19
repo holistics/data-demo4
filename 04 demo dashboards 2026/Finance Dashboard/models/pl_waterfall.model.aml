@@ -32,12 +32,12 @@ Model pl_waterfall {
   query: @sql WITH base AS (
     SELECT
         a.type,
-        SUM( 
+        SUM(
           CASE
-            WHEN {{ amount_dim_param }} = 'Actual' THEN f.actual_amount
-            WHEN {{ amount_dim_param }} = 'Budget' THEN f.budget_amount
+            WHEN {{ amount_dim_param }} = 'Actual' THEN CAST(f.actual_amount AS numeric)
+            WHEN {{ amount_dim_param }} = 'Budget' THEN CAST(f.budget_amount AS numeric)
             ELSE 0
-          END   
+          END
         ) AS sum_amount
     FROM {{ #fact_gl_entries as f }}
     JOIN {{ #dim_account as a }} ON f.account_id = a.id
