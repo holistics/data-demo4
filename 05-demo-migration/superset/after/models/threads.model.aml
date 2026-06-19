@@ -1,0 +1,88 @@
+Model threads {
+  type: 'table'
+  label: 'Threads'
+  description: 'Migrated from Superset dataset threads (uuid d7438be6-6078-17dd-cf9a-56f0ef546c80).'
+  data_source_name: 'demodb'
+  table_name: 'slack.threads'
+
+  dimension ts {
+    label: 'Ts'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.ts }};;
+  }
+  dimension client_msg_id {
+    label: 'Client Msg Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.client_msg_id }};;
+  }
+  dimension channel_id {
+    label: 'Channel Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.channel_id }};;
+  }
+  dimension thread_ts {
+    label: 'Thread Ts'
+    type: 'text'
+    definition: @sql {{ #SOURCE.thread_ts }};;
+  }
+  dimension latest_reply {
+    label: 'Latest Reply'
+    type: 'text'
+    definition: @sql {{ #SOURCE.latest_reply }};;
+  }
+  dimension team {
+    label: 'Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team }};;
+  }
+  dimension thread_type {
+    label: 'Type'
+    description: 'Maps to source column `type` (reserved word).'
+    type: 'text'
+    definition: @sql {{ #SOURCE.type }};;
+  }
+  dimension user_id {
+    label: 'User'
+    description: 'Maps to source column `user` (reserved word).'
+    type: 'text'
+    definition: @sql {{ #SOURCE.user }};;
+  }
+  dimension subscribed {
+    label: 'Subscribed'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.subscribed }};;
+  }
+  dimension reply_users_count {
+    label: 'Reply Users Count'
+    type: 'number'
+    definition: @sql {{ #SOURCE.reply_users_count }};;
+  }
+  dimension reply_count {
+    label: 'Reply Count'
+    type: 'number'
+    definition: @sql {{ #SOURCE.reply_count }};;
+  }
+  dimension reply_users {
+    label: 'Reply Users'
+    type: 'text'
+    definition: @sql {{ #SOURCE.reply_users }};;
+  }
+  dimension blocks {
+    label: 'Blocks'
+    type: 'text'
+    definition: @sql {{ #SOURCE.blocks }};;
+  }
+  dimension text {
+    label: 'Text'
+    type: 'text'
+    definition: @sql {{ #SOURCE.text }};;
+  }
+
+  measure count {
+    label: 'COUNT(*)'
+    description: 'Migrated from Superset metric `count` (COUNT(*)).'
+    type: 'number'
+    definition: @sql count(*);;
+    aggregation_type: 'custom'
+  }
+}

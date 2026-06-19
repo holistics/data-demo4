@@ -1,0 +1,9 @@
+database: examples
+schema: public
+table_name: messages_channels
+row_count: 4684
+columns:
+  - {name: ts, type: timestamp without time zone, nullable: true}
+  - {name: name, type: text, nullable: true}
+  - {name: text, type: text, nullable: true}
+constraints: []

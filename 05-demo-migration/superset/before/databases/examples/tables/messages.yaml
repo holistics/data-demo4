@@ -1,0 +1,50 @@
+database: examples
+schema: public
+table_name: messages
+row_count: 4684
+columns:
+  - {name: bot_profile__updated, type: timestamp without time zone, nullable: true}
+  - {name: last_read, type: text, nullable: true}
+  - {name: ts, type: timestamp without time zone, nullable: true}
+  - {name: bot_profile__team_id, type: text, nullable: true}
+  - {name: bot_profile__app_id, type: text, nullable: true}
+  - {name: bot_profile__name, type: text, nullable: true}
+  - {name: bot_profile__id, type: text, nullable: true}
+  - {name: parent_user_id, type: text, nullable: true}
+  - {name: client_msg_id, type: text, nullable: true}
+  - {name: icons__emoji, type: text, nullable: true}
+  - {name: channel_id, type: text, nullable: true}
+  - {name: source_team, type: text, nullable: true}
+  - {name: thread_ts, type: text, nullable: true}
+  - {name: old_name, type: text, nullable: true}
+  - {name: latest_reply, type: text, nullable: true}
+  - {name: user_team, type: text, nullable: true}
+  - {name: bot_id, type: text, nullable: true}
+  - {name: file_id, type: text, nullable: true}
+  - {name: username, type: text, nullable: true}
+  - {name: permalink, type: text, nullable: true}
+  - {name: name, type: text, nullable: true}
+  - {name: team, type: text, nullable: true}
+  - {name: subtype, type: text, nullable: true}
+  - {name: topic, type: text, nullable: true}
+  - {name: inviter, type: text, nullable: true}
+  - {name: purpose, type: text, nullable: true}
+  - {name: type, type: text, nullable: true}
+  - {name: user, type: text, nullable: true}
+  - {name: text, type: text, nullable: true}
+  - {name: bot_profile__deleted, type: text, nullable: true}
+  - {name: display_as_bot, type: text, nullable: true}
+  - {name: is_delayed_message, type: text, nullable: true}
+  - {name: is_starred, type: text, nullable: true}
+  - {name: is_intro, type: text, nullable: true}
+  - {name: upload, type: boolean, nullable: true}
+  - {name: subscribed, type: text, nullable: true}
+  - {name: reply_users_count, type: double precision, nullable: true}
+  - {name: unread_count, type: text, nullable: true}
+  - {name: reply_count, type: double precision, nullable: true}
+  - {name: file_ids, type: text, nullable: true}
+  - {name: pinned_to, type: text, nullable: true}
+  - {name: reply_users, type: text, nullable: true}
+  - {name: reactions, type: text, nullable: true}
+  - {name: blocks, type: text, nullable: true}
+constraints: []

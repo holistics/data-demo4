@@ -1,0 +1,238 @@
+Model messages {
+  type: 'table'
+  label: 'Messages'
+  description: 'Migrated from Superset dataset messages (uuid e032c69e-716e-d700-eff7-07800d0f9989).'
+  data_source_name: 'demodb'
+  table_name: 'slack.messages'
+
+  dimension bot_profile_updated {
+    label: 'Bot Profile Updated'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.bot_profile__updated }};;
+  }
+  dimension last_read {
+    label: 'Last Read'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.last_read }};;
+  }
+  dimension ts {
+    label: 'Ts'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.ts }};;
+  }
+  dimension bot_profile_team_id {
+    label: 'Bot Profile Team Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bot_profile__team_id }};;
+  }
+  dimension bot_profile_app_id {
+    label: 'Bot Profile App Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bot_profile__app_id }};;
+  }
+  dimension bot_profile_name {
+    label: 'Bot Profile Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bot_profile__name }};;
+  }
+  dimension bot_profile_id {
+    label: 'Bot Profile Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bot_profile__id }};;
+  }
+  dimension parent_user_id {
+    label: 'Parent User Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.parent_user_id }};;
+  }
+  dimension client_msg_id {
+    label: 'Client Msg Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.client_msg_id }};;
+  }
+  dimension icons_emoji {
+    label: 'Icons Emoji'
+    type: 'text'
+    definition: @sql {{ #SOURCE.icons__emoji }};;
+  }
+  dimension channel_id {
+    label: 'Channel Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.channel_id }};;
+  }
+  dimension source_team {
+    label: 'Source Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.source_team }};;
+  }
+  dimension thread_ts {
+    label: 'Thread Ts'
+    type: 'text'
+    definition: @sql {{ #SOURCE.thread_ts }};;
+  }
+  dimension old_name {
+    label: 'Old Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.old_name }};;
+  }
+  dimension latest_reply {
+    label: 'Latest Reply'
+    type: 'text'
+    definition: @sql {{ #SOURCE.latest_reply }};;
+  }
+  dimension user_team {
+    label: 'User Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.user_team }};;
+  }
+  dimension bot_id {
+    label: 'Bot Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bot_id }};;
+  }
+  dimension file_id {
+    label: 'File Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.file_id }};;
+  }
+  dimension username {
+    label: 'Username'
+    type: 'text'
+    definition: @sql {{ #SOURCE.username }};;
+  }
+  dimension permalink {
+    label: 'Permalink'
+    type: 'text'
+    definition: @sql {{ #SOURCE.permalink }};;
+  }
+  dimension name {
+    label: 'Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension team {
+    label: 'Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team }};;
+  }
+  dimension subtype {
+    label: 'Subtype'
+    type: 'text'
+    definition: @sql {{ #SOURCE.subtype }};;
+  }
+  dimension topic {
+    label: 'Topic'
+    type: 'text'
+    definition: @sql {{ #SOURCE.topic }};;
+  }
+  dimension inviter {
+    label: 'Inviter'
+    type: 'text'
+    definition: @sql {{ #SOURCE.inviter }};;
+  }
+  dimension purpose {
+    label: 'Purpose'
+    type: 'text'
+    definition: @sql {{ #SOURCE.purpose }};;
+  }
+  dimension message_type {
+    label: 'Type'
+    description: 'Maps to source column `type` (reserved word).'
+    type: 'text'
+    definition: @sql {{ #SOURCE.type }};;
+  }
+  dimension user_id {
+    label: 'User'
+    description: 'Maps to source column `user` (reserved word).'
+    type: 'text'
+    definition: @sql {{ #SOURCE.user }};;
+  }
+  dimension bot_profile_deleted {
+    label: 'Bot Profile Deleted'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.bot_profile__deleted }};;
+  }
+  dimension display_as_bot {
+    label: 'Display As Bot'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.display_as_bot }};;
+  }
+  dimension is_delayed_message {
+    label: 'Is Delayed Message'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_delayed_message }};;
+  }
+  dimension is_starred {
+    label: 'Is Starred'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_starred }};;
+  }
+  dimension is_intro {
+    label: 'Is Intro'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_intro }};;
+  }
+  dimension upload {
+    label: 'Upload'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.upload }};;
+  }
+  dimension subscribed {
+    label: 'Subscribed'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.subscribed }};;
+  }
+  dimension reply_users_count {
+    label: 'Reply Users Count'
+    type: 'number'
+    definition: @sql {{ #SOURCE.reply_users_count }};;
+  }
+  dimension unread_count {
+    label: 'Unread Count'
+    type: 'number'
+    definition: @sql {{ #SOURCE.unread_count }};;
+  }
+  dimension reply_count {
+    label: 'Reply Count'
+    type: 'number'
+    definition: @sql {{ #SOURCE.reply_count }};;
+  }
+  dimension file_ids {
+    label: 'File Ids'
+    type: 'text'
+    definition: @sql {{ #SOURCE.file_ids }};;
+  }
+  dimension pinned_to {
+    label: 'Pinned To'
+    type: 'text'
+    definition: @sql {{ #SOURCE.pinned_to }};;
+  }
+  dimension reply_users {
+    label: 'Reply Users'
+    type: 'text'
+    definition: @sql {{ #SOURCE.reply_users }};;
+  }
+  dimension reactions {
+    label: 'Reactions'
+    type: 'text'
+    definition: @sql {{ #SOURCE.reactions }};;
+  }
+  dimension blocks {
+    label: 'Blocks'
+    type: 'text'
+    definition: @sql {{ #SOURCE.blocks }};;
+  }
+  dimension text {
+    label: 'Text'
+    type: 'text'
+    definition: @sql {{ #SOURCE.text }};;
+  }
+
+  measure count {
+    label: 'COUNT(*)'
+    description: 'Migrated from Superset metric `count` (COUNT(*)).'
+    type: 'number'
+    definition: @sql count(*);;
+    aggregation_type: 'custom'
+  }
+}

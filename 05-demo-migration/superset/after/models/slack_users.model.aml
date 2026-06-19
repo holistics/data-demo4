@@ -1,0 +1,106 @@
+Model slack_users {
+  type: 'table'
+  label: 'Users'
+  description: 'Migrated from Superset dataset users (uuid 7195db6b-2d17-7619-b7c7-26b15378df8c).'
+  data_source_name: 'demodb'
+  table_name: 'slack.users'
+
+  dimension updated {
+    label: 'Updated'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.updated }};;
+  }
+  dimension has_2fa {
+    label: 'Has 2Fa'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.has_2fa }};;
+  }
+  dimension real_name {
+    label: 'Real Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.real_name }};;
+  }
+  dimension tz_label {
+    label: 'Tz Label'
+    type: 'text'
+    definition: @sql {{ #SOURCE.tz_label }};;
+  }
+  dimension team_id {
+    label: 'Team Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_id }};;
+  }
+  dimension name {
+    label: 'Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension color {
+    label: 'Color'
+    type: 'text'
+    definition: @sql {{ #SOURCE.color }};;
+  }
+  dimension id {
+    label: 'Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension tz {
+    label: 'Tz'
+    type: 'text'
+    definition: @sql {{ #SOURCE.tz }};;
+  }
+  dimension is_ultra_restricted {
+    label: 'Is Ultra Restricted'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_ultra_restricted }};;
+  }
+  dimension is_primary_owner {
+    label: 'Is Primary Owner'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_primary_owner }};;
+  }
+  dimension is_app_user {
+    label: 'Is App User'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_app_user }};;
+  }
+  dimension is_admin {
+    label: 'Is Admin'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_admin }};;
+  }
+  dimension is_bot {
+    label: 'Is Bot'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_bot }};;
+  }
+  dimension is_restricted {
+    label: 'Is Restricted'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_restricted }};;
+  }
+  dimension is_owner {
+    label: 'Is Owner'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_owner }};;
+  }
+  dimension deleted {
+    label: 'Deleted'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.deleted }};;
+  }
+  dimension tz_offset {
+    label: 'Tz Offset'
+    type: 'number'
+    definition: @sql {{ #SOURCE.tz_offset }};;
+  }
+
+  measure count {
+    label: 'COUNT(*)'
+    description: 'Migrated from Superset metric `count` (COUNT(*)).'
+    type: 'number'
+    definition: @sql count(*);;
+    aggregation_type: 'custom'
+  }
+}

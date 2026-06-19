@@ -1,0 +1,24 @@
+database: examples
+schema: public
+table_name: users
+row_count: 2505
+columns:
+  - {name: updated, type: timestamp without time zone, nullable: true}
+  - {name: has_2fa, type: text, nullable: true}
+  - {name: real_name, type: text, nullable: true}
+  - {name: tz_label, type: text, nullable: true}
+  - {name: team_id, type: text, nullable: true}
+  - {name: name, type: text, nullable: true}
+  - {name: color, type: text, nullable: true}
+  - {name: id, type: text, nullable: true}
+  - {name: tz, type: text, nullable: true}
+  - {name: is_ultra_restricted, type: text, nullable: true}
+  - {name: is_primary_owner, type: boolean, nullable: true}
+  - {name: is_app_user, type: boolean, nullable: true}
+  - {name: is_admin, type: boolean, nullable: true}
+  - {name: is_bot, type: boolean, nullable: true}
+  - {name: is_restricted, type: text, nullable: true}
+  - {name: is_owner, type: boolean, nullable: true}
+  - {name: deleted, type: boolean, nullable: true}
+  - {name: tz_offset, type: double precision, nullable: true}
+constraints: []

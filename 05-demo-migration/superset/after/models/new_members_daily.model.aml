@@ -1,0 +1,33 @@
+Model new_members_daily {
+  type: 'table'
+  label: 'New Members Daily'
+  description: 'Migrated from Superset dataset new_members_daily (uuid 9dd99cda-ff6b-4575-9a74-684d06e871ab).'
+  data_source_name: 'demodb'
+  table_name: 'slack.new_members_daily'
+
+  dimension date {
+    label: 'Date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.date }};;
+  }
+  dimension new_members {
+    label: 'New Members'
+    type: 'number'
+    definition: @sql {{ #SOURCE.new_members }};;
+  }
+
+  measure count {
+    label: 'Count'
+    description: 'Migrated from Superset metric `count` (count(*)).'
+    type: 'number'
+    definition: @sql count(*);;
+    aggregation_type: 'custom'
+  }
+
+  measure total_new_members {
+    label: 'Total New Members'
+    description: 'Migrated from ad-hoc Superset metric SUM(new_members) used by `New Members per Month` chart.'
+    type: 'number'
+    definition: @aql sum(new_members_daily.new_members);;
+  }
+}

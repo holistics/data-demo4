@@ -1,0 +1,31 @@
+Model messages_channels {
+  type: 'table'
+  label: 'Messages Channels'
+  description: 'Migrated from Superset dataset messages_channels (uuid 6e533506-fce6-4f6a-b116-d139df6dbdea).'
+  data_source_name: 'demodb'
+  table_name: 'slack.messages_channels'
+
+  dimension ts {
+    label: 'Ts'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.ts }};;
+  }
+  dimension name {
+    label: 'Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension text {
+    label: 'Text'
+    type: 'text'
+    definition: @sql {{ #SOURCE.text }};;
+  }
+
+  measure count {
+    label: 'Count'
+    description: 'Migrated from Superset metric `count` (count(*)).'
+    type: 'number'
+    definition: @sql count(*);;
+    aggregation_type: 'custom'
+  }
+}

@@ -1,0 +1,8 @@
+database: examples
+schema: public
+table_name: new_members_daily
+row_count: 1141
+columns:
+  - {name: date, type: timestamp without time zone, nullable: true}
+  - {name: new_members, type: double precision, nullable: true}
+constraints: []

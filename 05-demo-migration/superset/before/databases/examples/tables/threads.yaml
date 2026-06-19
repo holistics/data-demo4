@@ -1,0 +1,20 @@
+database: examples
+schema: public
+table_name: threads
+row_count: 85
+columns:
+  - {name: ts, type: timestamp without time zone, nullable: true}
+  - {name: client_msg_id, type: text, nullable: true}
+  - {name: channel_id, type: text, nullable: true}
+  - {name: thread_ts, type: text, nullable: true}
+  - {name: latest_reply, type: text, nullable: true}
+  - {name: team, type: text, nullable: true}
+  - {name: type, type: text, nullable: true}
+  - {name: user, type: text, nullable: true}
+  - {name: text, type: text, nullable: true}
+  - {name: subscribed, type: text, nullable: true}
+  - {name: reply_count, type: double precision, nullable: true}
+  - {name: reply_users, type: text, nullable: true}
+  - {name: blocks, type: text, nullable: true}
+  - {name: reply_users_count, type: double precision, nullable: true}
+constraints: []

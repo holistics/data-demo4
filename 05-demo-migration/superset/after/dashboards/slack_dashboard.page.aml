@@ -1,0 +1,230 @@
+Dashboard slack_overview {
+  title: 'Slack Dashboard'
+  description: 'Migrated from Superset dashboard `Slack Dashboard` (uuid 9726d8b0-222f-eb2c-034a-02b9f51ef5fd).'
+
+  block header: TextBlock {
+    content: @md <div style="
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #4A154B 0%, #611f64 60%, #ECB22E 100%);
+      border-radius: 12px;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    ">
+      <div style="color: #f5e1c8; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;">
+        Migrated from Superset
+      </div>
+      <div style="color: #ffffff; font-size: 28px; font-weight: 700; line-height: 1.2;">
+        Slack Dashboard
+      </div>
+    </div>;;
+  }
+
+  block kpi_members: VizBlock {
+    label: 'Number of Members'
+    viz: MetricKpi {
+      dataset: slack_dashboard
+      value: VizFieldFull {
+        ref: r(slack_users.count)
+        label: 'Slack Members'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_weekly_threads: VizBlock {
+    label: 'Weekly Threads'
+    viz: MetricKpi {
+      dataset: slack_dashboard
+      value: VizFieldFull {
+        ref: r(threads.count)
+        label: 'Weekly Threads'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(threads.ts)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'week'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_weekly_messages: VizBlock {
+    label: 'Weekly Messages'
+    viz: MetricKpi {
+      dataset: slack_dashboard
+      value: VizFieldFull {
+        ref: r(messages.count)
+        label: 'Weekly Messages'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(messages.ts)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'week'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_new_members_monthly: VizBlock {
+    label: 'New Members per Month'
+    viz: MetricKpi {
+      dataset: slack_dashboard
+      value: VizFieldFull {
+        ref: r(new_members_daily.total_new_members)
+        label: 'New Members'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(new_members_daily.date)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block top_timezones: VizBlock {
+    label: 'Top Timezones for Members'
+    viz: DataTable {
+      dataset: slack_dashboard
+      fields: [
+        VizFieldFull {
+          ref: r(slack_users.tz)
+          label: 'Timezone'
+        },
+        VizFieldFull {
+          ref: r(slack_users.count)
+          label: 'Count'
+          format {
+            type: 'number'
+            pattern: '#,###'
+          }
+        }
+      ]
+      settings {
+        row_limit: 10
+      }
+    }
+  }
+
+  block messages_per_channel: VizBlock {
+    label: 'Messages per Channel'
+    viz: AreaChart {
+      dataset: slack_dashboard
+      x_axis: VizFieldFull {
+        ref: r(messages_channels.ts)
+        transformation: 'datetrunc day'
+        format {
+          type: 'date'
+          pattern: 'LLL d'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(messages_channels.name)
+        label: 'Channel'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(messages_channels.count)
+            label: 'Messages'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 1000
+        legend_label: 'top'
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'Overview'
+    width: 1440
+    height: 900
+
+    block header {
+      position: pos(0, 0, 1440, 100)
+    }
+
+    block kpi_members {
+      position: pos(0, 116, 270, 160)
+    }
+
+    block kpi_weekly_threads {
+      position: pos(286, 116, 270, 160)
+    }
+
+    block kpi_weekly_messages {
+      position: pos(572, 116, 270, 160)
+    }
+
+    block kpi_new_members_monthly {
+      position: pos(858, 116, 270, 160)
+    }
+
+    block top_timezones {
+      position: pos(1144, 116, 296, 320)
+    }
+
+    block messages_per_channel {
+      position: pos(0, 292, 1128, 600)
+    }
+  }
+  theme: H.themes.vanilla
+}
