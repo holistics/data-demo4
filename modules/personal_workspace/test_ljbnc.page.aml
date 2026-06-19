@@ -1,66 +1,41 @@
 Dashboard test_ljbnc {
   title: 'Business User Metrics'
   owner: 'nam.tran@holistics.io'
-  block v_rq1a: VizBlock {
-    label: 'Product Id, Product Name and 2 more'
+  block v_tnht: VizBlock {
+    label: 'Classification of Users Age, Users Ag... and Count of Id'
     viz: DataTable {
       dataset: demo_ecommerce_version_2
-      calculation product_rank_by_revenue {
-        label: 'Product Rank By Revenue'
-        formula: @aql rank(order: revenue | desc());;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      filter {
-        field: 'product_rank_by_revenue'
-        operator: 'less_than'
-        value: '6'
+      calculation classification_of_users_age_users_age_users_a {
+        label: 'Classification of Users Age, Users Age, Users Age'
+        formula: @aql case(
+  when: ecommerce_users.age < 30,
+  then: "Under 30",
+  when: ecommerce_users.age > 30 and ecommerce_users.age <= 60,
+  then: "30 to 60",
+  else: "Over 60"
+);;
+        calc_type: 'dimension'
+        data_type: 'text'
+        model: ecommerce_users
       }
       fields: [
         VizFieldFull {
-          label: 'Product Id'
-          ref: r(ecommerce_products.id)
-          format {
-            type: 'number'
-            pattern: 'inherited'
-          }
-        },
-        VizFieldFull {
-          label: 'Product Name'
-          ref: r(ecommerce_products.name)
+          ref: ref('ecommerce_users', 'classification_of_users_age_users_age_users_a')
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          label: 'Revenue'
-          ref: r(demo_ecommerce_version_2.revenue)
+          ref: r(ecommerce_users.id)
+          aggregation: 'count'
           format {
             type: 'number'
-            pattern: '#,###0.00'
-          }
-        },
-        VizFieldFull {
-          label: 'Product Rank By Revenue'
-          ref: 'product_rank_by_revenue'
-          format {
-            type: 'number'
-            pattern: '#,###'
+            pattern: 'inherited'
           }
         }
       ]
       settings {
         show_row_number: true
-        sorts: [
-          SortSetting {
-            field_index: 2
-            direction: 'desc'
-          },
-          SortSetting {
-            field_index: 0
-            direction: 'asc'
-          }
-        ]
         row_limit: 5000
         aggregate_awareness {
           enabled: true
@@ -70,18 +45,40 @@ Dashboard test_ljbnc {
     }
   }
   interactions: []
-  view: CanvasLayout {
+  view: TabLayout {
     label: 'View 1'
-    width: 1300
-    height: 800
-    grid_size: 20
-    auto_expand_vertically: true
-    block v_rq1a {
-      position: pos(20, 20, 620, 420)
-      layer: 1
+    tab view_1: CanvasLayout {
+      label: 'Metric Submission'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      block v_tnht {
+        position: pos(20, 20, 620, 420)
+      }
+      mobile {
+        mode: 'auto'
+      }
     }
-    mobile {
-      mode: 'auto'
+    tab tab_rmma: CanvasLayout {
+      label: 'Metric Approved'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_lon6: CanvasLayout {
+      label: 'Metric Denied'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
     }
   }
   theme: H.themes.vanilla
