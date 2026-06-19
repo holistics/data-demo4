@@ -1,0 +1,73 @@
+Model wc_player_bio {
+  type: 'table'
+  label: 'Player Bio'
+  description: 'Open-data player bio (TheSportsDB), keyed by FIFA player id: age/club/detailed position/cutout image. Matched by name + validated against the squad nationality; matched = false rows are players searched without a confident match (bio hides for them — no fabrication). Tournament stats live in wc_player_stats; this is real-world identity only.'
+  data_source_name: 'demodb'
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_player_id }};;
+    primary_key: true
+  }
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension date_born {
+    label: 'Date of Birth'
+    type: 'date'
+    definition: @sql {{ #SOURCE.date_born }};;
+  }
+  dimension age {
+    label: 'Age'
+    type: 'number'
+    description: 'Whole years from date of birth to today (null when birth date is unknown).'
+    definition: @sql date_part('year', age({{ #SOURCE.date_born }}))::int;;
+  }
+  dimension age_label {
+    label: 'Age Label'
+    type: 'text'
+    description: 'Pre-formatted "26 yrs" (empty when birth date unknown so the chip hides via :empty).'
+    definition: @sql case when {{ #SOURCE.date_born }} is not null then date_part('year', age({{ #SOURCE.date_born }}))::int || ' yrs' else '' end;;
+  }
+  dimension club {
+    label: 'Club'
+    type: 'text'
+    definition: @sql {{ #SOURCE.club }};;
+  }
+  dimension nationality {
+    label: 'Nationality'
+    type: 'text'
+    definition: @sql {{ #SOURCE.nationality }};;
+  }
+  dimension position_detail {
+    label: 'Position (detail)'
+    type: 'text'
+    description: 'Detailed playing position, e.g. "Centre-Forward", "Attacking Midfield".'
+    definition: @sql {{ #SOURCE.position_detail }};;
+  }
+  dimension height {
+    label: 'Height'
+    type: 'text'
+    definition: @sql {{ #SOURCE.height }};;
+  }
+  dimension cutout_url {
+    label: 'Cutout URL'
+    type: 'text'
+    description: 'Transparent player cutout PNG — the FUT card art.'
+    definition: @sql {{ #SOURCE.cutout_url }};;
+  }
+  dimension thumb_url {
+    label: 'Thumb URL'
+    type: 'text'
+    definition: @sql {{ #SOURCE.thumb_url }};;
+  }
+  dimension matched {
+    label: 'Bio Matched'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.matched }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_player_bio"'
+}

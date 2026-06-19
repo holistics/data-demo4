@@ -1,0 +1,30 @@
+Model wc_history_editions {
+  type: 'table'
+  label: 'WC History Editions'
+  description: 'One row per finished World Cup edition 1930–2022 (name, hosts).'
+  data_source_name: 'demodb'
+  dimension year {
+    label: 'Edition'
+    type: 'number'
+    definition: @sql {{ #SOURCE.year }};;
+    primary_key: true
+  }
+  dimension season_id {
+    label: 'FIFA Season ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.season_id }};;
+  }
+  dimension name {
+    label: 'Edition Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension host_codes {
+    label: 'Host Codes'
+    type: 'text'
+    description: 'Comma-separated host nation codes (2002 = KOR,JPN).'
+    definition: @sql {{ #SOURCE.host_codes }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_history_editions"'
+}

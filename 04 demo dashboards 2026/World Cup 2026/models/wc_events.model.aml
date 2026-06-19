@@ -1,0 +1,210 @@
+Model wc_events {
+  type: 'table'
+  label: 'Events'
+  description: 'Match event stream (goals, cards, subs) with running score. Powers the Match Center timeline.'
+  data_source_name: 'demodb'
+  dimension event_id {
+    label: 'Event Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.event_id }};;
+    primary_key: true
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_player_id }};;
+  }
+  dimension type {
+    label: 'Event Type Code'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.type }};;
+  }
+  dimension type_name {
+    label: 'Event Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.type_name }};;
+  }
+  dimension match_minute {
+    label: 'Minute'
+    type: 'text'
+    definition: @sql {{ #SOURCE.match_minute }};;
+  }
+  dimension period {
+    label: 'Period'
+    type: 'number'
+    definition: @sql {{ #SOURCE.period }};;
+  }
+  dimension ts {
+    label: 'Event Time'
+    type: 'datetime'
+    hidden: true
+    definition: @sql {{ #SOURCE.ts }};;
+  }
+  dimension home_goals {
+    label: 'Running Home Goals'
+    type: 'number'
+    definition: @sql {{ #SOURCE.home_goals }};;
+  }
+  dimension away_goals {
+    label: 'Running Away Goals'
+    type: 'number'
+    definition: @sql {{ #SOURCE.away_goals }};;
+  }
+  dimension description {
+    label: 'Description'
+    type: 'text'
+    definition: @sql {{ #SOURCE.description }};;
+  }
+  dimension assist_player_id {
+    label: 'Assist Player Id'
+    type: 'text'
+    hidden: true
+    description: 'On goal events (type 0/41), the FIFA id of the assist provider (same-team IdSubPlayer); null otherwise. Powers per-player assist counts.'
+    definition: @sql {{ #SOURCE.assist_player_id }};;
+  }
+  dimension shot_x {
+    label: 'Shot X'
+    type: 'number'
+    hidden: true
+    description: 'Goal events only: pitch X of the shot origin (0–100 attacking space).'
+    definition: @sql {{ #SOURCE.shot_x }};;
+  }
+  dimension shot_y {
+    label: 'Shot Y'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.shot_y }};;
+  }
+  dimension goal_x {
+    label: 'Goal Mouth X'
+    type: 'number'
+    hidden: true
+    description: 'Goal events only: placement across the goal mouth.'
+    definition: @sql {{ #SOURCE.goal_x }};;
+  }
+  dimension goal_y {
+    label: 'Goal Mouth Y'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.goal_y }};;
+  }
+  dimension is_goal {
+    label: 'Is Goal'
+    type: 'truefalse'
+    definition: @aql in(wc_events.type, 0, 41) ;;
+  }
+  dimension event_icon {
+    label: 'Event Icon'
+    type: 'text'
+    description: 'Driver field: timeline glyph by event type (goal, yellow 2, red 3, sub 5).'
+    definition: @aql case(
+      when: in(wc_events.type, 0, 41), then: '⚽',
+      when: wc_events.type == 2, then: '🟨',
+      when: wc_events.type == 3, then: '🟥',
+      when: wc_events.type == 5, then: '🔄',
+      else: '•'
+    ) ;;
+  }
+  dimension is_key_event {
+    label: 'Is Key Event'
+    type: 'truefalse'
+    description: 'Timeline filter: goals (0/41), yellow (2), red (3), substitutions (5), plus the structural milestones — period starts (7), first-half end (8, period 3) and final whistle (26). Drops Coin Toss / Delay / Resume noise. Second-half end (8, period 5) is excluded: the final whistle row already closes the match.'
+    definition: @aql in(wc_events.type, 0, 41, 2, 3, 5, 7, 26)
+      or (wc_events.type == 8 and wc_events.period == 3) ;;
+  }
+  dimension side {
+    label: 'Side'
+    type: 'text'
+    description: 'Driver field: "home"/"away" of the event\'s team within its match — drives left/right alignment on the Match Center ticker; structural milestones (kick-off, half-time, full time) get "mid" and render as full-width spine markers.'
+    definition: @aql case(
+      when: in(wc_events.type, 7, 8, 26), then: 'mid',
+      when: wc_events.team_code == wc_matches.home_code, then: 'home',
+      else: 'away'
+    ) ;;
+  }
+  dimension event_kind {
+    label: 'Event Kind'
+    type: 'text'
+    description: 'Driver field: ticker row CSS class — goals render as gold hero cards, cards/subs as compact slips, structural rows as spine chips.'
+    definition: @aql case(
+      when: in(wc_events.type, 0, 41), then: 'goal',
+      when: wc_events.type == 2, then: 'yellow',
+      when: wc_events.type == 3, then: 'red',
+      when: wc_events.type == 5, then: 'sub',
+      else: 'ms'
+    ) ;;
+  }
+  dimension milestone_score {
+    label: 'Milestone Score'
+    type: 'text'
+    description: 'Driver field: the score at the break ("1–1") on half-time/full-time rows, empty otherwise (hides via :empty).'
+    definition: @aql case(
+      when: in(wc_events.type, 8, 26), then: concat(cast(wc_events.home_goals, 'text'), '–', cast(wc_events.away_goals, 'text')),
+      else: ''
+    ) ;;
+  }
+  dimension milestone_label {
+    label: 'Milestone Label'
+    type: 'text'
+    description: 'Driver field: short label for structural rows ("Kick-off", "Half-time", "Second half", "Full time"); empty for player events (hides via :empty). FIFA period codes: 3 = first half, 5 = second half.'
+    definition: @aql case(
+      when: wc_events.type == 7 and wc_events.period == 3, then: 'Kick-off',
+      when: wc_events.type == 7, then: 'Second half',
+      when: wc_events.type == 8 and wc_events.period == 3, then: 'Half-time',
+      when: wc_events.type == 26, then: 'Full time',
+      else: ''
+    ) ;;
+  }
+  dimension event_color {
+    label: 'Event Color'
+    type: 'text'
+    description: 'Driver field: ticker spine-dot colour (goal gold, yellow amber, red red, sub grey).'
+    definition: @aql case(
+      when: in(wc_events.type, 0, 41), then: '#C8920A',
+      when: wc_events.type == 2, then: '#E0A23B',
+      when: wc_events.type == 3, then: '#E5362B',
+      else: '#9AA4B2'
+    ) ;;
+  }
+  dimension score_chip {
+    label: 'Score Chip'
+    type: 'text'
+    description: 'Driver field: running score ("1–0") on goal events only, empty otherwise — empty chips hide via CSS :empty.'
+    definition: @aql case(
+      when: in(wc_events.type, 0, 41), then: concat(cast(wc_events.home_goals, 'text'), '–', cast(wc_events.away_goals, 'text')),
+      else: ''
+    ) ;;
+  }
+  // ---- In-match momentum series + shot map (real data only — coords ride on goal events) ----
+  dimension minute_num {
+    label: 'Minute (numeric)'
+    type: 'number'
+    description: 'Numeric kickoff minute parsed from match_minute ("45+2\'" -> 45) for the momentum x-axis. Order the series by ts for true sequence; use this for axis labels. Parsed in SQL (AQL has no string-to-int on this format).'
+    definition: @sql nullif(regexp_replace(split_part({{ #SOURCE.match_minute }}, '+', 1), '[^0-9]', '', 'g'), '')::int;;
+  }
+  dimension score_margin {
+    label: 'Running Margin (home−away)'
+    type: 'number'
+    description: 'Running home−away goal differential carried on every event row — the momentum line value (step series ordered by ts).'
+    definition: @aql wc_events.home_goals - wc_events.away_goals ;;
+  }
+  dimension is_located_goal {
+    label: 'Is Located Goal'
+    type: 'truefalse'
+    description: 'Goal event that carries FIFA shot/goal-mouth coords (shot_x/shot_y + goal_x/goal_y) — the rows a shot map can plot. ~17 goals so far; only goals carry coords (no all-shots feed exists).'
+    definition: @aql in(wc_events.type, 0, 41) and coalesce(wc_events.goal_x, -1) >= 0 ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_events"'
+}

@@ -1,0 +1,13 @@
+// Role-playing alias of wc_teams for the OPPONENT in a per-team match result row.
+Model wc_opponent_teams = wc_teams.extend({
+  label: 'Opponent'
+  dimension name {
+    label: 'Opponent'
+  }
+  dimension flag_url {
+    label: 'Opponent Flag'
+  }
+  dimension color_hex {
+    label: 'Opponent Color'
+  }
+})

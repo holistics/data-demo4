@@ -1,0 +1,43 @@
+Model wc_team_ratings {
+  type: 'table'
+  label: 'Team Ratings'
+  description: 'Elo snapshots for the 48 teams (monthly since 2024-07, daily during the tournament). Computed by the worldcup-sync nightly job.'
+  data_source_name: 'demodb'
+  dimension rating_key {
+    label: 'Rating Key'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }} || '-' || {{ #SOURCE.snapshot_date }};;
+    primary_key: true
+    hidden: true
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension snapshot_date {
+    label: 'Snapshot Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.snapshot_date }};;
+  }
+  dimension snapshot_label {
+    label: 'Snapshot Label'
+    type: 'text'
+    description: 'Pre-formatted snapshot date for trend-axis / picker display, e.g. "Jun 2026".'
+    definition: @aql date_format(wc_team_ratings.snapshot_date, '%b %Y') ;;
+  }
+  dimension elo {
+    label: 'Elo'
+    type: 'number'
+    definition: @sql {{ #SOURCE.elo }};;
+  }
+  dimension fifa_rank {
+    label: 'FIFA Rank'
+    type: 'number'
+    description: 'Currently 100% NULL in the source (ETL placeholder, never populated) — hidden until a FIFA-rank feed exists. Use wc_team_snapshot.elo_rank for a live ranking instead.'
+    hidden: true
+    definition: @sql {{ #SOURCE.fifa_rank }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_team_ratings"'
+}

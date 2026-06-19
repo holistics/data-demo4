@@ -1,0 +1,56 @@
+Model wc_match_predictions {
+  type: 'table'
+  label: 'Match Predictions'
+  description: 'Per-match outcome probabilities + expected goals from the backtested Elo→Poisson model. One row per (match, run_date) — daily history of odds movement.'
+  data_source_name: 'demodb'
+  dimension prediction_key {
+    label: 'Prediction Key'
+    type: 'text'
+    definition: @sql {{ #SOURCE.match_num }} || '-' || {{ #SOURCE.run_date }};;
+    primary_key: true
+    hidden: true
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+  }
+  dimension run_date {
+    label: 'Run Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.run_date }};;
+  }
+  dimension run_date_label {
+    label: 'Run Date Label'
+    type: 'text'
+    description: 'Pre-formatted prediction run date for trend-axis / picker display, e.g. "13 Jun".'
+    definition: @aql date_format(wc_match_predictions.run_date, '%d %b') ;;
+  }
+  dimension p_home {
+    label: 'P Home Win'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_home }};;
+  }
+  dimension p_draw {
+    label: 'P Draw'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_draw }};;
+  }
+  dimension p_away {
+    label: 'P Away Win'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_away }};;
+  }
+  dimension exp_home_goals {
+    label: 'Expected Home Goals'
+    type: 'number'
+    definition: @sql {{ #SOURCE.exp_home_goals }};;
+  }
+  dimension exp_away_goals {
+    label: 'Expected Away Goals'
+    type: 'number'
+    definition: @sql {{ #SOURCE.exp_away_goals }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_match_predictions"'
+}

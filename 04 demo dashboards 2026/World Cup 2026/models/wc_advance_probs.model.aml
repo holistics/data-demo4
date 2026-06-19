@@ -1,0 +1,67 @@
+Model wc_advance_probs {
+  type: 'table'
+  label: 'Advance Probabilities'
+  description: 'Monte Carlo (10k sims) tournament probabilities per team. One row per (team, run_date) — championship odds over time come free.'
+  data_source_name: 'demodb'
+  dimension prob_key {
+    label: 'Prob Key'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }} || '-' || {{ #SOURCE.run_date }};;
+    primary_key: true
+    hidden: true
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension run_date {
+    label: 'Run Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.run_date }};;
+  }
+  dimension run_date_label {
+    label: 'Run Date Label'
+    type: 'text'
+    description: 'Pre-formatted sim run date for the title-odds trend axis / picker, e.g. "13 Jun".'
+    definition: @aql date_format(wc_advance_probs.run_date, '%d %b') ;;
+  }
+  dimension p_champion_pct {
+    label: 'P Champion %'
+    type: 'number'
+    description: 'p_champion × 100 — the title-odds trend series value (one point per run_date).'
+    definition: @aql wc_advance_probs.p_champion * 100 ;;
+  }
+  dimension p_r32 {
+    label: 'P Reach R32'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_r32 }};;
+  }
+  dimension p_r16 {
+    label: 'P Reach R16'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_r16 }};;
+  }
+  dimension p_qf {
+    label: 'P Reach QF'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_qf }};;
+  }
+  dimension p_sf {
+    label: 'P Reach SF'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_sf }};;
+  }
+  dimension p_final {
+    label: 'P Reach Final'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_final }};;
+  }
+  dimension p_champion {
+    label: 'P Champion'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p_champion }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_advance_probs"'
+}
