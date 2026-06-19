@@ -2202,7 +2202,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       ]
       content: @md <style>
   .mt {
-    --node-w: clamp(100px, 12vw, 140px);
+    --node-w: clamp(150px, 12vw, 140px);
     --gap: clamp(6px, 1.5vw, 14px);
     --line-color: #999;
     --line-w: 2px;
@@ -2293,6 +2293,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
   /* Node card */
   .mt .node {
     width: var(--node-w);
+    aspect-ratio: 1 / 1;
     min-width: 0;
     padding: 10px 8px 8px;
     border: 2px solid #d1d5db;
@@ -2303,16 +2304,18 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     flex-direction: column;
     gap: 2px;
     box-sizing: border-box;
+    overflow: hidden;
+    justify-content: space-between;
   }
 
   .mt .label {
     font-size: clamp(11px, 1.2vw, 14px);
-    opacity: 0.7;
+    opacity: 1;
     text-align: center;
     margin: 0;
     padding: 0;
     line-height: 1.2;
-    color: #333;
+    color: #05264C;
     white-space: normal !important;
     overflow-wrap: break-word;
     max-width: 100%;
@@ -2476,7 +2479,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
 
 </div>
 </div>
-</div>    ;;
+</div>      ;;
       settings {
         show_row_total: true
         show_column_total: true
@@ -2849,14 +2852,14 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     tab tab_dstw: CanvasLayout {
       label: 'Metrics Tree'
       width: 1260
-      height: 1220
+      height: 1480
       grid_size: 20
       auto_expand_vertically: true
       mobile {
         mode: 'auto'
       }
       block v_hrkv {
-        position: pos(20, 240, 1220, 960)
+        position: pos(20, 240, 1220, 1140)
       }
       block t_4wpv {
         position: pos(40, 20, 140, 40)
