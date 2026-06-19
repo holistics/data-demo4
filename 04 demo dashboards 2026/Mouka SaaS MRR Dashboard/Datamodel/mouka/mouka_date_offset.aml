@@ -1,0 +1,24 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// mouka_date_offset.aml — Reusable date offset for Mouka mock data
+//
+// The Mouka demo dataset ends on 2026-03-31. Dashboard filters like "today"
+// or "this month" return empty results because the data is in the past.
+//
+// This const provides a single source of truth for shifting all date fields
+// forward so the latest data point aligns with today:
+//
+//   offset = today() - 2026-03-31   (integer number of days)
+//
+// Usage in table-type models:
+//   Add a hidden _date_offset_days dimension using this const, then reference
+//   it with {{ _date_offset_days }} in date dimension definitions.
+//
+// Usage in query-type models (inside query: @sql ... ;;):
+//   Use ${MOUKA_DATE_OFFSET_DAYS} to inline the expression directly in SQL.
+//
+// Example:
+//   CAST({{ #SOURCE.occurred_at }} AS TIMESTAMP) + {{ _date_offset_days }} * INTERVAL '1 day'
+//   (report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day')::DATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MOUKA_DATE_OFFSET_DAYS = '(CURRENT_DATE - MAKE_DATE(2026, 3, 31))'
