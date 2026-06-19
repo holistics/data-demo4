@@ -1,0 +1,73 @@
+Model wc_edition_compare {
+  type: 'query'
+  label: 'Edition Comparison'
+  description: 'One row per World Cup edition 1930–2026 with tournament-shape baselines: matches played, goals, goals per match, and average attendance. History rows come from wc_history_matches; the live 2026 row is aggregated from finished wc_matches (so it grows each matchday). Materialised because it UNIONs the historical fact with the live fact — not expressible as a single AQL measure. Lets the dashboard frame "this World Cup vs the others" (goals/match and attendance are comparable across all editions; cards/possession exist only for 2026 and are intentionally absent here).'
+  data_source_name: 'demodb'
+  models: [wc_history_matches, wc_matches]
+  query: @sql
+    with hist as (
+      select {{ #h.year }} as edition,
+        count(*) as matches,
+        sum({{ #h.home_score }} + {{ #h.away_score }}) as goals,
+        avg({{ #h.attendance }}) as avg_attendance
+      from {{ #wc_history_matches as h }}
+      group by {{ #h.year }}
+    ),
+    live as (
+      select 2026 as edition,
+        count(*) filter (where {{ #m.status }} = 'FT') as matches,
+        sum(case when {{ #m.status }} = 'FT' then {{ #m.home_score }} + {{ #m.away_score }} else 0 end) as goals,
+        avg({{ #m.attendance }}) filter (where {{ #m.status }} = 'FT') as avg_attendance
+      from {{ #wc_matches as m }}
+    ),
+    unioned as (
+      select edition, matches, goals, avg_attendance, false as is_current from hist
+      union all
+      select edition, matches, goals, avg_attendance, true as is_current from live
+    )
+    select
+      edition,
+      edition::text as edition_label,
+      matches,
+      goals,
+      round(goals::numeric / nullif(matches, 0), 2) as goals_per_match,
+      round(avg_attendance) as avg_attendance,
+      is_current
+    from unioned
+    where matches > 0
+    order by edition;;
+  dimension edition {
+    label: 'Edition'
+    type: 'number'
+    primary_key: true
+  }
+  dimension edition_label {
+    label: 'Edition Label'
+    type: 'text'
+    description: 'Year as text ("2026", never "2,026") for axis/labels — a numeric year reapplies digit grouping.'
+  }
+  dimension matches {
+    label: 'Matches'
+    type: 'number'
+    description: 'Matches in the edition; for 2026 this is finished matches only (grows each matchday).'
+  }
+  dimension goals {
+    label: 'Goals'
+    type: 'number'
+  }
+  dimension goals_per_match {
+    label: 'Goals per Match'
+    type: 'number'
+    description: 'The headline baseline — comparable across every edition 1930–2026.'
+  }
+  dimension avg_attendance {
+    label: 'Average Attendance'
+    type: 'number'
+  }
+  dimension is_current {
+    label: 'Is Current Edition'
+    type: 'truefalse'
+    description: 'True for the 2026 row — drives highlight styling against the historical bars.'
+  }
+  owner: 'hung.dd@holistics.io'
+}

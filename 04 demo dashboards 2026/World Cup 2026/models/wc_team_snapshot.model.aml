@@ -1,0 +1,136 @@
+Model wc_team_snapshot {
+  type: 'query'
+  label: 'Team Snapshot'
+  description: 'One row per team: the LATEST Elo + FIFA rank snapshot and the LATEST Monte Carlo run probabilities. Exists because max()-style metrics over wc_team_ratings/wc_advance_probs mix dates; this pins every value to its most recent date.'
+  data_source_name: 'demodb'
+  models: [wc_team_ratings, wc_advance_probs]
+  query: @sql
+    with latest_rating as (
+      select distinct on ({{ #r.team_code }})
+        {{ #r.team_code }} as team_code,
+        {{ #r.elo }} as elo,
+        {{ #r.snapshot_date }} as rating_date
+      from {{ #wc_team_ratings as r }}
+      order by {{ #r.team_code }}, {{ #r.snapshot_date }} desc
+    ),
+    latest_rank as (
+      -- fifa_rank only rides on some snapshots (monthly publish), so take the freshest non-null one
+      select distinct on ({{ #r2.team_code }})
+        {{ #r2.team_code }} as team_code,
+        {{ #r2.fifa_rank }} as fifa_rank
+      from {{ #wc_team_ratings as r2 }}
+      where {{ #r2.fifa_rank }} is not null
+      order by {{ #r2.team_code }}, {{ #r2.snapshot_date }} desc
+    ),
+    latest_prob as (
+      select distinct on ({{ #p.team_code }})
+        {{ #p.team_code }} as team_code,
+        {{ #p.run_date }} as run_date,
+        {{ #p.p_champion }} as p_champion,
+        {{ #p.p_final }} as p_final,
+        {{ #p.p_sf }} as p_sf,
+        {{ #p.p_qf }} as p_qf,
+        {{ #p.p_r16 }} as p_r16,
+        {{ #p.p_r32 }} as p_r32
+      from {{ #wc_advance_probs as p }}
+      order by {{ #p.team_code }}, {{ #p.run_date }} desc
+    )
+    select
+      coalesce(lr.team_code, lp.team_code) as team_code,
+      lr.elo, lk.fifa_rank, lr.rating_date,
+      rank() over (order by lr.elo desc nulls last) as elo_rank,
+      lp.run_date, lp.p_champion, lp.p_final, lp.p_sf, lp.p_qf, lp.p_r16, lp.p_r32
+    from latest_rating lr
+    full outer join latest_prob lp on lp.team_code = lr.team_code
+    left join latest_rank lk on lk.team_code = coalesce(lr.team_code, lp.team_code);;
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    primary_key: true
+  }
+  dimension elo {
+    label: 'Elo (latest)'
+    type: 'number'
+  }
+  dimension fifa_rank {
+    label: 'FIFA Rank (latest)'
+    type: 'number'
+    description: 'Currently all-null in the source table (ETL placeholder) — do not display until populated.'
+    hidden: true
+  }
+  dimension elo_rank {
+    label: 'Elo Rank'
+    type: 'number'
+    description: 'Rank among the 48 qualified teams by latest Elo (1 = strongest).'
+  }
+  dimension rating_date {
+    label: 'Rating As Of'
+    type: 'date'
+  }
+  dimension run_date {
+    label: 'Sim Run Date'
+    type: 'date'
+  }
+  dimension p_champion {
+    label: 'P Champion (latest)'
+    type: 'number'
+  }
+  dimension p_champion_pct {
+    label: 'Title Odds %'
+    type: 'number'
+    description: 'p_champion × 100 for display — render with pattern #,##0.0 and append % in the template.'
+    definition: @aql wc_team_snapshot.p_champion * 100 ;;
+  }
+  dimension run_date_label {
+    label: 'Sim Run Date Label'
+    type: 'text'
+    definition: @aql date_format(wc_team_snapshot.run_date, '%d %b %Y') ;;
+  }
+  dimension p_final {
+    label: 'P Reach Final (latest)'
+    type: 'number'
+  }
+  dimension p_sf {
+    label: 'P Reach SF (latest)'
+    type: 'number'
+  }
+  dimension p_qf {
+    label: 'P Reach QF (latest)'
+    type: 'number'
+  }
+  dimension p_r16 {
+    label: 'P Reach R16 (latest)'
+    type: 'number'
+  }
+  dimension p_r32 {
+    label: 'P Reach R32 (latest)'
+    type: 'number'
+  }
+  dimension p_r32_pct {
+    label: 'Reach R32 Odds %'
+    type: 'number'
+    description: 'p_r32 × 100 for display — render with pattern #,##0 and append % in the template (a %-format pattern does not ×100 here).'
+    definition: @aql wc_team_snapshot.p_r32 * 100 ;;
+  }
+  dimension p_r16_pct {
+    label: 'Reach R16 Odds %'
+    type: 'number'
+    definition: @aql wc_team_snapshot.p_r16 * 100 ;;
+  }
+  dimension p_qf_pct {
+    label: 'Reach QF Odds %'
+    type: 'number'
+    definition: @aql wc_team_snapshot.p_qf * 100 ;;
+  }
+  dimension p_sf_pct {
+    label: 'Reach SF Odds %'
+    type: 'number'
+    definition: @aql wc_team_snapshot.p_sf * 100 ;;
+  }
+  dimension p_final_pct {
+    label: 'Reach Final Odds %'
+    type: 'number'
+    definition: @aql wc_team_snapshot.p_final * 100 ;;
+  }
+  owner: 'hung.dd@holistics.io'
+}

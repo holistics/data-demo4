@@ -1,0 +1,228 @@
+// Team HQ — tournament pulse: current campaign stat chips + form strip with real scorelines.
+
+Func wc_hq_pulse() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'KO'
+          ref: r(wc_team_match_results.kickoff_utc)
+          uname: 'fko'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Res'
+          ref: r(wc_team_match_results.result)
+        },
+        VizFieldFull {
+          label: 'ResColor'
+          ref: r(wc_team_match_results.result_color)
+        },
+        VizFieldFull {
+          label: 'FGF'
+          ref: r(wc_team_match_results.gf)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'FGA'
+          ref: r(wc_team_match_results.ga)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Opp'
+          ref: r(wc_team_match_results.opponent_code)
+        },
+        VizFieldFull {
+          label: 'TeamColor'
+          ref: r(wc_teams.color_hex)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'P'
+          ref: r(worldcup.team_matches_played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'W'
+          ref: r(worldcup.matches_won)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'D'
+          ref: r(worldcup.matches_drawn)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'L'
+          ref: r(worldcup.matches_lost)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GF'
+          ref: r(worldcup.goals_for)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GA'
+          ref: r(worldcup.goals_against)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GD'
+          ref: r(worldcup.goal_difference)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Pts'
+          ref: r(worldcup.points)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'WR'
+          ref: r(worldcup.win_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0%'
+          }
+        },
+        VizFieldFull {
+          label: 'CS'
+          ref: r(worldcup.clean_sheets)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md
+<style>
+/* old-ground scoreboard: a board PAINTED in the selected team's kit colour, with the
+   campaign tallies hung as dark enamel number plates (screw heads, alternating hang).
+   Translation of the mockup's stat chips into this page's material language — distinct
+   from clipboard paper, LED glass, split-flap, chalkboard, sticker and broadcast glass. */
+/* height:auto, NOT 100% — the board hugs its content and the block's scroll-safety
+   headroom stays as transparent turf below it, never as empty paint inside it */
+.pulse { width:100%; box-sizing:border-box; border-radius:12px; overflow:hidden;
+  display:flex; flex-direction:column; gap:11px; padding:14px 20px 13px; color:#fff;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 3px, transparent 3px 8px),
+    radial-gradient(120% 90% at 50% -20%, rgba(255,255,255,.12), transparent 55%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--teamc, #1d5c3f) 58%, black 42%),
+      color-mix(in srgb, var(--teamc, #1d5c3f) 42%, black 58%));
+  border:1px solid rgba(0,0,0,.4);
+  box-shadow:0 18px 32px -16px rgba(4,18,11,.65), inset 0 0 0 2px rgba(255,255,255,.09),
+    inset 0 2px 0 rgba(255,255,255,.14), inset 0 -3px 8px rgba(0,0,0,.35); }
+.pulse-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+  padding-bottom:9px; border-bottom:1px solid rgba(255,255,255,.2); }
+.ph-t { font-family:var(--font-disp); font-weight:800; font-size:16px; letter-spacing:.07em;
+  text-transform:uppercase; text-shadow:0 1px 4px rgba(0,0,0,.45); white-space:nowrap; }
+.ph-t b { color:var(--gold-2); }
+.ph-s { font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:rgba(255,255,255,.68);
+  white-space:nowrap; }
+.pl-rail { display:grid; grid-template-columns:repeat(8, minmax(0,1fr)); gap:10px; }
+.pl-plate { text-align:center; min-width:0; }
+.pl-tile { position:relative; display:block; padding:9px 4px 7px; border-radius:6px;
+  background:linear-gradient(180deg,#262d31,#14181b 62%,#1b2125);
+  box-shadow:0 5px 9px -3px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 0 0 1px rgba(0,0,0,.55);
+  transform:rotate(-.5deg); }
+.pl-plate:nth-child(even) .pl-tile { transform:rotate(.5deg); }
+/* screw heads pinning each plate to the board */
+.pl-tile::before, .pl-tile::after { content:""; position:absolute; top:4px; width:5px; height:5px;
+  border-radius:50%; background:radial-gradient(circle at 35% 30%, #aeb6ba, #4e565a);
+  box-shadow:inset 0 -1px 1px rgba(0,0,0,.6); }
+.pl-tile::before { left: 5px; }
+.pl-tile::after { right: 5px; }
+.pl-tile .cv { display:block; font-family:var(--font-disp); font-weight:800; font-size:28px;
+  line-height:1; color:#f4f7f8; text-shadow:0 2px 2px rgba(0,0,0,.7);
+  font-variant-numeric:tabular-nums; white-space:nowrap; }
+.pl-tile .cv:empty::after { content:"0"; }
+.pl-plate.gold .pl-tile .cv { color:var(--gold-2); }
+.pl-plate .cl { display:block; font-size:8.5px; text-transform:uppercase; letter-spacing:.11em;
+  color:rgba(255,255,255,.72); margin-top:6px; white-space:nowrap; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+.pf-form { display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  padding-top:9px; border-top:1px solid rgba(255,255,255,.2); }
+.pf-form .fl { font-family:var(--font-disp); font-weight:700; font-size:10px; line-height:24px;
+  text-transform:uppercase; letter-spacing:.14em; color:rgba(255,255,255,.68); }
+.pf-r { display:inline-flex; align-items:center; gap:6px; font-size:11px; line-height:1; font-weight:600;
+  height:24px; padding:0 9px 0 4px; border-radius:6px; color:#eef2f3;
+  background:linear-gradient(180deg,#262d31,#171b1e);
+  box-shadow:0 3px 6px -2px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 0 0 1px rgba(0,0,0,.5); white-space:nowrap; }
+.pf-r .o { width:16px; height:16px; border-radius:50%; display:inline-flex; align-items:center;
+  justify-content:center; font-family:var(--font-disp); font-weight:800; font-size:9px; color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25); }
+.pf-r small { color:rgba(255,255,255,.55); font-weight:500; }
+</style>
+<div class="pulse" style="--teamc:{{ rows[0].`TeamColor`.raw }};">
+  <div class="pulse-head">
+    <span class="ph-t">This <b>tournament</b></span>
+    <span class="ph-s">Group stage tallies · form oldest → newest</span>
+  </div>
+  <div class="pl-rail">
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`P`.formatted }}</span></span><span class="cl">Played</span></span>
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`W`.formatted }}-{{ rows[0].values.`D`.formatted }}-{{ rows[0].values.`L`.formatted }}</span></span><span class="cl">W-D-L</span></span>
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`GF`.formatted }}</span></span><span class="cl">Goals for</span></span>
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`GA`.formatted }}</span></span><span class="cl">Goals against</span></span>
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`GD`.formatted }}</span></span><span class="cl">Goal diff</span></span>
+    <span class="pl-plate gold"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`Pts`.formatted }}</span></span><span class="cl">Points</span></span>
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`WR`.formatted }}</span></span><span class="cl">Win rate</span></span>
+    <span class="pl-plate"><span class="pl-tile"><span class="cv wc-num">{{ rows[0].values.`CS`.formatted }}</span></span><span class="cl">Clean sheets</span></span>
+  </div>
+  <div class="pf-form">
+    <span class="fl">Form</span>
+{% map(rows) %}
+  <span class="pf-r"><span class="o" style="background:{{ `ResColor`.raw }};">{{ `Res`.formatted }}</span><span class="wc-num">{{ `FGF`.formatted }}–{{ `FGA`.formatted }}</span><small>{{ `Opp`.formatted }}</small></span>
+{% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'fko'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 8
+        row_limit: 8
+      }
+    }
+  }
+}

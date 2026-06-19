@@ -1,0 +1,88 @@
+Model wc_group_standings {
+  type: 'table'
+  label: 'Group Standings'
+  description: 'Live group table A–L (3 pts/win, 1/draw; ranked by Pts, GD, GF). All 48 teams always present.'
+  data_source_name: 'demodb'
+  dimension group_code {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.group_code }};;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+    primary_key: true
+  }
+  dimension team_name {
+    label: 'Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_name }};;
+  }
+  dimension played {
+    label: 'Played'
+    type: 'number'
+    definition: @sql {{ #SOURCE.played }};;
+  }
+  dimension won {
+    label: 'Won'
+    type: 'number'
+    definition: @sql {{ #SOURCE.won }};;
+  }
+  dimension drawn {
+    label: 'Drawn'
+    type: 'number'
+    definition: @sql {{ #SOURCE.drawn }};;
+  }
+  dimension lost {
+    label: 'Lost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.lost }};;
+  }
+  dimension gf {
+    label: 'Goals For'
+    type: 'number'
+    definition: @sql {{ #SOURCE.gf }};;
+  }
+  dimension ga {
+    label: 'Goals Against'
+    type: 'number'
+    definition: @sql {{ #SOURCE.ga }};;
+  }
+  dimension gd {
+    label: 'Goal Difference'
+    type: 'number'
+    definition: @sql {{ #SOURCE.gd }};;
+  }
+  dimension pts {
+    label: 'Points'
+    type: 'number'
+    definition: @sql {{ #SOURCE.pts }};;
+  }
+  dimension rank {
+    label: 'Rank'
+    type: 'number'
+    definition: @sql {{ #SOURCE.rank }};;
+  }
+  dimension qual_status {
+    label: 'Qualification Status'
+    type: 'text'
+    definition: @aql case(
+      when: wc_group_standings.rank <= 2, then: 'Advances',
+      when: wc_group_standings.rank == 3, then: 'Best-third playoff',
+      else: 'Eliminated'
+    ) ;;
+  }
+  dimension qual_color {
+    label: 'Qualification Color'
+    type: 'text'
+    description: 'Driver field: standings band color (top-2 green, 3rd amber, else red).'
+    definition: @aql case(
+      when: wc_group_standings.rank <= 2, then: '#1FA36B',
+      when: wc_group_standings.rank == 3, then: '#E0A23B',
+      else: '#E5362B'
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_group_standings"'
+}

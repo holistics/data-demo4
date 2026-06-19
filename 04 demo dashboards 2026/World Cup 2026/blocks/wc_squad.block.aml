@@ -1,0 +1,303 @@
+// Team HQ panini-sticker squad wall. wc_squad_section covers the three outfield bands
+// (DF / MF / FW) — identical but for position filter, accent dot colour and band title.
+// Goalkeepers is its own func (aggregate-aware, shows all GKs, no row cap).
+// .stk-* styling lives in theme wc_pitch_day; album-drop keyframes in header_rail.
+// Spine is wc_player_stats (identity + tournament output) joined to wc_player_bio — each
+// sticker is a button that opens the SHARED player-profile popover (pp-* skin in header_rail).
+Func wc_squad_section(pos: String, color: String, title: String) {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_player_stats.position_group)
+        operator: 'is'
+        value: pos
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Pid'
+          ref: r(wc_player_stats.fifa_player_id)
+        },
+        VizFieldFull {
+          label: 'Num'
+          ref: r(wc_player_stats.shirt_number)
+          uname: 'shirt'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Name'
+          ref: r(wc_player_stats.name)
+        },
+        VizFieldFull {
+          label: 'Photo'
+          ref: r(wc_player_stats.picture_url)
+        },
+        VizFieldFull {
+          label: 'Kit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_player_stats.team_code)
+        },
+        VizFieldFull {
+          label: 'PosG'
+          ref: r(wc_player_stats.position_group)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(wc_player_stats.goals)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Assists'
+          ref: r(wc_player_stats.assists)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Apps'
+          ref: r(wc_player_stats.apps)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Starts'
+          ref: r(wc_player_stats.starts)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Yellows'
+          ref: r(wc_player_stats.yellows)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Reds'
+          ref: r(wc_player_stats.reds)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Log'
+          ref: r(wc_player_stats.goal_log_html)
+        },
+        VizFieldFull {
+          label: 'GoalSvg'
+          ref: r(wc_player_stats.goal_placement_svg)
+        },
+        VizFieldFull {
+          label: 'Age'
+          ref: r(wc_player_bio.age)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Club'
+          ref: r(wc_player_bio.club)
+        },
+        VizFieldFull {
+          label: 'PosDetail'
+          ref: r(wc_player_bio.position_detail)
+        },
+        VizFieldFull {
+          label: 'Height'
+          ref: r(wc_player_bio.height)
+        }
+      ]
+      content: @md
+<div class="stk-band">
+  <div class="stk-head"><span class="stk-dot" style="background:${color};"></span><span class="stk-title">${title}</span><span class="stk-rule"></span></div>
+  <div class="stk-rail">
+{% map(rows) %}
+  <button class="stk" type="button" popovertarget="pp-{{ `Pid`.raw }}" style="anchor-name:--pp-{{ `Pid`.raw }};">
+  <span class="stk-num wc-num" style="background:{{ `Kit`.raw }};">{{ `Num`.formatted }}</span>
+  <div class="stk-ph"><img src="{{ `Photo`.raw }}" alt="" /></div>
+  <div class="stk-kit" style="background:{{ `Kit`.raw }};"></div>
+  <div class="stk-name">{{ `Name`.formatted }}</div>
+  </button>
+  <div id="pp-{{ `Pid`.raw }}" popover class="pp-card" style="position-anchor:--pp-{{ `Pid`.raw }}; --ppc:{{ `Kit`.raw }};">
+  <div class="pp-top">
+  <div class="pp-fig"><img src="{{ `Photo`.raw }}" alt="" style="margin:0 !important" /></div>
+  <div class="pp-id">
+  <div class="pp-nm">{{ `Name`.formatted }}</div>
+  <div class="pp-sub"><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />{{ `Team`.formatted }} &middot; #{{ `Num`.formatted }} &middot; {{ `PosG`.formatted }}</div>
+  <div class="pp-chips"><span class="pp-chip cl-age">{{ `Age`.formatted }}</span><span class="pp-chip cl-pos">{{ `PosDetail`.formatted }}</span><span class="pp-chip cl-club">{{ `Club`.formatted }}</span><span class="pp-chip cl-ht">{{ `Height`.formatted }}</span></div>
+  </div>
+  </div>
+  <div class="pp-stats"><div class="pp-stat hl"><b class="wc-num">{{ `Goals`.formatted }}</b><i>Goals</i></div><div class="pp-stat"><b class="wc-num">{{ `Assists`.formatted }}</b><i>Assists</i></div><div class="pp-stat"><b class="wc-num">{{ `Apps`.formatted }}</b><i>Apps</i></div><div class="pp-stat"><b class="wc-num">{{ `Starts`.formatted }}</b><i>Starts</i></div><div class="pp-stat"><b class="wc-num">{{ `Yellows`.formatted }}</b><i>Yellow</i></div><div class="pp-stat"><b class="wc-num">{{ `Reds`.formatted }}</b><i>Red</i></div></div>
+  <div class="pp-goal"><div class="pp-goal-box"><svg class="pp-net" viewBox="0 0 120 58" aria-hidden="true" style="margin:0 !important"><defs><linearGradient id="ppPost-{{ `Pid`.raw }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#aeb9c4"/></linearGradient><pattern id="ppnet-{{ `Pid`.raw }}" width="6.5" height="6.5" patternUnits="userSpaceOnUse"><path d="M0 0 L6.5 6.5 M6.5 0 L0 6.5" stroke="rgba(226,233,242,.15)" stroke-width=".5"/></pattern></defs><polygon class="pp-depth" points="11,9 19,3 101,3 109,9"/><rect x="19" y="3" width="82" height="6" fill="url(#ppnet-{{ `Pid`.raw }})" opacity=".45"/><rect x="11" y="9" width="98" height="43" fill="url(#ppnet-{{ `Pid`.raw }})"/><rect x="0" y="52" width="120" height="6" fill="rgba(74,128,86,.16)"/><line class="ground" x1="6" y1="52" x2="114" y2="52"/><rect x="8" y="6" width="104" height="3" rx="1.5" fill="url(#ppPost-{{ `Pid`.raw }})"/><rect x="8" y="6" width="3" height="46" rx="1.5" fill="url(#ppPost-{{ `Pid`.raw }})"/><rect x="109" y="6" width="3" height="46" rx="1.5" fill="url(#ppPost-{{ `Pid`.raw }})"/><g class="pp-dots">{{ `GoalSvg`.raw }}</g></svg></div></div>
+  <ul class="pp-gl">{{ `Log`.raw }}</ul>
+  </div>
+{% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'shirt'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 15
+        row_limit: 15
+      }
+    }
+  }
+}
+
+// Goalkeepers band — aggregate-aware, shows every GK (no row cap).
+Func wc_squad_gk() {
+  VizBlock {
+    label: 'Num, Name and 2 more'
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_player_stats.position_group)
+        operator: 'is'
+        value: 'GK'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Pid'
+          ref: r(wc_player_stats.fifa_player_id)
+        },
+        VizFieldFull {
+          label: 'Num'
+          ref: r(wc_player_stats.shirt_number)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'shirt'
+        },
+        VizFieldFull {
+          label: 'Name'
+          ref: r(wc_player_stats.name)
+        },
+        VizFieldFull {
+          label: 'Photo'
+          ref: r(wc_player_stats.picture_url)
+        },
+        VizFieldFull {
+          label: 'Kit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_player_stats.team_code)
+        },
+        VizFieldFull {
+          label: 'PosG'
+          ref: r(wc_player_stats.position_group)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(wc_player_stats.goals)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Assists'
+          ref: r(wc_player_stats.assists)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Apps'
+          ref: r(wc_player_stats.apps)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Starts'
+          ref: r(wc_player_stats.starts)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Yellows'
+          ref: r(wc_player_stats.yellows)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Reds'
+          ref: r(wc_player_stats.reds)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Log'
+          ref: r(wc_player_stats.goal_log_html)
+        },
+        VizFieldFull {
+          label: 'GoalSvg'
+          ref: r(wc_player_stats.goal_placement_svg)
+        },
+        VizFieldFull {
+          label: 'Age'
+          ref: r(wc_player_bio.age)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'Club'
+          ref: r(wc_player_bio.club)
+        },
+        VizFieldFull {
+          label: 'PosDetail'
+          ref: r(wc_player_bio.position_detail)
+        },
+        VizFieldFull {
+          label: 'Height'
+          ref: r(wc_player_bio.height)
+        }
+      ]
+      content: @md <div class="stk-band">
+  <div class="stk-head"><span class="stk-dot" style="background:#E0A23B;"></span><span class="stk-title">Goalkeepers</span><span class="stk-rule"></span></div>
+  <div class="stk-rail">
+{% map(rows) %}
+  <button class="stk" type="button" popovertarget="pp-{{ `Pid`.raw }}" style="anchor-name:--pp-{{ `Pid`.raw }};">
+  <span class="stk-num wc-num" style="background:{{ `Kit`.raw }};">{{ `Num`.formatted }}</span>
+  <div class="stk-ph"><img src="{{ `Photo`.raw }}" alt="" /></div>
+  <div class="stk-kit" style="background:{{ `Kit`.raw }};"></div>
+  <div class="stk-name">{{ `Name`.formatted }}</div>
+  </button>
+  <div id="pp-{{ `Pid`.raw }}" popover class="pp-card" style="position-anchor:--pp-{{ `Pid`.raw }}; --ppc:{{ `Kit`.raw }};">
+  <div class="pp-top">
+  <div class="pp-fig"><img src="{{ `Photo`.raw }}" alt="" style="margin:0 !important" /></div>
+  <div class="pp-id">
+  <div class="pp-nm">{{ `Name`.formatted }}</div>
+  <div class="pp-sub"><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />{{ `Team`.formatted }} &middot; #{{ `Num`.formatted }} &middot; {{ `PosG`.formatted }}</div>
+  <div class="pp-chips"><span class="pp-chip cl-age">{{ `Age`.formatted }}</span><span class="pp-chip cl-pos">{{ `PosDetail`.formatted }}</span><span class="pp-chip cl-club">{{ `Club`.formatted }}</span><span class="pp-chip cl-ht">{{ `Height`.formatted }}</span></div>
+  </div>
+  </div>
+  <div class="pp-stats"><div class="pp-stat hl"><b class="wc-num">{{ `Goals`.formatted }}</b><i>Goals</i></div><div class="pp-stat"><b class="wc-num">{{ `Assists`.formatted }}</b><i>Assists</i></div><div class="pp-stat"><b class="wc-num">{{ `Apps`.formatted }}</b><i>Apps</i></div><div class="pp-stat"><b class="wc-num">{{ `Starts`.formatted }}</b><i>Starts</i></div><div class="pp-stat"><b class="wc-num">{{ `Yellows`.formatted }}</b><i>Yellow</i></div><div class="pp-stat"><b class="wc-num">{{ `Reds`.formatted }}</b><i>Red</i></div></div>
+  <div class="pp-goal"><div class="pp-goal-box"><svg class="pp-net" viewBox="0 0 120 58" aria-hidden="true" style="margin:0 !important"><defs><linearGradient id="ppPost-{{ `Pid`.raw }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#aeb9c4"/></linearGradient><pattern id="ppnet-{{ `Pid`.raw }}" width="6.5" height="6.5" patternUnits="userSpaceOnUse"><path d="M0 0 L6.5 6.5 M6.5 0 L0 6.5" stroke="rgba(226,233,242,.15)" stroke-width=".5"/></pattern></defs><polygon class="pp-depth" points="11,9 19,3 101,3 109,9"/><rect x="19" y="3" width="82" height="6" fill="url(#ppnet-{{ `Pid`.raw }})" opacity=".45"/><rect x="11" y="9" width="98" height="43" fill="url(#ppnet-{{ `Pid`.raw }})"/><rect x="0" y="52" width="120" height="6" fill="rgba(74,128,86,.16)"/><line class="ground" x1="6" y1="52" x2="114" y2="52"/><rect x="8" y="6" width="104" height="3" rx="1.5" fill="url(#ppPost-{{ `Pid`.raw }})"/><rect x="8" y="6" width="3" height="46" rx="1.5" fill="url(#ppPost-{{ `Pid`.raw }})"/><rect x="109" y="6" width="3" height="46" rx="1.5" fill="url(#ppPost-{{ `Pid`.raw }})"/><g class="pp-dots">{{ `GoalSvg`.raw }}</g></svg></div></div>
+  <ul class="pp-gl">{{ `Log`.raw }}</ul>
+  </div>
+{% end %}
+  </div>
+</div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'shirt'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+}

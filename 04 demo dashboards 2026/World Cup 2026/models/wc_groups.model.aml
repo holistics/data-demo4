@@ -1,0 +1,25 @@
+Model wc_groups {
+  type: 'table'
+  label: 'Groups'
+  description: 'World Cup 2026 groups A–L.'
+  data_source_name: 'demodb'
+  dimension code {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.code }};;
+    primary_key: true
+  }
+  dimension name {
+    label: 'Group Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension fifa_group_id {
+    label: 'FIFA Group Id'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.fifa_group_id }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_groups"'
+}

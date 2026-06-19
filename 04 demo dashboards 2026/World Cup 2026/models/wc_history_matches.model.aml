@@ -1,0 +1,122 @@
+Model wc_history_matches {
+  type: 'table'
+  label: 'WC History Matches'
+  description: 'Every World Cup match 1930–2022 (964 rows, FIFA API backfill). home/away_canonical map defunct nations to their modern successors for joins.'
+  data_source_name: 'demodb'
+  dimension fifa_match_id {
+    label: 'FIFA Match ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_match_id }};;
+    primary_key: true
+  }
+  dimension year {
+    label: 'Edition'
+    type: 'number'
+    definition: @sql {{ #SOURCE.year }};;
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+  }
+  dimension match_date {
+    label: 'Match Date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.match_date }};;
+  }
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+    description: 'Normalized: group / group2 / r16 / qf / sf / third_place / final.'
+    definition: @sql {{ #SOURCE.stage }};;
+  }
+  dimension stage_name {
+    label: 'Stage Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.stage_name }};;
+  }
+  dimension group_name {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.group_name }};;
+  }
+  dimension home_code {
+    label: 'Home Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.home_code }};;
+  }
+  dimension home_name {
+    label: 'Home Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.home_name }};;
+  }
+  dimension away_code {
+    label: 'Away Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.away_code }};;
+  }
+  dimension away_name {
+    label: 'Away Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.away_name }};;
+  }
+  dimension home_canonical {
+    label: 'Home Canonical Code'
+    type: 'text'
+    description: 'Defunct nations mapped to FIFA successor (FRG→GER, URS→RUS, …) — join key toward wc_teams roles.'
+    definition: @sql CASE {{ #SOURCE.home_code }}
+      WHEN 'FRG' THEN 'GER' WHEN 'URS' THEN 'RUS' WHEN 'TCH' THEN 'CZE'
+      WHEN 'YUG' THEN 'SRB' WHEN 'SCG' THEN 'SRB' WHEN 'ZAI' THEN 'COD'
+      WHEN 'INH' THEN 'IDN' ELSE {{ #SOURCE.home_code }} END;;
+  }
+  dimension away_canonical {
+    label: 'Away Canonical Code'
+    type: 'text'
+    definition: @sql CASE {{ #SOURCE.away_code }}
+      WHEN 'FRG' THEN 'GER' WHEN 'URS' THEN 'RUS' WHEN 'TCH' THEN 'CZE'
+      WHEN 'YUG' THEN 'SRB' WHEN 'SCG' THEN 'SRB' WHEN 'ZAI' THEN 'COD'
+      WHEN 'INH' THEN 'IDN' ELSE {{ #SOURCE.away_code }} END;;
+  }
+  dimension home_score {
+    label: 'Home Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.home_score }};;
+  }
+  dimension away_score {
+    label: 'Away Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.away_score }};;
+  }
+  dimension home_pen {
+    label: 'Home Pens'
+    type: 'number'
+    definition: @sql {{ #SOURCE.home_pen }};;
+  }
+  dimension away_pen {
+    label: 'Away Pens'
+    type: 'number'
+    definition: @sql {{ #SOURCE.away_pen }};;
+  }
+  dimension winner_code {
+    label: 'Winner Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.winner_code }};;
+  }
+  dimension attendance {
+    label: 'Attendance'
+    type: 'number'
+    definition: @sql {{ #SOURCE.attendance }};;
+  }
+  dimension venue {
+    label: 'Venue'
+    type: 'text'
+    definition: @sql {{ #SOURCE.venue }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_history_matches"'
+}

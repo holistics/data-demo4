@@ -1,0 +1,130 @@
+Model wc_history_finals {
+  type: 'query'
+  label: 'WC History Finals'
+  description: 'One row per edition 1930–2022: the final resolved into champion vs runner-up (codes, names, flags, scoreline). 21 editions come from stage=final; 1950 (a round-robin with no final) uses the decisive Uruguay–Brazil Maracanazo. Exists because resolving both finalist names + crests from historical codes (defunct nations + non-2026 finalists) plus the scoreline cannot be expressed through the dataset filter graph.'
+  data_source_name: 'demodb'
+  models: [wc_history_matches, wc_history_editions, wc_team_aliases, wc_teams]
+  query: @sql
+    with fin as (
+      select {{ #h.year }} as year, {{ #h.home_code }} as home_code, {{ #h.away_code }} as away_code,
+             {{ #h.home_score }} as home_score, {{ #h.away_score }} as away_score,
+             {{ #h.home_pen }} as home_pen, {{ #h.away_pen }} as away_pen, {{ #h.winner_code }} as winner_code
+      from {{ #wc_history_matches as h }}
+      where {{ #h.stage }} = 'final'
+      union all
+      -- 1950 was decided by a final round-robin; the deciding match (Uruguay 2–1 Brazil) is the de-facto final.
+      select {{ #h2.year }}, {{ #h2.home_code }}, {{ #h2.away_code }},
+             {{ #h2.home_score }}, {{ #h2.away_score }}, {{ #h2.home_pen }}, {{ #h2.away_pen }}, {{ #h2.winner_code }}
+      from {{ #wc_history_matches as h2 }}
+      where {{ #h2.year }} = 1950 and {{ #h2.stage }} = 'group2'
+        and (({{ #h2.home_code }} = 'URU' and {{ #h2.away_code }} = 'BRA')
+          or ({{ #h2.home_code }} = 'BRA' and {{ #h2.away_code }} = 'URU'))
+    ),
+    sided as (
+      select year,
+        case when winner_code = home_code then home_code else away_code end as champ_code,
+        case when winner_code = home_code then away_code else home_code end as runner_code,
+        case when winner_code = home_code then home_score else away_score end as champ_score,
+        case when winner_code = home_code then away_score else home_score end as runner_score,
+        case when winner_code = home_code then home_pen else away_pen end as champ_pen,
+        case when winner_code = home_code then away_pen else home_pen end as runner_pen
+      from fin
+    )
+    select
+      {{ #e.year }} as year,
+      ({{ #e.year }})::text as year_text,
+      -- the edition name embeds the host ("1954 FIFA World Cup Switzerland"); strip the prefix for a clean host label
+      regexp_replace({{ #e.name }}, '^[0-9]{4} FIFA World Cup ', '') as host_name,
+      s.champ_code,
+      s.runner_code,
+      s.champ_score,
+      s.runner_score,
+      s.champ_pen,
+      s.runner_pen,
+      s.champ_score::text || '–' || s.runner_score::text
+        || case when coalesce(s.champ_pen, 0) + coalesce(s.runner_pen, 0) > 0
+                then ' (' || s.champ_pen::text || '–' || s.runner_pen::text || ' p)'
+                else '' end as score_label,
+      -- name precedence: real historical name for defunct nations (West Germany, Czechoslovakia) →
+      -- official 2026 name → curated marquee nations the dataset has no name for → raw code
+      coalesce(
+        nullif({{ #ca.display_name }}, {{ #ca.alias_code }}),
+        {{ #ct.name }},
+        case s.champ_code when 'ITA' then 'Italy' when 'HUN' then 'Hungary' else null end,
+        s.champ_code
+      ) as champ_name,
+      coalesce({{ #ct.flag_url }}, 'https://api.fifa.com/api/v3/picture/flags-sq-4/' || coalesce({{ #ca.canonical_code }}, s.champ_code)) as champ_flag,
+      coalesce(
+        nullif({{ #ra.display_name }}, {{ #ra.alias_code }}),
+        {{ #rt.name }},
+        case s.runner_code when 'ITA' then 'Italy' when 'HUN' then 'Hungary' else null end,
+        s.runner_code
+      ) as runner_name,
+      coalesce({{ #rt.flag_url }}, 'https://api.fifa.com/api/v3/picture/flags-sq-4/' || coalesce({{ #ra.canonical_code }}, s.runner_code)) as runner_flag
+    from {{ #wc_history_editions as e }}
+    left join sided s on s.year = {{ #e.year }}
+    left join {{ #wc_team_aliases as ca }} on {{ #ca.alias_code }} = s.champ_code
+    left join {{ #wc_teams as ct }} on {{ #ct.code }} = {{ #ca.canonical_code }}
+    left join {{ #wc_team_aliases as ra }} on {{ #ra.alias_code }} = s.runner_code
+    left join {{ #wc_teams as rt }} on {{ #rt.code }} = {{ #ra.canonical_code }};;
+  dimension year {
+    label: 'Edition'
+    type: 'number'
+    primary_key: true
+  }
+  dimension year_text {
+    label: 'Edition Label'
+    type: 'text'
+    description: 'Ungrouped edition year for display ("1998", never "1,998") — cast in SQL because AQL cast() reapplies digit grouping.'
+  }
+  dimension host_name {
+    label: 'Host'
+    type: 'text'
+  }
+  dimension champ_code {
+    label: 'Champion Code'
+    type: 'text'
+  }
+  dimension runner_code {
+    label: 'Runner-up Code'
+    type: 'text'
+  }
+  dimension champ_score {
+    label: 'Champion Score'
+    type: 'number'
+  }
+  dimension runner_score {
+    label: 'Runner-up Score'
+    type: 'number'
+  }
+  dimension champ_pen {
+    label: 'Champion Pens'
+    type: 'number'
+  }
+  dimension runner_pen {
+    label: 'Runner-up Pens'
+    type: 'number'
+  }
+  dimension score_label {
+    label: 'Final Scoreline'
+    type: 'text'
+    description: 'Champion-perspective scoreline, e.g. "3–2" or "0–0 (3–2 p)".'
+  }
+  dimension champ_name {
+    label: 'Champion'
+    type: 'text'
+  }
+  dimension champ_flag {
+    label: 'Champion Flag'
+    type: 'text'
+  }
+  dimension runner_name {
+    label: 'Runner-up'
+    type: 'text'
+  }
+  dimension runner_flag {
+    label: 'Runner-up Flag'
+    type: 'text'
+  }
+  owner: 'hung.dd@holistics.io'
+}

@@ -1,0 +1,49 @@
+Model wc_goals {
+  type: 'table'
+  label: 'Goals'
+  description: 'Goal events (regular + penalty), player-attributed. Derived view over wc_events.'
+  data_source_name: 'demodb'
+  dimension event_id {
+    label: 'Event Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.event_id }};;
+    primary_key: true
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_player_id }};;
+  }
+  dimension player_name {
+    label: 'Scorer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.player_name }};;
+  }
+  dimension match_minute {
+    label: 'Minute'
+    type: 'text'
+    definition: @sql {{ #SOURCE.match_minute }};;
+  }
+  dimension period {
+    label: 'Period'
+    type: 'number'
+    definition: @sql {{ #SOURCE.period }};;
+  }
+  dimension is_penalty {
+    label: 'Is Penalty'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_penalty }};;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_goals"'
+}

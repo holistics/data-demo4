@@ -1,0 +1,127 @@
+Model wc_lineup_grid {
+  type: 'query'
+  label: 'Lineup Grid'
+  description: 'One row per STARTER per match with broadcast-graphic layout baked in: stage_x/y_pct place each token on a dual half-pitch stage (home 0–46%, away 54–100%), reveal_delay staggers the pop-in cascade GK → defence → attack. Rows derive from the FORMATION STRING (4-1-2-3 → bands of 4/1/2/3) because FIFA never sends LineupX/Y: starters are ordered GK→DF→MF→FW then shirt number and dealt into bands, so a winger listed as FW can sit one band off — layout is faithful to the formation, heuristic per player.'
+  data_source_name: 'demodb'
+  models: [wc_lineups, wc_matches, wc_players]
+  query: @sql
+    with starters as (
+      select {{ #l.match_num }} as match_num, {{ #l.team_code }} as team_code,
+             {{ #l.fifa_player_id }} as fifa_player_id, {{ #l.is_captain }} as is_captain,
+             case when {{ #l.team_code }} = {{ #m.home_code }} then 'home' else 'away' end as side,
+             case when {{ #l.team_code }} = {{ #m.home_code }} then {{ #m.home_formation }} else {{ #m.away_formation }} end as formation,
+             {{ #p.shirt_number }} as shirt_number, {{ #p.name }} as name,
+             {{ #p.picture_url }} as picture_url, {{ #p.position }} as position
+      from {{ #wc_lineups as l }}
+      join {{ #wc_matches as m }} on {{ #m.match_num }} = {{ #l.match_num }}
+      join {{ #wc_players as p }} on {{ #p.fifa_player_id }} = {{ #l.fifa_player_id }}
+      where {{ #l.is_starter }}
+    ),
+    seqd as (
+      select *, row_number() over (
+        partition by match_num, team_code
+        order by position asc, shirt_number asc nulls last
+      ) as seq
+      from starters
+      where formation is not null
+    ),
+    bands as (
+      select f.match_num, f.team_code, b.val::int as band_size, b.idx::int as band_idx
+      from (select distinct match_num, team_code, formation from seqd) f
+      cross join lateral unnest(string_to_array(f.formation, '-')) with ordinality as b(val, idx)
+    ),
+    bandc as (
+      select *,
+        sum(band_size) over (partition by match_num, team_code order by band_idx) as cum_end,
+        max(band_idx) over (partition by match_num, team_code) as nbands
+      from bands
+    )
+    select
+      s.match_num || '-' || s.fifa_player_id as grid_key,
+      s.match_num, s.team_code, s.side, s.formation,
+      s.shirt_number, s.name, s.picture_url, s.is_captain,
+      -- per-pitch x (GK centred; band players at odd 2k-ths), then offset into the dual stage
+      round((case when s.side = 'home' then 0 else 54 end)
+        + (case when s.seq = 1 then 50.0
+                else ((s.seq - 1 - (b.cum_end - b.band_size)) * 2 - 1)::numeric / (b.band_size * 2) * 100 end) * 0.46, 1) as stage_x,
+      -- GK at 88%, defence band at 72%, front band at 14%
+      round(case when s.seq = 1 then 88.0
+                 else 72 - (b.band_idx - 1) * (58.0 / greatest(b.nbands - 1, 1)) end, 1) as y_pct,
+      s.seq
+    from seqd s
+    left join bandc b on b.match_num = s.match_num and b.team_code = s.team_code
+      and s.seq - 1 > b.cum_end - b.band_size and s.seq - 1 <= b.cum_end;;
+  dimension grid_key {
+    label: 'Grid Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+  }
+  dimension side {
+    label: 'Side'
+    type: 'text'
+  }
+  dimension formation {
+    label: 'Formation'
+    type: 'text'
+  }
+  dimension shirt_number {
+    label: 'Shirt Number'
+    type: 'number'
+  }
+  dimension name {
+    label: 'Player'
+    type: 'text'
+  }
+  dimension picture_url {
+    label: 'Picture URL'
+    type: 'text'
+  }
+  dimension is_captain {
+    label: 'Is Captain'
+    type: 'truefalse'
+    hidden: true
+  }
+  dimension role {
+    label: 'Role'
+    type: 'text'
+    description: 'Driver field: "gk" (gold ring) / "of" — token CSS class.'
+    definition: @aql case(when: wc_lineup_grid.seq == 1, then: 'gk', else: 'of') ;;
+  }
+  dimension cap_tag {
+    label: 'Captain Tag'
+    type: 'text'
+    description: 'Driver field: "C" armband chip, empty otherwise (hides via :empty).'
+    definition: @aql case(when: wc_lineup_grid.is_captain, then: 'C', else: '') ;;
+  }
+  dimension stage_x {
+    label: 'Stage X %'
+    type: 'number'
+    description: 'Driver field: token left% on the dual-pitch stage (home half 0–46, away half 54–100).'
+  }
+  dimension y_pct {
+    label: 'Stage Y %'
+    type: 'number'
+    description: 'Driver field: token top% — GK 88, defence 72, front band 14.'
+  }
+  dimension reveal_delay {
+    label: 'Reveal Delay (s)'
+    type: 'number'
+    description: 'Driver field: animation-delay for the broadcast pop-in cascade, GK first then band by band.'
+    definition: @aql 0.15 + wc_lineup_grid.seq * 0.12 ;;
+  }
+  dimension seq {
+    label: 'Reveal Order'
+    type: 'number'
+    hidden: true
+  }
+  owner: 'hung.dd@holistics.io'
+}

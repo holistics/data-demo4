@@ -1,0 +1,432 @@
+// ⚠ GLOBAL STYLE HOST — do not split.
+// header_rail renders on EVERY tab, so its <style> is the home for all shared @keyframes
+// (wc-pulse / wc-deal-in / wc-power-on / wc-meter-fill / wc-trophy-glow / wc-pennant-wave /
+// wc-tie-glow) AND cross-tab animation rules (.clipboard, .tie, .wc-pitch .pen, .goal …).
+// Theme custom_css @keyframes are INERT on viz blocks — they must live here. The stadium-fascia
+// header rail (data-driven stage ribbon) is the visible content.
+
+Func wc_header_rail() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_matches.ribbon_order)
+        operator: 'less_than'
+        value: 9
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Ord'
+          ref: r(wc_matches.ribbon_order)
+          uname: 'ord'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Short'
+          ref: r(wc_matches.ribbon_short)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'State'
+          ref: r(worldcup.stage_state)
+        },
+        VizFieldFull {
+          label: 'TPlayed'
+          ref: r(worldcup.tourn_played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'AsOf'
+          ref: r(worldcup.tourn_as_of)
+        },
+        VizFieldFull {
+          label: 'Headline'
+          ref: r(worldcup.live_headline)
+        },
+        VizFieldFull {
+          label: 'LiveClass'
+          ref: r(worldcup.live_class)
+        }
+      ]
+      content: @md
+<style>
+/* the fascia: a broadcast lower-third bar that SEATS the header on the surround (vs floating text).
+   glass fill + a full-width gold underline clipped to the rounded bar = its signature (no floating hairline). */
+.wc-fascia { position:relative; display:flex; align-items:stretch; justify-content:space-between; gap:0;
+  height:100%; box-sizing:border-box; padding:0; border-radius:13px; color:var(--line); overflow:hidden;
+  background:linear-gradient(180deg, rgba(10,28,19,.78), rgba(7,19,13,.5));
+  border:1px solid rgba(255,236,200,.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 12px 26px -18px rgba(0,0,0,.7);
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  opacity:0; animation:wc-fascia-in .55s ease-out .05s forwards; }
+@keyframes wc-fascia-in { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+/* full-width gold broadcast underline — clipped to the rounded corners by the bar's overflow:hidden */
+.wc-fascia::after { content:""; position:absolute; left:0; right:0; bottom:0; height:2.5px; z-index:3;
+  background:linear-gradient(90deg, rgba(200,146,10,.18), var(--gold) 20%, var(--gold-2) 50%, var(--gold) 80%, rgba(200,146,10,.18)); }
+/* three zones share the bar height and are separated by faint inset dividers, so the wide bar reads as
+   a composed broadcast graphic rather than text floating in empty space */
+.wc-brand { display:flex; align-items:center; gap:15px; min-width:0; flex:1 1 0; padding:0 26px; }
+.wc-brand .wc-emblem { height:50px !important; width:auto !important; display:block !important; margin:0 !important;
+  filter:drop-shadow(0 3px 9px rgba(0,0,0,.55)); }
+.wc-brand .t1 { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.03em;
+  font-size:24px; line-height:1; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.5); }
+.wc-brand .t1 b { color:var(--gold-2); }
+.wc-brand .t2 { font-size:11px; color:rgba(234,255,242,.74); margin-top:7px; letter-spacing:.03em; }
+.wc-brand .t2 .sep { opacity:.4; padding:0 7px; }
+/* stage-progress ribbon — "the road to the final" as a connected node chain. The current stage borrows
+   the concept's active-tab look (gold pill, dark ink, lifted + glow); future stages stay dim. */
+/* segmented stepper: chips are DIRECT flex children of .wc-stages (same structure as the working knockout
+   bracket), forced to align-self:center so none can drop. .wc-stages hugs its content (flex:0 0 auto) and is
+   centred between equal-width brand/meta zones → sits at the BAR's centre. The rail is .wc-stages::before,
+   inset to the side padding so it runs first→last chip, hidden under the end plates, showing in the gaps. */
+.wc-stages { position:relative; display:flex; align-items:center; flex:0 0 auto; justify-content:center;
+  gap:30px; min-width:0; padding:0 26px;
+  border-left:1px solid rgba(255,236,200,.1); border-right:1px solid rgba(255,236,200,.1);
+  box-shadow:inset 1px 0 0 rgba(0,0,0,.2), inset -1px 0 0 rgba(0,0,0,.2); }
+.wc-stages::before { content:""; position:absolute; top:50%; left:26px; right:26px; height:2px; z-index:0;
+  transform:translateY(-50%); background:rgba(234,255,242,.24); }
+.wc-stage { position:relative; z-index:1; flex:0 0 auto; align-self:center;
+  display:inline-flex; align-items:center; gap:8px; padding:7px 13px; border-radius:9px; line-height:1; white-space:nowrap;
+  background:linear-gradient(180deg, rgba(13,30,20,.95), rgba(8,19,13,.95));
+  box-shadow:inset 0 0 0 1px rgba(255,236,200,.08);
+  font-family:var(--font-disp); font-weight:700; text-transform:uppercase; letter-spacing:.12em;
+  font-size:11.5px; color:rgba(234,255,242,.5); }
+.wc-stage .d { width:7px; height:7px; border-radius:50%; background:rgba(234,255,242,.32); flex:none; }
+/* completed stages: brighter ink + a gold node; upcoming stays the dim base defined above */
+.wc-stage.done { color:rgba(234,255,242,.74); }
+.wc-stage.done .d { background:var(--gold); box-shadow:0 0 6px rgba(242,200,75,.5); }
+.wc-stage.now { color:#22160a; background:linear-gradient(180deg, var(--gold-2), var(--gold)); transform:translateY(-1px);
+  box-shadow:0 -1px 12px -3px rgba(242,200,75,.6), inset 0 1px 0 rgba(255,255,255,.55), 0 3px 6px rgba(0,0,0,.3); }
+.wc-stage.now .d { background:#3a2a06; box-shadow:none; }
+/* meta status dot: pulsing red when any match is live, steady gold when idle */
+.wc-dot { display:inline-block; width:8px; height:8px; border-radius:50%; vertical-align:middle; margin-right:6px; }
+.wc-dot.live { background:var(--live); animation:wc-pulse 1.8s infinite; }
+.wc-dot.idle { background:var(--gold-2); }
+/* meta */
+.wc-meta { display:flex; flex-direction:column; justify-content:center; align-items:flex-end; text-align:right; flex:1 1 0; min-width:0; padding:0 26px; }
+.wc-meta .m1 { font-family:var(--font-disp); font-size:13px; font-weight:700; letter-spacing:.04em;
+  color:rgba(234,255,242,.95); text-transform:uppercase; }
+.wc-meta .m2 { font-size:10.5px; color:rgba(234,255,242,.62); margin-top:5px; }
+@media (prefers-reduced-motion: reduce) { .wc-fascia { animation:none; opacity:1; } .wc-dot.live, .wc-pulse { animation:none !important; } }
+/* ── GLOBAL motion (keyframes + cross-tab rules) ──────────────────────────
+   IMPORTANT: @keyframes defined in the theme custom_css are NOT applied to viz
+   blocks — only @keyframes defined in a page block <style> work. header_rail
+   renders on every tab, so ALL shared keyframes + cross-tab animation rules
+   live here. (The theme keeps the static tokens/material styling, which DO
+   apply; its copies of these keyframes are dead and can be removed.) */
+@keyframes wc-pulse { 0%{box-shadow:0 0 0 0 rgba(230,29,37,.5);} 70%{box-shadow:0 0 0 8px rgba(230,29,37,0);} 100%{box-shadow:0 0 0 0 rgba(230,29,37,0);} }
+@keyframes wc-deal-in { from { opacity:0; transform:translateY(14px) scale(.985); } to { opacity:1; transform:none; } }
+@keyframes wc-power-on { 0% { filter:brightness(2.4) saturate(.4); } 18% { filter:brightness(.4); } 34% { filter:brightness(2); } 52% { filter:brightness(.7); } 100% { filter:brightness(1); } }
+@keyframes wc-meter-fill { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+@keyframes wc-trophy-glow {
+  0%,100% { filter:drop-shadow(0 0 12px rgba(242,200,75,.65)) drop-shadow(0 0 24px rgba(242,200,75,.32)) drop-shadow(0 6px 12px rgba(0,0,0,.55)); }
+  50% { filter:drop-shadow(0 0 22px rgba(242,200,75,.95)) drop-shadow(0 0 38px rgba(242,200,75,.5)) drop-shadow(0 6px 12px rgba(0,0,0,.55)); } }
+@keyframes wc-pennant-wave {
+  0% { transform:rotate(-4deg) skewX(5deg); }
+  30% { transform:rotate(7deg) skewX(-11deg); }
+  55% { transform:rotate(1deg) skewX(-3deg); }
+  80% { transform:rotate(5deg) skewX(-8deg); }
+  100% { transform:rotate(-4deg) skewX(5deg); } }
+@keyframes wc-tie-glow {
+  0%,100% { box-shadow:0 9px 18px -10px rgba(120,85,15,.5), 0 0 9px -1px rgba(242,200,75,.45), inset 0 1px 0 rgba(255,255,255,.55); }
+  50% { box-shadow:0 9px 18px -10px rgba(120,85,15,.5), 0 0 14px 0 rgba(242,200,75,.85), inset 0 1px 0 rgba(255,255,255,.55); } }
+/* Players-tab pack-reveal backdrop atmosphere — dust motes rising through the spotlight, the
+   floodlight bloom breathing, the gantry rigs twinkling. Keyframes host here (page-block scope). */
+@keyframes pkr-drift {
+  0% { transform:translate(0,14px) scale(.85); opacity:0; }
+  18% { opacity:.7; } 82% { opacity:.5; }
+  100% { transform:translate(16px,-48px) scale(1.08); opacity:0; } }
+@keyframes pkr-flare {
+  0%,100% { opacity:.8; transform:translateX(-50%) scale(1); }
+  50% { opacity:1; transform:translateX(-50%) scale(1.045); } }
+@keyframes pkr-twinkle { 0%,100% { opacity:.5; } 50% { opacity:1; } }
+@keyframes gp-pop { 0% { transform:scale(0); opacity:0; } 60% { transform:scale(1.25); } 100% { transform:scale(1); opacity:1; } }
+.clipboard { animation:cb-drop .55s cubic-bezier(.2,.74,.3,1.05) backwards; transform-origin:top center;
+  transition:transform .2s cubic-bezier(.2,.7,.3,1.05), box-shadow .2s ease; }
+@keyframes cb-drop {
+  0% { opacity:0; transform:perspective(950px) rotateX(-15deg); }
+  62% { opacity:1; transform:perspective(950px) rotateX(3deg); }
+  100% { transform:perspective(950px) rotateX(0deg); } }
+.clipboard:hover { transform:translateY(-3px);
+  box-shadow:0 24px 36px -16px var(--shadow-dir), 0 2px 0 rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.75); }
+/* knockout ties cascade down the funnel (per-round --rd inline on each .kbr); final tie idle shimmer.
+   Keyframes wc-deal-in / wc-tie-glow / wc-pennant-wave / wc-trophy-glow live early in the theme and
+   survive the truncation, so page rules can reference them; goal-in / trophy-pop / cb-drop are defined here. */
+.tie { animation:wc-deal-in .46s cubic-bezier(.2,.7,.3,1) var(--rd,0s) backwards;
+  transition:transform .18s cubic-bezier(.2,.7,.3,1.05), box-shadow .18s ease, border-color .18s ease; }
+.tie:hover { transform:translateY(-2px); border-color:rgba(12,36,24,.3); box-shadow:0 14px 24px -12px var(--shadow-dir); }
+.tie-final { animation:wc-deal-in .5s cubic-bezier(.2,.7,.25,1.1) var(--rd,0s) backwards, wc-tie-glow 3.6s ease-in-out 1.1s infinite; }
+.tie-final:hover { transform:translateY(-2px); }
+/* corner pennants — flag on a pole at each pitch corner; the SHAPE lives here so it actually renders */
+.wc-pitch .pen { position:absolute; z-index:2; width:2px; height:26px; pointer-events:none; border-radius:1px;
+  background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.45)); }
+.wc-pitch .pen::before { content:""; position:absolute; top:0; left:2px; width:17px; height:11px;
+  background:linear-gradient(135deg, var(--gold-2), var(--gold)); box-shadow:0 1px 2px rgba(0,0,0,.3);
+  clip-path:polygon(0 0, 100% 50%, 0 100%); transform-origin:left center;
+  animation:wc-pennant-wave 2.8s ease-in-out infinite; }
+.wc-pitch .pen.tl { left:34px; top:10px; }
+.wc-pitch .pen.tr { right:34px; top:10px; }
+.wc-pitch .pen.bl { left:34px; bottom:10px; }
+.wc-pitch .pen.br { right:34px; bottom:10px; }
+.wc-pitch .pen.tr::before, .wc-pitch .pen.br::before { left:auto; right:2px; clip-path:polygon(100% 0, 0 50%, 100% 100%); transform-origin:right center; }
+.wc-pitch .pen.tr::before { animation-delay:-1.2s; }
+.wc-pitch .pen.bl::before { animation-delay:-.6s; }
+.wc-pitch .pen.br::before { animation-delay:-1.8s; }
+/* goal frame rises, trophy pops then breathes a gold glow */
+.goal { animation:goal-in .6s ease-out .85s backwards; }
+@keyframes goal-in { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+.goal img { animation:trophy-pop .55s cubic-bezier(.2,.7,.25,1.3) .95s backwards, wc-trophy-glow 3.8s ease-in-out 1.7s infinite; }
+@keyframes trophy-pop { 0% { opacity:0; transform:scale(.6); } 100% { opacity:1; transform:scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .clipboard, .tie, .tie-final, .goal, .goal img { animation:none !important; opacity:1 !important; transform:none !important; }
+  .clipboard:hover, .tie:hover, .tie-final:hover { transform:none !important; }
+  .wc-pitch .pen::before { animation:none !important; } }
+
+/* ── SHARED PLAYER-PROFILE POPOVER (pp-*) ─────────────────────────────────────
+   The reusable player card-back: opened from the Team HQ squad stickers and the
+   Players-tab FUT cards. Native Popover API → renders in the browser top layer,
+   so it escapes every viz block's overflow:hidden clip; anchored to the trigger
+   via CSS anchor positioning (falls back to viewport-centred). Markup is emitted
+   per-player inside each block's map; this is just the shared skin. */
+button.stk { appearance:none; -webkit-appearance:none; border:none; font:inherit; color:inherit; text-align:inherit; }
+.pp-card { margin:auto; border:none; padding:0 0 18px; overflow:hidden; width:392px;
+  font-family:var(--font-disp); color:#e7ecf1;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px), linear-gradient(155deg,#2c323a,#171b20 74%);
+  border-radius:16px;
+  box-shadow:0 34px 74px -16px rgba(0,0,0,.74), inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 0 1px rgba(0,0,0,.6); }
+.pp-card::backdrop { background:rgba(8,11,15,.55); }
+@supports (anchor-name: --a) {
+  .pp-card { margin:8px; inset:auto; position-area:top; position-try-fallbacks:flip-block, flip-inline, flip-block flip-inline; } }
+.pp-card:popover-open { animation:pp-in .22s cubic-bezier(.2,.7,.25,1) both; }
+@keyframes pp-in { from { opacity:0; transform:translateY(9px) scale(.97); } to { opacity:1; transform:none; } }
+.pp-top { position:relative; display:flex; gap:16px; padding:18px 20px 16px; overflow:hidden; border-radius:16px 16px 0 0; }
+.pp-top::before { content:""; position:absolute; inset:0; opacity:.22; pointer-events:none;
+  background:linear-gradient(118deg, var(--ppc,#1d5c3f), transparent 66%); }
+/* avatar: the figure is zoomed + top-anchored so the head/torso fills the frame (FIFA art floats small in its source canvas) */
+.pp-fig { position:relative; width:92px; height:92px; flex:none; border-radius:16px; overflow:hidden;
+  background:radial-gradient(120% 110% at 50% 8%, rgba(255,255,255,.16), rgba(0,0,0,.34));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16), 0 4px 10px rgba(0,0,0,.4); }
+.pp-fig img { width:100%; height:100%; object-fit:cover; object-position:center top;
+  transform:scale(1.7); transform-origin:center top; display:block; margin:0 !important; }
+.pp-id { position:relative; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:7px; }
+.pp-nm { font-weight:800; font-size:23px; line-height:.98; letter-spacing:.01em; text-transform:uppercase; color:#fff; }
+.pp-sub { display:flex; align-items:center; gap:8px; font-weight:700; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:rgba(225,231,238,.9); }
+.pp-sub img { width:23px; height:15px; border-radius:2px; object-fit:cover; display:block; margin:0 !important; box-shadow:0 1px 2px rgba(0,0,0,.45); }
+.pp-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.pp-chip { display:inline-flex; align-items:baseline; gap:6px; font-weight:800; font-size:11px; letter-spacing:.02em;
+  text-transform:uppercase; color:#eef2f6; background:rgba(255,255,255,.08); border-radius:6px; padding:5px 10px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05); }
+.pp-chip::before { font-size:7.5px; font-weight:800; letter-spacing:.13em; color:var(--gold,#ffd35c); opacity:.92; }
+.cl-age::before { content:"AGE"; }
+.cl-pos::before { content:"POS"; }
+.cl-club::before { content:"CLUB"; }
+.cl-ht::before { content:"HT"; }
+.pp-chip:empty { display:none; }
+.pp-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; margin:16px 20px 0; background:rgba(0,0,0,.42);
+  border-radius:10px; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(0,0,0,.5); }
+.pp-stat { background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(0,0,0,.12)); padding:12px 2px 10px; text-align:center; }
+.pp-stat b { display:block; font-weight:800; font-size:23px; line-height:1; color:#fff; font-variant-numeric:tabular-nums; }
+.pp-stat i { display:block; font-style:normal; font-weight:700; font-size:8.5px; letter-spacing:.07em; text-transform:uppercase; color:rgba(225,231,238,.62); margin-top:5px; }
+.pp-stat.hl b { color:var(--gold,#ffd35c); }
+.pp-gl { list-style:none !important; margin:14px 20px 0; padding:0 !important; display:flex; flex-direction:column; gap:4px; max-height:136px; overflow:auto; }
+.pp-gl:empty { display:none; }
+.pp-gl::before { content:"Goals"; font-weight:800; font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(225,231,238,.55); margin-bottom:4px; }
+.pp-gl li { list-style:none !important; margin:0 !important; font-weight:700; font-size:12px; letter-spacing:.02em; color:rgba(225,231,238,.9);
+  padding:6px 11px; border-radius:6px; background:rgba(255,255,255,.05); }
+.pp-gl li::marker { content:"" !important; }
+.pp-gl li b { color:var(--gold,#ffd35c); font-variant-numeric:tabular-nums; margin-right:6px; }
+/* goal-mouth placement map — a front-on net with a gold dot per placed goal. The dots come from
+   wc_player_stats.goal_placement_svg (null → empty <g>), so the whole section hides for players
+   with no coord-bearing goal via :has() — no empty frame for the ~96% who haven't placed one yet. */
+.pp-goal { margin:15px 20px 0; }
+.pp-goal::before { content:"Where they score"; display:block; font-weight:800; font-size:9px; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(225,231,238,.55); margin-bottom:7px; }
+/* the goal sits in a spotlit case: a cool top-down bloom + a lit inner edge, like a stadium net at night */
+.pp-goal-box { border-radius:9px; padding:11px 13px 7px; overflow:hidden;
+  background:radial-gradient(80% 98% at 50% -8%, rgba(150,184,224,.16), transparent 58%), linear-gradient(180deg, rgba(23,29,37,.62), rgba(7,10,14,.58));
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.45), inset 0 0 28px -8px rgba(150,184,224,.24); }
+.pp-net { display:block; width:100%; height:auto; margin:0 !important; }
+/* back-net depth panel (the goal has a roof going back) — kept faint */
+.pp-net .pp-depth { fill:rgba(7,11,15,.4); stroke:rgba(226,233,242,.16); stroke-width:.7; stroke-linejoin:round; }
+.pp-net .ground { stroke:rgba(226,233,242,.32); stroke-width:1.2; stroke-linecap:round; }
+/* placement dots: gold core + pale rim + glow, popping in when the card opens */
+.pp-net .gp { fill:var(--gold,#ffd35c); stroke:rgba(255,243,209,.9); stroke-width:.6; transform-box:fill-box; transform-origin:center;
+  filter:drop-shadow(0 0 4px rgba(242,200,75,.9)); }
+.pp-card:popover-open .pp-net .gp { animation:gp-pop .42s cubic-bezier(.2,.7,.25,1.5) both; }
+.pp-goal:has(.pp-dots:empty) { display:none; }
+@media (prefers-reduced-motion: reduce) { .pp-card:popover-open { animation:none !important; } }
+
+/* ── SHARED FUT CARD MATERIAL (.fut*) ─────────────────────────────────────────
+   The gold-foil shield used by BOTH the Tournament boot podium and the Players
+   gallery. Lives here (global host) so the two are pixel-identical — one source.
+   Layout-specific rules (.bp-row podium positioning, .fut-wall grid) stay in
+   their own blocks; this is just the card itself. */
+.fut { position:relative; width:176px; height:232px; flex:none; border-radius:18px; color:#4a3608;
+  --rest:perspective(900px) translateY(0) rotateY(0deg) scale(1); transform:var(--rest); isolation:isolate;
+  transition:transform .26s cubic-bezier(.2,.7,.3,1.05), filter .26s ease;
+  clip-path:path('M 0 34 C 0 18 10 8 26 7 L 64 7 C 74 7 80 2 88 2 C 96 2 102 7 112 7 L 150 7 C 166 8 176 18 176 34 L 176 168 C 176 192 168 204 146 214 C 124 223 102 230 88 230 C 74 230 52 223 30 214 C 8 204 0 192 0 168 Z');
+  background:
+    radial-gradient(130% 70% at 50% -10%, #fcf0c4, transparent 55%),
+    linear-gradient(120deg, transparent 36%, rgba(255,255,255,.28) 46%, transparent 58%),
+    linear-gradient(180deg, #f0dc9e 0%, #e3c068 52%, #c99b36 100%);
+  filter:drop-shadow(0 10px 12px rgba(7,30,18,.4)); }
+.fut::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.14;
+  background:linear-gradient(115deg, transparent 38%, var(--teamc) 50%, transparent 67%); }
+.fut .fut-frame { position:absolute !important; inset:0 !important; width:100% !important; height:100% !important;
+  pointer-events:none; display:block !important; margin:0 !important; }
+.fut-medal { position:absolute; top:7px; left:50%; transform:translateX(-50%); z-index:3; width:24px; height:24px;
+  border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-disp);
+  font-weight:800; font-size:12px; color:#f9edc6; background:radial-gradient(120% 120% at 32% 28%, #8a6516, #5d430c);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.35), 0 1px 3px rgba(74,54,8,.45); }
+.fut-body { position:absolute; inset:0; display:flex; flex-direction:column; padding:16px 16px 14px; }
+.fut-top { position:relative; flex:1; min-height:0; }
+.fut-rate { position:absolute; left:0; top:0; bottom:0; z-index:2; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; width:40px; line-height:1; padding-bottom:12px; }
+.fut-rate .n { font-family:var(--font-disp); font-weight:800; font-size:34px; text-shadow:0 1px 0 rgba(255,255,255,.45); }
+.fut-rate .u { font-family:var(--font-disp); font-weight:700; font-size:7.5px; letter-spacing:.14em;
+  text-transform:uppercase; opacity:.78; margin-top:4px; }
+.fut-rate .fut-flag { width:25px !important; height:17px !important; border-radius:2px !important; object-fit:cover;
+  display:block !important; margin:10px 0 0 !important; box-shadow:0 1px 2px rgba(0,0,0,.3); }
+.fut-ph { position:absolute; right:-4px; top:4px; bottom:0; width:72%; overflow:hidden; }
+.fut-ph img { width:100% !important; height:100% !important; object-fit:cover; object-position:top center;
+  transform:scale(2.2); transform-origin:top center; display:block !important; margin:0 !important; }
+.fut-ph img[src=""], .fut-ph img:not([src]) { display:none !important; }
+.fut-name { position:relative; font-family:var(--font-disp); font-weight:800; text-transform:uppercase;
+  font-size:14px; letter-spacing:.03em; text-align:center; line-height:1.1; padding:7px 6px 6px; margin:0 4px;
+  border-bottom:1px solid rgba(120,85,20,.4); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fut-meta { font-family:var(--font-disp); font-weight:700; font-size:9px; letter-spacing:.13em;
+  text-transform:uppercase; text-align:center; opacity:.82; padding-top:6px; }
+.fut-meta b { font-size:11px; font-weight:800; }
+.fut.t2 { color:#39424a;
+  background:
+    radial-gradient(130% 70% at 50% -10%, #ffffff, transparent 55%),
+    linear-gradient(120deg, transparent 36%, rgba(255,255,255,.45) 46%, transparent 58%),
+    linear-gradient(180deg, #f2f5f7 0%, #cfd6db 52%, #a7b1b9 100%); }
+.fut.t2 .fut-frame path { stroke:#7e8a92; }
+.fut.t2 .fut-name { border-bottom-color:rgba(70,85,95,.4); }
+.fut.t2 .fut-medal { color:#eef3f6; background:radial-gradient(120% 120% at 32% 28%, #5d6970, #39444b);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.4), 0 1px 3px rgba(40,50,57,.45); }
+.fut.t3 { color:#46301a;
+  background:
+    radial-gradient(130% 70% at 50% -10%, #f6e3cf, transparent 55%),
+    linear-gradient(120deg, transparent 36%, rgba(255,255,255,.3) 46%, transparent 58%),
+    linear-gradient(180deg, #e9cdaf 0%, #cd9f6e 52%, #a87146 100%); }
+.fut.t3 .fut-frame path { stroke:#7e5226; }
+.fut.t3 .fut-name { border-bottom-color:rgba(110,70,30,.45); }
+.fut.t3 .fut-medal { color:#f3e2cd; background:radial-gradient(120% 120% at 32% 28%, #6e4a20, #46300f);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.35), 0 1px 3px rgba(60,40,15,.45); }
+.fut { animation:fut-deal .55s cubic-bezier(.2,.74,.3,1.16) backwards; }
+@keyframes fut-deal {
+  0% { opacity:0; transform:perspective(900px) translateY(34px) rotateY(-26deg) scale(.9); }
+  100% { opacity:1; transform:var(--rest); } }
+.fut::after { content:""; position:absolute; inset:0; z-index:4; pointer-events:none; opacity:0;
+  background:linear-gradient(115deg, transparent 32%, rgba(255,255,255,.5) 47%, transparent 63%);
+  transform:translateX(-120%); }
+.fut:hover { transform:perspective(900px) translateY(-10px) rotateY(0deg) scale(1.06); z-index:6;
+  filter:drop-shadow(0 22px 22px rgba(7,30,18,.5)) drop-shadow(0 0 28px rgba(242,200,75,.6)); }
+.fut:hover::after { opacity:1; animation:fut-foil .6s ease-out; }
+@keyframes fut-foil { from { transform:translateX(-120%); } to { transform:translateX(120%); } }
+@media (prefers-reduced-motion: reduce) {
+  .fut { animation:none !important; opacity:1 !important; transform:var(--rest) !important; }
+  .fut:hover { transform:var(--rest) !important; }
+  .fut::after { display:none !important; } }
+/* ── RACE LADDER (rl-*) — the Players-tab "Race for the Golden Boot / Playmaker".
+   A matte broadcast TIMING-BOARD, not the foil .fut card: each contender owns a lane
+   and the lane itself FILLS toward the leader (the SQL-resolved %), so the board reads
+   as a live race rather than a chart. Shared by both ladders — they differ ONLY in the
+   metric and the lane-light hue (boot = gold, play = ice), which the accent tokens carry.
+   No edge stripe; the material is the engraved plate + the lit lanes themselves. */
+.rl { position:relative; height:100%; box-sizing:border-box; display:flex; flex-direction:column;
+  font-family:var(--font-disp); color:var(--line); border-radius:15px; overflow:hidden; padding:18px 20px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.016) 0 2px, transparent 2px 6px),
+    linear-gradient(168deg, #232a31, #13171c 80%);
+  box-shadow:0 26px 52px -22px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(0,0,0,.5);
+  opacity:0; animation:wc-deal-in .5s cubic-bezier(.2,.7,.3,1) .05s forwards; }
+.rl.boot { --ac:#f2c84b; --ac-soft:rgba(242,200,75,.34); --ac-dim:rgba(242,200,75,.05); --ac-edge:rgba(255,224,140,.95); --ac-glow:rgba(242,200,75,.5); }
+.rl.play { --ac:#86d9ec; --ac-soft:rgba(120,210,232,.32); --ac-dim:rgba(120,210,232,.05); --ac-edge:rgba(190,242,252,.92); --ac-glow:rgba(120,210,232,.5); }
+/* header plate: an engraved title bar seated above the lanes, closed by an accent hairline */
+.rl-head { display:flex; align-items:center; gap:13px; padding:0 2px 14px; margin-bottom:13px; position:relative; }
+.rl-head::after { content:""; position:absolute; left:0; right:0; bottom:0; height:2px;
+  background:linear-gradient(90deg, var(--ac-edge), transparent 78%); opacity:.8; }
+.rl-mark { width:38px; height:38px; flex:none; border-radius:11px; display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(120% 120% at 32% 24%, rgba(255,255,255,.16), rgba(0,0,0,.32));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), 0 3px 8px rgba(0,0,0,.4); }
+.rl-mark svg { width:21px; height:21px; display:block; margin:0 !important; stroke:var(--ac); }
+.rl-ttl { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.rl-ttl .a { font-weight:800; font-size:18px; line-height:1; letter-spacing:.03em; text-transform:uppercase; color:#fff; }
+.rl-ttl .b { font-weight:700; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:rgba(225,231,238,.55); }
+.rl-ttl .b em { font-style:normal; color:var(--ac); }
+/* the lanes: equal-share the remaining height so the board always fills its block cleanly */
+.rl-list { display:flex; flex-direction:column; gap:7px; flex:1; min-height:0; }
+.rl-row { position:relative; display:grid; grid-template-columns:30px 28px 1fr auto; align-items:center; gap:11px;
+  flex:1; min-height:0; padding:0 14px 0 9px; border-radius:9px; overflow:hidden;
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.17));
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);
+  animation:wc-deal-in .42s cubic-bezier(.2,.7,.3,1) backwards; }
+/* the lane fill — a translucent wash growing left→right to the leader-relative width, with a lit leading edge */
+.rl-fill { position:absolute; left:0; top:0; bottom:0; width:max(9%, var(--w,0%)); z-index:0; border-radius:9px 0 0 9px;
+  background:linear-gradient(90deg, var(--ac-dim), var(--ac-soft)); box-shadow:inset -2px 0 0 var(--ac-edge);
+  transform-origin:left center; animation:wc-meter-fill .85s cubic-bezier(.2,.7,.25,1) .3s backwards; }
+.rl-rank, .rl-flag, .rl-id, .rl-val { position:relative; z-index:1; }
+.rl-rank { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:11.5px; font-variant-numeric:tabular-nums; color:rgba(225,231,238,.62);
+  background:radial-gradient(120% 120% at 32% 28%, #3a434c, #232a31); box-shadow:inset 0 0 0 1px rgba(0,0,0,.4); }
+.rl-row.r1 .rl-rank { color:#3a2a06; background:radial-gradient(120% 120% at 32% 24%, #ffe08c, #e0a82a);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.55), 0 1px 4px var(--ac-glow); }
+.rl-row.r2 .rl-rank { color:#1f262c; background:radial-gradient(120% 120% at 32% 24%, #f1f5f8, #aeb8c0); box-shadow:inset 0 1px 1px rgba(255,255,255,.5); }
+.rl-row.r3 .rl-rank { color:#33240f; background:radial-gradient(120% 120% at 32% 24%, #f0cba0, #c08a52); box-shadow:inset 0 1px 1px rgba(255,255,255,.4); }
+.rl-flag { width:26px; height:18px; border-radius:3px; object-fit:cover; display:block; margin:0 !important; box-shadow:0 1px 2px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.12); }
+.rl-id { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.rl-id .n { font-weight:800; font-size:13.5px; letter-spacing:.01em; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rl-id .s { font-weight:700; font-size:9px; letter-spacing:.09em; text-transform:uppercase; color:rgba(225,231,238,.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rl-val { font-weight:800; font-size:22px; line-height:1; font-variant-numeric:tabular-nums; color:#fff; text-align:right; padding-left:8px; }
+.rl-row.r1 .rl-val { color:var(--ac); text-shadow:0 0 12px var(--ac-glow); }
+.rl-list .rl-row:nth-child(1){animation-delay:.34s} .rl-list .rl-row:nth-child(2){animation-delay:.40s}
+.rl-list .rl-row:nth-child(3){animation-delay:.46s} .rl-list .rl-row:nth-child(4){animation-delay:.52s}
+.rl-list .rl-row:nth-child(5){animation-delay:.58s} .rl-list .rl-row:nth-child(6){animation-delay:.64s}
+.rl-list .rl-row:nth-child(7){animation-delay:.70s} .rl-list .rl-row:nth-child(n+8){animation-delay:.76s}
+@media (prefers-reduced-motion: reduce) {
+  .rl, .rl-row { animation:none !important; opacity:1 !important; }
+  .rl-fill { animation:none !important; } }
+</style>
+<div class="wc-fascia">
+  <div class="wc-brand">
+    <img class="wc-emblem" style="margin:0 !important" src="https://upload.wikimedia.org/wikipedia/en/thumb/1/17/2026_FIFA_World_Cup_emblem.svg/500px-2026_FIFA_World_Cup_emblem.svg.png" alt="FIFA World Cup 26 emblem" />
+    <div>
+      <div class="t1">FIFA World <b>Cup 26</b></div>
+      <div class="t2">Canada · Mexico · USA<span class="sep">·</span>48 teams<span class="sep">·</span>104 matches</div>
+    </div>
+  </div>
+  <div class="wc-stages">
+{% map(rows) %}
+  <div class="wc-stage {{ values.`State`.raw }}"><i class="d"></i>{{ `Short`.formatted }}</div>
+{% end %}
+  </div>
+  <div class="wc-meta">
+    <div class="m1"><span class="wc-dot {{ rows[0].values.`LiveClass`.raw }}"></span> {{ rows[0].values.`Headline`.formatted }}</div>
+    <div class="m2">{{ rows[0].values.`TPlayed`.formatted }} of 104 played · as of {{ rows[0].values.`AsOf`.formatted }}</div>
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'ord'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 6
+        row_limit: 6
+      }
+    }
+  }
+}

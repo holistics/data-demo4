@@ -1,0 +1,84 @@
+Model wc_lineups {
+  type: 'table'
+  label: 'Lineups'
+  description: 'Per-match per-player lineup with formation pitch coordinates (pitch_x / pitch_y).'
+  data_source_name: 'demodb'
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+  }
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_player_id }};;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension is_starter {
+    label: 'Is Starter'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_starter }};;
+  }
+  dimension is_captain {
+    label: 'Is Captain'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_captain }};;
+  }
+  dimension pitch_x {
+    label: 'Pitch X'
+    type: 'number'
+    description: 'FIFA LineupX — currently null on every row (not in the live payload); team sheets render as lists, not a positioned pitch plot.'
+    hidden: true
+    definition: @sql {{ #SOURCE.pitch_x }};;
+  }
+  dimension pitch_y {
+    label: 'Pitch Y'
+    type: 'number'
+    description: 'FIFA LineupY — currently null on every row (see pitch_x).'
+    hidden: true
+    definition: @sql {{ #SOURCE.pitch_y }};;
+  }
+  dimension side {
+    label: 'Side'
+    type: 'text'
+    description: 'Driver field: "home"/"away" of the player\'s team within the match — splits the Match Center team sheets. Cross-model ref resolves through the dataset (lineups → matches is many-to-one).'
+    definition: @aql case(
+      when: wc_lineups.team_code == wc_matches.home_code, then: 'home',
+      else: 'away'
+    ) ;;
+  }
+  dimension role {
+    label: 'Role'
+    type: 'text'
+    description: 'Driver field: "xi" (starter) / "bench" — CSS class on the team-sheet row (no template conditionals).'
+    definition: @aql case(
+      when: wc_lineups.is_starter, then: 'xi',
+      else: 'bench'
+    ) ;;
+  }
+  dimension role_sort {
+    label: 'Role Sort'
+    type: 'number'
+    hidden: true
+    description: 'Driver field: starters (0) before bench (1) — lexical sort on role would put bench first.'
+    definition: @aql case(
+      when: wc_lineups.is_starter, then: 0,
+      else: 1
+    ) ;;
+  }
+  dimension captain_tag {
+    label: 'Captain Tag'
+    type: 'text'
+    description: 'Driver field: "C" for the captain, empty otherwise — empty armband chips hide via CSS :empty.'
+    definition: @aql case(
+      when: wc_lineups.is_captain, then: 'C',
+      else: ''
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_world_cup"."wc_lineups"'
+}

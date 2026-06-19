@@ -1,0 +1,468 @@
+Dataset worldcup {
+  __engine__: 'aql'
+  label: 'World Cup 2026'
+  description: 'Live World Cup 2026 semantic layer: fixtures, results, standings, scorers, squads, lineups and events.'
+  data_source_name: 'demodb'
+  models: [
+    wc_teams,
+    wc_home_teams,
+    wc_away_teams,
+    wc_opponent_teams,
+    wc_groups,
+    wc_matches,
+    wc_players,
+    wc_lineups,
+    wc_events,
+    wc_goals,
+    wc_scorers,
+    wc_team_match_results,
+    wc_group_standings,
+    wc_third_place_ranking,
+    wc_history_matches,
+    wc_history_editions,
+    wc_history_team_editions,
+    wc_team_aliases,
+    wc_team_ratings,
+    wc_match_predictions,
+    wc_advance_probs,
+    wc_team_snapshot,
+    wc_team_next_h2h,
+    wc_match_odds,
+    wc_contender_board,
+    wc_lineup_grid,
+    wc_history_finals,
+    wc_player_stats,
+    wc_player_bio,
+    wc_team_rating_movement,
+    wc_edition_compare,
+    wc_title_odds_movement,
+    wc_history_h2h,
+    wc_player_match_form,
+    wc_team_running_standings
+  ]
+  relationships: [
+    relationship(wc_matches.home_code > wc_home_teams.code, true),
+    relationship(wc_matches.away_code > wc_away_teams.code, true),
+    relationship(wc_matches.group_code > wc_groups.code, true),
+    relationship(wc_goals.match_num > wc_matches.match_num, true),
+    relationship(wc_goals.team_code > wc_teams.code, true),
+    relationship(wc_team_match_results.team_code > wc_teams.code, true),
+    relationship(wc_team_match_results.opponent_code > wc_opponent_teams.code, true),
+    relationship(wc_group_standings.team_code > wc_teams.code, true),
+    relationship(wc_group_standings.group_code > wc_groups.code, true),
+    relationship(wc_players.team_code > wc_teams.code, true),
+    relationship(wc_lineups.match_num > wc_matches.match_num, true),
+    relationship(wc_lineups.fifa_player_id > wc_players.fifa_player_id, true),
+    relationship(wc_lineups.fifa_player_id > wc_player_stats.fifa_player_id, true),
+    relationship(wc_lineups.team_code > wc_teams.code, true),
+    relationship(wc_events.match_num > wc_matches.match_num, true),
+    relationship(wc_events.team_code > wc_teams.code, true),
+    relationship(wc_events.fifa_player_id > wc_players.fifa_player_id, true),
+    relationship(wc_scorers.fifa_player_id > wc_players.fifa_player_id, true),
+    relationship(wc_scorers.team_code > wc_teams.code, true),
+    relationship(wc_third_place_ranking.team_code > wc_teams.code, true),
+    relationship(wc_third_place_ranking.group_code > wc_groups.code, true),
+    relationship(wc_history_matches.year > wc_history_editions.year, true),
+    relationship(wc_history_matches.home_canonical > wc_home_teams.code, true),
+    relationship(wc_history_matches.away_canonical > wc_away_teams.code, true),
+    relationship(wc_history_team_editions.team_code > wc_team_aliases.alias_code, true),
+    relationship(wc_team_aliases.canonical_code > wc_teams.code, true),
+    relationship(wc_team_ratings.team_code > wc_teams.code, true),
+    relationship(wc_match_predictions.match_num > wc_matches.match_num, true),
+    relationship(wc_advance_probs.team_code > wc_teams.code, true),
+    relationship(wc_team_snapshot.team_code > wc_teams.code, true),
+    relationship(wc_team_next_h2h.team_code > wc_teams.code, true),
+    relationship(wc_match_odds.match_num > wc_matches.match_num, true),
+    relationship(wc_contender_board.team_code > wc_teams.code, true),
+    relationship(wc_lineup_grid.match_num > wc_matches.match_num, true),
+    relationship(wc_lineup_grid.team_code > wc_teams.code, true),
+    relationship(wc_player_stats.team_code > wc_teams.code, true),
+    relationship(wc_player_stats.fifa_player_id > wc_player_bio.fifa_player_id, true),
+    relationship(wc_team_rating_movement.team_code > wc_teams.code, true),
+    relationship(wc_title_odds_movement.team_code > wc_teams.code, true),
+    relationship(wc_edition_compare.edition > wc_history_editions.year, true),
+    relationship(wc_history_h2h.team_code > wc_teams.code, true),
+    relationship(wc_history_h2h.opp_code > wc_opponent_teams.code, true),
+    relationship(wc_player_match_form.fifa_player_id > wc_players.fifa_player_id, true),
+    relationship(wc_player_match_form.team_code > wc_teams.code, true),
+    relationship(wc_player_match_form.match_num > wc_matches.match_num, true),
+    relationship(wc_player_match_form.opponent_code > wc_opponent_teams.code, true),
+    relationship(wc_team_running_standings.team_code > wc_teams.code, true),
+    relationship(wc_team_running_standings.group_code > wc_groups.code, true),
+    relationship(wc_team_running_standings.match_num > wc_matches.match_num, true)
+  ]
+
+  metric total_goals {
+    label: 'Total Goals'
+    type: 'number'
+    description: 'All goals scored in finished matches (each goal counted once as the scoring team).'
+    definition: @aql sum(wc_team_match_results.gf) ;;
+  }
+  metric matches_played {
+    label: 'Matches Played'
+    type: 'number'
+    description: 'Count of finished (FT) matches in context.'
+    definition: @aql count_if(wc_matches.status == 'FT') ;;
+  }
+  metric total_matches {
+    label: 'Total Matches'
+    type: 'number'
+    description: 'All scheduled matches in context regardless of status (104 tournament-wide).'
+    definition: @aql count(wc_matches.match_num) ;;
+  }
+  metric scorer_bar_pct {
+    label: 'Scorer Bar Pct'
+    type: 'number'
+    description: 'Driver field: a scorer\'s goals as a percentage of the current Golden Boot leader\'s goals — drives leaderboard bar widths (leader = 100).'
+    definition: @aql 100 * safe_divide(sum(wc_scorers.goals), window_max(sum(wc_scorers.goals))) ;;
+  }
+  metric goals_per_match {
+    label: 'Goals per Match'
+    type: 'number'
+    description: 'Average goals across finished matches.'
+    definition: @aql safe_divide(sum(wc_team_match_results.gf), count_if(wc_matches.status == 'FT')) ;;
+  }
+  metric win_rate {
+    label: 'Win Rate'
+    type: 'number'
+    description: 'Share of a team\'s finished matches that ended in a win (per-team grain).'
+    definition: @aql safe_divide(count_if(wc_team_match_results.result == 'W'), count(wc_team_match_results.match_num)) ;;
+  }
+  metric clean_sheets {
+    label: 'Clean Sheets'
+    type: 'number'
+    description: 'Finished matches in which the team conceded zero (per-team grain).'
+    definition: @aql count_if(wc_team_match_results.clean_sheet) ;;
+  }
+  metric points {
+    label: 'Points'
+    type: 'number'
+    description: 'Group-stage points (3 per win, 1 per draw) from the standings view.'
+    definition: @aql sum(wc_group_standings.pts) ;;
+  }
+  metric team_form_html {
+    label: 'Form'
+    type: 'text'
+    description: 'Pre-built HTML: one form-chip <span> per finished match, coloured by result (win/draw/loss), in kickoff order (oldest→newest). Render with a field format of type html. Null until a team has played; pair with a standings measure so all teams stay in the result (multi-fact left join). Chronological order is achieved by leading each chip with a constant prefix + the ISO kickoff in data-ko, so string_agg order:asc sorts lexically == by time.'
+    definition: @aql string_agg(
+      concat('<span class="cb-chip" data-ko="', cast(wc_team_match_results.kickoff_utc, 'text'), '" style="background:', wc_team_match_results.result_color, '"></span>'),
+      sep: '',
+      order: 'asc'
+    ) ;;
+  }
+  metric goals_for {
+    label: 'Goals For'
+    type: 'number'
+    description: 'Goals scored by the team(s) in context (per-team grain).'
+    definition: @aql sum(wc_team_match_results.gf) ;;
+  }
+  metric goals_against {
+    label: 'Goals Against'
+    type: 'number'
+    description: 'Goals conceded by the team(s) in context (per-team grain).'
+    definition: @aql sum(wc_team_match_results.ga) ;;
+  }
+  metric goal_difference {
+    label: 'Goal Difference'
+    type: 'number'
+    description: 'Goals for minus goals against (per-team grain).'
+    definition: @aql sum(wc_team_match_results.gf) - sum(wc_team_match_results.ga) ;;
+  }
+  metric team_matches_played {
+    label: 'Team Matches Played'
+    type: 'number'
+    description: 'Finished matches for the team(s) in context (per-team grain, from the team-match fact).'
+    definition: @aql count(wc_team_match_results.match_num) ;;
+  }
+  metric matches_won {
+    label: 'Matches Won'
+    type: 'number'
+    definition: @aql count_if(wc_team_match_results.result == 'W') ;;
+  }
+  metric matches_drawn {
+    label: 'Matches Drawn'
+    type: 'number'
+    definition: @aql count_if(wc_team_match_results.result == 'D') ;;
+  }
+  metric matches_lost {
+    label: 'Matches Lost'
+    type: 'number'
+    definition: @aql count_if(wc_team_match_results.result == 'L') ;;
+  }
+  metric avg_attendance {
+    label: 'Average Attendance'
+    type: 'number'
+    description: 'Mean attendance across matches with attendance recorded.'
+    definition: @aql average(wc_matches.attendance) ;;
+  }
+  metric total_attendance {
+    label: 'Total Attendance'
+    type: 'number'
+    definition: @aql sum(wc_matches.attendance) ;;
+  }
+  metric teams_count {
+    label: 'Teams'
+    type: 'number'
+    description: 'Number of participating nations (48).'
+    definition: @aql count(wc_teams.code) ;;
+  }
+  metric wc_titles {
+    label: 'WC Titles'
+    type: 'number'
+    description: 'World Cup titles 1930–2022. Grouped by wc_teams via aliases, defunct-nation titles roll up to the successor (FRG → GER).'
+    definition: @aql count_if(wc_history_team_editions.champion) ;;
+  }
+  metric wc_finals_reached {
+    label: 'WC Finals Reached'
+    type: 'number'
+    definition: @aql count_if(wc_history_team_editions.in_final) ;;
+  }
+  metric wc_semis_reached {
+    label: 'WC Semis Reached'
+    type: 'number'
+    definition: @aql count_if(wc_history_team_editions.in_semi) ;;
+  }
+  metric wc_appearances {
+    label: 'WC Appearances'
+    type: 'number'
+    description: 'Editions played 1930–2022 (one row per edition per team).'
+    definition: @aql count(wc_history_team_editions.year) ;;
+  }
+  metric hist_wins {
+    label: 'All-time WC Wins'
+    type: 'number'
+    definition: @aql sum(wc_history_team_editions.won) ;;
+  }
+  metric hist_draws {
+    label: 'All-time WC Draws'
+    type: 'number'
+    description: 'Shootout results count as draws.'
+    definition: @aql sum(wc_history_team_editions.drawn) ;;
+  }
+  metric hist_losses {
+    label: 'All-time WC Losses'
+    type: 'number'
+    definition: @aql sum(wc_history_team_editions.lost) ;;
+  }
+  metric hist_gf {
+    label: 'All-time WC Goals For'
+    type: 'number'
+    definition: @aql sum(wc_history_team_editions.gf) ;;
+  }
+  metric hist_ga {
+    label: 'All-time WC Goals Against'
+    type: 'number'
+    definition: @aql sum(wc_history_team_editions.ga) ;;
+  }
+  metric hist_win_rate {
+    label: 'All-time WC Win Rate'
+    type: 'number'
+    description: 'Wins / matches across all editions in context (shootouts count as draws).'
+    definition: @aql safe_divide(sum(wc_history_team_editions.won), sum(wc_history_team_editions.played)) ;;
+  }
+  metric hist_goals_per_match {
+    label: 'Historical Goals per Match'
+    type: 'number'
+    description: 'Baseline: goals per match across the editions in context (filter year for an era).'
+    definition: @aql safe_divide(sum(wc_history_matches.home_score) + sum(wc_history_matches.away_score), count(wc_history_matches.fifa_match_id)) ;;
+  }
+  metric hist_goals_per_match_modern {
+    label: 'Goals per Match Since 1998'
+    type: 'number'
+    description: 'Baseline for the jumbotron: goals/match across the 64-match-era editions (1998–2022).'
+    definition: @aql safe_divide(
+      sum(case(when: wc_history_matches.year >= 1998, then: wc_history_matches.home_score + wc_history_matches.away_score, else: 0)),
+      count_if(wc_history_matches.year >= 1998)
+    ) ;;
+  }
+  metric hist_title_years {
+    label: 'Title Years'
+    type: 'text'
+    description: 'Comma-separated editions the team(s) in context won, oldest→newest. Built on year_text (cast in SQL) so years render without digit grouping; empty for non-champions.'
+    definition: @aql string_agg(wc_history_team_editions.year_text, sep: ', ', order: 'asc') | where(wc_history_team_editions.champion) ;;
+  }
+  metric hist_first_title_year {
+    label: 'First Title Year'
+    type: 'text'
+    description: 'Earliest edition the team(s) in context won, as text (champion editions only). Built on year_text (cast in SQL) so it renders "1958" — a numeric year metric reapplies digit grouping ("1,958.00").'
+    definition: @aql min(wc_history_team_editions.year_text) | where(wc_history_team_editions.champion) ;;
+  }
+  metric hist_last_title_year {
+    label: 'Last Title Year'
+    type: 'text'
+    description: 'Most recent edition the team(s) in context won, as text. Built on year_text to avoid digit grouping.'
+    definition: @aql max(wc_history_team_editions.year_text) | where(wc_history_team_editions.champion) ;;
+  }
+  metric title_odds {
+    label: 'Title Odds'
+    type: 'number'
+    description: 'P(champion) from the Monte Carlo sim. Per (team, run_date) grain — filter run_date (e.g. latest) when displaying a single board.'
+    definition: @aql average(wc_advance_probs.p_champion) ;;
+  }
+  metric latest_run_date {
+    label: 'Latest Prediction Run'
+    type: 'date'
+    definition: @aql max(wc_advance_probs.run_date) ;;
+  }
+  metric current_elo {
+    label: 'Current Elo'
+    type: 'number'
+    description: 'Latest Elo snapshot in context (max over snapshot dates in filter range).'
+    definition: @aql max(wc_team_ratings.elo) ;;
+  }
+  // ---- All-time pedigree index (group on wc_team_aliases.entity_code) ----
+  // Weighted prestige score across all editions 1930–2022: every title, final, semi and appearance
+  // compounds (a title contributes at all four tiers), so sustained tournament excellence rises to the
+  // top. Defunct nations roll into their successor via entity_code (West Germany → Germany, etc.).
+  metric pedigree_score {
+    label: 'Pedigree Score'
+    type: 'number'
+    description: 'Weighted all-time prestige: 8·titles + 4·finals reached + 2·semis reached + appearances. Tiers are nested (a champion also reached the final and semi), so titles compound. Group on wc_team_aliases.entity_code.'
+    definition: @aql 8 * count_if(wc_history_team_editions.champion)
+      + 4 * count_if(wc_history_team_editions.in_final)
+      + 2 * count_if(wc_history_team_editions.in_semi)
+      + count(wc_history_team_editions.year) ;;
+  }
+  metric pedigree_bar_pct {
+    label: 'Pedigree Bar Pct'
+    type: 'number'
+    description: 'Driver field: a nation\'s pedigree score as a percentage of the highest score in context — drives leaderboard bar widths (leader = 100).'
+    definition: @aql 100 * safe_divide(
+      8 * count_if(wc_history_team_editions.champion) + 4 * count_if(wc_history_team_editions.in_final) + 2 * count_if(wc_history_team_editions.in_semi) + count(wc_history_team_editions.year),
+      window_max(8 * count_if(wc_history_team_editions.champion) + 4 * count_if(wc_history_team_editions.in_final) + 2 * count_if(wc_history_team_editions.in_semi) + count(wc_history_team_editions.year))
+    ) ;;
+  }
+  metric pedigree_field_avg {
+    label: 'Pedigree Field Average'
+    type: 'number'
+    description: 'Baseline: the average pedigree score across the nations in context (window average). Pairs every leaderboard score with a comparison.'
+    definition: @aql window_avg(8 * count_if(wc_history_team_editions.champion) + 4 * count_if(wc_history_team_editions.in_final) + 2 * count_if(wc_history_team_editions.in_semi) + count(wc_history_team_editions.year)) ;;
+  }
+  metric pedigree_avg_pct {
+    label: 'Pedigree Average Pct'
+    type: 'number'
+    description: 'Driver field: the field-average pedigree as a percentage of the leader — positions the baseline marker on the leaderboard bars.'
+    definition: @aql 100 * safe_divide(
+      window_avg(8 * count_if(wc_history_team_editions.champion) + 4 * count_if(wc_history_team_editions.in_final) + 2 * count_if(wc_history_team_editions.in_semi) + count(wc_history_team_editions.year)),
+      window_max(8 * count_if(wc_history_team_editions.champion) + 4 * count_if(wc_history_team_editions.in_final) + 2 * count_if(wc_history_team_editions.in_semi) + count(wc_history_team_editions.year))
+    ) ;;
+  }
+  // ---- Header stage-progress ribbon + live meta (used by the header fascia, grouped on wc_matches.ribbon_short,
+  // filtered to the six funnel stages). stage_state is per-stage; the tourn_* metrics window over the stage rows
+  // to broadcast tournament-wide totals onto every row (read via rows[0] in the header template). ----
+  metric stage_state {
+    label: 'Stage State'
+    type: 'text'
+    description: 'Driver field for the header ribbon: done (all matches FT) / now (earliest stage not yet complete, via window_min over the stage rows) / upcoming. Done stages contribute a 999 sentinel so window_min lands on the current stage.'
+    definition: @aql case(
+      when: count_if(wc_matches.status == 'FT') >= count(wc_matches.match_num), then: 'done',
+      when: min(wc_matches.ribbon_order) == window_min(case(when: count_if(wc_matches.status == 'FT') < count(wc_matches.match_num), then: min(wc_matches.ribbon_order), else: 999)), then: 'now',
+      else: 'upcoming'
+    ) ;;
+  }
+  metric tourn_played {
+    label: 'Tournament Matches Played'
+    type: 'number'
+    description: 'Window total of finished matches across the stage rows in context — the tournament-wide played count broadcast onto every ribbon row.'
+    definition: @aql window_sum(count_if(wc_matches.status == 'FT')) ;;
+  }
+  metric tourn_as_of {
+    label: 'Tournament As Of'
+    type: 'text'
+    description: 'Latest finished-match kickoff across the stage rows, formatted "DD Mon"; "pre-tournament" before any result.'
+    definition: @aql coalesce(date_format(window_max(max(wc_matches.kickoff_utc) | where(wc_matches.status == 'FT')), '%d %b'), 'pre-tournament') ;;
+  }
+  metric live_headline {
+    label: 'Live Headline'
+    type: 'text'
+    description: 'Header meta line: "N live now" when any match is live (window total), else "No live matches".'
+    definition: @aql case(
+      when: window_sum(count_if(wc_matches.status == 'LIVE')) > 0,
+        then: concat(cast(window_sum(count_if(wc_matches.status == 'LIVE')), 'text'), ' live now'),
+      else: 'No live matches'
+    ) ;;
+  }
+  metric live_class {
+    label: 'Live Class'
+    type: 'text'
+    description: 'Driver field: live / idle — drives the header status-dot (pulsing red when any match is live).'
+    definition: @aql case(when: window_sum(count_if(wc_matches.status == 'LIVE')) > 0, then: 'live', else: 'idle') ;;
+  }
+  // ---- Team HQ scouting report (deterministic verdict; AQL-first). Numbers stay as formatted viz
+  //      fields; every qualitative tag is a case() over real aggregates with thresholds calibrated
+  //      to tournament norms (~1.3 goals/team/game). No fabricated prose — the words are a direct,
+  //      reproducible function of the figures shown beside them. ----
+  metric goals_for_per_game {
+    label: 'Goals For per Game'
+    type: 'number'
+    description: 'Team goals scored per finished match (per-team grain) — the scouting attack rate.'
+    definition: @aql safe_divide(sum(wc_team_match_results.gf), count(wc_team_match_results.match_num)) ;;
+  }
+  metric goals_against_per_game {
+    label: 'Goals Against per Game'
+    type: 'number'
+    description: 'Team goals conceded per finished match (per-team grain) — the scouting defensive rate.'
+    definition: @aql safe_divide(sum(wc_team_match_results.ga), count(wc_team_match_results.match_num)) ;;
+  }
+  metric scout_form_verdict {
+    label: 'Scouting Verdict'
+    type: 'text'
+    description: 'Headline read from results so far: Maximum points (won all) / On the front foot (more wins than losses) / Holding steady (level) / Under pressure; "Awaiting kick-off" before a team has played.'
+    definition: @aql case(
+      when: coalesce(count(wc_team_match_results.match_num), 0) == 0, then: 'Awaiting kick-off',
+      when: count_if(wc_team_match_results.result == 'W') == count(wc_team_match_results.match_num), then: 'Maximum points',
+      when: count_if(wc_team_match_results.result == 'W') > count_if(wc_team_match_results.result == 'L'), then: 'On the front foot',
+      when: count_if(wc_team_match_results.result == 'W') == count_if(wc_team_match_results.result == 'L'), then: 'Holding steady',
+      else: 'Under pressure'
+    ) ;;
+  }
+  metric scout_attack {
+    label: 'Scouting Attack Tag'
+    type: 'text'
+    description: 'Calibrated read of goals/game (norm ~1.3): Free-scoring ≥2.0, Potent ≥1.4, Steady ≥0.9, Goal-shy >0; "Yet to score"/"Awaiting debut" otherwise.'
+    definition: @aql case(
+      when: coalesce(count(wc_team_match_results.match_num), 0) == 0, then: 'Awaiting debut',
+      when: safe_divide(sum(wc_team_match_results.gf), count(wc_team_match_results.match_num)) >= 2.0, then: 'Free-scoring',
+      when: safe_divide(sum(wc_team_match_results.gf), count(wc_team_match_results.match_num)) >= 1.4, then: 'Potent',
+      when: safe_divide(sum(wc_team_match_results.gf), count(wc_team_match_results.match_num)) >= 0.9, then: 'Steady',
+      when: sum(wc_team_match_results.gf) > 0, then: 'Goal-shy',
+      else: 'Yet to score'
+    ) ;;
+  }
+  metric scout_defence {
+    label: 'Scouting Defence Tag'
+    type: 'text'
+    description: 'Calibrated read of goals conceded/game (norm ~1.3): Miserly ≤0.5, Resolute ≤1.0, Leaky ≤1.6, else Porous; "Awaiting debut" before a team has played.'
+    definition: @aql case(
+      when: coalesce(count(wc_team_match_results.match_num), 0) == 0, then: 'Awaiting debut',
+      when: safe_divide(sum(wc_team_match_results.ga), count(wc_team_match_results.match_num)) <= 0.5, then: 'Miserly',
+      when: safe_divide(sum(wc_team_match_results.ga), count(wc_team_match_results.match_num)) <= 1.0, then: 'Resolute',
+      when: safe_divide(sum(wc_team_match_results.ga), count(wc_team_match_results.match_num)) <= 1.6, then: 'Leaky',
+      else: 'Porous'
+    ) ;;
+  }
+  metric scout_class {
+    label: 'Scouting Class Tag'
+    type: 'text'
+    description: 'Standing among the 48 qualified teams by latest Elo: Elite ≤8, Strong ≤16, Solid ≤24, Mid-tier ≤36, else Outsider.'
+    definition: @aql case(
+      when: max(wc_team_snapshot.elo_rank) <= 8, then: 'Elite tier',
+      when: max(wc_team_snapshot.elo_rank) <= 16, then: 'Strong side',
+      when: max(wc_team_snapshot.elo_rank) <= 24, then: 'Solid outfit',
+      when: max(wc_team_snapshot.elo_rank) <= 36, then: 'Mid-tier',
+      else: 'Outsider'
+    ) ;;
+  }
+  metric scout_outlook {
+    label: 'Scouting Outlook Tag'
+    type: 'text'
+    description: 'Model read on reaching the knockouts from P(reach R32): Strong favourite ≥0.75, Likely ≥0.5, In the hunt ≥0.3, Long odds >0; "Awaiting sim" otherwise.'
+    definition: @aql case(
+      when: max(wc_team_snapshot.p_r32) >= 0.75, then: 'Strong favourite to advance',
+      when: max(wc_team_snapshot.p_r32) >= 0.5, then: 'Likely to progress',
+      when: max(wc_team_snapshot.p_r32) >= 0.3, then: 'In the hunt',
+      when: max(wc_team_snapshot.p_r32) > 0, then: 'Long odds to progress',
+      else: 'Awaiting sim'
+    ) ;;
+  }
+}

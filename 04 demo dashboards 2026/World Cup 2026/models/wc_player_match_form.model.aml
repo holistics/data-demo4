@@ -1,0 +1,135 @@
+Model wc_player_match_form {
+  type: 'query'
+  label: 'Player Match Form'
+  description: 'One row per (player, match) the player appeared in: goals / assists / G+A / cards and whether they started, tagged with the match\'s matchday, stage, kickoff date and opponent. This is the per-matchday breakdown behind the tournament-total wc_player_stats — it lets the dashboard chart a player\'s form across matchdays or filter the Players tab to a single matchday. Appearances are the base (from lineups), so a player who featured without scoring still has a row.'
+  data_source_name: 'demodb'
+  models: [wc_lineups, wc_events, wc_matches, wc_players]
+  query: @sql
+    with apps as (
+      select {{ #l.fifa_player_id }} as fifa_player_id, {{ #l.match_num }} as match_num,
+        max({{ #l.team_code }}) as team_code,
+        bool_or({{ #l.is_starter }}) as started,
+        bool_or({{ #l.is_captain }}) as captain
+      from {{ #wc_lineups as l }}
+      group by {{ #l.fifa_player_id }}, {{ #l.match_num }}
+    ),
+    ev as (
+      select {{ #e.fifa_player_id }} as fifa_player_id, {{ #e.match_num }} as match_num,
+        count(*) filter (where {{ #e.type }} in (0, 41)) as goals,
+        count(*) filter (where {{ #e.type }} = 41) as penalty_goals,
+        count(*) filter (where {{ #e.type }} = 2) as yellows,
+        count(*) filter (where {{ #e.type }} = 3) as reds
+      from {{ #wc_events as e }}
+      where {{ #e.fifa_player_id }} is not null
+      group by {{ #e.fifa_player_id }}, {{ #e.match_num }}
+    ),
+    ast as (
+      select {{ #ea.assist_player_id }} as fifa_player_id, {{ #ea.match_num }} as match_num, count(*) as assists
+      from {{ #wc_events as ea }}
+      where {{ #ea.type }} in (0, 41) and {{ #ea.assist_player_id }} is not null
+      group by {{ #ea.assist_player_id }}, {{ #ea.match_num }}
+    )
+    select
+      a.fifa_player_id || '-' || a.match_num as form_key,
+      a.fifa_player_id,
+      a.match_num,
+      a.team_code,
+      {{ #p.name }} as name,
+      {{ #m.matchday }} as matchday,
+      {{ #m.stage }} as stage,
+      {{ #m.kickoff_utc }}::date as kickoff_date,
+      case when {{ #m.matchday }} in (1, 2, 3) then 'Matchday ' || {{ #m.matchday }}::text
+           else initcap(replace({{ #m.stage }}, '_', ' ')) end as matchday_label,
+      case when a.team_code = {{ #m.home_code }} then {{ #m.away_code }} else {{ #m.home_code }} end as opponent_code,
+      coalesce(ev.goals, 0) as goals,
+      coalesce(ev.penalty_goals, 0) as penalty_goals,
+      coalesce(ast.assists, 0) as assists,
+      coalesce(ev.goals, 0) + coalesce(ast.assists, 0) as goal_contributions,
+      coalesce(ev.yellows, 0) as yellows,
+      coalesce(ev.reds, 0) as reds,
+      a.started,
+      a.captain
+    from apps a
+    join {{ #wc_matches as m }} on {{ #m.match_num }} = a.match_num
+    left join {{ #wc_players as p }} on {{ #p.fifa_player_id }} = a.fifa_player_id
+    left join ev on ev.fifa_player_id = a.fifa_player_id and ev.match_num = a.match_num
+    left join ast on ast.fifa_player_id = a.fifa_player_id and ast.match_num = a.match_num;;
+  dimension form_key {
+    label: 'Form Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+  }
+  dimension name {
+    label: 'Player'
+    type: 'text'
+  }
+  dimension matchday {
+    label: 'Matchday'
+    type: 'number'
+    description: 'Group-stage matchday 1–3; null for knockout rounds (use stage / matchday_label there).'
+  }
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+  }
+  dimension matchday_label {
+    label: 'Matchday / Round'
+    type: 'text'
+    description: '"Matchday 1/2/3" for the group stage, else the knockout stage name — the per-matchday form axis / filter label.'
+  }
+  dimension kickoff_date {
+    label: 'Kickoff Date'
+    type: 'date'
+  }
+  dimension opponent_code {
+    label: 'Opponent Code'
+    type: 'text'
+  }
+  dimension goals {
+    label: 'Goals'
+    type: 'number'
+  }
+  dimension penalty_goals {
+    label: 'Penalty Goals'
+    type: 'number'
+  }
+  dimension assists {
+    label: 'Assists'
+    type: 'number'
+  }
+  dimension goal_contributions {
+    label: 'Goal Contributions'
+    type: 'number'
+    description: 'Goals + assists in this match.'
+  }
+  dimension yellows {
+    label: 'Yellow Cards'
+    type: 'number'
+  }
+  dimension reds {
+    label: 'Red Cards'
+    type: 'number'
+  }
+  dimension started {
+    label: 'Started'
+    type: 'truefalse'
+  }
+  dimension captain {
+    label: 'Captain'
+    type: 'truefalse'
+  }
+  owner: 'hung.dd@holistics.io'
+}

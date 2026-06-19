@@ -1,0 +1,106 @@
+// Tournament-tab compact group standings clipboard (Pl · Pts · Form columns).
+// One per group A–C on the Tournament tab. Param `grp` drives the filter + heading.
+// Distinct from wc_group_card (Groups tab) which shows the full P/W/D/L/GF/GA/GD ledger.
+// Styling lives in theme wc_pitch_day (.clipboard/.cb-*) + header_rail keyframes.
+Func wc_group_standings_card(grp: String) {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_group_standings.group_code)
+        operator: 'is'
+        value: grp
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Rank'
+          ref: r(wc_group_standings.rank)
+          uname: 'rank'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_group_standings.team_name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Played'
+          ref: r(wc_group_standings.played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'QualColor'
+          ref: r(wc_group_standings.qual_color)
+        },
+        VizFieldFull {
+          label: 'QualStatus'
+          ref: r(wc_group_standings.qual_status)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Pts'
+          ref: r(worldcup.points)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Form'
+          ref: r(worldcup.team_form_html)
+          format {
+            type: 'html'
+          }
+        }
+      ]
+      content: @md
+<div class="cb-wrap"><div class="clipboard">
+  <div class="cb-head">
+    <span class="cb-grp">Group <b>${grp}</b></span>
+    <span class="cb-sub">Group stage · matchday 1</span>
+  </div>
+  <div class="cb-colhead"><span class="c">#</span><span></span><span>Team</span><span class="c">Pl</span><span class="c">Pts</span><span class="e">Form</span></div>
+{% map(rows) %}
+  <div class="cb-row" style="border-left-color:{{ `QualColor`.raw }};">
+    <span class="cb-rank">{{ `Rank`.formatted }}</span>
+    <img src="{{ `Flag`.raw }}" alt="" />
+    <span class="cb-name">{{ `Team`.formatted }}</span>
+    <span class="cb-p wc-num">{{ `Played`.formatted }}</span>
+    <span class="cb-pts wc-num">{{ values.`Pts`.formatted }}</span>
+    <span class="cb-form" title="{{ `QualStatus`.formatted }}">{{ values.`Form`.formatted }}</span>
+  </div>
+{% end %}
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--qual-adv);"></span>Advance</span>
+    <span class="lg"><span class="dot" style="background:var(--qual-po);"></span>Playoff</span>
+    <span class="lg"><span class="dot" style="background:var(--qual-out);"></span>Out</span>
+    <span class="sp">Form fills in as matches kick off</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'rank'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 4
+        row_limit: 4
+      }
+    }
+  }
+}

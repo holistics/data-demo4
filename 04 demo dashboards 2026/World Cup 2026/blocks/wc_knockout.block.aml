@@ -1,0 +1,273 @@
+// Knockout bracket rounds (Tournament tab). .kbr/.tie/.goal styling lives in theme wc_pitch_day;
+// the cascade keyframes live in header_rail. Each round sets its own --rd cascade delay.
+//
+// wc_knockout_round covers the three identical middle rounds (R16, QF, SF) — they differ only by
+// stage code, heading, cascade delay and row cap. R32 (shows all 16 ties, aggregate-aware) and the
+// Final (trophy meta + .tie-final markup) are kept as their own funcs because their bodies differ.
+Func wc_knockout_round(stage: String, title: String, rd: String, n: Number) {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_matches.stage)
+        operator: 'is'
+        value: stage
+      }
+      rows: [
+        VizFieldFull {
+          label: 'MatchNum'
+          ref: r(wc_matches.match_num)
+          uname: 'mnum'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeFlag'
+          ref: r(wc_home_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayFlag'
+          ref: r(wc_away_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'HomeScore'
+          ref: r(wc_matches.home_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'AwayScore'
+          ref: r(wc_matches.away_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'KODay'
+          ref: r(wc_matches.kickoff_day)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_matches.city)
+        }
+      ]
+      content: @md <style>/* knockout round — .kbr/.tie/.goal styles live in theme wc_pitch_day */</style>
+<div class="kbr" style="--rd:${rd}">
+<div class="kbr-h">${title}</div>
+<div class="kbr-row">
+{% map(rows) %}
+  <article class="tie">
+    <div class="tie-meta"><span>{{ `KODay`.formatted }}</span><span>{{ `City`.formatted }}</span></div>
+    <div class="tie-row"><img src="{{ `HomeFlag`.raw }}" alt="" /><span class="nm">{{ `Home`.formatted }}</span><span class="g wc-num">{{ `HomeScore`.formatted }}</span></div>
+    <div class="tie-row"><img src="{{ `AwayFlag`.raw }}" alt="" /><span class="nm">{{ `Away`.formatted }}</span><span class="g wc-num">{{ `AwayScore`.formatted }}</span></div>
+  </article>
+{% end %}
+</div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'mnum'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: n
+        row_limit: n
+      }
+    }
+  }
+}
+
+// Round of 32 — shows all 16 ties (aggregate-aware, no row cap).
+Func wc_knockout_r32() {
+  VizBlock {
+    label: 'MatchNum, Home and 7 more'
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_matches.stage)
+        operator: 'is'
+        value: 'r32'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'MatchNum'
+          ref: r(wc_matches.match_num)
+          uname: 'mnum'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeFlag'
+          ref: r(wc_home_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayFlag'
+          ref: r(wc_away_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'HomeScore'
+          ref: r(wc_matches.home_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'AwayScore'
+          ref: r(wc_matches.away_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'KODay'
+          ref: r(wc_matches.kickoff_day)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_matches.city)
+        }
+      ]
+      content: @md <style>/* knockout round — .kbr/.tie/.goal styles live in theme wc_pitch_day */</style>
+<div class="kbr" style="--rd:.15s">
+<div class="kbr-h">Round of 32</div>
+<div class="kbr-row">
+{% map(rows) %}
+  <article class="tie">
+    <div class="tie-meta"><span>{{ `KODay`.formatted }}</span><span>{{ `City`.formatted }}</span></div>
+    <div class="tie-row"><img src="{{ `HomeFlag`.raw }}" alt="" /><span class="nm">{{ `Home`.formatted }}</span><span class="g wc-num">{{ `HomeScore`.formatted }}</span></div>
+    <div class="tie-row"><img src="{{ `AwayFlag`.raw }}" alt="" /><span class="nm">{{ `Away`.formatted }}</span><span class="g wc-num">{{ `AwayScore`.formatted }}</span></div>
+  </article>
+{% end %}
+</div>
+</div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'mnum'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+}
+
+// The Final — single tie with trophy meta + gold-foil .tie-final treatment.
+Func wc_knockout_final() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_matches.stage)
+        operator: 'is'
+        value: 'final'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'MatchNum'
+          ref: r(wc_matches.match_num)
+          uname: 'mnum'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeFlag'
+          ref: r(wc_home_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayFlag'
+          ref: r(wc_away_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'HomeScore'
+          ref: r(wc_matches.home_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'AwayScore'
+          ref: r(wc_matches.away_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'KODay'
+          ref: r(wc_matches.kickoff_day)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_matches.city)
+        }
+      ]
+      content: @md <style>/* knockout round — .kbr/.tie/.goal styles live in theme wc_pitch_day */</style>
+<div class="kbr" style="--rd:.67s">
+<div class="kbr-h">Final</div>
+<div class="kbr-row">
+{% map(rows) %}
+  <article class="tie tie-final">
+    <div class="tie-meta"><span class="kt"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:12px;height:12px;margin:0 !important;"><path d="M7 4h10v3a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.6"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 16h6M12 12v4M9 20h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>The Final</span><span>{{ `KODay`.formatted }} · {{ `City`.formatted }}</span></div>
+    <div class="tie-row"><img src="{{ `HomeFlag`.raw }}" alt="" /><span class="nm">{{ `Home`.formatted }}</span><span class="g wc-num">{{ `HomeScore`.formatted }}</span></div>
+    <div class="tie-row"><img src="{{ `AwayFlag`.raw }}" alt="" /><span class="nm">{{ `Away`.formatted }}</span><span class="g wc-num">{{ `AwayScore`.formatted }}</span></div>
+  </article>
+{% end %}
+</div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'mnum'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+}
