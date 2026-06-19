@@ -33,7 +33,7 @@ BlockTheme holistics_ant_card_blocktheme_2a24b81 {
 }
 @tag('Status/WIP')
 Dashboard company_dashboard_v2_2a24b81 {
-  title: "[Demo] Ecommerce Dashboard - v2.202510 (Don't Touch)"
+  title: "[Demo] Ecommerce Dashboard - v2.202510 (Don't Edit)"
   owner: 'thong.do@holistics.io'
   description: ''''''
   block v34: VizBlock {
@@ -1737,20 +1737,21 @@ height: 100%
         }
       ]
       content: @md <style>
-/* Scoped styles for deals component */
+/* Product Card Grid */
 .deals-container {
 display: grid;
-padding: 1.5rem;
+padding: 0;
+margin: 0;
 grid-template-columns: repeat(2, minmax(0, 1fr));
-column-gap: 1.5rem;
-row-gap: 2rem;
+column-gap: 1rem;
+row-gap: 1rem;
 list-style: none;
+margin-right: 40px;
 }
 
 @media (min-width: 1024px) {
 .deals-container {
 grid-template-columns: repeat(3, minmax(0, 1fr));
-column-gap: 2rem;
 }
 }
 
@@ -1759,39 +1760,58 @@ overflow: hidden;
 border-radius: 0.75rem;
 border: 1px solid #E5E7EB;
 list-style: none;
+background: #ffffff;
+transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.deals-container .deal-container:hover {
+box-shadow: 0 4px 16px rgba(5, 38, 76, 0.1);
+transform: translateY(-2px);
 }
 
 .deals-container .deal-header {
 display: flex;
-padding: 1.5rem;
-column-gap: 1rem;
+padding: 1rem;
+column-gap: 0.875rem;
 align-items: center;
-border-bottom: 1px solid rgb(17 24 39 / 0.05);
 background-color: #F9FAFB;
+border-bottom: 1px solid #E5E7EB;
 }
 
 .deals-container .deal-logo {
 object-fit: cover;
 flex: none;
 border-radius: 0.5rem;
-border: 1px solid rgb(229 231 235);
-width: 4rem;
-height: 4rem;
+border: 1px solid #E5E7EB;
+width: 3.5rem;
+height: 3.5rem;
 background-color: #ffffff;
 }
 
-.deals-container .deal-name {
-font-size: 1rem;
-line-height: 1.5rem;
+.deals-container .deal-meta {
+display: flex;
+flex-direction: column;
+gap: 2px;
+}
+
+.deals-container .deal-category {
+font-size: 0.7rem;
 font-weight: 500;
-color: #111827;
+color: #9ca3af;
+text-transform: uppercase;
+letter-spacing: 0.04em;
+}
+
+.deals-container .deal-name {
+font-size: 0.875rem;
+line-height: 1.3rem;
+font-weight: 600;
+color: #05264C;
 }
 
 .deals-container .deal-details {
-padding: 1rem 1.5rem;
-margin: -0.75rem 0;
-border-color: #F3F4F6;
-font-size: 0.875rem;
+padding: 0.75rem 1rem;
+font-size: 0.8125rem;
 line-height: 1.5rem;
 }
 
@@ -1800,25 +1820,47 @@ display: flex;
 padding: 0.3rem 0;
 column-gap: 1rem;
 justify-content: space-between;
+border-bottom: 1px solid #f3f4f6;
 }
 
 .deals-container .deal-details-inner:last-of-type {
-border-bottom-width: 0;
+border-bottom: none;
+}
+
+.deals-container .deal-label {
+color: #6b7280;
+font-size: 0.8rem;
+}
+
+.deals-container .deal-value {
+font-weight: 600;
+color: #05264C;
+font-size: 0.8125rem;
+}
+
+.deals-container .deal-value-price::before {
+content: "$";
+}
+
+.deals-container .revenue-badge {
+display: inline-block;
+padding: 1px 8px;
+border-radius: 999px;
+font-size: 0.775rem;
+font-weight: 600;
+background: #e8f3fd;
+color: #1b7ce4;
+border: 1px solid #8dbef2;
 }
 
 /* Selection state */
 .deals-container .h-drill-selected {
-color: green;
+color: #1b7ce4;
 }
 
 .deals-container .deal-container:has(.h-drill-selected) {
-border-color: #2563EB;
-background: #EFF6FF;
-}
-
-.deals-container .deal-name:has(.h-drill-selected) {
-border-color: #2563EB;
-background: #EFF6FF;
+border-color: #1b7ce4;
+box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
 }
 </style>
 
@@ -1829,38 +1871,30 @@ background: #EFF6FF;
 <li class="deal-container">
 <div class="deal-header">
 <img src="{{ `Product Image Url`.raw }}" class="deal-logo" alt="{{ `Name`.raw }}">
-<section class="deal-name flex flex-col items-start">
-<div class="flex flex-row items-center">{{ `Name` }}</div>
-</section>
+<div class="deal-meta">
+<span class="deal-category">{{ `Category Name` }}</span>
+<span class="deal-name">{{ `Name` }}</span>
+</div>
 </div>
 
-<dl class="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
-<div class="deal-details-inner" style="border-bottom: none;">
-<dt class="text-gray-500">Revenue</dt>
-<dd class="flex items-start gap-x-2">
-<section class="rounded-md ml-2 font-medium ring-1 ring-inset text-green-700 bg-green-50 ring-green-600/10" style="padding: 2px 6px">{{ values.`Revenue` }}</section>
+<dl class="deal-details">
+<div class="deal-details-inner">
+<dt class="deal-label">Revenue</dt>
+<dd>
+<span class="revenue-badge">{{ values.`Revenue` }}</span>
 </dd>
 </div>
 
 <div class="deal-details-inner">
-<dt class="text-gray-500">Category</dt>
-<dd class="flex items-start gap-x-2">
-<div class="font-medium text-gray-900">{{ `Category Name` }}</div>
-</dd>
-</div>
-
-<div class="deal-details-inner">
-<dt class="text-gray-500">Price</dt>
-<dd class="flex items-start gap-x-2">
-<div class="font-medium text-gray-900">{{ values.`Total Price` }}</div>
-</dd>
+<dt class="deal-label">Price</dt>
+<dd class="deal-value deal-value-price">{{ values.`Total Price` }}</dd>
 </div>
 </dl>
 </li>
 
 {% end %}
 
-</ul> ;;
+</ul>  ;;
       settings {
         show_row_total: true
         show_column_total: true
@@ -1869,6 +1903,9 @@ background: #EFF6FF;
           debug_comments: true
         }
       }
+    }
+    settings {
+      hide_label: true
     }
   }
   block t_p4ru: TextBlock {
@@ -2911,7 +2948,7 @@ background: #EFF6FF;
     tab tab4: CanvasLayout {
       label: 'Products'
       width: 1260
-      height: 1490
+      height: 1510
       block t_9x1p {
         position: pos(40, 30, 140, 40)
         layer: 1
@@ -2924,11 +2961,11 @@ background: #EFF6FF;
         position: pos(0, 0, 1260, 220)
       }
       block v_su0w {
-        position: pos(50, 280, 1120, 1140)
+        position: pos(40, 300, 1180, 1140)
         layer: 1013
       }
       block t_p4ru {
-        position: pos(30, 260, 1190, 1200)
+        position: pos(40, 260, 1180, 1210)
         layer: 1012
       }
       mobile {
