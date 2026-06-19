@@ -36,8 +36,8 @@ Model mou_mrr_by_segment {
       JOIN "demo_saas_mrr"."plan_tiers" pt ON sub.plan_tier_id = pt.id
     )
     SELECT
-      TO_CHAR(report_month, 'YYYY-MM') AS month_label,
-      report_month::DATE AS report_month,
+      TO_CHAR(report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day', 'YYYY-MM') AS month_label,
+      (report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day')::DATE AS report_month,
       plan_name,
       billing_cycle,
       region,
