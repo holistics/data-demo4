@@ -40,9 +40,8 @@ Dataset demo_finance_di {
     definition: @aql gross_profit * 100.0 / total_revenue;;
     format: "#,###0.00\\%"
   }
-
   metric ebitda {
-    label: "EBITDA"
+    label: "Net"
     type: "number"
     hidden: false
     description: ""
@@ -66,7 +65,7 @@ Dataset demo_finance_di {
     definition: @aql max(fact_cashflow_entries.cash_balance_eop);;
   }
   metric expenses {
-    label: "Expenses"
+    label: "Raw Expenses"
     type: "number"
     hidden: false
     description: ""
