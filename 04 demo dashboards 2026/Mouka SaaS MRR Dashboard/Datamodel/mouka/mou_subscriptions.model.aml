@@ -61,19 +61,25 @@ Model mou_subscriptions {
     hidden: false
     definition: @sql {{ #SOURCE.status }};;
   }
+  dimension _date_offset_days {
+    label: 'Date Offset Days'
+    hidden: true
+    type: 'number'
+    definition: @sql ${MOUKA_DATE_OFFSET_DAYS};;
+  }
   dimension started_at {
     label: 'Started At'
     description: 'Date subscription began. Example: "2024-09-01 00:00:00". Used to determine active subs at any given month.'
     type: 'datetime'
     hidden: false
-    definition: @sql CAST({{ #SOURCE.started_at }} AS TIMESTAMP);;
+    definition: @sql CAST({{ #SOURCE.started_at }} AS TIMESTAMP) + {{ _date_offset_days }} * INTERVAL '1 day';;
   }
   dimension churned_at {
     label: 'Churned At'
     description: 'Date subscription was cancelled. NULL if still active. Example: "2025-08-15 00:00:00"'
     type: 'datetime'
     hidden: false
-    definition: @sql CAST({{ #SOURCE.churned_at }} AS TIMESTAMP);;
+    definition: @sql CAST({{ #SOURCE.churned_at }} AS TIMESTAMP) + {{ _date_offset_days }} * INTERVAL '1 day';;
   }
 
   // ── Measures ────────────────────────────────────────────────────────────────
