@@ -13,7 +13,7 @@ Dashboard business_users_metric_promotion {
       mobile {
         mode: 'auto'
       }
-      block v_pzpr {
+      block v_m825 {
         position: pos(20, 20, 620, 420)
       }
     }
@@ -42,26 +42,22 @@ Dashboard business_users_metric_promotion {
   settings {
     autorun_on_open: true
   }
-  block v_pzpr: VizBlock {
-    label: 'Running total of Total Users'
+  block v_m825: VizBlock {
+    label: 'Running total of Total Revenue'
     viz: DataTable {
       dataset: demo_ecommerce_version_2
-      calculation running_total_of_total_users {
-        label: 'Running total of Total Users'
-        formula: @aql total_users | running_total();;
+      calculation running_total_of_total_revenue {
+        label: 'Running total of Total Revenue'
+        formula: @aql revenue | running_total();;
         calc_type: 'measure'
         data_type: 'number'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
       }
       fields: [
         VizFieldFull {
-          ref: 'running_total_of_total_users'
+          ref: 'running_total_of_total_revenue'
           format {
             type: 'number'
-            pattern: 'none'
+            pattern: 'inherited'
           }
         }
       ]
