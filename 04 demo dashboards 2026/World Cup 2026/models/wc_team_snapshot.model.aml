@@ -2,7 +2,7 @@ Model wc_team_snapshot {
   type: 'query'
   label: 'Team Snapshot'
   description: 'One row per team: the LATEST Elo + FIFA rank snapshot and the LATEST Monte Carlo run probabilities. Exists because max()-style metrics over wc_team_ratings/wc_advance_probs mix dates; this pins every value to its most recent date.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_team_ratings, wc_advance_probs]
   query: @sql
     with latest_rating as (

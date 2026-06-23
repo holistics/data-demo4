@@ -2,7 +2,7 @@ Model wc_lineup_grid {
   type: 'query'
   label: 'Lineup Grid'
   description: 'One row per STARTER per match with broadcast-graphic layout baked in: stage_x/y_pct place each token on a dual half-pitch stage (home 0–46%, away 54–100%), reveal_delay staggers the pop-in cascade GK → defence → attack. Rows derive from the FORMATION STRING (4-1-2-3 → bands of 4/1/2/3) because FIFA never sends LineupX/Y: starters are ordered GK→DF→MF→FW then shirt number and dealt into bands, so a winger listed as FW can sit one band off — layout is faithful to the formation, heuristic per player.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_lineups, wc_matches, wc_players]
   query: @sql
     with starters as (

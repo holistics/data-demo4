@@ -2,7 +2,7 @@ Model wc_team_ratings {
   type: 'table'
   label: 'Team Ratings'
   description: 'Elo snapshots for the 48 teams (monthly since 2024-07, daily during the tournament). Computed by the worldcup-sync nightly job.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension rating_key {
     label: 'Rating Key'
     type: 'text'
@@ -39,5 +39,5 @@ Model wc_team_ratings {
     definition: @sql {{ #SOURCE.fifa_rank }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_team_ratings"'
+  table_name: '"public"."wc_team_ratings"'
 }

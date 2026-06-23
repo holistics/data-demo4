@@ -2,7 +2,7 @@ Model wc_history_matches {
   type: 'table'
   label: 'WC History Matches'
   description: 'Every World Cup match 1930–2022 (964 rows, FIFA API backfill). home/away_canonical map defunct nations to their modern successors for joins.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension fifa_match_id {
     label: 'FIFA Match ID'
     type: 'text'
@@ -118,5 +118,5 @@ Model wc_history_matches {
     definition: @sql {{ #SOURCE.city }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_history_matches"'
+  table_name: '"public"."wc_history_matches"'
 }

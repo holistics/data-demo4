@@ -2,7 +2,7 @@ Model wc_lineups {
   type: 'table'
   label: 'Lineups'
   description: 'Per-match per-player lineup with formation pitch coordinates (pitch_x / pitch_y).'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension match_num {
     label: 'Match Number'
     type: 'number'
@@ -80,5 +80,5 @@ Model wc_lineups {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_lineups"'
+  table_name: '"public"."wc_lineups"'
 }

@@ -2,7 +2,7 @@ Model wc_team_next_h2h {
   type: 'query'
   label: 'Next Opponent H2H'
   description: 'Per team: the next unplayed fixture (opponent, kickoff, venue) joined to every historical World Cup meeting against that opponent, scored from the team\'s perspective. One row per past meeting; teams that never met their next opponent keep a single row with null meeting columns. Exists because "home OR away" cannot be expressed through the dataset filter graph.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_matches, wc_history_matches, wc_teams]
   query: @sql
     with sides as (

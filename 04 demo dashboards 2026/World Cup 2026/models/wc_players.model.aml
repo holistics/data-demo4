@@ -2,7 +2,7 @@ Model wc_players {
   type: 'table'
   label: 'Players'
   description: 'World Cup 2026 squad players (populated by live sync from match-detail squads).'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension fifa_player_id {
     label: 'FIFA Player Id'
     type: 'text'
@@ -52,5 +52,5 @@ Model wc_players {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_players"'
+  table_name: '"public"."wc_players"'
 }

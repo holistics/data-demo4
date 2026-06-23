@@ -2,7 +2,7 @@ Model wc_history_editions {
   type: 'table'
   label: 'WC History Editions'
   description: 'One row per finished World Cup edition 1930–2022 (name, hosts).'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension year {
     label: 'Edition'
     type: 'number'
@@ -26,5 +26,5 @@ Model wc_history_editions {
     definition: @sql {{ #SOURCE.host_codes }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_history_editions"'
+  table_name: '"public"."wc_history_editions"'
 }

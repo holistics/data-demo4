@@ -2,7 +2,7 @@ Model wc_contender_board {
   type: 'query'
   label: 'Contender Board'
   description: 'One row per team for the Contender Index: latest Elo + 30-day move, a pre-scaled SVG polyline string of the 24-month Elo curve (field-wide y-bounds so curves are comparable), and the latest Monte Carlo run probabilities with day-over-day deltas vs the previous run. Spark/delta strings are built in SQL — templates cannot loop into a polyline attribute and AQL cast() re-applies digit grouping.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_team_ratings, wc_advance_probs]
   query: @sql
     with snaps as (

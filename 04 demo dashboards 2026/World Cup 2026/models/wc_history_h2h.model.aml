@@ -2,7 +2,7 @@ Model wc_history_h2h {
   type: 'query'
   label: 'All-time Head-to-Head'
   description: 'One row per (team, opponent) ordered pair: their all-time World Cup record 1930–2022 from that team\'s perspective (played / W-D-L / goals). Both teams use canonical codes (defunct nations folded into the modern successor) so a 2026 team resolves its full lineage. Built by UNIONing home and away perspectives of wc_history_matches — a cross-row aggregation that is not a single AQL measure. Shootouts count as draws (the 90/120-min score decides W/D/L), matching wc_history_team_editions.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_history_matches, wc_teams, wc_team_aliases]
   query: @sql
     with persp as (

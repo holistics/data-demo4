@@ -2,7 +2,7 @@ Model wc_player_stats {
   type: 'query'
   label: 'Player Stats'
   description: 'One row per squad player with tournament output aggregated from the event stream + lineups: goals (incl. penalties), assists (goal-event assist provider), goal contributions (G+A), appearances, starts, captaincies, and cards. Ranks (goals_rank, ga_rank) are window functions over the whole field — the Golden Boot / playmaker order. Goals come from events (type 0 open play, 41 penalty), the same source wc_scorers is derived from.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_players, wc_events, wc_lineups, wc_matches]
   query: @sql
     with apps as (

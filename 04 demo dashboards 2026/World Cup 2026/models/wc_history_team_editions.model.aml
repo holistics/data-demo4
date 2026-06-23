@@ -2,7 +2,7 @@ Model wc_history_team_editions {
   type: 'table'
   label: 'WC History Team Editions'
   description: 'Per (edition, team) rollup 1930–2022: record, goals, pedigree flags (in_semi/in_final/champion). Shootouts count as draws.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension edition_team {
     label: 'Edition Team Key'
     type: 'text'
@@ -95,5 +95,5 @@ Model wc_history_team_editions {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_history_team_editions"'
+  table_name: '"public"."wc_history_team_editions"'
 }

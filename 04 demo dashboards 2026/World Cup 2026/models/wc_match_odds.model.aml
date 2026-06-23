@@ -2,7 +2,7 @@ Model wc_match_odds {
   type: 'query'
   label: 'Match Odds (Latest)'
   description: 'One row per MATCH (all 104, from wc_matches): the LATEST Elo→Poisson run probabilities plus the day-over-day delta vs the previous run. Matches with no prediction rows (M1–M2 finished before the first nightly run on 12 Jun 2026) keep their row with null probabilities and a status_note, so the odds board renders a styled empty state instead of the platform "no data" pill. Delta labels/colours are built in SQL — AQL has no signed to_char and cast() re-applies digit grouping.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_match_predictions, wc_matches]
   query: @sql
     with ranked as (

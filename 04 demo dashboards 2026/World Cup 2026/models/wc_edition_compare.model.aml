@@ -2,7 +2,7 @@ Model wc_edition_compare {
   type: 'query'
   label: 'Edition Comparison'
   description: 'One row per World Cup edition 1930–2026 with tournament-shape baselines: matches played, goals, goals per match, and average attendance. History rows come from wc_history_matches; the live 2026 row is aggregated from finished wc_matches (so it grows each matchday). Materialised because it UNIONs the historical fact with the live fact — not expressible as a single AQL measure. Lets the dashboard frame "this World Cup vs the others" (goals/match and attendance are comparable across all editions; cards/possession exist only for 2026 and are intentionally absent here).'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_history_matches, wc_matches]
   query: @sql
     with hist as (

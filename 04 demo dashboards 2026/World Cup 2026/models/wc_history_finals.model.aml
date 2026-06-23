@@ -2,7 +2,7 @@ Model wc_history_finals {
   type: 'query'
   label: 'WC History Finals'
   description: 'One row per edition 1930–2022: the final resolved into champion vs runner-up (codes, names, flags, scoreline). 21 editions come from stage=final; 1950 (a round-robin with no final) uses the decisive Uruguay–Brazil Maracanazo. Exists because resolving both finalist names + crests from historical codes (defunct nations + non-2026 finalists) plus the scoreline cannot be expressed through the dataset filter graph.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_history_matches, wc_history_editions, wc_team_aliases, wc_teams]
   query: @sql
     with fin as (

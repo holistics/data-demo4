@@ -2,7 +2,7 @@ Model wc_team_running_standings {
   type: 'query'
   label: 'Running Standings'
   description: 'One row per (team, finished match) carrying the team\'s running totals AFTER that match — cumulative points, goals for/against, goal difference and games played — ordered by kickoff. This is the matchday-over-matchday movement series behind the current-only wc_group_standings: chart cum_points against matchday to show how a group table built up. Running totals are a window over ordered rows, not an AQL dimension, so they are materialised here.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_team_match_results, wc_matches]
   query: @sql
     with base as (
