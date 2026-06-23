@@ -2,7 +2,7 @@ Model wc_title_odds_movement {
   type: 'query'
   label: 'Title Odds Movement'
   description: 'One row per team: latest Monte-Carlo championship odds vs the previous nightly run, with the day-over-day shift. Materialised for the same reason as wc_match_odds — a run-over-run lag and signed delta label are not AQL dimensions. NOTE: only a few nightly runs exist this early (first run 12 Jun 2026), so deltas are sparse until runs accumulate; the full title-odds *trend* line is wc_advance_probs (long format, one point per run_date).'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_advance_probs]
   query: @sql
     with ranked as (

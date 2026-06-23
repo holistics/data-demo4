@@ -2,7 +2,7 @@ Model wc_team_aliases {
   type: 'table'
   label: 'Team Aliases'
   description: 'Every team code in WC history → display name + canonical (modern successor) code. Bridge between historical rollups and wc_teams.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension alias_code {
     label: 'Alias Code'
     type: 'text'
@@ -75,5 +75,5 @@ Model wc_team_aliases {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_team_aliases"'
+  table_name: '"public"."wc_team_aliases"'
 }

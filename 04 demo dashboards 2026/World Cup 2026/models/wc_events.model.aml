@@ -2,7 +2,7 @@ Model wc_events {
   type: 'table'
   label: 'Events'
   description: 'Match event stream (goals, cards, subs) with running score. Powers the Match Center timeline.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension event_id {
     label: 'Event Id'
     type: 'text'
@@ -206,5 +206,5 @@ Model wc_events {
     definition: @aql in(wc_events.type, 0, 41) and coalesce(wc_events.goal_x, -1) >= 0 ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_events"'
+  table_name: '"public"."wc_events"'
 }

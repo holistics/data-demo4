@@ -2,7 +2,7 @@ Model wc_team_match_results {
   type: 'table'
   label: 'Team Match Results'
   description: 'Canonical per-team grain: one row per team per finished match. Source for per-team metrics.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension team_code {
     label: 'Team Code'
     type: 'text'
@@ -96,5 +96,5 @@ Model wc_team_match_results {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_team_match_results"'
+  table_name: '"public"."wc_team_match_results"'
 }

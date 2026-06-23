@@ -2,7 +2,7 @@ Model wc_team_rating_movement {
   type: 'query'
   label: 'Team Rating Movement'
   description: 'One row per team comparing the LATEST Elo snapshot against the previous snapshot and the nearest snapshot ~30 days earlier, with rank movement. Period comparison cannot be expressed as an AQL dimension (it needs a row-offset lag over snapshot dates), so it is materialised here. Signed delta labels/colours are built in SQL (AQL has no signed to_char). Snapshots are monthly since 2024-07 then daily during the tournament, so "previous" tightens to day-over-day once play starts.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_team_ratings]
   query: @sql
     with snaps as (

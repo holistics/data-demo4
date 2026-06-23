@@ -2,7 +2,7 @@ Model wc_groups {
   type: 'table'
   label: 'Groups'
   description: 'World Cup 2026 groups A–L.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension code {
     label: 'Group'
     type: 'text'
@@ -21,5 +21,5 @@ Model wc_groups {
     definition: @sql {{ #SOURCE.fifa_group_id }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_groups"'
+  table_name: '"public"."wc_groups"'
 }

@@ -2,7 +2,7 @@ Model wc_goals {
   type: 'table'
   label: 'Goals'
   description: 'Goal events (regular + penalty), player-attributed. Derived view over wc_events.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension event_id {
     label: 'Event Id'
     type: 'text'
@@ -45,5 +45,5 @@ Model wc_goals {
     definition: @sql {{ #SOURCE.is_penalty }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_goals"'
+  table_name: '"public"."wc_goals"'
 }

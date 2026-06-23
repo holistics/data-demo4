@@ -2,7 +2,7 @@ Model wc_scorers {
   type: 'table'
   label: 'Scorers'
   description: 'Top-scorer leaderboard derived from the goal event stream (Golden Boot race).'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension fifa_player_id {
     label: 'FIFA Player Id'
     type: 'text'
@@ -36,5 +36,5 @@ Model wc_scorers {
     definition: @aql rank(order: wc_scorers.goals | desc()) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_scorers"'
+  table_name: '"public"."wc_scorers"'
 }

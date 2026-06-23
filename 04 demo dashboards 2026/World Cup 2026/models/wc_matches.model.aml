@@ -2,7 +2,7 @@ Model wc_matches {
   type: 'table'
   label: 'Matches'
   description: 'World Cup 2026 fixtures and results (104). Match grain: one row per match.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension match_num {
     label: 'Match Number'
     type: 'number'
@@ -253,7 +253,7 @@ Model wc_matches {
     description: 'Driver: the single featured match — lowest featured_sort (live, else soonest upcoming, else most recent finished) with a match_num tie-break for determinism. The featured hero filters on this and the upcoming-fixtures band excludes it, so the two never show the same match twice.'
     definition: @sql ({{ #SOURCE.match_num }} = (
       select sub.match_num
-      from "demo_world_cup"."wc_matches" sub
+      from "public"."wc_matches" sub
       order by (case when sub.status = 'LIVE' then 0
                      when sub.status = 'NS' then extract(epoch from sub.kickoff_utc)
                      else 100000000000 - extract(epoch from sub.kickoff_utc) end) asc, sub.match_num asc
@@ -341,5 +341,5 @@ Model wc_matches {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_matches"'
+  table_name: '"public"."wc_matches"'
 }

@@ -2,7 +2,7 @@ Model wc_group_standings {
   type: 'table'
   label: 'Group Standings'
   description: 'Live group table A–L (3 pts/win, 1/draw; ranked by Pts, GD, GF). All 48 teams always present.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension group_code {
     label: 'Group'
     type: 'text'
@@ -84,5 +84,5 @@ Model wc_group_standings {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_group_standings"'
+  table_name: '"public"."wc_group_standings"'
 }

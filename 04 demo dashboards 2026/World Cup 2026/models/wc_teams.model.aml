@@ -2,7 +2,7 @@ Model wc_teams {
   type: 'table'
   label: 'Teams'
   description: 'World Cup 2026 national teams (48). Dimension spine for flags, kit colors, names.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension code {
     label: 'Team Code'
     type: 'text'
@@ -49,5 +49,5 @@ Model wc_teams {
     definition: @sql case when {{ #SOURCE.code }} in ('MEX', 'USA', 'CAN') then 'Co-host' else '' end;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_teams"'
+  table_name: '"public"."wc_teams"'
 }

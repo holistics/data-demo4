@@ -2,7 +2,7 @@ Model wc_third_place_ranking {
   type: 'table'
   label: 'Third Place Ranking'
   description: '2026 format: the 8 best third-placed teams (of 12 groups) advance to the Round of 32.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension group_code {
     label: 'Group'
     type: 'text'
@@ -67,5 +67,5 @@ Model wc_third_place_ranking {
     ) ;;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_third_place_ranking"'
+  table_name: '"public"."wc_third_place_ranking"'
 }

@@ -2,7 +2,7 @@ Model wc_advance_probs {
   type: 'table'
   label: 'Advance Probabilities'
   description: 'Monte Carlo (10k sims) tournament probabilities per team. One row per (team, run_date) — championship odds over time come free.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension prob_key {
     label: 'Prob Key'
     type: 'text'
@@ -63,5 +63,5 @@ Model wc_advance_probs {
     definition: @sql {{ #SOURCE.p_champion }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_advance_probs"'
+  table_name: '"public"."wc_advance_probs"'
 }

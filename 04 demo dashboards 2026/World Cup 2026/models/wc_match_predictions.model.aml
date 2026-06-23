@@ -2,7 +2,7 @@ Model wc_match_predictions {
   type: 'table'
   label: 'Match Predictions'
   description: 'Per-match outcome probabilities + expected goals from the backtested Elo→Poisson model. One row per (match, run_date) — daily history of odds movement.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   dimension prediction_key {
     label: 'Prediction Key'
     type: 'text'
@@ -52,5 +52,5 @@ Model wc_match_predictions {
     definition: @sql {{ #SOURCE.exp_away_goals }};;
   }
   owner: 'hung.dd@holistics.io'
-  table_name: '"demo_world_cup"."wc_match_predictions"'
+  table_name: '"public"."wc_match_predictions"'
 }

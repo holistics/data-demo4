@@ -2,7 +2,7 @@ Dataset worldcup {
   __engine__: 'aql'
   label: 'World Cup 2026'
   description: 'Live World Cup 2026 semantic layer: fixtures, results, standings, scorers, squads, lineups and events.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [
     wc_teams,
     wc_home_teams,

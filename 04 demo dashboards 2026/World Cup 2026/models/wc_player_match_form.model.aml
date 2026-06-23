@@ -2,7 +2,7 @@ Model wc_player_match_form {
   type: 'query'
   label: 'Player Match Form'
   description: 'One row per (player, match) the player appeared in: goals / assists / G+A / cards and whether they started, tagged with the match\'s matchday, stage, kickoff date and opponent. This is the per-matchday breakdown behind the tournament-total wc_player_stats — it lets the dashboard chart a player\'s form across matchdays or filter the Players tab to a single matchday. Appearances are the base (from lineups), so a player who featured without scoring still has a row.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_worldcup'
   models: [wc_lineups, wc_events, wc_matches, wc_players]
   query: @sql
     with apps as (
