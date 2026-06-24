@@ -232,10 +232,15 @@ Dashboard company_dashboard_v2_2a24b81 {
           pattern: 'LLL yyyy'
         }
       }
+      legend: VizFieldFull {
+        ref: r(ecommerce_users.gender)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
         settings {
           axis_min: 0
-          axis_max: 1200
           show_data_label_by: 'value'
           hidden: true
         }
@@ -253,29 +258,8 @@ Dashboard company_dashboard_v2_2a24b81 {
           }
         }
       }
-      y_axis {
-        settings {
-          alignment: 'right'
-          hidden: true
-        }
-        series {
-          mark_type: 'line'
-          field: VizFieldFull {
-            ref: 'total_cumulative_users'
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#00767B'
-            line_interpolation: 'smooth'
-          }
-        }
-      }
       settings {
         row_limit: 5000
-        legend_label: 'hidden'
         x_axis_show_null_datetime: false
         aggregate_awareness {
           enabled: true
