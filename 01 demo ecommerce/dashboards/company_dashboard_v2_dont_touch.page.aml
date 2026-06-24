@@ -1336,18 +1336,17 @@ Dashboard company_dashboard_v2_2a24b81 {
           }
         }
         settings {
-          color_palette: 36356
+          point {
+            value: 'refunded'
+            color: '#00767B'
+          }
           point {
             value: 'cancelled'
             color: '#05264C'
           }
           point {
             value: 'delivered'
-            color: '#003A61'
-          }
-          point {
-            value: 'refunded'
-            color: '#004E71'
+            color: '#259B6C'
           }
         }
       }
