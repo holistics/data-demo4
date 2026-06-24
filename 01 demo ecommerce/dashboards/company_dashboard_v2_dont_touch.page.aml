@@ -232,12 +232,6 @@ Dashboard company_dashboard_v2_2a24b81 {
           pattern: 'LLL yyyy'
         }
       }
-      legend: VizFieldFull {
-        ref: r(ecommerce_users.gender)
-        format {
-          type: 'text'
-        }
-      }
       y_axis {
         settings {
           axis_min: 0
@@ -255,6 +249,24 @@ Dashboard company_dashboard_v2_2a24b81 {
           }
           settings {
             color: '#05264C'
+          }
+        }
+      }
+      y_axis {
+        settings {
+          alignment: 'right'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'cumulative_total_users'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
           }
         }
       }
