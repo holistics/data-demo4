@@ -313,8 +313,14 @@ Dashboard company_dashboard_v2 {
   }
   block v44: VizBlock {
     label: 'Revenue over time'
-    viz: LineChart {
+    viz: CombinationChart {
       dataset: demo_ecommerce_version_2
+      calculation revenue_prev_1_period {
+        label: 'Revenue (prev. 1 period)'
+        formula: @aql revenue | relative_period(ecommerce_orders.created_at, -1, strict: true);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       x_axis: VizFieldFull {
         ref: r(ecommerce_orders.created_at)
         transformation: 'datetrunc quarter'
@@ -326,11 +332,24 @@ Dashboard company_dashboard_v2 {
       y_axis {
         settings {
           show_stack_total: true
-          stack_series_by: 'value'
         }
         series {
+          mark_type: 'column'
           field: VizFieldFull {
             ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#05264C'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'revenue_prev_1_period'
             format {
               type: 'number'
               pattern: 'inherited'
