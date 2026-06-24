@@ -168,32 +168,32 @@ Dashboard _3_customer_demographics_demo {
       dataset: demo_ecommerce_version_2
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_users', 'id')
+          ref: r(ecommerce_users.id)
           format {
             type: 'number'
             pattern: 'inherited'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'full_name')
+          ref: r(ecommerce_users.full_name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'email')
+          ref: r(ecommerce_users.email)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_countries', 'continent_name')
+          ref: r(ecommerce_countries.continent_name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'sign_up_date')
+          ref: r(ecommerce_users.sign_up_date)
           format {
             type: 'date'
           }
@@ -201,6 +201,10 @@ Dashboard _3_customer_demographics_demo {
       ]
       settings {
         show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -209,7 +213,7 @@ Dashboard _3_customer_demographics_demo {
     viz: PieChart {
       dataset: demo_ecommerce_version_2
       legend: VizFieldFull {
-        ref: ref('ecommerce_users', 'age_group')
+        ref: r(ecommerce_users.age_group)
         format {
           type: 'text'
         }
@@ -217,18 +221,36 @@ Dashboard _3_customer_demographics_demo {
       series {
         field: VizFieldFull {
           label: 'Total'
-          ref: ref('ecommerce_users', 'total_users')
+          ref: r(ecommerce_users.total_users)
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###'
+          }
+        }
+        settings {
+          point {
+            value: '1. Under 20'
+            color: '#05264C'
+          }
+          point {
+            value: '3. 30 and above'
+            color: '#259B6C'
+          }
+          point {
+            value: '2. From 20 to 29'
+            color: '#00627A'
           }
         }
       }
       settings {
         display_as_donut: true
-        show_total: true
         show_data_label: true
         show_percentage: true
+        data_label_position: 'outside'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -237,7 +259,7 @@ Dashboard _3_customer_demographics_demo {
     viz: PieChart {
       dataset: demo_ecommerce_version_2
       legend: VizFieldFull {
-        ref: ref('ecommerce_users', 'gender')
+        ref: r(ecommerce_users.gender)
         format {
           type: 'text'
         }
@@ -245,16 +267,20 @@ Dashboard _3_customer_demographics_demo {
       series {
         field: VizFieldFull {
           label: 'Total '
-          ref: ref('ecommerce_users', 'total_users')
+          ref: r(ecommerce_users.total_users)
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###'
           }
         }
         settings {
           point {
             value: 'Male'
-            color: '#F2B602'
+            color: '#008976'
+          }
+          point {
+            value: 'Female'
+            color: '#05264C'
           }
         }
       }
@@ -262,6 +288,11 @@ Dashboard _3_customer_demographics_demo {
         display_as_donut: true
         show_data_label: true
         show_percentage: true
+        data_label_position: 'outside'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
