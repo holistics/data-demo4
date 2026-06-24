@@ -1,0 +1,891 @@
+// Team HQ tab blocks (scouting dossier). Nation filter (hq_team_filter) stays inline in the page.
+// Squad wall = wc_squad_section / wc_squad_gk. Styling in theme wc_pitch_day; keyframes in header_rail.
+
+Func wc_hq_filter_hint() {
+  TextBlock {
+    content: @md
+<style>
+.hq-hint { font-size:10.5px; line-height:1.5; color:rgba(234,255,242,.62); padding:2px 4px; }
+.hq-hint b { color:rgba(234,255,242,.85); font-weight:600; }
+</style>
+<div class="hq-hint"><b>Pick a nation</b> — the nameplate, pedigree, scouting report and squad sheet all re-arm. Squads fill in as each team's first match kicks off.</div>
+;;
+  }
+}
+
+Func wc_hq_banner() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Kit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Grp'
+          ref: r(wc_teams.group_code)
+        },
+        VizFieldFull {
+          label: 'Code'
+          ref: r(wc_teams.code)
+        },
+        VizFieldFull {
+          label: 'Host'
+          ref: r(wc_teams.cohost_tag)
+        },
+        VizFieldFull {
+          label: 'Elo'
+          ref: r(wc_team_snapshot.elo)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'EloRank'
+          ref: r(wc_team_snapshot.elo_rank)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Odds'
+          ref: r(wc_team_snapshot.p_champion_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'RunDate'
+          ref: r(wc_team_snapshot.run_date_label)
+        }
+      ]
+      content: @md
+<style>
+.hqb { display:flex; justify-content:center; padding:8px 10px 16px; }
+.hqb-bezel { position:relative; width:100%; border-radius:14px; padding:10px;
+  background:linear-gradient(180deg, var(--board-bezel-a), var(--board-bezel-b));
+  box-shadow:0 14px 26px -14px rgba(0,0,0,.6), 0 3px 0 rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 5px rgba(0,0,0,.22); }
+.hqb-screen { position:relative; border-radius:8px; overflow:hidden; padding:16px 24px;
+  background:radial-gradient(120% 140% at 50% -20%, rgba(120,255,180,.18), transparent 55%), var(--board-bg);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 40px rgba(0,0,0,.6); }
+.hqb-screen::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); }
+.hqb-row { position:relative; display:flex; align-items:center; gap:22px; }
+.hqb-kit { flex:none; width:7px; align-self:stretch; border-radius:4px; box-shadow:0 0 12px rgba(255,255,255,.18); }
+.hqb-id { display:flex; align-items:center; gap:20px; min-width:0; flex:1; }
+.hqb-id img { width:78px !important; height:52px !important; border-radius:4px !important; margin:0 !important;
+  display:block !important; object-fit:cover; flex:none; box-shadow:var(--flag-shadow); }
+.hqb-name { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.03em;
+  font-size:48px; line-height:1; color:var(--board-ink); text-shadow:0 0 14px var(--board-glow);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hqb-tag { flex:none; font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.12em;
+  text-transform:uppercase; color:rgba(234,255,242,.8); border:1px solid rgba(234,255,242,.28);
+  border-radius:999px; padding:4px 12px; margin-left:6px; white-space:nowrap; }
+.hqb-tag:empty { display:none; }
+.hqb-tag.host { color:var(--gold-2); border-color:rgba(242,200,75,.45); }
+.hqb-kpis { display:flex; gap:30px; flex:none; }
+.hqb-kpi { text-align:center; min-width:128px; }
+.hqb-kpi .v { font-family:var(--font-disp); font-weight:800; font-size:44px; line-height:.95; color:var(--gold-2);
+  text-shadow:0 0 16px var(--board-glow), 0 2px 0 rgba(0,0,0,.45); }
+.hqb-kpi .v small { font-size:.46em; color:rgba(234,255,242,.6); font-weight:700; }
+.hqb-kpi .l { font-size:10.5px; text-transform:uppercase; letter-spacing:.13em; color:rgba(234,255,242,.78); margin-top:5px; }
+.hqb-kpi .bl { font-size:9.5px; letter-spacing:.08em; color:rgba(234,255,242,.45); margin-top:3px; }
+.hqb-sep { width:1px; align-self:stretch; background:rgba(234,255,242,.16); }
+/* ── Team HQ motion (page block style on this tab; wc-power-on / cb-drop / wc-deal-in
+   keyframes come from header_rail. Honours/campaigns/H2H are .clipboard → already hinge in.) */
+.hqb-screen { animation:wc-power-on .6s ease-out .2s 1; }
+/* squad stickers drop into the album from above, settling to their resting tilt (--rest); hover straightens + lifts */
+.stk { animation:stk-drop .5s cubic-bezier(.2,.74,.3,1.1) backwards; transition:transform .2s cubic-bezier(.2,.7,.3,1.1), box-shadow .2s ease; }
+@keyframes stk-drop { 0% { opacity:0; transform:translateY(-22px) rotate(-7deg) scale(.92); } 60% { opacity:1; } 100% { opacity:1; transform:var(--rest); } }
+.stk-rail .stk:nth-child(1){animation-delay:.04s} .stk-rail .stk:nth-child(2){animation-delay:.09s}
+.stk-rail .stk:nth-child(3){animation-delay:.14s} .stk-rail .stk:nth-child(4){animation-delay:.19s}
+.stk-rail .stk:nth-child(5){animation-delay:.24s} .stk-rail .stk:nth-child(6){animation-delay:.29s}
+.stk-rail .stk:nth-child(7){animation-delay:.34s} .stk-rail .stk:nth-child(8){animation-delay:.39s}
+.stk-rail .stk:nth-child(n+9){animation-delay:.44s}
+.stk:hover { transform:translateY(-7px) rotate(0deg) scale(1.06); z-index:5;
+  box-shadow:0 24px 34px -14px var(--shadow-dir), 0 3px 0 rgba(0,0,0,.16), inset 0 1px 0 #fff; }
+/* next-match card hinges from its clip and lifts on hover, like the clipboards */
+.nx { animation:cb-drop .55s cubic-bezier(.2,.74,.3,1.05) backwards; transform-origin:top center;
+  transition:transform .2s cubic-bezier(.2,.7,.3,1.05), box-shadow .2s ease; }
+.nx:hover { transform:translateY(-3px);
+  box-shadow:0 26px 40px -16px var(--shadow-dir), 0 2px 0 rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.75); }
+/* team-pulse stat tiles deal in L→R (the resting ±.5° tilt is restored after via fill:backwards) */
+.pl-tile { animation:wc-deal-in .5s cubic-bezier(.2,.7,.3,1) backwards; }
+.pl-plate:nth-child(1) .pl-tile{animation-delay:.05s} .pl-plate:nth-child(2) .pl-tile{animation-delay:.10s}
+.pl-plate:nth-child(3) .pl-tile{animation-delay:.15s} .pl-plate:nth-child(4) .pl-tile{animation-delay:.20s}
+.pl-plate:nth-child(5) .pl-tile{animation-delay:.25s} .pl-plate:nth-child(6) .pl-tile{animation-delay:.30s}
+.pl-plate:nth-child(7) .pl-tile{animation-delay:.35s} .pl-plate:nth-child(8) .pl-tile{animation-delay:.40s}
+@media (prefers-reduced-motion: reduce) {
+  .hqb-screen { animation:none !important; }
+  .stk, .nx, .pl-tile { animation:none !important; opacity:1 !important; transform:var(--rest, none) !important; }
+  .stk:hover { transform:var(--rest) !important; } }
+</style>
+<div class="hqb"><div class="hqb-bezel"><div class="hqb-screen">
+{% map(rows) %}
+  <div class="hqb-row">
+    <span class="hqb-kit" style="background:{{ `Kit`.raw }};"></span>
+    <div class="hqb-id">
+      <img src="{{ `Flag`.raw }}" alt="" />
+      <span class="hqb-name">{{ `Team`.formatted }}</span>
+      <span class="hqb-tag wc-num">FIFA · {{ `Code`.formatted }}</span>
+      <span class="hqb-tag">Group {{ `Grp`.formatted }}</span>
+      <span class="hqb-tag host">{{ `Host`.formatted }}</span>
+    </div>
+    <span class="hqb-sep"></span>
+    <div class="hqb-kpis">
+      <div class="hqb-kpi"><div class="v wc-num">{{ `Elo`.formatted }}</div><div class="l">Elo rating</div><div class="bl wc-num">#{{ `EloRank`.formatted }} of 48 by Elo</div></div>
+      <div class="hqb-kpi"><div class="v wc-num">{{ `Odds`.formatted }}<small>%</small></div><div class="l">Title odds</div><div class="bl wc-num">field avg 2.1% · sim {{ `RunDate`.formatted }}</div></div>
+    </div>
+  </div>
+{% end %}
+</div></div></div>
+;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+}
+
+Func wc_hq_zone_left() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">The pedigree · World Cups 1930–2022</p>
+;;
+  }
+}
+
+Func wc_hq_zone_right() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">Next up · the scouting report</p>
+;;
+  }
+}
+
+Func wc_hq_zone_squad() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+.hq-zone-sub { text-align:center; font-size:10.5px; color:rgba(234,255,242,.65); margin:6px 0 0;
+  text-shadow:0 1px 3px rgba(0,0,0,.4); }
+</style>
+<p class="grp-zone-label">The squad · team sheet</p>
+<p class="hq-zone-sub">FIFA publishes each 26-man list with the nation's first match — stickers appear at first kickoff.</p>
+;;
+  }
+}
+
+Func wc_hq_zone_alltime() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">Every rival · all-time head-to-head</p>
+;;
+  }
+}
+
+Func wc_hq_honours() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      values: [
+        VizFieldFull {
+          label: 'Titles'
+          ref: r(worldcup.wc_titles)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Finals'
+          ref: r(worldcup.wc_finals_reached)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Semis'
+          ref: r(worldcup.wc_semis_reached)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Apps'
+          ref: r(worldcup.wc_appearances)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Wins'
+          ref: r(worldcup.hist_wins)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Draws'
+          ref: r(worldcup.hist_draws)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Losses'
+          ref: r(worldcup.hist_losses)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GF'
+          ref: r(worldcup.hist_gf)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GA'
+          ref: r(worldcup.hist_ga)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md
+<style>
+.hn-grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; }
+.hn-tile { text-align:center; padding:10px 4px 8px; }
+.hn-tile + .hn-tile { border-left:1px solid var(--panel-line); }
+.hn-v { font-family:var(--font-disp); font-weight:800; font-size:40px; line-height:.95; color:var(--panel-ink);
+  font-variant-numeric:tabular-nums; }
+.hn-v:empty::after { content:"0"; }
+.hn-tile.gold .hn-v { color:var(--gold); text-shadow:0 1px 0 rgba(255,255,255,.6); }
+.hn-tile.gold .hn-v::before { content:"★ "; font-size:.5em; vertical-align:.45em; }
+.hn-l { font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--panel-muted); margin-top:6px; }
+.hn-rec { display:flex; justify-content:center; gap:18px; margin-top:11px; padding-top:10px;
+  border-top:1px solid var(--panel-line); font-size:11px; color:var(--panel-muted);
+  text-transform:uppercase; letter-spacing:.06em; }
+.hn-rec b { font-family:var(--font-disp); font-size:15px; color:var(--panel-ink); font-weight:800; }
+</style>
+<div class="cb-wrap"><div class="clipboard">
+  <div class="cb-head">
+    <span class="cb-grp">Honours <b>board</b></span>
+    <span class="cb-sub">All World Cups · defunct nations roll up</span>
+  </div>
+  <div class="hn-grid">
+    <div class="hn-tile gold"><div class="hn-v wc-num">{{ rows[0].values.`Titles`.formatted }}</div><div class="hn-l">Titles</div></div>
+    <div class="hn-tile"><div class="hn-v wc-num">{{ rows[0].values.`Finals`.formatted }}</div><div class="hn-l">Finals</div></div>
+    <div class="hn-tile"><div class="hn-v wc-num">{{ rows[0].values.`Semis`.formatted }}</div><div class="hn-l">Semi-finals</div></div>
+    <div class="hn-tile"><div class="hn-v wc-num">{{ rows[0].values.`Apps`.formatted }}</div><div class="hn-l">Editions</div></div>
+  </div>
+  <div class="hn-rec">
+    <span><b class="wc-num">{{ rows[0].values.`Wins`.formatted }}</b> W</span>
+    <span><b class="wc-num">{{ rows[0].values.`Draws`.formatted }}</b> D</span>
+    <span><b class="wc-num">{{ rows[0].values.`Losses`.formatted }}</b> L</span>
+    <span><b class="wc-num">{{ rows[0].values.`GF`.formatted }}</b> GF</span>
+    <span><b class="wc-num">{{ rows[0].values.`GA`.formatted }}</b> GA</span>
+  </div>
+</div></div>
+;;
+    }
+  }
+}
+
+Func wc_hq_campaigns() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Year'
+          ref: r(wc_history_team_editions.year_text)
+        },
+        VizFieldFull {
+          label: 'YearSort'
+          ref: r(wc_history_team_editions.year)
+          uname: 'ysort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'P'
+          ref: r(wc_history_team_editions.played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'W'
+          ref: r(wc_history_team_editions.won)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'D'
+          ref: r(wc_history_team_editions.drawn)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'L'
+          ref: r(wc_history_team_editions.lost)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GF'
+          ref: r(wc_history_team_editions.gf)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GA'
+          ref: r(wc_history_team_editions.ga)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Finish'
+          ref: r(wc_history_team_editions.finish_label)
+        },
+        VizFieldFull {
+          label: 'FinishColor'
+          ref: r(wc_history_team_editions.finish_color)
+        }
+      ]
+      content: @md
+<style>
+.cp-colhead, .cp-row { display:grid; grid-template-columns:64px repeat(6, 40px) minmax(0,1fr); align-items:center; gap:8px; }
+.cp-colhead { padding:0 2px 6px; font-family:var(--font-disp); font-weight:700; font-size:10px;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--panel-muted); }
+.cp-colhead .c { text-align:center; }
+.cp-colhead .e { text-align:right; }
+.cp-row { padding:8px 2px; }
+.cp-row + .cp-row { border-top:1px solid var(--panel-line); }
+.cp-year { font-family:var(--font-disp); font-weight:800; font-size:18px; font-variant-numeric:tabular-nums; }
+.cp-n { font-family:var(--font-disp); font-size:15px; text-align:center; color:var(--panel-muted);
+  font-variant-numeric:tabular-nums; }
+.cp-n.w { color:var(--panel-ink); font-weight:700; }
+.cp-fin { justify-self:end; font-family:var(--font-disp); font-weight:700; font-size:10.5px;
+  letter-spacing:.08em; text-transform:uppercase; color:#fff; border-radius:999px; padding:3px 11px;
+  box-shadow:0 1px 2px rgba(0,0,0,.18); }
+</style>
+<div class="cb-wrap"><div class="clipboard">
+  <div class="cb-head">
+    <span class="cb-grp">Campaign <b>ledger</b></span>
+    <span class="cb-sub">Latest first · shootouts count as draws</span>
+  </div>
+  <div class="cp-colhead"><span>Edition</span><span class="c">P</span><span class="c">W</span><span class="c">D</span><span class="c">L</span><span class="c">GF</span><span class="c">GA</span><span class="e">Finish</span></div>
+{% map(rows) %}
+  <div class="cp-row">
+    <span class="cp-year">{{ `Year`.formatted }}</span>
+    <span class="cp-n">{{ `P`.formatted }}</span>
+    <span class="cp-n w">{{ `W`.formatted }}</span>
+    <span class="cp-n">{{ `D`.formatted }}</span>
+    <span class="cp-n">{{ `L`.formatted }}</span>
+    <span class="cp-n">{{ `GF`.formatted }}</span>
+    <span class="cp-n">{{ `GA`.formatted }}</span>
+    <span class="cp-fin" style="background:{{ `FinishColor`.raw }};">{{ `Finish`.formatted }}</span>
+  </div>
+{% end %}
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--gold);"></span>Champions</span>
+    <span class="lg"><span class="dot" style="background:#8b979d;"></span>Final</span>
+    <span class="lg"><span class="dot" style="background:#a9714b;"></span>Semi-final</span>
+    <span class="sp">Showing the 10 most recent campaigns</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'ysort'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 10
+        row_limit: 10
+      }
+    }
+  }
+}
+
+Func wc_hq_next_match() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'TeamFlag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'TeamKit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Opp'
+          ref: r(wc_team_next_h2h.opponent_name)
+        },
+        VizFieldFull {
+          label: 'OppFlag'
+          ref: r(wc_team_next_h2h.opponent_flag)
+        },
+        VizFieldFull {
+          label: 'OppKit'
+          ref: r(wc_team_next_h2h.opponent_color)
+        },
+        VizFieldFull {
+          label: 'KO'
+          ref: r(wc_team_next_h2h.next_ko_label)
+        },
+        VizFieldFull {
+          label: 'Stage'
+          ref: r(wc_team_next_h2h.next_stage_label)
+        },
+        VizFieldFull {
+          label: 'Venue'
+          ref: r(wc_team_next_h2h.next_venue)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_team_next_h2h.next_city)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Met'
+          ref: r(wc_team_next_h2h.meetings)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'HW'
+          ref: r(wc_team_next_h2h.h2h_wins)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'HD'
+          ref: r(wc_team_next_h2h.h2h_draws)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'HL'
+          ref: r(wc_team_next_h2h.h2h_losses)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md
+<style>
+.nx-wrap { width:100%; height:100%; box-sizing:border-box; display:flex; align-items:flex-start;
+  justify-content:center; padding:16px 8px 10px; }
+.nx { position:relative; width:100%; border-radius:11px 11px 13px 13px; color:var(--panel-ink);
+  background:linear-gradient(180deg,#fbfdfb,#ecf3ee); border:1px solid var(--panel-line); padding:22px 16px 11px;
+  box-shadow:0 18px 30px -16px var(--shadow-dir), 0 2px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.7); }
+.nx::before { content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+  width:72px; height:17px; border-radius:5px; background:linear-gradient(180deg,#e2e8ea,#9aa6ab 55%,#6f7a7f);
+  box-shadow:0 2px 4px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.85); }
+.nx::after { content:""; position:absolute; top:-2px; left:50%; transform:translateX(-50%);
+  width:28px; height:6px; border-radius:3px; background:#586267; box-shadow:inset 0 1px 1px rgba(0,0,0,.55); }
+.nx-meta { display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--panel-line); }
+.nx-stage { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+  font-size:15px; }
+.nx-stage b { color:var(--gold); }
+.nx-ko { font-size:11px; font-weight:600; color:var(--panel-muted); white-space:nowrap; }
+.nx-grid { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:14px; padding:4px 0 10px; }
+.nx-side { display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0; text-align:center; }
+.nx-side img { width:62px !important; height:42px !important; border-radius:3px !important; margin:0 !important;
+  display:block !important; object-fit:cover; box-shadow:var(--flag-shadow); }
+.nx-side .nm { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; font-size:16px;
+  letter-spacing:.03em; line-height:1.1; }
+.nx-side .kit { width:34px; height:4px; border-radius:2px; }
+.nx-vs { font-family:var(--font-disp); font-weight:800; font-size:13px; color:var(--panel-muted);
+  text-transform:uppercase; letter-spacing:.14em; }
+.nx-venue { text-align:center; font-size:11px; color:var(--panel-muted); padding-bottom:10px; }
+.nx-tally { display:flex; justify-content:center; align-items:center; gap:14px; padding-top:9px;
+  border-top:1px solid var(--panel-line); font-size:10px; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--panel-muted); }
+.nx-tally b { font-family:var(--font-disp); font-size:14px; font-weight:800; color:var(--panel-ink); }
+.nx-tally .tw b { color:var(--win); }
+.nx-tally .td b { color:var(--draw); }
+.nx-tally .tl b { color:var(--loss); }
+</style>
+<div class="nx-wrap">
+{% map(rows) %}
+  <div class="nx">
+    <div class="nx-meta">
+      <span class="nx-stage">Next <b>fixture</b> · {{ `Stage`.formatted }}</span>
+      <span class="nx-ko">{{ `KO`.formatted }} UTC</span>
+    </div>
+    <div class="nx-grid">
+      <div class="nx-side"><img src="{{ `TeamFlag`.raw }}" alt="" /><span class="nm">{{ `Team`.formatted }}</span><span class="kit" style="background:{{ `TeamKit`.raw }};"></span></div>
+      <span class="nx-vs">vs</span>
+      <div class="nx-side"><img src="{{ `OppFlag`.raw }}" alt="" /><span class="nm">{{ `Opp`.formatted }}</span><span class="kit" style="background:{{ `OppKit`.raw }};"></span></div>
+    </div>
+    <div class="nx-venue">{{ `Venue`.formatted }} · {{ `City`.formatted }}</div>
+    <div class="nx-tally">
+      <span><b class="wc-num">{{ values.`Met`.formatted }}</b> WC meetings</span>
+      <span class="tw"><b class="wc-num">{{ values.`HW`.formatted }}</b> W</span>
+      <span class="td"><b class="wc-num">{{ values.`HD`.formatted }}</b> D</span>
+      <span class="tl"><b class="wc-num">{{ values.`HL`.formatted }}</b> L</span>
+    </div>
+  </div>
+{% end %}
+</div>
+;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+}
+
+Func wc_hq_h2h() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Year'
+          ref: r(wc_team_next_h2h.year_text)
+        },
+        VizFieldFull {
+          label: 'YearSort'
+          ref: r(wc_team_next_h2h.year)
+          uname: 'hsort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Stage'
+          ref: r(wc_team_next_h2h.stage_name)
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(wc_team_next_h2h.score_label)
+        },
+        VizFieldFull {
+          label: 'Res'
+          ref: r(wc_team_next_h2h.result)
+        },
+        VizFieldFull {
+          label: 'ResColor'
+          ref: r(wc_team_next_h2h.result_color)
+        }
+      ]
+      content: @md
+<style>
+.hh-colhead, .hh-row { display:grid; grid-template-columns:26px 60px minmax(0,1fr) 86px; align-items:center; gap:10px; }
+.hh-colhead { padding:0 2px 6px; font-family:var(--font-disp); font-weight:700; font-size:10px;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--panel-muted); }
+.hh-colhead .e { text-align:right; }
+.hh-row { padding:8px 2px; }
+.hh-row + .hh-row { border-top:1px solid var(--panel-line); }
+.hh-chip { width:20px; height:20px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center;
+  color:#fff; font-family:var(--font-disp); font-weight:800; font-size:11px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), 0 1px 1px rgba(0,0,0,.12); }
+.hh-chip:empty::after { content:"·"; }
+.hh-year { font-family:var(--font-disp); font-weight:800; font-size:18px; font-variant-numeric:tabular-nums; }
+.hh-year:empty::after { content:"—"; color:var(--panel-muted); font-weight:500; }
+.hh-stage { font-size:13px; color:var(--panel-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hh-stage:empty::after { content:"No World Cup meeting yet — first one is next"; font-style:italic; }
+.hh-score { font-family:var(--font-disp); font-weight:800; font-size:18px; text-align:right;
+  font-variant-numeric:tabular-nums; white-space:nowrap; }
+</style>
+<div class="cb-wrap"><div class="clipboard">
+  <div class="cb-head">
+    <span class="cb-grp">Head-to-<b>head</b></span>
+    <span class="cb-sub">All WC meetings vs the next opponent</span>
+  </div>
+  <div class="hh-colhead"><span></span><span>Year</span><span>Stage</span><span class="e">Score</span></div>
+{% map(rows) %}
+  <div class="hh-row">
+    <span class="hh-chip" style="background:{{ `ResColor`.raw }};">{{ `Res`.formatted }}</span>
+    <span class="hh-year">{{ `Year`.formatted }}</span>
+    <span class="hh-stage">{{ `Stage`.formatted }}</span>
+    <span class="hh-score">{{ `Score`.formatted }}</span>
+  </div>
+{% end %}
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--win);"></span>Win</span>
+    <span class="lg"><span class="dot" style="background:var(--draw);"></span>Draw</span>
+    <span class="lg"><span class="dot" style="background:var(--loss);"></span>Loss</span>
+    <span class="sp">Score shown from the selected team's side</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'hsort'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 12
+        row_limit: 12
+      }
+    }
+  }
+}
+
+Func wc_hq_alltime_h2h() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Opp'
+          ref: r(wc_history_h2h.opp_name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_history_h2h.opp_flag)
+        },
+        VizFieldFull {
+          label: 'Span'
+          ref: r(wc_history_h2h.span_label)
+        },
+        VizFieldFull {
+          label: 'P'
+          ref: r(wc_history_h2h.played)
+          uname: 'p_sort'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Rec'
+          ref: r(wc_history_h2h.record_label)
+        },
+        VizFieldFull {
+          label: 'W'
+          ref: r(wc_history_h2h.wins)
+          uname: 'w_sort'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'D'
+          ref: r(wc_history_h2h.draws)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'L'
+          ref: r(wc_history_h2h.losses)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GD'
+          ref: r(wc_history_h2h.gd_label)
+        },
+        VizFieldFull {
+          label: 'GDColor'
+          ref: r(wc_history_h2h.gd_color)
+        }
+      ]
+      content: @md
+<style>
+/* ===== Team HQ · all-time rivalry RECORD BOOK (own material: a bound football almanac) =====
+   Shared Saira type scale + gold accent (house style); bespoke surface = aged leaf, oxblood
+   leather spine binding, ruled register lines. Dominance bar = flex segments ∝ W:D:L share. */
+.rb-wrap { width:100%; height:100%; box-sizing:border-box; display:flex; align-items:flex-start;
+  justify-content:center; padding:14px 6px 10px; }
+.rb-book { position:relative; width:100%; border-radius:3px 13px 13px 3px; overflow:hidden;
+  color:#2c2418; padding:18px 24px 12px 36px;
+  background:
+    radial-gradient(135% 120% at 100% -10%, rgba(255,251,238,.85), transparent 58%),
+    linear-gradient(180deg,#f4ebd6,#e8ddc0); -webkit-print-color-adjust:exact;
+  box-shadow:0 24px 42px -18px rgba(7,30,18,.55), 0 3px 0 rgba(60,40,15,.18),
+    inset 0 1px 0 rgba(255,255,255,.6), inset 0 0 0 1px rgba(120,90,40,.18); }
+/* bound leather spine = the book's binding (a material edge, NOT a team-colour accent stripe) */
+.rb-book::before { content:""; position:absolute; left:0; top:0; bottom:0; width:18px;
+  background:linear-gradient(90deg,#4c1a16,#7d2c22 55%,#591f18);
+  box-shadow:inset -3px 0 5px rgba(0,0,0,.45), inset 2px 0 0 rgba(255,255,255,.12), 1px 0 0 rgba(0,0,0,.2); }
+.rb-book::after { content:""; position:absolute; left:23px; top:14px; bottom:14px; width:0;
+  border-left:1px dashed rgba(255,224,150,.5); }
+.rb-mast { position:relative; display:flex; align-items:baseline; justify-content:space-between;
+  gap:10px; padding-bottom:9px; border-bottom:2px solid rgba(120,75,30,.5); margin-bottom:1px; }
+.rb-mast::after { content:""; position:absolute; left:0; right:0; bottom:-4px; height:1px; background:rgba(120,75,30,.28); }
+.rb-title { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+  font-size:18px; line-height:1; color:#2c2418; }
+.rb-title b { color:var(--gold); }
+.rb-sub { font-size:9px; text-transform:uppercase; letter-spacing:.14em; color:#9c8a68; white-space:nowrap; }
+.rb-colhead, .rb-row { display:grid;
+  grid-template-columns:26px 184px 94px 28px 62px minmax(220px,1fr) 56px;
+  align-items:center; gap:12px; }
+.rb-colhead { padding:11px 2px 6px; font-family:var(--font-disp); font-weight:700; font-size:9px;
+  text-transform:uppercase; letter-spacing:.11em; color:#a08a66; }
+.rb-colhead .c { text-align:center; }
+.rb-colhead .e { text-align:right; }
+.rb-row { padding:7px 2px; }
+.rb-row + .rb-row { border-top:1px solid rgba(120,75,30,.16); }
+.rb-book .rb-row img { width:25px !important; height:17px !important; border-radius:2px !important;
+  margin:0 !important; display:block !important; object-fit:cover; box-shadow:0 1px 2px rgba(0,0,0,.32); }
+.rb-name { font-family:var(--font-disp); font-weight:700; font-size:14.5px; letter-spacing:.01em;
+  text-transform:uppercase; color:#2c2418; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rb-span { font-size:10.5px; color:#9c8a68; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.rb-p { font-family:var(--font-disp); font-weight:700; font-size:14px; text-align:center; color:#7a6a4c;
+  font-variant-numeric:tabular-nums; }
+.rb-rec { font-family:var(--font-disp); font-weight:800; font-size:14.5px; color:#2c2418; letter-spacing:.03em;
+  font-variant-numeric:tabular-nums; }
+.rb-bar { position:relative; display:flex; height:14px; border-radius:2px; overflow:hidden;
+  background:rgba(120,75,30,.12); box-shadow:inset 0 1px 2px rgba(60,40,15,.28), inset 0 0 0 1px rgba(120,75,30,.2); }
+.rb-seg { height:100%; min-width:0; }
+.rb-seg.w { background:linear-gradient(180deg,#36c07f,#1f9a64); }
+.rb-seg.d { background:linear-gradient(180deg,#ecb454,#d99a2f); }
+.rb-seg.l { background:linear-gradient(180deg,#ee5a4f,#d83a2e); }
+.rb-gd { font-family:var(--font-disp); font-weight:800; font-size:14px; text-align:right; color:#5b4a30;
+  font-variant-numeric:tabular-nums; }
+.rb-foot { display:flex; align-items:center; gap:13px; flex-wrap:wrap; margin-top:9px; padding-top:8px;
+  border-top:2px solid rgba(120,75,30,.38); font-size:9px; text-transform:uppercase; letter-spacing:.06em; color:#9c8a68; }
+.rb-foot .rb-lg { display:inline-flex; align-items:center; gap:5px; }
+.rb-foot .rb-dot { width:9px; height:9px; border-radius:2px; flex:none; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14); }
+.rb-foot .rb-sp { margin-left:auto; text-transform:none; letter-spacing:.02em; font-style:italic; }
+/* motion — the leaf opens from its spine; dominance bars ink across (reduced-motion safe) */
+.rb-book { animation:rb-open .55s cubic-bezier(.2,.7,.3,1.05) both; transform-origin:left center; }
+@keyframes rb-open { 0% { opacity:0; transform:perspective(1300px) rotateY(-10deg) translateY(8px); } 100% { opacity:1; transform:none; } }
+.rb-bar .rb-seg { animation:rb-ink .5s ease-out both; transform-origin:left center; }
+@keyframes rb-ink { 0% { transform:scaleX(0); } 100% { transform:scaleX(1); } }
+.rb-rows .rb-row:nth-child(1) .rb-seg{animation-delay:.24s} .rb-rows .rb-row:nth-child(2) .rb-seg{animation-delay:.27s}
+.rb-rows .rb-row:nth-child(3) .rb-seg{animation-delay:.30s} .rb-rows .rb-row:nth-child(4) .rb-seg{animation-delay:.33s}
+.rb-rows .rb-row:nth-child(5) .rb-seg{animation-delay:.36s} .rb-rows .rb-row:nth-child(6) .rb-seg{animation-delay:.39s}
+.rb-rows .rb-row:nth-child(7) .rb-seg{animation-delay:.42s} .rb-rows .rb-row:nth-child(8) .rb-seg{animation-delay:.45s}
+.rb-rows .rb-row:nth-child(9) .rb-seg{animation-delay:.48s} .rb-rows .rb-row:nth-child(n+10) .rb-seg{animation-delay:.51s}
+@media (prefers-reduced-motion:reduce){ .rb-book,.rb-bar .rb-seg{animation:none !important; opacity:1 !important; transform:none !important;} }
+</style>
+<div class="rb-wrap"><div class="rb-book">
+  <div class="rb-mast">
+    <span class="rb-title">The Record <b>Book</b></span>
+    <span class="rb-sub">All-time World Cup meetings · 1930–2022</span>
+  </div>
+  <div class="rb-colhead"><span></span><span>Rival</span><span>Years</span><span class="c">P</span><span>W–D–L</span><span>Dominance</span><span class="e">GD</span></div>
+  <div class="rb-rows">
+{% map(rows) %}
+  <div class="rb-row">
+    <img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />
+    <span class="rb-name">{{ `Opp`.formatted }}</span>
+    <span class="rb-span wc-num">{{ `Span`.formatted }}</span>
+    <span class="rb-p wc-num">{{ `P`.formatted }}</span>
+    <span class="rb-rec wc-num">{{ `Rec`.formatted }}</span>
+    <span class="rb-bar"><span class="rb-seg w" style="flex:{{ `W`.formatted }}"></span><span class="rb-seg d" style="flex:{{ `D`.formatted }}"></span><span class="rb-seg l" style="flex:{{ `L`.formatted }}"></span></span>
+    <span class="rb-gd wc-num" style="color:{{ `GDColor`.raw }}">{{ `GD`.formatted }}</span>
+  </div>
+{% end %}
+  </div>
+  <div class="rb-foot">
+    <span class="rb-lg"><span class="rb-dot" style="background:var(--win)"></span>Won</span>
+    <span class="rb-lg"><span class="rb-dot" style="background:var(--draw)"></span>Drawn</span>
+    <span class="rb-lg"><span class="rb-dot" style="background:var(--loss)"></span>Lost</span>
+    <span class="rb-sp">12 most-played rivals · bar = win / draw / loss share</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'p_sort'
+            direction: 'desc'
+          },
+          SortSetting {
+            key: 'w_sort'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 12
+        row_limit: 12
+      }
+    }
+  }
+}
