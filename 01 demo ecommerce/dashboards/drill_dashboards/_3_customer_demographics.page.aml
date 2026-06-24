@@ -401,50 +401,50 @@ Dashboard _3_customer_demographics_demo {
   view: CanvasLayout {
     label: 'Canvas Layout'
     width: 1220
-    height: 910
+    height: 870
     grid_size: 20
     block city {
-      position: pos(20, 20, 280, 100)
+      position: pos(20, 20, 280, 80)
       layer: 1
     }
     block product_name {
-      position: pos(320, 20, 280, 100)
+      position: pos(320, 20, 280, 80)
       layer: 1
     }
     block country {
-      position: pos(620, 20, 280, 100)
+      position: pos(620, 20, 280, 80)
       layer: 1
     }
     block gender {
-      position: pos(920, 20, 280, 100)
+      position: pos(920, 20, 280, 80)
       layer: 1
     }
     block order_status {
-      position: pos(20, 140, 280, 100)
+      position: pos(20, 120, 280, 80)
       layer: 1
     }
     block age_group {
-      position: pos(320, 140, 280, 100)
+      position: pos(320, 120, 280, 80)
       layer: 1
     }
     block order_date {
-      position: pos(620, 140, 280, 100)
+      position: pos(620, 120, 280, 80)
       layer: 1
     }
     block date_drill {
-      position: pos(920, 140, 280, 100)
+      position: pos(920, 120, 280, 80)
       layer: 1
     }
     block v1 {
-      position: pos(20, 260, 630, 630)
+      position: pos(20, 220, 630, 630)
       layer: 1
     }
     block v2 {
-      position: pos(670, 260, 530, 330)
+      position: pos(680, 220, 540, 320)
       layer: 1
     }
     block v3 {
-      position: pos(670, 610, 530, 280)
+      position: pos(680, 540, 540, 300)
       layer: 1
     }
   }
