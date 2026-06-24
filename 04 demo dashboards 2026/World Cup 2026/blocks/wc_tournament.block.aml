@@ -617,11 +617,11 @@ Func wc_boot_podium() {
       rows: [
         VizFieldFull {
           label: 'Scorer'
-          ref: r(wc_scorers.player_name)
+          ref: r(wc_player_stats.name)
         },
         VizFieldFull {
           label: 'Photo'
-          ref: r(wc_players.picture_url)
+          ref: r(wc_player_stats.picture_url)
         },
         VizFieldFull {
           label: 'Flag'
@@ -633,11 +633,11 @@ Func wc_boot_podium() {
         },
         VizFieldFull {
           label: 'Team'
-          ref: r(wc_scorers.team_code)
+          ref: r(wc_player_stats.team_code)
         },
         VizFieldFull {
           label: 'Rank'
-          ref: r(wc_scorers.boot_rank)
+          ref: r(wc_player_stats.goals_rank)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -645,7 +645,7 @@ Func wc_boot_podium() {
         },
         VizFieldFull {
           label: 'Pens'
-          ref: r(wc_scorers.penalty_goals)
+          ref: r(wc_player_stats.penalty_goals)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -653,7 +653,7 @@ Func wc_boot_podium() {
         },
         VizFieldFull {
           label: 'Goals'
-          ref: r(wc_scorers.goals)
+          ref: r(wc_player_stats.goals)
           uname: 'goals'
           format {
             type: 'number'
@@ -726,14 +726,14 @@ Func wc_boot_rack() {
     viz: MarkdownViz {
       dataset: worldcup
       filter {
-        field: r(wc_scorers.boot_rank)
+        field: r(wc_player_stats.goals_rank)
         operator: 'greater_than'
         value: 3
       }
       rows: [
         VizFieldFull {
           label: 'Scorer'
-          ref: r(wc_scorers.player_name)
+          ref: r(wc_player_stats.name)
         },
         VizFieldFull {
           label: 'Flag'
@@ -741,11 +741,11 @@ Func wc_boot_rack() {
         },
         VizFieldFull {
           label: 'Team'
-          ref: r(wc_scorers.team_code)
+          ref: r(wc_player_stats.team_code)
         },
         VizFieldFull {
           label: 'Rank'
-          ref: r(wc_scorers.boot_rank)
+          ref: r(wc_player_stats.goals_rank)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -753,18 +753,16 @@ Func wc_boot_rack() {
         },
         VizFieldFull {
           label: 'Goals'
-          ref: r(wc_scorers.goals)
+          ref: r(wc_player_stats.goals)
           uname: 'goals'
           format {
             type: 'number'
             pattern: '#,##0'
           }
-        }
-      ]
-      values: [
+        },
         VizFieldFull {
           label: 'BarPct'
-          ref: r(worldcup.scorer_bar_pct)
+          ref: r(wc_player_stats.goals_bar_pct)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -794,7 +792,7 @@ Func wc_boot_rack() {
   <div class="brk-h"><span class="t">Chasing pack</span><span class="s">rank 4+ · goals</span></div>
   <ul class="brk-list wc-num">
 {% map(rows) %}
-  <li><span class="rk">{{ `Rank`.formatted }}</span><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" /><span class="pn">{{ `Scorer`.formatted }} <small>{{ `Team`.formatted }}</small></span><span class="bar"><i style="width:{{ values.`BarPct`.raw }}%"></i></span><span class="gl">{{ `Goals`.formatted }}</span></li>
+  <li><span class="rk">{{ `Rank`.formatted }}</span><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" /><span class="pn">{{ `Scorer`.formatted }} <small>{{ `Team`.formatted }}</small></span><span class="bar"><i style="width:{{ `BarPct`.raw }}%"></i></span><span class="gl">{{ `Goals`.formatted }}</span></li>
 {% end %}
   </ul>
 </div> ;;
