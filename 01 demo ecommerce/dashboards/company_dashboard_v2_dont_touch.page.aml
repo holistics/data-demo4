@@ -2751,7 +2751,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     tab tab6: CanvasLayout {
       label: 'Sales & Orders'
       width: 1260
-      height: 2200
+      height: 2090
       block f3 {
         position: pos(40, 240, 300, 60)
         layer: 2
@@ -2761,11 +2761,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 6
       }
       block t22 {
-        position: pos(0, 730, 1280, 20)
+        position: pos(0, 700, 1280, 20)
         layer: 1
       }
       block v44 {
-        position: pos(40, 360, 740, 370)
+        position: pos(40, 330, 740, 370)
         layer: 9
       }
       block t_k657 {
@@ -2784,39 +2784,39 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: -1
       }
       block v_wtl8 {
-        position: pos(800, 360, 420, 370)
+        position: pos(800, 330, 420, 370)
         layer: 1
       }
       block f_lmkf {
-        position: pos(60, 840, 300, 60)
+        position: pos(60, 810, 300, 60)
         layer: 30
       }
       block f_ua94 {
-        position: pos(380, 840, 300, 60)
+        position: pos(380, 810, 300, 60)
         layer: 29
       }
       block t_9qh4 {
-        position: pos(60, 780, 360, 40)
+        position: pos(60, 750, 360, 40)
         layer: 127
       }
       block t_a63g {
-        position: pos(40, 820, 1180, 20)
+        position: pos(40, 790, 1180, 20)
         layer: 128
       }
       block t_t9m9 {
-        position: pos(1090, 930, 100, 40)
+        position: pos(1090, 900, 100, 40)
         layer: 1033
       }
       block t_wysj {
-        position: pos(40, 760, 1180, 600)
+        position: pos(40, 730, 1180, 530)
         layer: 21
       }
       block v_530w {
-        position: pos(40, 1380, 1180, 760)
+        position: pos(40, 1270, 1180, 760)
         layer: 20
       }
       block v_kp1e {
-        position: pos(60, 920, 1140, 420)
+        position: pos(60, 890, 1140, 350)
         layer: 25
       }
       mobile {
