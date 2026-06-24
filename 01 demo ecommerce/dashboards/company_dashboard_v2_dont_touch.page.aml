@@ -1326,41 +1326,27 @@ Dashboard company_dashboard_v2_2a24b81 {
   }
   block v_wtl8: VizBlock {
     label: 'Order Details'
-    viz: DataTable {
+    viz: PieChart {
       dataset: demo_ecommerce_version_2
-      fields: [
-        VizFieldFull {
-          ref: r(ecommerce_orders.id)
+      legend: VizFieldFull {
+        ref: r(ecommerce_orders.status)
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
           format {
             type: 'number'
             pattern: 'inherited'
-          }
-        },
-        VizFieldFull {
-          ref: r(ecommerce_orders.created_at)
-          transformation: 'datetrunc month'
-          format {
-            type: 'date'
-            pattern: 'LLL yyyy'
-          }
-        },
-        VizFieldFull {
-          ref: r(ecommerce_orders.delivery_attempts)
-          format {
-            type: 'number'
-            pattern: 'inherited'
-          }
-        },
-        VizFieldFull {
-          ref: r(ecommerce_orders.status)
-          format {
-            type: 'text'
           }
         }
-      ]
+      }
       settings {
-        wrap_header_text: true
+        display_as_donut: true
         row_limit: 5000
+        data_label_position: 'outside'
         aggregate_awareness {
           enabled: true
           debug_comments: true
