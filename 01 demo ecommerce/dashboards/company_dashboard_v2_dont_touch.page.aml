@@ -329,7 +329,7 @@ Dashboard company_dashboard_v2_2a24b81 {
   }
   block v44: VizBlock {
     label: 'GMV and NMV over time'
-    viz: LineChart {
+    viz: ColumnChart {
       dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
         ref: r(ecommerce_orders.created_at)
@@ -339,10 +339,15 @@ Dashboard company_dashboard_v2_2a24b81 {
           pattern: 'yyyy Qq'
         }
       }
+      legend: VizFieldFull {
+        ref: r(ecommerce_countries.continent_name)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
         settings {
           show_stack_total: true
-          stack_series_by: 'value'
         }
         series {
           field: VizFieldFull {
@@ -355,18 +360,22 @@ Dashboard company_dashboard_v2_2a24b81 {
           settings {
             color: '#05264C'
             line_interpolation: 'smooth'
-          }
-        }
-        series {
-          field: VizFieldFull {
-            ref: r(demo_ecommerce_version_2.nmv)
-            format {
-              type: 'number'
-              pattern: 'inherited'
+            point {
+              value: 'Asia'
+              line_interpolation: 'smooth'
             }
-          }
-          settings {
-            color: '#259B6C'
+            point {
+              value: 'Europe'
+              line_interpolation: 'smooth'
+            }
+            point {
+              value: 'Oceania'
+              line_interpolation: 'smooth'
+            }
+            point {
+              value: 'North America'
+              line_interpolation: 'smooth'
+            }
           }
         }
       }
