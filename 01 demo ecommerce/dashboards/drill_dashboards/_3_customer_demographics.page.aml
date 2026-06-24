@@ -161,6 +161,7 @@ Dashboard _3_customer_demographics_demo {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'ecommerce_users_id'
         },
         VizFieldFull {
           ref: r(ecommerce_users.full_name)
@@ -193,6 +194,12 @@ Dashboard _3_customer_demographics_demo {
           enabled: true
           debug_comments: true
         }
+        column_styles: [
+          ColumnStyle {
+            key: 'ecommerce_users_id'
+            width: 30
+          }
+        ]
       }
     }
   }
@@ -436,15 +443,15 @@ Dashboard _3_customer_demographics_demo {
       layer: 1
     }
     block v1 {
-      position: pos(20, 220, 630, 630)
+      position: pos(20, 220, 620, 640)
       layer: 1
     }
     block v2 {
-      position: pos(680, 220, 540, 320)
+      position: pos(660, 220, 540, 300)
       layer: 1
     }
     block v3 {
-      position: pos(680, 540, 540, 300)
+      position: pos(660, 540, 540, 320)
       layer: 1
     }
   }
