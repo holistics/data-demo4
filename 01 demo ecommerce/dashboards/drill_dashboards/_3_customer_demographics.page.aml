@@ -147,18 +147,6 @@ Dashboard _3_customer_demographics_demo {
       }
     }
   }
-  block age_demographic: FilterBlock {
-    label: 'Age Demographic'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_users', 'age_group')
-    }
-    default {
-      operator: 'is'
-      value: []
-    }
-  }
   block date_drill: DateDrillBlock {
     label: 'Date Drill'
   }
@@ -307,8 +295,7 @@ Dashboard _3_customer_demographics_demo {
             'gender',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -324,8 +311,7 @@ Dashboard _3_customer_demographics_demo {
             'gender',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -341,8 +327,7 @@ Dashboard _3_customer_demographics_demo {
             'gender',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -358,8 +343,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -375,8 +359,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'gender',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -392,8 +375,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'gender',
             'order_status',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -409,25 +391,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'gender',
             'order_status',
-            'age_group',
-            'age_demographic'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'age_demographic'
-      to: [
-        CustomMapping {
-          block: [
-            'city',
-            'product_name',
-            'country',
-            'gender',
-            'order_status',
-            'age_group',
-            'order_date'
+            'age_group'
           ]
           disabled: true
         }
@@ -437,7 +401,7 @@ Dashboard _3_customer_demographics_demo {
   view: CanvasLayout {
     label: 'Canvas Layout'
     width: 1220
-    height: 1030
+    height: 910
     grid_size: 20
     block city {
       position: pos(20, 20, 280, 100)
@@ -467,24 +431,20 @@ Dashboard _3_customer_demographics_demo {
       position: pos(620, 140, 280, 100)
       layer: 1
     }
-    block age_demographic {
+    block date_drill {
       position: pos(920, 140, 280, 100)
       layer: 1
     }
-    block date_drill {
-      position: pos(20, 260, 280, 100)
-      layer: 1
-    }
     block v1 {
-      position: pos(20, 380, 630, 630)
+      position: pos(20, 260, 630, 630)
       layer: 1
     }
     block v2 {
-      position: pos(670, 380, 530, 330)
+      position: pos(670, 260, 530, 330)
       layer: 1
     }
     block v3 {
-      position: pos(670, 730, 530, 280)
+      position: pos(670, 610, 530, 280)
       layer: 1
     }
   }
