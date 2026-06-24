@@ -1,0 +1,150 @@
+// Groups tab furniture (zone labels + best-third board). Group cards = wc_group_card.
+
+Func wc_groups_zone_label() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">Group stage ledger · groups A–L</p>
+;;
+  }
+}
+
+Func wc_advance_zone_label() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">The advancement projector · 48 chase 32 places</p>
+;;
+  }
+}
+
+Func wc_thirds_zone_label() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">The best-thirds race · 8 cross the line</p>
+;;
+  }
+}
+
+Func wc_third_place_board() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Rank'
+          ref: r(wc_third_place_ranking.overall_rank)
+          uname: 'orank'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Grp'
+          ref: r(wc_third_place_ranking.group_code)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_third_place_ranking.team_name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'P'
+          ref: r(wc_third_place_ranking.played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GF'
+          ref: r(wc_third_place_ranking.gf)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GD'
+          ref: r(wc_third_place_ranking.gd)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Pts'
+          ref: r(wc_third_place_ranking.pts)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'QualColor'
+          ref: r(wc_third_place_ranking.qual_color)
+        },
+        VizFieldFull {
+          label: 'QualStatus'
+          ref: r(wc_third_place_ranking.qual_status)
+        }
+      ]
+      content: @md
+<div class="cb-wrap"><div class="clipboard cb-tp">
+  <div class="cb-head">
+    <span class="cb-grp">Best <b>thirds</b></span>
+    <span class="cb-sub">Top 8 of 12 advance · Round of 32</span>
+  </div>
+  <div class="cb-colhead"><span class="c">#</span><span class="c">Grp</span><span></span><span>Team</span><span class="c">P</span><span class="c">GF</span><span class="c">GD</span><span class="c">Pts</span><span class="e">Status</span></div>
+  <div class="tp-body">
+{% map(rows) %}
+  <div class="cb-row" style="border-left-color:{{ `QualColor`.raw }};">
+    <span class="cb-rank">{{ `Rank`.formatted }}</span>
+    <span class="tp-grp">{{ `Grp`.formatted }}</span>
+    <img src="{{ `Flag`.raw }}" alt="" />
+    <span class="cb-name">{{ `Team`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `P`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `GF`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `GD`.formatted }}</span>
+    <span class="cb-pts wc-num">{{ `Pts`.formatted }}</span>
+    <span class="tp-st" style="color:{{ `QualColor`.raw }};">{{ `QualStatus`.formatted }}</span>
+  </div>
+{% end %}
+  </div>
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--qual-adv);"></span>In the 8 — advances</span>
+    <span class="lg"><span class="dot" style="background:var(--qual-out);"></span>Below the line</span>
+    <span class="sp">Ranked by Pts, GD, GF across groups</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'orank'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 12
+        row_limit: 12
+      }
+    }
+  }
+}

@@ -1,0 +1,148 @@
+// Group-stage standings clipboard card. One per group A–L on the Groups tab.
+// Param `grp` drives the standings filter + the "Group X" heading; everything else is identical.
+// Styling/keyframes live in the theme + header_rail block (renders on every tab).
+Func wc_group_card(grp: String) {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_group_standings.group_code)
+        operator: 'is'
+        value: grp
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Rank'
+          ref: r(wc_group_standings.rank)
+          uname: 'rank'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_group_standings.team_name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'P'
+          ref: r(wc_group_standings.played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'W'
+          ref: r(wc_group_standings.won)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'D'
+          ref: r(wc_group_standings.drawn)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'L'
+          ref: r(wc_group_standings.lost)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GF'
+          ref: r(wc_group_standings.gf)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GA'
+          ref: r(wc_group_standings.ga)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'GD'
+          ref: r(wc_group_standings.gd)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Pts'
+          ref: r(wc_group_standings.pts)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'QualColor'
+          ref: r(wc_group_standings.qual_color)
+        },
+        VizFieldFull {
+          label: 'QualStatus'
+          ref: r(wc_group_standings.qual_status)
+        }
+      ]
+      content: @md
+<div class="cb-wrap"><div class="clipboard cb-x">
+  <div class="cb-head">
+    <span class="cb-grp">Group <b>${grp}</b></span>
+    <span class="cb-sub">Group stage · matchday 1</span>
+  </div>
+  <div class="cb-colhead"><span class="c">#</span><span></span><span>Team</span><span class="c">P</span><span class="c">W</span><span class="c">D</span><span class="c">L</span><span class="c">GF</span><span class="c">GA</span><span class="c">GD</span><span class="c">Pts</span></div>
+{% map(rows) %}
+  <div class="cb-row" style="border-left-color:{{ `QualColor`.raw }};">
+    <span class="cb-rank">{{ `Rank`.formatted }}</span>
+    <img src="{{ `Flag`.raw }}" alt="" />
+    <span class="cb-name" title="{{ `QualStatus`.formatted }}">{{ `Team`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `P`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `W`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `D`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `L`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `GF`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `GA`.formatted }}</span>
+    <span class="cb-n wc-num">{{ `GD`.formatted }}</span>
+    <span class="cb-pts wc-num">{{ `Pts`.formatted }}</span>
+  </div>
+{% end %}
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--qual-adv);"></span>Advance</span>
+    <span class="lg"><span class="dot" style="background:var(--qual-po);"></span>Best-third race</span>
+    <span class="lg"><span class="dot" style="background:var(--qual-out);"></span>Out</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'rank'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 4
+        row_limit: 4
+      }
+    }
+  }
+}

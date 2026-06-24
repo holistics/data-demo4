@@ -1,0 +1,976 @@
+Dashboard worldcup_the_pitch {
+  title: 'World Cup 2026 — On the Pitch'
+  description: 'Live World Cup 2026 — the dashboard is the pitch.'
+  theme: wc_pitch_day
+
+  // ---- Jumbotron: stadium big-screen scoreboard (tournament KPIs) ----
+  block jumbotron: wc_jumbotron()
+  block match_cards: wc_match_cards()
+  block featured_match: wc_featured_match()
+
+  // ---- Golden Boot — race leaders as game-style (FUT) cards: clipped shield silhouette with a gold rim,
+  //      big photo region beside the rating column (goals = the "rating"), faded team flag as the card
+  //      background texture. Grid places the leader alone on top (spans both columns), #2 and #3 side by
+  //      side beneath — reads as a podium for 1, 2 or 3 scorers without empty slots. Top 3 by goals (ties
+  //      beyond 3 cut until the race spreads). The rank-4+ rack returns once it would be non-empty —
+  //      Holistics renders a built-in unstylable "no data" pill for empty results, so no empty blocks. ----
+  block boot_podium: wc_boot_podium()
+
+  // ---- Golden Boot — chasing pack: ranks 4+ beside the podium cards, mockup rack style (rank, flag, name,
+  //      gold bar relative to the best of the pack, goals). Shows the platform's empty-result state until
+  //      the race has a rank-4+ tail — accepted while data is thin. ----
+  block boot_rack: wc_boot_rack()
+
+  // ---- Header rail: a seated stadium-broadcast fascia on the dark surround. Reworks the (un-stylable)
+  //      Holistics tab material into a premium header: glass bar + a full-width gold broadcast underline,
+  //      WC26 brand, a DATA-DRIVEN stage-progress ribbon (Group → … → Final; the gold "now" chip is the
+  //      earliest stage not yet complete, from the stage_state metric), faint dividers, and a live meta
+  //      (live count + played/104 + as-of, all window aggregates). VizBlock on worldcup, grouped on
+  //      ribbon_short, filtered to the six funnel stages (ribbon_order < 9 drops the third-place match);
+  //      tournament constants (48 teams, 104 matches) stay inline. Disabled in both page-filter interactions.
+  //      Band is 78px so the content breathes. ----
+  block header_rail: wc_header_rail()
+
+  // ---- The pitch: mown-turf panel + white field markings. Lowest layer; content stacks on top.
+  //      REUSABLE: surface styles (.wc-pitch) live in the theme with height:100%, so this one block can be
+  //      placed at ANY size on any tab with zero edits here: the boundary, halfway line, centre circle/spot
+  //      and corner arcs are theme classes anchored by the box model (insets + 50%), so they reposition
+  //      themselves when the block resizes. The only fixed coordinates are inside the top penalty-box SVG,
+  //      which is pinned to the top edge and scales with the block's width — its numbers never change:
+  //        penalty area x 410..1070 depth 212 · six-yard x 580..900 depth 112 · spot (740,152) · arc r=100
+  //      (All markings share the 32px boundary inset and the #e6f0ea 4px stroke, defined in the theme.)
+  block pitch: wc_pitch()
+
+  // ---- The goal + trophy: same content as before (funnel label + goal), now its own block so the pitch
+  //      stays a pure reusable surface. Theme .goal-wrap pins the goal base to the block's bottom edge,
+  //      which the layout places at the same spot the goal previously rendered (bottom of the turf). ----
+  block goal_prize: wc_goal_prize()
+
+  // ---- Standings clipboards: one coach's board per group (A–C), laid on the turf in the upper midfield.
+  // ---- Standings clipboards: one coach's board per group (A–C), laid on the turf in the upper midfield.
+  //      Core grain = wc_group_standings (one row/team) + wc_teams flag/kit (many-to-one, no fan-out).
+  //      qual_color paints each row's left band (top-2 green, 3rd amber, else red). Form chips come from the
+  //      worldcup.team_form_html metric (html format); the points measure anchors the multi-fact join so every
+  //      team stays in the result. Shared .cb-* / .clipboard styles live in the theme. ----
+  block standings_a: wc_group_standings_card('A')
+
+  block standings_b: wc_group_standings_card('B')
+
+  block standings_c: wc_group_standings_card('C')
+
+  // ---- Knockout bracket: "Road to the final" funnelling down the pitch toward the goal. One VizBlock per
+  //      round (wc_matches filtered by stage), ties rendered as cards that wrap and narrow each round. Teams are
+  //      TBD until the groups finish (home/away null → "TBD", flags hidden); venue + date show today. Shared
+  //      .kbr / .tie / .goal styles live in the theme. ----
+  block knockout_label: wc_knockout_label()
+  block ko_r32: wc_knockout_r32()
+
+  block ko_r16: wc_knockout_round('r16', 'Round of 16', '.28s', 8)
+
+  block ko_qf: wc_knockout_round('qf', 'Quarter-finals', '.41s', 4)
+
+  block ko_sf: wc_knockout_round('sf', 'Semi-finals', '.54s', 2)
+
+  block ko_final: wc_knockout_final()
+
+
+  // ---- Groups tab: full-stat clipboards, one per group A–L (theme .cb-x ledger grid).
+  //      All columns are wc_group_standings dimensions (no measures needed) + wc_teams flag. ----
+  block groups_a: wc_group_card('A')
+
+  block groups_b: wc_group_card('B')
+
+  block groups_c: wc_group_card('C')
+
+  block groups_d: wc_group_card('D')
+
+  block groups_e: wc_group_card('E')
+
+  block groups_f: wc_group_card('F')
+
+  block groups_g: wc_group_card('G')
+
+  block groups_h: wc_group_card('H')
+
+  block groups_i: wc_group_card('I')
+
+  block groups_j: wc_group_card('J')
+
+  block groups_k: wc_group_card('K')
+
+  block groups_l: wc_group_card('L')
+
+  // ---- Groups tab: zone labels (own <style> — block CSS only ships with blocks placed on the tab) ----
+  block groups_zone_label: wc_groups_zone_label()
+  block advance_zone_label: wc_advance_zone_label()
+  block thirds_zone_label: wc_thirds_zone_label()
+
+  // ---- Advancement projector: brushed-steel magnet board, one lane per group A–L. Each team is a
+  //      colour magnet puck positioned by its Monte-Carlo odds to reach the Round of 32 (wc_team_snapshot
+  //      p_r32). Own bespoke material (steel + magnets), not the chalk slate / clipboard. ----
+  block advance_board: wc_advance_board()
+
+  // ---- Best-thirds board: the 12 third-placed teams ranked across groups; top 8 advance to the
+  //      Round of 32 (2026 format). One wide clipboard — the dashed amber rule under row 8 (theme
+  //      .cb-tp) is the qualification line; qual_color/qual_status drive the row bands (no template
+  //      conditionals). All fields are wc_third_place_ranking dimensions + the wc_teams flag. ----
+  block third_place_board: wc_third_place_board()
+  block hq_team_filter: FilterBlock {
+    label: 'Nation'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: worldcup
+      field: r(wc_teams.name)
+    }
+    default {
+      operator: 'is'
+      value: 'Mexico'
+    }
+    settings {
+      input_type: 'nullable-single'
+    }
+  }
+
+  block hq_filter_hint: wc_hq_filter_hint()
+
+  // ---- LED nameplate: the tab's "dressing room board" on the stadium surround.
+  //      Same bezel/screen language as the jumbotron, scaled down; kit ribbon = team colour.
+  //      Elo baseline = rank among the 48 (honest, computed in wc_team_snapshot);
+  //      title-odds baseline = field average 1/48 ≈ 2.1% (constant by construction). ----
+  block hq_banner: wc_hq_banner()
+
+  block hq_zone_left: wc_hq_zone_left()
+
+  block hq_zone_right: wc_hq_zone_right()
+
+  block hq_zone_squad: wc_hq_zone_squad()
+
+  // ---- Honours board: all-time pedigree counts on one clipboard. Counts roll up through
+  //      wc_team_aliases, so defunct-nation honours land on the successor (FRG → GER). ----
+  block hq_honours: wc_hq_honours()
+
+  // ---- Campaign ledger: one row per edition played, latest first. Finish badge colour is the
+  //      finish_color driver dimension (champion gold / final silver / semi bronze) — no template
+  //      conditionals. row_limit trims long histories; the footer says so. ----
+  block hq_campaigns: wc_hq_campaigns()
+
+  // ---- Next-fixture card: who's next, where, and the all-time tally against them.
+  //      All next_* dims repeat on every H2H row, so grouping collapses to one card;
+  //      the W/D/L tally measures aggregate the same rows the H2H ledger lists. ----
+  block hq_next_match: wc_hq_next_match()
+
+  // ---- H2H ledger: every World Cup meeting vs the next opponent, scored from the selected
+  //      team's side. The result chip colour is the result_color driver dimension. ----
+  block hq_h2h: wc_hq_h2h()
+
+  // ---- Section label (turf wayfinder) above the Record Book. ----
+  block hq_alltime_zone: wc_hq_zone_alltime()
+
+  // ---- The Record Book: all-time World Cup head-to-head vs every nation faced (1930–2022),
+  //      the 12 most-played rivals. Own material (a bound football almanac, NOT the clipboard);
+  //      each row's dominance bar is flex-proportioned to its win/draw/loss share. Opponent name +
+  //      crest are resolved inside the wc_history_h2h model so every historical nation shows (not
+  //      just the 48 in the 2026 field). Scoped to the Nation filter via an explicit wc_teams.name
+  //      mapping (the team side), since wc_opponent_teams.name would otherwise capture the filter. ----
+  block hq_alltime_h2h: wc_hq_alltime_h2h()
+  block hq_squad_gk: wc_squad_gk()
+
+  block hq_squad_df: wc_squad_section('DF', '#1D3F8E', 'Defenders')
+
+  block hq_squad_mf: wc_squad_section('MF', '#1f9d52', 'Midfielders')
+
+  block hq_squad_fw: wc_squad_section('FW', '#E61D25', 'Forwards')
+
+  // ---- Tournament pulse: the selected team's CURRENT campaign — stat chips + a form strip
+  //      with real scorelines ("W 2–0 RSA"), adopted from the concept mockup. Multi-grain:
+  //      rows = one per finished match (form chips), values = team aggregates (multi-fact
+  //      join keeps the row even before the first match). Opponents shown by CODE — the
+  //      nation filter auto-maps by field name, and wc_opponent_teams.name would collide.
+  //      HEIGHT BUDGET (block 320): wrap 32 + clipboard 35 + head 33 + chips 64 + form 38
+  //      + foot 28 + ~40 MarkdownViz overhead ≈ 270. ----
+  block hq_pulse: wc_hq_pulse()
+
+  // ---- Scouting report: a coach's dossier — a stamped verdict + four evidence pillars (attack,
+  //      defence, class, outlook). Every word is a case() metric (scout_*) over live form + the
+  //      Elo/sim model; numbers stay as formatted fields. Distinct material from the LED nameplate,
+  //      painted pulse board, bronze honours and sticker wall. Auto-maps to the nation filter via
+  //      wc_teams.name; disabled for the match filter. ----
+  block hq_scout: wc_hq_scout()
+
+  // ---- Rating trajectory: native Elo LineChart on a crafted dark "rating monitor" chrome, scoped
+  //      to the Nation filter (wc_team_ratings → wc_teams), so it follows the selected team. A
+  //      DateDrillBlock (hq_elo_drill) drives snapshot_date granularity (month/quarter/year) via a
+  //      DateDrillInteraction. Frame + zone label are TextBlocks (no dataset → no filter wiring);
+  //      the chart is disabled on the Match filter. ----
+  block hq_zone_rating: wc_hq_zone_rating()
+  block hq_rating_frame: wc_hq_rating_frame()
+  block hq_rating_chart: wc_hq_rating_chart()
+  block hq_elo_drill: DateDrillBlock {
+    label: 'Granularity'
+    default: 'month'
+  }
+  block hq_rating_move: wc_hq_rating_move()
+
+  // ============================ MATCH CENTER TAB ============================
+  // Per-match detail: pick a match → LED scoreboard, event ticker, team sheets,
+  // odds board. Officials/weather/possession are absent from the source tables
+  // (FIFA live payload gaps) — no blocks fake them.
+  block mc_match_filter: FilterBlock {
+    label: 'Match'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: worldcup
+      field: r(wc_matches.match_label)
+    }
+    default {
+      operator: 'is'
+      value: '06/12 · 02:00 · KOR vs CZE'
+    }
+    settings {
+      input_type: 'nullable-single'
+    }
+  }
+
+  block mc_filter_hint: wc_mc_filter_hint()
+
+  // ---- Match scoreboard: the jumbotron language scaled to one fixture — kit rails on both
+  //      wings, big LED score (or kickoff time pre-match, via the featured_display drivers). ----
+  block mc_scoreboard: wc_mc_scoreboard()
+
+  block mc_zone_ticker: wc_mc_zone_ticker()
+
+  block mc_zone_odds: wc_mc_zone_odds()
+
+  // ---- Event ticker: goals/cards/subs on a centre spine, home events left, away right
+  //      (side + colours are model driver dims — no template conditionals). Running score
+  //      chips appear on goal events only (score_chip empty otherwise → :empty hides). ----
+  block mc_timeline: wc_mc_timeline()
+
+  // ---- Team sheets: one clipboard per side — starters XI above the dashed cut, bench below
+  //      (role driver dim = row class; the xi→bench transition styles the divider). Captain
+  //      armband from captain_tag (:empty hides). Sorted GK→DF→MF→FW then shirt number. ----
+  block mc_lineup_home: wc_mc_lineup_home()
+
+  block mc_lineup_away: wc_mc_lineup_away()
+
+  // ---- Odds board: latest Elo→Poisson run for the selected match — three-way probability
+  //      bar in kit colours (draw grey), expected score, and day-over-day delta chips
+  //      (labels/colours computed in wc_match_odds SQL; empty on the first run). M1–M2
+  //      pre-date the first run → platform empty-state, called out in the filter hint. ----
+  block mc_odds: wc_mc_odds()
+
+  // ---- Starting line-ups: broadcast formation graphic — two vertical half-pitches, one
+  //      photo token per starter (kit ring, shirt badge, gold GK, captain armband), popping
+  //      in on a GK→defence→attack cascade. All layout (stage_x/y_pct) and stagger
+  //      (reveal_delay) come from wc_lineup_grid; the template only places tokens, so no
+  //      conditionals and no JS — the cascade replays whenever the match filter changes.
+  //      Tokens are %-positioned: the stage scales with the block, no overflow possible. ----
+  block mc_formations: wc_mc_formations()
+
+  // ---- Momentum: a native LineChart (gold step trace of wc_events.score_margin over minute_num)
+  //      layered on a crafted "plotter" chrome — the first native-viz-on-crafted-chrome surface.
+  //      The chart auto-maps to the Match filter (wc_events→wc_matches); disabled on the Nation
+  //      filter. The frame + zone label are TextBlocks (no dataset → no interaction wiring). ----
+  block mc_zone_momentum: wc_mc_zone_momentum()
+  block mc_momentum_frame: wc_mc_momentum_frame()
+  block mc_momentum_chart: wc_mc_momentum_chart()
+
+  // ============================ CONTENDER INDEX TAB ============================
+  // "Who's actually good" — ranked by the nightly sim's title odds (the sim IS the
+  // approved Elo-prior blend: ratings update with results, odds re-run nightly).
+  // Material: the manager's chalkboard — wooden frame, slate, chalk lines. New
+  // object on this page; not clipboard, LED or split-flap.
+  block ci_zone: wc_ci_zone()
+
+  // ---- The big board: top 10 by title odds. Elo spark = 24 months, SQL-built polyline
+  //      (see wc_contender_board). HEIGHT BUDGET (block 860): frame 24 + slate 32 + head 41
+  //      + 10 rows × 53 + foot 21 + ~40 MarkdownViz body overhead ≈ 700. ----
+  block ci_board: wc_ci_board()
+
+  // ---- Road survival: P(reach stage) ladders for the top 6 — six chalk columns per team,
+  //      gold column = lift the trophy. HEIGHT BUDGET (block 860): frame 24 + slate 32 +
+  //      head 41 + 6 sections × 95 + foot 21 + ~40 MarkdownViz body overhead ≈ 730. ----
+  block ci_ladder: wc_ci_ladder()
+
+  // ============================ HISTORY TAB ============================
+  // "Who owns the World Cup" — the all-time archive 1930–2022. All-time stats are grouped on
+  // wc_team_aliases.entity_code (successor rollup: West Germany→Germany=4, Soviet/Yugoslav/
+  // Czechoslovak records into Russia/Serbia/Czechia, East Germany kept as its own entity), with
+  // entity_name/entity_flag giving readable labels + crests for nations the 2026 table never had.
+  // Material: an engraved bronze honours plaque on walnut — the trophy-cabinet wall. New, 8th object;
+  // its signature is DEBOSSED Roman-inscription lettering (Cinzel), not the emissive/printed/raised
+  // text of the LED, split-flap, chalkboard, sticker, glass or enamel-scoreboard materials.
+  // ---- Trophy-hall backdrop (replaces the pitch turf on this tab): a dim honours gallery — deep
+  //      stadium-green-to-charcoal wall, a warm overhead spotlight pooling on the board, faint
+  //      wood-panel seams, a marble floor sheen and a vignette. Lowest layer; the plaque sits on it
+  //      like a trophy cabinet under a museum light. height:100% so it fills whatever the layout gives it. ----
+  block hist_wall: wc_hist_wall()
+
+  block hist_zone: wc_hist_zone()
+
+  // ---- Hall of Champions: every nation that has lifted the trophy, by titles. The hero of the tab.
+  //      Title count is the focal engraving; finals/semis/apps and the first–last span give every
+  //      headline its comparison (a champion's reign in context). Rank via CSS counter (rows arrive
+  //      pre-sorted), so no rank field is needed. Opaque plaque → height:auto so the block's scroll
+  //      headroom renders as turf below (design rule). HEIGHT BUDGET (block 740): walnut 16·2 +
+  //      plate 18·2 + title 60 + colhead 20 + 8 rows·54 + foot 26 + ~40 MarkdownViz ≈ 646 → ~13% turf. ----
+  block hist_champions: wc_hist_champions()
+
+  // ---- Roll of Champions: every final 1930–2022 engraved chronologically on a second bronze plaque —
+  //      EDITION · HOST | champion (gold) | scoreline | runner-up. One row per edition from the
+  //      wc_history_finals query model (21 stage='final' + the 1950 Maracanazo). Same walnut/bronze/Cinzel
+  //      material as the Hall; .roll-* prefix so its denser ledger layout never inherits the Hall's hero rows.
+  //      Opaque plaque → height:auto so the block's scroll headroom renders as wall below (design rule).
+  //      HEIGHT BUDGET (block 1640): walnut 22·2 + plate 18·2 + title 50 + sub 27 + colhead 24 +
+  //      22 rows·53 (stacked year/host cell governs) + foot 40 + ~40 MarkdownViz ≈ 1420 → ~15% wall
+  //      headroom, all 22 rows visible without an inner scroll. ----
+  block hist_roll: wc_hist_roll()
+
+  // ---- All-time pedigree leaderboard: top 12 nations by a weighted prestige index (8·titles + 4·finals +
+  //      2·semis + apps), grouped on wc_team_aliases.entity_code (successor rollup). Every bar is scaled to
+  //      the leader (Brazil) and carries a baseline notch at the field-average pedigree — no score ships
+  //      without its comparison. Third bronze plaque, same material, .ped-* prefix. Opaque → height:auto.
+  //      HEIGHT BUDGET (block 1000): walnut 22·2 + plate 18·2 + title 60 + sub 16 + colhead 22 +
+  //      12 rows·52 + foot 24 + ~40 MarkdownViz ≈ 860 → ~15% wall headroom. ----
+  block hist_pedigree: wc_hist_pedigree()
+
+  // ---- Edition comparison: CRAFTED MarkdownViz (bronze-plaque column timeline, goals/match per
+  //      edition, 2026 gold + dashed average line). Static surface (no filter/drill/pop) → stays on
+  //      the History wall material rather than a native chart. Bar heights from inline window measures.
+  //      In both disable lists for consistency; zone label is a TextBlock. ----
+  block hist_zone_editions: wc_hist_zone_editions()
+  block hist_editions: wc_hist_editions()
+
+  // ============================ PLAYERS TAB ============================
+  // "Stars of the tournament" — a FUT-card wall of every goal contributor, ranked by G+A
+  //   (wc_player_stats). Each card opens the shared player-profile popover (pp-* skin in
+  //   header_rail) with bio (wc_player_bio: age/club/position) + 6-stat grid + goal log.
+  block pack_reveal: wc_pack_reveal()
+  block players_zone_label: wc_players_zone_label()
+  block player_gallery: wc_player_gallery()
+  // "The race" — two timing-board ladders (Golden Boot / Playmaker) below the FUT wall,
+  // seated on their own dark backdrop so they don't float on the green page surround.
+  block race_backdrop: wc_race_backdrop()
+  block race_zone_label: wc_race_zone_label()
+  block boot_ladder: wc_boot_ladder()
+  block playmaker_ladder: wc_playmaker_ladder()
+  view: TabLayout {
+    label: 'View 1'
+    tab tab_tournament: CanvasLayout {
+      label: 'Tournament'
+      width: 1600
+      height: 3280
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block jumbotron {
+        position: pos(60, 96, 1480, 240)
+        layer: 5
+      }
+      block pitch {
+        position: pos(60, 320, 1480, 2940)
+        layer: 1
+      }
+      block match_cards {
+        position: pos(117, 846, 1370, 400)
+        layer: 5
+      }
+      block standings_a {
+        position: pos(115, 1236, 438, 300)
+        layer: 6
+      }
+      block standings_b {
+        position: pos(580, 1236, 440, 300)
+        layer: 6
+      }
+      block standings_c {
+        position: pos(1047, 1236, 438, 300)
+        layer: 6
+      }
+      block featured_match {
+        position: pos(340, 380, 920, 440)
+        layer: 8
+      }
+      block boot_podium {
+        position: pos(120, 1620, 1380, 320)
+        layer: 6
+      }
+      block boot_rack {
+        position: pos(480, 1940, 660, 260)
+        layer: 6
+      }
+      block knockout_label {
+        position: pos(115, 3034, 1370, 32)
+        layer: 5
+      }
+      block ko_r32 {
+        position: pos(115, 2252, 1370, 160)
+        layer: 6
+      }
+      block ko_r16 {
+        position: pos(115, 2420, 1370, 115)
+        layer: 6
+      }
+      block ko_qf {
+        position: pos(115, 2543, 1370, 115)
+        layer: 6
+      }
+      block ko_sf {
+        position: pos(115, 2666, 1370, 115)
+        layer: 6
+      }
+      block ko_final {
+        position: pos(115, 2789, 1370, 125)
+        layer: 6
+      }
+      block goal_prize {
+        position: pos(580, 2940, 440, 280)
+        layer: 7
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.8
+    }
+    tab tab_match_center: CanvasLayout {
+      label: 'Match Center'
+      width: 1600
+      height: 2260
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block mc_scoreboard {
+        position: pos(60, 96, 1140, 240)
+        layer: 5
+      }
+      block mc_match_filter {
+        position: pos(1230, 110, 280, 80)
+        layer: 8
+      }
+      block mc_filter_hint {
+        position: pos(1230, 196, 280, 130)
+        layer: 5
+      }
+      block pitch {
+        position: pos(60, 360, 1480, 1880)
+        layer: 1
+      }
+      block mc_zone_ticker {
+        position: pos(465, 404, 670, 32)
+        layer: 5
+      }
+      block mc_lineup_home {
+        position: pos(115, 432, 330, 1020)
+        layer: 6
+      }
+      block mc_formations {
+        position: pos(465, 452, 670, 500)
+        layer: 6
+      }
+      block mc_timeline {
+        position: pos(465, 972, 670, 500)
+        layer: 6
+      }
+      block mc_lineup_away {
+        position: pos(1155, 432, 330, 1020)
+        layer: 6
+      }
+      block mc_zone_odds {
+        position: pos(115, 1496, 1370, 28)
+        layer: 5
+      }
+      block mc_odds {
+        position: pos(115, 1536, 1370, 260)
+        layer: 6
+      }
+      block mc_zone_momentum {
+        position: pos(115, 1836, 1370, 32)
+        layer: 5
+      }
+      block mc_momentum_frame {
+        position: pos(115, 1876, 1370, 300)
+        layer: 6
+      }
+      block mc_momentum_chart {
+        position: pos(131, 1929, 1340, 216)
+        layer: 7
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.8
+    }
+    tab tab_groups: CanvasLayout {
+      label: 'Groups'
+      width: 1600
+      height: 2920
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block pitch {
+        position: pos(60, 96, 1480, 2810)
+        layer: 1
+      }
+      block groups_zone_label {
+        position: pos(115, 150, 1370, 32)
+        layer: 5
+      }
+      block groups_a {
+        position: pos(115, 200, 438, 300)
+        layer: 6
+      }
+      block groups_b {
+        position: pos(580, 200, 440, 300)
+        layer: 6
+      }
+      block groups_c {
+        position: pos(1047, 200, 438, 300)
+        layer: 6
+      }
+      block groups_d {
+        position: pos(115, 520, 438, 300)
+        layer: 6
+      }
+      block groups_e {
+        position: pos(580, 520, 440, 300)
+        layer: 6
+      }
+      block groups_f {
+        position: pos(1047, 520, 438, 300)
+        layer: 6
+      }
+      block groups_g {
+        position: pos(115, 840, 438, 300)
+        layer: 6
+      }
+      block groups_h {
+        position: pos(580, 840, 440, 300)
+        layer: 6
+      }
+      block groups_i {
+        position: pos(1047, 840, 438, 300)
+        layer: 6
+      }
+      block groups_j {
+        position: pos(115, 1160, 438, 300)
+        layer: 6
+      }
+      block groups_k {
+        position: pos(580, 1160, 440, 300)
+        layer: 6
+      }
+      block groups_l {
+        position: pos(1047, 1160, 438, 300)
+        layer: 6
+      }
+      block advance_zone_label {
+        position: pos(115, 1510, 1370, 32)
+        layer: 5
+      }
+      block advance_board {
+        position: pos(120, 1560, 1380, 600)
+        layer: 6
+      }
+      block thirds_zone_label {
+        position: pos(115, 2210, 1370, 32)
+        layer: 5
+      }
+      block third_place_board {
+        position: pos(420, 2260, 760, 580)
+        layer: 6
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.8
+    }
+    tab tab_team_hq: CanvasLayout {
+      label: 'Team HQ'
+      width: 1600
+      height: 4800
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block hq_banner {
+        position: pos(60, 96, 1140, 200)
+        layer: 5
+      }
+      block hq_team_filter {
+        position: pos(1230, 110, 280, 80)
+        layer: 8
+      }
+      block hq_filter_hint {
+        position: pos(1230, 196, 280, 90)
+        layer: 5
+      }
+      block pitch {
+        position: pos(60, 320, 1480, 4400)
+        layer: 1
+      }
+      block hq_pulse {
+        position: pos(115, 400, 1370, 260)
+        layer: 6
+      }
+      block hq_scout {
+        position: pos(120, 620, 1360, 300)
+        layer: 6
+      }
+      block hq_zone_left {
+        position: pos(115, 1008, 700, 32)
+        layer: 5
+      }
+      block hq_zone_right {
+        position: pos(845, 1008, 640, 32)
+        layer: 5
+      }
+      block hq_honours {
+        position: pos(115, 1060, 700, 320)
+        layer: 6
+      }
+      block hq_next_match {
+        position: pos(845, 1060, 640, 320)
+        layer: 6
+      }
+      block hq_campaigns {
+        position: pos(115, 1400, 700, 700)
+        layer: 6
+      }
+      block hq_h2h {
+        position: pos(845, 1400, 640, 700)
+        layer: 6
+      }
+      block hq_alltime_zone {
+        position: pos(115, 2140, 1370, 32)
+        layer: 5
+      }
+      block hq_alltime_h2h {
+        position: pos(115, 2192, 1370, 620)
+        layer: 6
+      }
+      block hq_zone_rating {
+        position: pos(115, 2840, 1370, 32)
+        layer: 5
+      }
+      block hq_rating_frame {
+        position: pos(115, 2888, 1370, 330)
+        layer: 6
+      }
+      block hq_rating_chart {
+        position: pos(150, 2920, 1300, 250)
+        layer: 7
+      }
+      block hq_rating_move {
+        position: pos(160, 2940, 120, 40)
+        layer: 8
+      }
+      block hq_elo_drill {
+        position: pos(1186, 2875, 280, 40)
+        layer: 8
+      }
+      block hq_zone_squad {
+        position: pos(115, 3260, 1370, 56)
+        layer: 5
+      }
+      block hq_squad_gk {
+        position: pos(120, 3320, 1380, 220)
+        layer: 6
+      }
+      block hq_squad_df {
+        position: pos(120, 3560, 1380, 360)
+        layer: 6
+      }
+      block hq_squad_mf {
+        position: pos(120, 3920, 1380, 360)
+        layer: 6
+      }
+      block hq_squad_fw {
+        position: pos(120, 4300, 1380, 220)
+        layer: 6
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.8
+    }
+    tab tab_players: CanvasLayout {
+      label: 'Players'
+      width: 1600
+      height: 2260
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block pack_reveal {
+        position: pos(60, 100, 1480, 1440)
+        layer: 1
+      }
+      block players_zone_label {
+        position: pos(115, 140, 1370, 32)
+        layer: 5
+      }
+      block player_gallery {
+        position: pos(120, 260, 1380, 1140)
+        layer: 6
+      }
+      block race_backdrop {
+        position: pos(60, 1560, 1480, 680)
+        layer: 1
+      }
+      block race_zone_label {
+        position: pos(115, 1570, 1370, 32)
+        layer: 5
+      }
+      block boot_ladder {
+        position: pos(115, 1620, 675, 560)
+        layer: 6
+      }
+      block playmaker_ladder {
+        position: pos(810, 1620, 675, 560)
+        layer: 6
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.8
+    }
+    tab tab_history: CanvasLayout {
+      label: 'History'
+      width: 1600
+      height: 3990
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block hist_wall {
+        position: pos(60, 100, 1480, 3860)
+        layer: 1
+      }
+      block hist_zone {
+        position: pos(115, 140, 1370, 32)
+        layer: 5
+      }
+      block hist_champions {
+        position: pos(115, 192, 1370, 880)
+        layer: 6
+      }
+      block hist_roll {
+        position: pos(115, 1000, 1370, 1640)
+        layer: 6
+      }
+      block hist_pedigree {
+        position: pos(115, 2408, 1370, 1000)
+        layer: 6
+      }
+      block hist_zone_editions {
+        position: pos(115, 3408, 1370, 32)
+        layer: 5
+      }
+      block hist_editions {
+        position: pos(115, 3456, 1370, 410)
+        layer: 6
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.85
+    }
+    tab tab_contenders: CanvasLayout {
+      label: 'Contender Index'
+      width: 1600
+      height: 1146
+      grid_size: 20
+      auto_expand_vertically: true
+      block header_rail {
+        position: pos(60, 14, 1480, 78)
+        layer: 5
+      }
+      block pitch {
+        position: pos(60, 96, 1480, 1030)
+        layer: 1
+      }
+      block ci_zone {
+        position: pos(115, 140, 1370, 32)
+        layer: 5
+      }
+      block ci_board {
+        position: pos(115, 192, 800, 860)
+        layer: 6
+      }
+      block ci_ladder {
+        position: pos(935, 192, 550, 860)
+        layer: 6
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.8
+    }
+  }
+  // Page filters auto-map to every same-dataset viz block on ALL tabs, so each filter
+  // carries an explicit disable list for everything outside its own tab.
+  // - Nation filter: DISABLED outside Team HQ; the squad blocks get an explicit field
+  //   mapping because auto-map matches the filter onto their wc_players.name field
+  //   (player name == 'Mexico' → always empty) instead of wc_teams.name.
+  // - Match filter: wc_matches.match_label collides with nothing, so Match Center blocks
+  //   keep their auto mapping (it propagates through the match_num relationships);
+  //   everything else is disabled.
+  interactions: [
+    FilterInteraction {
+      from: 'hq_team_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'hq_squad_gk',
+            'hq_squad_df',
+            'hq_squad_mf',
+            'hq_squad_fw',
+            'hq_alltime_h2h'
+          ]
+          field: r(wc_teams.name)
+        },
+        CustomMapping {
+          block: [
+            'jumbotron',
+            'match_cards',
+            'featured_match',
+            'boot_podium',
+            'boot_rack',
+            'standings_a',
+            'standings_b',
+            'standings_c',
+            'ko_r32',
+            'ko_r16',
+            'ko_qf',
+            'ko_sf',
+            'ko_final',
+            'groups_a',
+            'groups_b',
+            'groups_c',
+            'groups_d',
+            'groups_e',
+            'groups_f',
+            'groups_g',
+            'groups_h',
+            'groups_i',
+            'groups_j',
+            'groups_k',
+            'groups_l',
+            'advance_board',
+            'third_place_board',
+            'player_gallery',
+            'boot_ladder',
+            'playmaker_ladder',
+            'mc_scoreboard',
+            'mc_timeline',
+            'mc_formations',
+            'mc_lineup_home',
+            'mc_lineup_away',
+            'mc_odds',
+            'ci_board',
+            'ci_ladder',
+            'hist_champions',
+            'hist_roll',
+            'hist_pedigree',
+            'hist_editions',
+            'header_rail',
+            'mc_match_filter',
+            'mc_momentum_chart'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'mc_match_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'jumbotron',
+            'match_cards',
+            'featured_match',
+            'boot_podium',
+            'boot_rack',
+            'standings_a',
+            'standings_b',
+            'standings_c',
+            'ko_r32',
+            'ko_r16',
+            'ko_qf',
+            'ko_sf',
+            'ko_final',
+            'groups_a',
+            'groups_b',
+            'groups_c',
+            'groups_d',
+            'groups_e',
+            'groups_f',
+            'groups_g',
+            'groups_h',
+            'groups_i',
+            'groups_j',
+            'groups_k',
+            'groups_l',
+            'advance_board',
+            'third_place_board',
+            'player_gallery',
+            'boot_ladder',
+            'playmaker_ladder',
+            'hq_banner',
+            'hq_pulse',
+            'hq_scout',
+            'hq_honours',
+            'hq_next_match',
+            'hq_campaigns',
+            'hq_h2h',
+            'hq_alltime_h2h',
+            'hq_squad_gk',
+            'hq_squad_df',
+            'hq_squad_mf',
+            'hq_squad_fw',
+            'ci_board',
+            'ci_ladder',
+            'hist_champions',
+            'hist_roll',
+            'hist_pedigree',
+            'hist_editions',
+            'header_rail',
+            'hq_team_filter',
+            'hq_rating_chart',
+            'hq_rating_move'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    DateDrillInteraction {
+      from: 'hq_elo_drill'
+      to: [
+        CustomMapping {
+          block: 'hq_rating_chart'
+          field: r(wc_team_ratings.snapshot_date)
+        }
+      ]
+    }
+  ]
+  settings {
+    timezone: 'Etc/UTC'
+    cache_duration: 10
+    autorun_on_open: true
+  }
+}
