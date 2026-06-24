@@ -272,6 +272,7 @@ Dashboard company_dashboard_v2_2a24b81 {
       }
       settings {
         row_limit: 5000
+        legend_label: 'hidden'
         x_axis_show_null_datetime: false
         aggregate_awareness {
           enabled: true
@@ -359,22 +360,21 @@ Dashboard company_dashboard_v2_2a24b81 {
           }
           settings {
             color: '#05264C'
-            line_interpolation: 'smooth'
             point {
               value: 'Asia'
-              line_interpolation: 'smooth'
+              color: '#07326C'
             }
             point {
               value: 'Europe'
-              line_interpolation: 'smooth'
+              color: '#21908D'
             }
             point {
               value: 'Oceania'
-              line_interpolation: 'smooth'
+              color: '#00767B'
             }
             point {
               value: 'North America'
-              line_interpolation: 'smooth'
+              color: '#A8BEEE'
             }
           }
         }
