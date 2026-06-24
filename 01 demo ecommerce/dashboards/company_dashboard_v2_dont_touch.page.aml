@@ -2812,7 +2812,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 21
       }
       block v_530w {
-        position: pos(40, 1270, 1180, 760)
+        position: pos(40, 1310, 1180, 760)
         layer: 20
       }
       block v_kp1e {
