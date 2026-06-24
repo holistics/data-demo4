@@ -2615,7 +2615,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     tab tab1: CanvasLayout {
       label: 'Users'
       width: 1260
-      height: 2040
+      height: 1970
       block f1 {
         position: pos(40, 240, 310, 80)
         layer: 4
@@ -2625,7 +2625,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 9
       }
       block v34 {
-        position: pos(40, 820, 1180, 520)
+        position: pos(40, 1460, 1180, 520)
         layer: 1
       }
       block v37 {
@@ -2661,7 +2661,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 1
       }
       block t_gldd {
-        position: pos(40, 770, 350, 50)
+        position: pos(40, 1410, 350, 50)
         layer: 14
       }
       block v_xvgb {
@@ -2685,38 +2685,38 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 16
       }
       block t_6mrf {
-        position: pos(1200, 810, 30, 30)
+        position: pos(1200, 1450, 30, 30)
         layer: 17
       }
       block f_xzr7 {
-        position: pos(60, 1440, 300, 60)
+        position: pos(60, 820, 300, 60)
         layer: 1
       }
       block f_29w2 {
-        position: pos(380, 1440, 300, 60)
+        position: pos(380, 820, 300, 60)
         layer: 2
       }
       block v_mfrz {
-        position: pos(60, 1530, 1140, 450)
+        position: pos(60, 910, 1140, 460)
         layer: 3
       }
       block t_izwa {
-        position: pos(40, 1420, 1180, 580)
+        position: pos(40, 800, 1180, 590)
       }
       block t_wopf {
         position: pos(-20, 200, 1300, 120)
         layer: -3
       }
       block t_q1m5 {
-        position: pos(40, 1370, 810, 50)
+        position: pos(40, 750, 810, 50)
         layer: 18
       }
       block t_kr0c {
-        position: pos(40, 1500, 1180, 20)
+        position: pos(40, 880, 1180, 20)
         layer: 19
       }
       block t_od8o {
-        position: pos(1100, 1440, 100, 30)
+        position: pos(1100, 820, 100, 30)
         layer: 120
       }
       default_zoom: 0.9
