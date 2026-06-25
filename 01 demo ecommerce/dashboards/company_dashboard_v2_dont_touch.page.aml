@@ -352,7 +352,7 @@ Dashboard company_dashboard_v2_2a24b81 {
         }
         series {
           field: VizFieldFull {
-            label: ' '
+            label: ' GMV'
             ref: r(demo_ecommerce_version_2.gmv)
             format {
               type: 'number'
