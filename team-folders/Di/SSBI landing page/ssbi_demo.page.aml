@@ -390,7 +390,7 @@ Dashboard ssbi_demo {
     label: 'Date Drill'
   }
   block v_lwrf: VizBlock {
-    label: 'Orders details copy'
+    label: 'Orders details'
     viz: DataTable {
       dataset: demo_ecommerce_version_2
       fields: [
