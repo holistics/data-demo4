@@ -329,7 +329,7 @@ Dashboard company_dashboard_v2_2a24b81 {
     }
   }
   block v44: VizBlock {
-    label: 'GMV and NMV over time'
+    label: 'GMV by continent over time'
     viz: ColumnChart {
       dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
@@ -352,10 +352,13 @@ Dashboard company_dashboard_v2_2a24b81 {
         }
         series {
           field: VizFieldFull {
+            label: ' GMV'
             ref: r(demo_ecommerce_version_2.gmv)
             format {
               type: 'number'
-              pattern: 'inherited'
+              pattern: '#,###"A"'
+              group_separator: ','
+              decimal_separator: '.'
             }
           }
           settings {
@@ -1322,7 +1325,7 @@ Dashboard company_dashboard_v2_2a24b81 {
 : 2px solid #EDF1F5"></div>;;
   }
   block v_wtl8: VizBlock {
-    label: 'Orders by status'
+    label: 'Order Details'
     viz: PieChart {
       dataset: demo_ecommerce_version_2
       legend: VizFieldFull {
@@ -1334,31 +1337,16 @@ Dashboard company_dashboard_v2_2a24b81 {
       series {
         field: VizFieldFull {
           label: ' '
-          ref: r(ecommerce_orders.total_orders_count)
+          ref: r(demo_ecommerce_version_2.total_orders)
           format {
             type: 'number'
             pattern: 'inherited'
-          }
-        }
-        settings {
-          point {
-            value: 'refunded'
-            color: '#00767B'
-          }
-          point {
-            value: 'cancelled'
-            color: '#05264C'
-          }
-          point {
-            value: 'delivered'
-            color: '#259B6C'
           }
         }
       }
       settings {
         display_as_donut: true
         row_limit: 5000
-        show_percentage: true
         data_label_position: 'outside'
         aggregate_awareness {
           enabled: true
@@ -2502,6 +2490,10 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
   }
   block t_sgr9: block_ha_page_header('Ecommerce Metrics Tree', 'An overview of our metrics and their correlation ')
   block t_853s: block_ha_page_header_bg()
+  block d_date_drill: DateDrillBlock {
+    label: 'Date Drill'
+    default: 'month'
+  }
   view: TabLayout {
     label: 'View 1'
     tab tab_5dpo: CanvasLayout {
@@ -2756,7 +2748,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     tab tab6: CanvasLayout {
       label: 'Sales & Orders'
       width: 1260
-      height: 2090
+      height: 2080
       block f3 {
         position: pos(40, 240, 300, 60)
         layer: 2
@@ -2766,11 +2758,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 6
       }
       block t22 {
-        position: pos(0, 700, 1280, 20)
+        position: pos(0, 710, 1280, 20)
         layer: 1
       }
       block v44 {
-        position: pos(40, 330, 740, 370)
+        position: pos(40, 340, 630, 370)
         layer: 9
       }
       block t_k657 {
@@ -2789,40 +2781,44 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: -1
       }
       block v_wtl8 {
-        position: pos(800, 330, 420, 370)
+        position: pos(680, 340, 540, 370)
         layer: 1
       }
       block f_lmkf {
-        position: pos(60, 810, 300, 60)
+        position: pos(60, 820, 300, 60)
         layer: 30
       }
       block f_ua94 {
-        position: pos(380, 810, 300, 60)
+        position: pos(380, 820, 300, 60)
         layer: 29
       }
       block t_9qh4 {
-        position: pos(60, 750, 360, 40)
+        position: pos(60, 760, 360, 40)
         layer: 127
       }
       block t_a63g {
-        position: pos(40, 790, 1180, 20)
+        position: pos(40, 800, 1180, 20)
         layer: 128
       }
       block t_t9m9 {
-        position: pos(1090, 900, 100, 40)
+        position: pos(1090, 910, 100, 40)
         layer: 1033
       }
       block t_wysj {
-        position: pos(40, 730, 1180, 530)
+        position: pos(40, 740, 1180, 530)
         layer: 21
       }
       block v_530w {
-        position: pos(40, 1310, 1180, 760)
+        position: pos(40, 1320, 1180, 760)
         layer: 20
       }
       block v_kp1e {
-        position: pos(60, 890, 1140, 350)
+        position: pos(60, 900, 1140, 350)
         layer: 25
+      }
+      block d_date_drill {
+        position: pos(700, 240, 300, 80)
+        layer: 9
       }
       mobile {
         mode: 'auto'
@@ -3164,10 +3160,25 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
           field: ref('ecommerce_users', 'sign_up_at')
         }
       ]
+    },
+    DateDrillInteraction {
+      from: 'd_date_drill'
+      to: [
+        CustomMapping {
+          block: [
+            'v44',
+            'v_wtl8'
+          ]
+          field: ref('ecommerce_orders', 'created_at')
+        }
+      ]
     }
   ]
   theme: holistics_ant
   settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
     autorun_on_open: true
+    autorun_on_changes: true
   }
 }
