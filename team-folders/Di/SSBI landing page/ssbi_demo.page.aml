@@ -1,6 +1,6 @@
 Dashboard ssbi_demo {
   title: '[Demo] Ecommerce Dashboard'
-  owner: 'thong.do@holistics.io'
+  owner: 'di.hoang@holistics.io'
   description: ''''''
   block f3: FilterBlock {
     label: 'Date'
@@ -270,7 +270,7 @@ Dashboard ssbi_demo {
     content: @md <hr>;;
   }
   block v_5w08: VizBlock {
-    label: 'GMV by continent over time'
+    label: 'GMV by Continent'
     viz: ColumnChart {
       dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
@@ -344,7 +344,7 @@ Dashboard ssbi_demo {
 : 2px solid #EDF1F5"></div>;;
   }
   block v_vojm: VizBlock {
-    label: 'Orders by status'
+    label: 'Orders by Status'
     viz: PieChart {
       dataset: demo_ecommerce_version_2
       legend: VizFieldFull {
@@ -390,7 +390,7 @@ Dashboard ssbi_demo {
     label: 'Date Drill'
   }
   block v_lwrf: VizBlock {
-    label: 'Orders details'
+    label: 'Orders Details'
     viz: DataTable {
       dataset: demo_ecommerce_version_2
       fields: [
