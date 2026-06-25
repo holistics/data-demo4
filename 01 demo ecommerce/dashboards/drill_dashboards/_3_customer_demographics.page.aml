@@ -47,17 +47,20 @@ Dashboard _3_customer_demographics_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_countries', 'name')
+      field: r(ecommerce_countries.name)
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -89,17 +92,20 @@ Dashboard _3_customer_demographics_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'status')
+      field: r(ecommerce_orders.status)
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }

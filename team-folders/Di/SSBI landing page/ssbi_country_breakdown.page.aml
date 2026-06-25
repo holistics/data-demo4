@@ -1,15 +1,27 @@
-Dashboard _1_country_breakdown_copy {
+Dashboard ssbi_country_beakdown {
   title: 'Country Breakdown'
   block created_at: FilterBlock {
     label: 'Created At'
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'created_at')
+      field: r(ecommerce_orders.created_at)
     }
     default {
       operator: 'matches'
       value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo'
+            ]
+          }
+        ]
+      }
     }
   }
   block country: FilterBlock {
@@ -17,38 +29,21 @@ Dashboard _1_country_breakdown_copy {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_countries', 'name')
+      field: r(ecommerce_countries.name)
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
-          AutoDrillthroughSource {
-          }
-        ]
-      }
-    }
-  }
-  block city: FilterBlock {
-    label: 'City'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_cities', 'name')
-    }
-    default {
-      operator: 'is'
-      value: []
-    }
-    settings {
-      drillthrough: Drillthrough {
-        enabled: true
-        sources: [
-          AutoDrillthroughSource {
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo',
+              'ssbi_customer_demographics'
+            ]
           }
         ]
       }
@@ -601,8 +596,7 @@ Dashboard _1_country_breakdown_copy {
         CustomMapping {
           block: [
             'v_14o4',
-            'country',
-            'city'
+            'country'
           ]
           disabled: true
         }
@@ -612,23 +606,7 @@ Dashboard _1_country_breakdown_copy {
       from: 'country'
       to: [
         CustomMapping {
-          block: [
-            'created_at',
-            'city'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'city'
-      to: [
-        CustomMapping {
-          block: [
-            'v_14o4',
-            'created_at',
-            'country'
-          ]
+          block: 'created_at'
           disabled: true
         }
       ]
@@ -645,10 +623,6 @@ Dashboard _1_country_breakdown_copy {
     }
     block country {
       position: pos(20, 20, 340, 80)
-      layer: 1
-    }
-    block city {
-      position: pos(420, 180, 340, 80)
       layer: 1
     }
     block v1 {

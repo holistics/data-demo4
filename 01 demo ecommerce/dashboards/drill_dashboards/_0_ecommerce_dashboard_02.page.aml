@@ -5,7 +5,7 @@ Dashboard _1_country_breakdown_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'created_at')
+      field: r(ecommerce_orders.created_at)
     }
     default {
       operator: 'last'
@@ -20,6 +20,9 @@ Dashboard _1_country_breakdown_demo {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -857,7 +860,7 @@ Dashboard _1_country_breakdown_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'created_at')
+      field: r(ecommerce_orders.created_at)
     }
     default {
       operator: 'matches'
@@ -868,6 +871,9 @@ Dashboard _1_country_breakdown_demo {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -990,15 +996,15 @@ Dashboard _1_country_breakdown_demo {
       to: [
         CustomMapping {
           block: 'v3'
-          field: ref('ecommerce_products', 'created_at')
+          field: r(ecommerce_products.created_at)
         },
         CustomMapping {
           block: 'v4'
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         },
         CustomMapping {
           block: 'v5'
-          field: ref('ecommerce_orders', 'created_date')
+          field: r(ecommerce_orders.created_date)
         }
       ]
     }
