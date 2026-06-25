@@ -1336,6 +1336,7 @@ Dashboard company_dashboard_v2_2a24b81 {
       }
       series {
         field: VizFieldFull {
+          label: ' '
           ref: r(demo_ecommerce_version_2.total_orders)
           format {
             type: 'number'
