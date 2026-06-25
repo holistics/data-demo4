@@ -635,14 +635,9 @@ Dashboard company_dashboard_v2 {
     ;;
   }
   block v_5ty3: VizBlock {
-    label: 'Products Listed compared with Products Listed (Prev. 1y)'
+    label: 'Products Listed'
     viz: MetricKpi {
       dataset: demo_ecommerce_version_2
-      filter {
-        field: r(ecommerce_products.created_at)
-        operator: 'matches'
-        value: '2023'
-      }
       theme {
         metric_kpi {
           label {
@@ -662,13 +657,6 @@ Dashboard company_dashboard_v2 {
           pattern: '#,###'
           group_separator: ','
           decimal_separator: '.'
-        }
-      }
-      compare_value: VizPopSettings {
-        field: r(ecommerce_products.created_at)
-        value: RelativePopValue {
-          duration: 1
-          granularity: 'year'
         }
       }
       settings {
