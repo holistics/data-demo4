@@ -1,0 +1,883 @@
+Dashboard company_dashboard_v2_2a24b81_copy {
+  title: '[Demo] Ecommerce Dashboard'
+  owner: 'thong.do@holistics.io'
+  description: ''''''
+  block f3: FilterBlock {
+    label: 'Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 24 months'
+    }
+  }
+  block v44: VizBlock {
+    label: 'GMV by continent over time'
+    viz: ColumnChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(ecommerce_countries.continent_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_stack_total: true
+        }
+        series {
+          field: VizFieldFull {
+            label: ' '
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: '#,###"A"'
+              group_separator: ','
+              decimal_separator: '.'
+            }
+          }
+          settings {
+            color: '#05264C'
+            point {
+              value: 'Asia'
+              color: '#07326C'
+            }
+            point {
+              value: 'Europe'
+              color: '#00767B'
+            }
+            point {
+              value: 'Oceania'
+              color: '#00B8D5FF'
+            }
+            point {
+              value: 'North America'
+              color: '#259B6C'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block t22: TextBlock {
+    content: @md <hr>;;
+  }
+  block v52a: VizBlock {
+    label: 'NMV Realized from GMV'
+    viz: GaugeChart {
+      dataset: demo_ecommerce_version_2
+      calculation net_orders {
+        label: 'Net Orders'
+        formula: @aql total_orders - total_cancelled_orders - total_refunded_orders;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation net_order_ratio {
+        label: 'Net Order Ratio'
+        formula: @aql net_orders*1.0/total_orders;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation undelivered_orders {
+        label: 'Undelivered Orders'
+        formula: @aql total_orders-net_orders;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation target_net_order_ratio {
+        label: 'Target Net Order Ratio'
+        formula: @aql 0.85;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      theme {
+      }
+      value: VizFieldFull {
+        ref: 'net_order_ratio'
+        format {
+          type: 'number'
+          pattern: '#,###%'
+        }
+      }
+      max_value: VizFieldFull {
+        ref: 'target_net_order_ratio'
+        format {
+          type: 'number'
+          pattern: '#,###%'
+        }
+      }
+      settings {
+        label: 'Realized NMV from GMV'
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v53a: VizBlock {
+    label: 'Total Orders Count by Delivery Status'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      calculation order_status_success_fail {
+        label: 'Order Status Success Fail'
+        formula: @aql case(
+  when: ecommerce_orders.status is 'delivered'
+  , then: 'success'
+  , else: 'failed'
+);;
+        calc_type: 'dimension'
+        data_type: 'text'
+        model: ecommerce_orders
+      }
+      theme {
+      }
+      x_axis: VizFieldFull {
+        ref: ref('ecommerce_orders', 'created_at')
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      legend: VizFieldFull {
+        ref: ref('ecommerce_orders', 'order_status_success_fail')
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_stack_total: true
+          show_data_label_by: 'value'
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: ref('ecommerce_orders', 'total_order')
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_k657: TextBlock {
+    content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
+  }
+  block t_zbx8: block_ha_page_header_bg()
+  block t_f117: block_ha_page_header('Sales and Orders', 'Monitor overall sales performance, order trends, and fulfillment outcomes to understand revenue drivers and operational efficiency.')
+  block t_zbp0: TextBlock {
+    content: @md <div style="width: 100%; height: 100%; background: white; border-bottom
+: 2px solid #EDF1F5"></div>;;
+  }
+  block v_wtl8: VizBlock {
+    label: 'Orders by status'
+    viz: PieChart {
+      dataset: demo_ecommerce_version_2
+      legend: VizFieldFull {
+        ref: r(ecommerce_orders.status)
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          label: ' '
+          ref: r(ecommerce_orders.total_orders_count)
+        }
+        settings {
+          point {
+            value: 'cancelled'
+            color: '#05264C'
+          }
+          point {
+            value: 'delivered'
+            color: '#00767B'
+          }
+          point {
+            value: 'refunded'
+            color: '#259B6C'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        row_limit: 5000
+        show_percentage: true
+        data_label_position: 'none'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block d_date_drill: DateDrillBlock {
+    label: 'Date Drill'
+  }
+  block f_4l6c: FilterBlock {
+    label: 'Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 24 months'
+    }
+  }
+  block t_5i9z: TextBlock {
+    content: @md <hr>;;
+  }
+  block v_5w08: VizBlock {
+    label: 'GMV by continent over time'
+    viz: ColumnChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(ecommerce_countries.continent_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_stack_total: true
+        }
+        series {
+          field: VizFieldFull {
+            label: ' '
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: '#,###"A"'
+              group_separator: ','
+              decimal_separator: '.'
+            }
+          }
+          settings {
+            color: '#05264C'
+            point {
+              value: 'Asia'
+              color: '#07326C'
+            }
+            point {
+              value: 'Europe'
+              color: '#00767B'
+            }
+            point {
+              value: 'Oceania'
+              color: '#00B8D5FF'
+            }
+            point {
+              value: 'North America'
+              color: '#259B6C'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block t_5l6d: TextBlock {
+    content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
+  }
+  block t_4khz: block_ha_page_header_bg()
+  block t_u2jy: block_ha_page_header('Sales and Orders', 'Monitor overall sales performance, order trends, and fulfillment outcomes to understand revenue drivers and operational efficiency.')
+  block t_eknr: TextBlock {
+    content: @md <div style="width: 100%; height: 100%; background: white; border-bottom
+: 2px solid #EDF1F5"></div>;;
+  }
+  block v_vojm: VizBlock {
+    label: 'Orders by status'
+    viz: PieChart {
+      dataset: demo_ecommerce_version_2
+      legend: VizFieldFull {
+        ref: r(ecommerce_orders.status)
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          label: ' '
+          ref: r(ecommerce_orders.total_orders_count)
+        }
+        settings {
+          point {
+            value: 'cancelled'
+            color: '#05264C'
+          }
+          point {
+            value: 'delivered'
+            color: '#00767B'
+          }
+          point {
+            value: 'refunded'
+            color: '#259B6C'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        row_limit: 5000
+        show_percentage: true
+        data_label_position: 'none'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block d_wz7c: DateDrillBlock {
+    label: 'Date Drill'
+  }
+  block v_lwrf: VizBlock {
+    label: 'Orders details copy'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull {
+          label: 'Created Date'
+          ref: r(ecommerce_orders.created_at)
+          transformation: 'datetrunc day'
+          format {
+            type: 'date'
+            pattern: 'LLL dd, yyyy'
+          }
+          uname: 'datetrunc_day_created_at'
+        },
+        VizFieldFull {
+          ref: r(ecommerce_orders.status)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_orders.discount)
+          format {
+            type: 'number'
+            pattern: '#,###%'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_orders.delivery_attempts)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Buyer'
+          ref: r(ecommerce_users.full_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_users.gender)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'datetrunc_day_created_at'
+            width: 157
+          }
+        ]
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block v_3lcg: VizBlock {
+    label: 'Sales metrics'
+    viz: MetricSheet {
+      dataset: demo_ecommerce_version_2
+      theme {
+        table {
+          general {
+            borders {
+              outer: true
+              vertical: true
+              horizontal: true
+              header: true
+            }
+          }
+        }
+      }
+      date_field: VizFieldFull {
+        ref: r(dim_dates.date_key)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      rows: [
+        MetricHeading {
+          label: '🎯 Orders'
+          settings {
+            background_color: '#F5F8FA'
+            text_color: '#05264CFF'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_orders)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_cancelled_orders)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_refunded_orders)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_delivered_orders)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricHeading {
+          label: '💰 Transaction Value'
+          settings {
+            background_color: '#F5F8FA'
+            text_color: '#05264C'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.nmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.aov)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_ccr8: block_ha_card()
+  view: TabLayout {
+    label: 'View 1'
+    tab tab_5dpo: CanvasLayout {
+      label: 'Overview'
+      width: 1260
+      height: 2130
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.9
+    }
+    tab tab1: CanvasLayout {
+      label: 'Users'
+      width: 1260
+      height: 1970
+      default_zoom: 0.9
+    }
+    tab tab4: CanvasLayout {
+      label: 'Products'
+      width: 1260
+      height: 1510
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.9
+    }
+    tab tab_9iqj: CanvasLayout {
+      label: 'Sales & Orders'
+      width: 1260
+      height: 1370
+      block f_4l6c {
+        position: pos(40, 240, 300, 60)
+        layer: 2
+      }
+      block t_5i9z {
+        position: pos(0, 710, 1280, 20)
+        layer: 1
+      }
+      block v_5w08 {
+        position: pos(40, 340, 740, 370)
+        layer: 9
+      }
+      block t_5l6d {
+        position: pos(40, 30, 140, 40)
+        layer: 1
+      }
+      block t_4khz {
+        position: pos(0, 0, 1260, 220)
+      }
+      block t_u2jy {
+        position: pos(40, 80, 650, 100)
+        layer: 19
+      }
+      block t_eknr {
+        position: pos(-20, 200, 1300, 120)
+        layer: -1
+      }
+      block v_vojm {
+        position: pos(800, 340, 420, 370)
+        layer: 1
+      }
+      block d_wz7c {
+        position: pos(350, 240, 300, 70)
+        layer: 9
+      }
+      block v_lwrf {
+        position: pos(40, 730, 1180, 580)
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.9
+    }
+    tab tab6: CanvasLayout {
+      label: 'Dictionary'
+      width: 1260
+      height: 1370
+      block f3 {
+        position: pos(40, 240, 300, 60)
+        layer: 2
+      }
+      block t22 {
+        position: pos(0, 710, 1280, 20)
+        layer: 1
+      }
+      block v44 {
+        position: pos(40, 340, 740, 370)
+        layer: 9
+      }
+      block t_k657 {
+        position: pos(40, 30, 140, 40)
+        layer: 1
+      }
+      block t_zbx8 {
+        position: pos(0, 0, 1260, 220)
+      }
+      block t_f117 {
+        position: pos(40, 80, 650, 100)
+        layer: 19
+      }
+      block t_zbp0 {
+        position: pos(-20, 200, 1300, 120)
+        layer: -1
+      }
+      block v_wtl8 {
+        position: pos(800, 340, 420, 370)
+        layer: 1
+      }
+      block d_date_drill {
+        position: pos(350, 240, 300, 70)
+        layer: 9
+      }
+      block v_3lcg {
+        position: pos(70, 760, 1110, 470)
+        layer: 43
+      }
+      block t_ccr8 {
+        position: pos(40, 730, 1180, 530)
+        layer: 36
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.9
+    }
+    tab tab_dstw: CanvasLayout {
+      label: 'Metrics Tree'
+      width: 1260
+      height: 1480
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f3'
+      to: [
+        CustomMapping {
+          block: [
+            'v_5w08',
+            'v_vojm',
+            'v_lwrf',
+            'v_3lcg',
+            'f_4l6c'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v44'
+      to: [
+        CustomMapping {
+          block: [
+            'v_5w08',
+            'v_vojm',
+            'v_lwrf',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v52a'
+      to: [
+        CustomMapping {
+          block: [
+            'v_lwrf',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v53a'
+      to: [
+        CustomMapping {
+          block: [
+            'v_lwrf',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_wtl8'
+      to: [
+        CustomMapping {
+          block: [
+            'v_5w08',
+            'v_vojm',
+            'v_lwrf',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_4l6c'
+      to: [
+        CustomMapping {
+          block: [
+            'v44',
+            'v_wtl8',
+            'v_3lcg',
+            'f3'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_5w08'
+      to: [
+        CustomMapping {
+          block: [
+            'v44',
+            'v_wtl8',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_vojm'
+      to: [
+        CustomMapping {
+          block: [
+            'v44',
+            'v_wtl8',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_lwrf'
+      to: [
+        CustomMapping {
+          block: [
+            'v44',
+            'v52a',
+            'v53a',
+            'v_wtl8',
+            'v_3lcg'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_3lcg'
+      to: [
+        CustomMapping {
+          block: [
+            'v44',
+            'v52a',
+            'v53a',
+            'v_wtl8',
+            'v_5w08',
+            'v_vojm',
+            'v_lwrf'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    DateDrillInteraction {
+      from: 'd_wz7c'
+      to: [
+        CustomMapping {
+          block: 'v_5w08'
+          field: r(ecommerce_orders.created_at)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_1fyo'
+      to: [
+
+      ]
+    },
+    DateDrillInteraction {
+      from: 'd_date_drill'
+      to: [
+        CustomMapping {
+          block: 'v44'
+          field: r(ecommerce_orders.created_at)
+        },
+        CustomMapping {
+          block: 'v_3lcg'
+          field: ref('dim_dates', 'date_key')
+        }
+      ]
+    }
+  ]
+  theme: holistics_ant
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}
