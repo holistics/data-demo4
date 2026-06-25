@@ -638,6 +638,17 @@ Dashboard company_dashboard_v2 {
     label: 'Products Listed'
     viz: MetricKpi {
       dataset: demo_ecommerce_version_2
+      theme {
+        metric_kpi {
+          label {
+            font_color: '#05264c'
+            font_size: 18
+          }
+          value {
+            font_color: '#05264C'
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Products Listed'
         ref: r(ecommerce_products.total_products)
@@ -653,14 +664,6 @@ Dashboard company_dashboard_v2 {
         aggregate_awareness {
           enabled: true
           debug_comments: true
-        }
-        label {
-          font_size: 18
-          font_color: '#05264c'
-        }
-        alignment: 'left'
-        metric_value {
-          font_color: '#05264C'
         }
       }
     }
@@ -2647,7 +2650,7 @@ background: #EFF6FF;
         layer: 1
       }
       block v_5ty3 {
-        position: pos(60, 380, 190, 120)
+        position: pos(50, 380, 190, 120)
         layer: 2
       }
       block v_hkuz {
