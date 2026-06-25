@@ -20,6 +20,9 @@ Dashboard pied_piper_country_breakdown_tpmdo {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -34,13 +37,16 @@ Dashboard pied_piper_country_breakdown_tpmdo {
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -586,6 +592,9 @@ Dashboard pied_piper_country_breakdown_tpmdo {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -767,15 +776,15 @@ Dashboard pied_piper_country_breakdown_tpmdo {
       to: [
         CustomMapping {
           block: 'v3'
-          field: ref('ecommerce_products', 'created_at')
+          field: r(ecommerce_products.created_at)
         },
         CustomMapping {
           block: 'v4'
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         },
         CustomMapping {
           block: 'v5'
-          field: ref('ecommerce_orders', 'created_date')
+          field: r(ecommerce_orders.created_date)
         }
       ]
     }
