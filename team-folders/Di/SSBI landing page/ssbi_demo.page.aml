@@ -845,30 +845,28 @@ Dashboard ssbi_demo {
       ]
     },
     DateDrillInteraction {
-      from: 'd_wz7c'
-      to: [
-        CustomMapping {
-          block: 'v_5w08'
-          field: r(ecommerce_orders.created_at)
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_1fyo'
-      to: [
-
-      ]
-    },
-    DateDrillInteraction {
       from: 'd_date_drill'
       to: [
         CustomMapping {
           block: 'v44'
-          field: r(ecommerce_orders.created_at)
+          field: ref('ecommerce_orders', 'created_at')
         },
         CustomMapping {
           block: 'v_3lcg'
           field: ref('dim_dates', 'date_key')
+        }
+      ]
+    },
+    DateDrillInteraction {
+      from: 'd_wz7c'
+      to: [
+        CustomMapping {
+          block: 'v_5w08'
+          field: ref('ecommerce_orders', 'created_at')
+        },
+        CustomMapping {
+          block: 'v_lwrf'
+          field: ref('ecommerce_orders', 'created_at')
         }
       ]
     }
