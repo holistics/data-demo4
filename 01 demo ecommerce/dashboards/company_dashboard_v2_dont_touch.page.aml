@@ -2494,6 +2494,35 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     label: 'Date Drill'
     default: 'month'
   }
+  block v_938c: VizBlock {
+    label: 'Count of Merchants Id'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation count_of_merchants_id {
+        label: 'Count of Merchants Id'
+        formula: @aql count(ecommerce_merchants.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: 'count_of_merchants_id'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   view: TabLayout {
     label: 'View 1'
     tab tab_5dpo: CanvasLayout {
@@ -2871,6 +2900,19 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       }
       block t_853s {
         position: pos(0, 0, 1260, 220)
+      }
+    }
+    tab tab_1nwe: CanvasLayout {
+      label: 'More'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      block v_938c {
+        position: pos(20, 20, 620, 420)
+      }
+      mobile {
+        mode: 'auto'
       }
     }
   }
