@@ -293,7 +293,7 @@ Dashboard ssbi_demo {
         }
         series {
           field: VizFieldFull {
-            label: ' '
+            label: ' GMV'
             ref: r(demo_ecommerce_version_2.gmv)
             format {
               type: 'number'
