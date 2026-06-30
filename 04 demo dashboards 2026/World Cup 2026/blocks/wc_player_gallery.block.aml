@@ -122,6 +122,14 @@ Func wc_player_gallery() {
         operator: 'greater_than'
         value: 0
       }
+      // Top 24 by goal contributions via a 24th-rank filter — row_limit is dropped on MarkdownViz
+      // shareable links. The goal_contributions>0 guard above stops zero-contribution players
+      // (collapsed into one tie rank) from flooding the wall on ties.
+      filter {
+        field: r(wc_player_stats.ga_rank)
+        operator: 'less_than'
+        value: 25
+      }
       rows: [
         VizFieldFull { label: 'Pid' ref: r(wc_player_stats.fifa_player_id) },
         VizFieldFull { label: 'Name' ref: r(wc_player_stats.name) },
@@ -212,7 +220,6 @@ button.fut { appearance:none; -webkit-appearance:none; border:none; padding:0; f
           SortSetting { key: 'goals' direction: 'desc' }
         ]
         pagination_size: 24
-        row_limit: 24
       }
     }
   }

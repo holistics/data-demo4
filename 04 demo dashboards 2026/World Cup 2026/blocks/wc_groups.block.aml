@@ -143,7 +143,6 @@ Func wc_third_place_board() {
           }
         ]
         pagination_size: 12
-        row_limit: 12
       }
     }
   }

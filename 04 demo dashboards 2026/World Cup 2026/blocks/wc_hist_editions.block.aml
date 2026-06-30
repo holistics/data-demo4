@@ -224,7 +224,6 @@ Func wc_hist_editions() {
           }
         ]
         pagination_size: 30
-        row_limit: 30
       }
     }
   }
