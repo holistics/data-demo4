@@ -86,7 +86,6 @@ Func wc_knockout_round(stage: String, title: String, rd: String, n: Number) {
           }
         ]
         pagination_size: n
-        row_limit: n
       }
     }
   }
@@ -266,7 +265,6 @@ Func wc_knockout_final() {
           }
         ]
         pagination_size: 1
-        row_limit: 1
       }
     }
   }

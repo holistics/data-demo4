@@ -42,6 +42,14 @@ Func wc_hist_champions() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // Hall of champions = the nations that have actually won (exactly 8). Filtering on wc_titles>0
+      // is both the correct definition and shareable-safe; row_limit is dropped on MarkdownViz
+      // shareable links, and without this guard every nation that ever played would render.
+      filter {
+        field: r(worldcup.wc_titles)
+        operator: 'greater_than'
+        value: 0
+      }
       rows: [
         VizFieldFull {
           label: 'Team'
@@ -222,7 +230,6 @@ Func wc_hist_champions() {
           }
         ]
         pagination_size: 8
-        row_limit: 8
       }
     }
   }
@@ -382,7 +389,6 @@ Func wc_hist_roll() {
           }
         ]
         pagination_size: 22
-        row_limit: 22
       }
     }
   }
@@ -395,6 +401,21 @@ Func wc_hist_pedigree() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // Top 12 nations by all-time pedigree. row_limit is dropped on MarkdownViz shareable links, so
+      // the cap lives in the query as a Top-12 rank on the pedigree_score metric (aggregation 'custom'
+      // uses the metric's own definition). Without it every nation that ever played would render.
+      filter {
+        field: r(wc_team_aliases.entity_name)
+        operator: 'top'
+        value: 12
+        options {
+          rank_by {
+            field: r(worldcup.pedigree_score)
+            aggregation: 'custom'
+            logic: 'standard'
+          }
+        }
+      }
       rows: [
         VizFieldFull {
           label: 'Team'
@@ -590,7 +611,6 @@ Func wc_hist_pedigree() {
           }
         ]
         pagination_size: 12
-        row_limit: 12
       }
     }
   }

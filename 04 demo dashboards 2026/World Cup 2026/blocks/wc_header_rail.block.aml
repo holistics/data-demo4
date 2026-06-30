@@ -425,7 +425,6 @@ button.stk { appearance:none; -webkit-appearance:none; border:none; font:inherit
           }
         ]
         pagination_size: 6
-        row_limit: 6
       }
     }
   }
