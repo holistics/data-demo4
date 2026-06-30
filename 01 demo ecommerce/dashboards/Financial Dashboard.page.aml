@@ -1,6 +1,6 @@
 @tag('Endorsed')
 Dashboard finance_dashboard {
-  title: 'Executive Dashboard'
+  title: 'Finance Dashboard'
   description: ''
   block t1: TextBlock {
     content: @md <div 
