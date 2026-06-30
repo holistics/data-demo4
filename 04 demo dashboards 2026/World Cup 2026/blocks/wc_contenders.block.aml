@@ -19,6 +19,13 @@ Func wc_ci_board() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // Top 10 by title odds via a 10th-rank filter — row_limit is dropped on MarkdownViz shareable
+      // links, so the cap lives in the query. odds_rank is a unique 1..N rank (no tie collapse).
+      filter {
+        field: r(wc_contender_board.odds_rank)
+        operator: 'less_than'
+        value: 11
+      }
       rows: [
         VizFieldFull {
           label: 'OddsRank'
@@ -181,7 +188,6 @@ Func wc_ci_board() {
           }
         ]
         pagination_size: 10
-        row_limit: 10
       }
     }
   }
@@ -348,7 +354,6 @@ Func wc_ci_ladder() {
           }
         ]
         pagination_size: 6
-        row_limit: 6
       }
     }
   }

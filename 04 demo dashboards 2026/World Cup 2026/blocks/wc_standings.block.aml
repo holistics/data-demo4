@@ -99,7 +99,6 @@ Func wc_group_standings_card(grp: String) {
           }
         ]
         pagination_size: 4
-        row_limit: 4
       }
     }
   }

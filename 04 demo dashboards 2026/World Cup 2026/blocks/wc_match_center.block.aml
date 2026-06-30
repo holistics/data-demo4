@@ -161,7 +161,6 @@ Func wc_mc_scoreboard() {
           }
         ]
         pagination_size: 1
-        row_limit: 1
       }
     }
   }
@@ -379,7 +378,6 @@ Func wc_mc_timeline() {
           }
         ]
         pagination_size: 40
-        row_limit: 40
       }
     }
   }
@@ -536,7 +534,6 @@ Func wc_mc_lineup_home() {
           }
         ]
         pagination_size: 26
-        row_limit: 26
       }
     }
   }
@@ -693,7 +690,6 @@ Func wc_mc_lineup_away() {
           }
         ]
         pagination_size: 26
-        row_limit: 26
       }
     }
   }
@@ -934,7 +930,6 @@ Func wc_mc_odds() {
           }
         ]
         pagination_size: 1
-        row_limit: 1
       }
     }
   }
@@ -1118,7 +1113,6 @@ Func wc_mc_formations() {
           }
         ]
         pagination_size: 22
-        row_limit: 22
       }
     }
   }

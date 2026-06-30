@@ -145,9 +145,6 @@ Func wc_hq_rating_move() {
 {% end %}
 </div>
 ;;
-      settings {
-        row_limit: 1
-      }
     }
   }
 }

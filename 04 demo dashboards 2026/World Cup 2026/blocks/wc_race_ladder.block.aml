@@ -60,6 +60,14 @@ Func wc_boot_ladder() {
         operator: 'greater_than'
         value: 0
       }
+      // Top 8 by goals: filter to the 8th rank instead of row_limit (row_limit is dropped on
+      // MarkdownViz shareable links, so the limit must live in the query as a filter). The goals>0
+      // guard above stops zero-goal players (collapsed to one tie rank) from flooding in on ties.
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'less_than'
+        value: 9
+      }
       rows: [
         VizFieldFull { label: 'Rank' ref: r(wc_player_stats.goals_rank) format { type: 'number' pattern: '#,##0' } },
         VizFieldFull { label: 'Name' ref: r(wc_player_stats.name) },
@@ -98,7 +106,6 @@ Func wc_boot_ladder() {
           SortSetting { key: 'goals' direction: 'desc' }
         ]
         pagination_size: 8
-        row_limit: 8
       }
     }
   }
@@ -115,6 +122,13 @@ Func wc_playmaker_ladder() {
         field: r(wc_player_stats.assists)
         operator: 'greater_than'
         value: 0
+      }
+      // Top 8 by assists via 8th-rank filter (see Golden Boot above) — row_limit is not honoured on
+      // MarkdownViz shareable links; the assists>0 guard prevents zero-assist tie flooding.
+      filter {
+        field: r(wc_player_stats.assists_rank)
+        operator: 'less_than'
+        value: 9
       }
       rows: [
         VizFieldFull { label: 'Rank' ref: r(wc_player_stats.assists_rank) format { type: 'number' pattern: '#,##0' } },
@@ -154,7 +168,6 @@ Func wc_playmaker_ladder() {
           SortSetting { key: 'assists' direction: 'desc' }
         ]
         pagination_size: 8
-        row_limit: 8
       }
     }
   }

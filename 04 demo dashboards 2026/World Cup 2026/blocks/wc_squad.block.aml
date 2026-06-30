@@ -146,7 +146,6 @@ Func wc_squad_section(pos: String, color: String, title: String) {
           }
         ]
         pagination_size: 15
-        row_limit: 15
       }
     }
   }

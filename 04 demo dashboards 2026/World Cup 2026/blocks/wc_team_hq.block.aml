@@ -158,7 +158,6 @@ Func wc_hq_banner() {
 ;;
       settings {
         pagination_size: 1
-        row_limit: 1
       }
     }
   }
@@ -343,6 +342,20 @@ Func wc_hq_campaigns() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // 10 most recent campaigns via a Top-10 rank on the edition year — row_limit is dropped on
+      // MarkdownViz shareable links, so the cap lives in the query. A team can have up to 22 editions.
+      filter {
+        field: r(wc_history_team_editions.year)
+        operator: 'top'
+        value: 10
+        options {
+          rank_by {
+            field: r(wc_history_team_editions.year)
+            aggregation: 'max'
+            logic: 'standard'
+          }
+        }
+      }
       rows: [
         VizFieldFull {
           label: 'Year'
@@ -462,7 +475,6 @@ Func wc_hq_campaigns() {
           }
         ]
         pagination_size: 10
-        row_limit: 10
       }
     }
   }
@@ -612,7 +624,6 @@ Func wc_hq_next_match() {
 ;;
       settings {
         pagination_size: 1
-        row_limit: 1
       }
     }
   }
@@ -702,7 +713,6 @@ Func wc_hq_h2h() {
           }
         ]
         pagination_size: 12
-        row_limit: 12
       }
     }
   }
@@ -715,6 +725,20 @@ Func wc_hq_alltime_h2h() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // 12 most-played rivals via a Top-12 rank on all-time meetings — row_limit is dropped on
+      // MarkdownViz shareable links, so the cap lives in the query. A team can have ~50 opponents.
+      filter {
+        field: r(wc_history_h2h.opp_code)
+        operator: 'top'
+        value: 12
+        options {
+          rank_by {
+            field: r(wc_history_h2h.played)
+            aggregation: 'sum'
+            logic: 'standard'
+          }
+        }
+      }
       rows: [
         VizFieldFull {
           label: 'Opp'
@@ -884,7 +908,6 @@ Func wc_hq_alltime_h2h() {
           }
         ]
         pagination_size: 12
-        row_limit: 12
       }
     }
   }
