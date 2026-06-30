@@ -290,7 +290,6 @@ Func wc_advance_board() {
           }
         ]
         pagination_size: 48
-        row_limit: 48
       }
     }
   }

@@ -221,7 +221,6 @@ Func wc_hq_pulse() {
           }
         ]
         pagination_size: 8
-        row_limit: 8
       }
     }
   }

@@ -120,6 +120,21 @@ Func wc_match_cards() {
         operator: 'is'
         value: true
       }
+      // Soonest 12 upcoming fixtures. row_limit is dropped on MarkdownViz shareable links, so the
+      // cap lives in the query as a Bottom-12 rank on kickoff (earliest 12), matching the kickoff-asc
+      // sort below. The band already excludes finished + featured matches.
+      filter {
+        field: r(wc_matches.match_num)
+        operator: 'bottom'
+        value: 12
+        options {
+          rank_by {
+            field: r(wc_matches.kickoff_utc)
+            aggregation: 'min'
+            logic: 'standard'
+          }
+        }
+      }
       rows: [
         VizFieldFull {
           label: 'MatchNum'
@@ -348,7 +363,6 @@ Func wc_match_cards() {
           }
         ]
         pagination_size: 12
-        row_limit: 12
         aggregate_awareness {
           enabled: true
           debug_comments: true
@@ -594,7 +608,6 @@ Func wc_featured_match() {
             direction: 'asc'
           }
         ]
-        row_limit: 1
         aggregate_awareness {
           enabled: true
           debug_comments: true
@@ -614,6 +627,19 @@ Func wc_boot_podium() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // Top 3 scorers via a 3rd-rank filter (not row_limit — that is dropped on MarkdownViz
+      // shareable links). The goals>0 guard stops zero-goal players (collapsed into one tie rank)
+      // from flooding the podium before anyone has scored.
+      filter {
+        field: r(wc_player_stats.goals)
+        operator: 'greater_than'
+        value: 0
+      }
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'less_than'
+        value: 4
+      }
       rows: [
         VizFieldFull {
           label: 'Scorer'
@@ -708,7 +734,6 @@ Func wc_boot_podium() {
           }
         ]
         pagination_size: 3
-        row_limit: 3
         aggregate_awareness {
           enabled: true
           debug_comments: true
@@ -725,10 +750,23 @@ Func wc_boot_rack() {
     }
     viz: MarkdownViz {
       dataset: worldcup
+      // The chasing pack = ranks 4–10. Bound both ends with rank filters (row_limit is dropped on
+      // MarkdownViz shareable links). The goals>0 guard is essential: zero-goal players collapse into
+      // one shared tie rank, which can fall inside 4–10 when few have scored and would flood the rack.
+      filter {
+        field: r(wc_player_stats.goals)
+        operator: 'greater_than'
+        value: 0
+      }
       filter {
         field: r(wc_player_stats.goals_rank)
         operator: 'greater_than'
         value: 3
+      }
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'less_than'
+        value: 11
       }
       rows: [
         VizFieldFull {
@@ -804,7 +842,6 @@ Func wc_boot_rack() {
           }
         ]
         pagination_size: 7
-        row_limit: 7
         aggregate_awareness {
           enabled: true
           debug_comments: true
