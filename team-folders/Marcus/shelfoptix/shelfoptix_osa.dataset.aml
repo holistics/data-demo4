@@ -1,0 +1,109 @@
+Dataset shelfoptix_osa {
+  label: 'ShelfOptix OSA/OOS'
+  description: 'On-Shelf Availability / Out-of-Stock semantic layer over ShelfOptix robot/store shelf scans. Defaults (pending customer confirm): tenant = project_id_no, OOS = stocking_quantity 0, OSA = observed availability (share of scanned facings in stock), grain = primary_sku_no.'
+  data_source_name: 'demodb'
+  models: [
+    shelfoptix_store_scan_sample,
+    shelfoptix_dim_store_sample,
+    shelfoptix_dim_tenant_sample,
+    shelfoptix_dim_product_sample
+  ]
+  relationships: [
+    relationship(shelfoptix_store_scan_sample.store_no > shelfoptix_dim_store_sample.store_no, true),
+    relationship(shelfoptix_store_scan_sample.project_id_no > shelfoptix_dim_tenant_sample.project_id_no, true),
+    relationship(shelfoptix_store_scan_sample.primary_sku_no > shelfoptix_dim_product_sample.primary_sku_no, true)
+  ]
+
+  // ---- helper row-level flags (0/1) so aggregates stay simple & portable ----
+  dimension is_oos {
+    label: 'Is OOS'
+    type: 'number'
+    description: '1 when the scanned facing had zero shelf quantity.'
+    definition: @aql case(when: shelfoptix_store_scan_sample.stocking_quantity == 0, then: 1, else: 0) ;;
+    model: shelfoptix_store_scan_sample
+  }
+  dimension is_in_stock {
+    label: 'Is In Stock'
+    type: 'number'
+    description: '1 when the scanned facing had stock on shelf.'
+    definition: @aql case(when: shelfoptix_store_scan_sample.stocking_quantity > 0, then: 1, else: 0) ;;
+    model: shelfoptix_store_scan_sample
+  }
+  dimension is_upc_mismatch {
+    label: 'Is UPC Mismatch'
+    type: 'number'
+    description: 'Scanned UPC differs from master UPC — possible mislabel / voided slot / misplacement.'
+    definition: @aql case(when: shelfoptix_store_scan_sample.scanned_upc != shelfoptix_store_scan_sample.upc_no, then: 1, else: 0) ;;
+    model: shelfoptix_store_scan_sample
+  }
+
+  // ---- core metrics ----
+  metric total_scans {
+    label: 'Total Scans'
+    type: 'number'
+    description: 'Number of scanned facings/observations.'
+    definition: @aql count(shelfoptix_store_scan_sample.order_line_item_no) ;;
+  }
+  metric oos_count {
+    label: 'OOS Count'
+    type: 'number'
+    description: 'Facings observed out of stock (stocking_quantity = 0).'
+    definition: @aql sum(shelfoptix_store_scan_sample.is_oos) ;;
+  }
+  metric in_stock_count {
+    label: 'In-Stock Count'
+    type: 'number'
+    definition: @aql sum(shelfoptix_store_scan_sample.is_in_stock) ;;
+  }
+  metric oos_rate {
+    label: 'OOS Rate %'
+    type: 'number'
+    description: 'OOS facings / total facings, in percentage points (0-100).'
+    definition: @aql (sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no) ;;
+  }
+  metric availability_rate {
+    label: 'Availability %'
+    type: 'number'
+    description: 'Observed on-shelf availability = 100 - OOS rate (of scanned facings), in percentage points.'
+    definition: @aql 100.0 - ((sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no)) ;;
+  }
+  metric total_units {
+    label: 'Total Units On Shelf'
+    type: 'number'
+    description: 'Sum of observed shelf quantity.'
+    definition: @aql sum(shelfoptix_store_scan_sample.stocking_quantity) ;;
+  }
+  metric stores_scanned {
+    label: 'Stores Scanned'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_store_scan_sample.store_no) ;;
+  }
+  metric skus_tracked {
+    label: 'SKUs Tracked'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_store_scan_sample.primary_sku_no) ;;
+  }
+  metric tenants_count {
+    label: 'Tenants'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_store_scan_sample.project_id_no) ;;
+  }
+  metric upc_mismatch_count {
+    label: 'UPC Mismatch Count'
+    type: 'number'
+    description: 'Scanned UPC != master UPC (shelf-condition proxy).'
+    definition: @aql sum(shelfoptix_store_scan_sample.is_upc_mismatch) ;;
+  }
+  metric avail_target {
+    label: 'Target %'
+    type: 'number'
+    description: 'Constant availability target (90%). Used as a straight reference line.'
+    definition: @aql (sum(shelfoptix_store_scan_sample.is_oos) * 0.0) + 90.0 ;;
+  }
+  metric avail_gap {
+    label: 'Δ to Target'
+    type: 'number'
+    description: 'Availability % minus 90% target (percentage points). Negative = below target.'
+    definition: @aql 10.0 - ((sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no)) ;;
+  }
+}

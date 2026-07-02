@@ -1,0 +1,868 @@
+Dashboard shelfoptix_osa_overview {
+  title: 'ShelfOptix — OSA / OOS Overview'
+  description: 'Shelf availability story: are we on target (health), where are we losing availability (diagnosis), and what/who to fix (action). OOS = stocking_quantity 0; Availability = 100 - OOS Rate. Enriched via tenant/store/product dimensions.'
+
+  block header: VizBlock {
+    label: 'Header'
+    viz: MarkdownViz {
+      dataset: shelfoptix_osa
+      rows: [
+        VizFieldFull {
+          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      content: @md <div style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(90deg,#B3141A,#E11B22); padding:16px 24px; border-radius:8px; font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;">
+  <div style="display:flex; align-items:center; gap:16px;">
+    <span style="font-size:26px; font-weight:800; color:#ffffff; letter-spacing:-0.5px;">Shelf<span style="color:#ffffff;">◉</span>ptix</span>
+    <span style="width:1px; height:26px; background:rgba(255,255,255,0.45);"></span>
+    <span style="color:#ffffff; font-size:15px; font-weight:600;">Actionable Shelf Intelligence at Scale</span>
+  </div>
+  <div style="color:#ffffff; text-align:right; line-height:1.35;">
+    <div style="font-size:15px; font-weight:700;">OSA / OOS Command Center</div>
+    <div style="font-size:11px; opacity:0.85;">On-Shelf Availability &amp; Out-of-Stock</div>
+  </div>
+</div> ;;
+    }
+    settings {
+      hide_label: true
+    }
+    theme: BlockTheme {
+      padding: 1
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_color: 'transparent'
+        border_width: '0px'
+      }
+    }
+  }
+
+  block intro: TextBlock {
+    content: @md On-shelf availability from ShelfOptix robot & store scans. **Target availability = 90%.**
+
+**OOS** = a facing with `stocking_quantity = 0` · **OOS Rate %** = OOS ÷ scans · **Availability %** = 100 − OOS Rate %.
+
+*Tenant* = customer org · reporting grain = primary SKU.;;
+  }
+
+  block f_date: FilterBlock {
+    label: 'Scan Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_store_scan_sample.order_date)
+    }
+    default {
+      operator: 'matches'
+      value: '2026'
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_tenant: FilterBlock {
+    label: 'Tenant'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_dim_tenant_sample.tenant_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_store_scan_sample.class_description)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_scantype: FilterBlock {
+    label: 'Scan Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_store_scan_sample.order_line_type)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_region: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_dim_store_sample.region)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+
+  block kpi_availability: VizBlock {
+    label: 'Availability %'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.availability_rate)
+        label: 'Availability %'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_gap: VizBlock {
+    label: 'Δ vs Target'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.avail_gap)
+        label: 'Δ vs Target (pts)'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_oos_rate: VizBlock {
+    label: 'OOS Rate %'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.oos_rate)
+        label: 'OOS Rate %'
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_oos_count: VizBlock {
+    label: 'OOS Facings'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.oos_count)
+        label: 'OOS Facings'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_scans: VizBlock {
+    label: 'Total Scans'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.total_scans)
+        label: 'Total Scans'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_stores: VizBlock {
+    label: 'Stores'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.stores_scanned)
+        label: 'Stores'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_skus: VizBlock {
+    label: 'SKUs'
+    viz: MetricKpi {
+      dataset: shelfoptix_osa
+      value: VizFieldFull {
+        ref: r(shelfoptix_osa.skus_tracked)
+        label: 'SKUs'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block sec_health: TextBlock {
+    content: @md ## ① OSA - are we hitting the target?;;
+  }
+
+  block avail_trend: VizBlock {
+    label: 'Availability % vs 90% Target by Week'
+    viz: CombinationChart {
+      dataset: shelfoptix_osa
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_store_scan_sample.order_date)
+        transformation: 'datetrunc week'
+        format {
+          type: 'date'
+          pattern: 'LLL dd'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(shelfoptix_osa.availability_rate)
+            label: 'Availability %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color: '#10b981'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(shelfoptix_osa.avail_target)
+            label: 'Target 90%'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings {
+            color: '#9ca3af'
+            line_interpolation: 'linear'
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        legend_label: 'top'
+      }
+    }
+  }
+
+  block scan_coverage: VizBlock {
+    label: 'Scan Coverage by Type'
+    viz: ColumnChart {
+      dataset: shelfoptix_osa
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_store_scan_sample.order_line_type)
+        label: 'Scan Type'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_osa.total_scans)
+            label: 'Scans'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings {
+            color: '#6366f1'
+          }
+        }
+      }
+    }
+  }
+  block avail_by_tenant: VizBlock {
+    label: 'Tenant Availability'
+    viz: DataTable {
+      dataset: shelfoptix_osa
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
+          format {
+            type: 'text'
+          }
+          uname: 'ts_tenant'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.stores_scanned)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'ts_stores'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.total_scans)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'ts_scans'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.availability_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+          uname: 'ts_avail'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.avail_gap)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+          uname: 'ts_gap'
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'ts_avail'
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'ts_avail'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 90
+              }
+              text_color: '#259B6C'
+              background_color: '#00000000'
+            }
+          },
+          ConditionalFormat {
+            key: 'ts_gap'
+            format: SingleFormat {
+              condition {
+                operator: 'less_than'
+                value: 0
+              }
+              text_color: '#BF0E08'
+              background_color: '#00000000'
+            }
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block sec_where: TextBlock {
+    content: @md ## ② OOS - Where are we losing availability?;;
+  }
+
+  block oos_by_category: VizBlock {
+    label: 'OOS Rate % by Category'
+    viz: ColumnChart {
+      dataset: shelfoptix_osa
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_store_scan_sample.class_description)
+        label: 'Category'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_osa.oos_rate)
+            label: 'OOS Rate %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+    }
+  }
+
+  block oos_by_region: VizBlock {
+    label: 'OOS Rate % by Region'
+    viz: ColumnChart {
+      dataset: shelfoptix_osa
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_dim_store_sample.region)
+        label: 'Region'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_osa.oos_rate)
+            label: 'OOS Rate %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+    }
+  }
+
+  block oos_by_banner: VizBlock {
+    label: 'OOS Rate % by Retailer Banner'
+    viz: ColumnChart {
+      dataset: shelfoptix_osa
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_dim_store_sample.retailer_banner)
+        label: 'Retailer Banner'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_osa.oos_rate)
+            label: 'OOS Rate %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+    }
+  }
+
+  block top_oos_skus: VizBlock {
+    label: 'Top OOS SKUs — replenishment shortlist'
+    viz: DataTable {
+      dataset: shelfoptix_osa
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_store_scan_sample.primary_sku_description)
+          format {
+            type: 'text'
+          }
+          uname: 'sku_name'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_dim_product_sample.brand)
+          format {
+            type: 'text'
+          }
+          uname: 'sku_brand'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_store_scan_sample.class_description)
+          format {
+            type: 'text'
+          }
+          uname: 'sku_cat'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.oos_count)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'sku_oos'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.oos_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+          uname: 'sku_oos_rate'
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'sku_oos'
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'sku_oos_rate'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 15
+              }
+              text_color: '#BF0E08'
+              background_color: '#00000000'
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  block store_detail: VizBlock {
+    label: 'Store Detail — worst first'
+    viz: DataTable {
+      dataset: shelfoptix_osa
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
+          format {
+            type: 'text'
+          }
+          uname: 'sd_tenant'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_dim_store_sample.store_name)
+          format {
+            type: 'text'
+          }
+          uname: 'sd_store'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_dim_store_sample.region)
+          format {
+            type: 'text'
+          }
+          uname: 'sd_region'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.oos_count)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'sd_oos'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.oos_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+          uname: 'sd_oos_rate'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_osa.availability_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+          uname: 'sd_avail'
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'sd_oos_rate'
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'sd_oos_rate'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 15
+              }
+              text_color: '#BF0E08'
+              background_color: '#00000000'
+            }
+          },
+          ConditionalFormat {
+            key: 'sd_avail'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 90
+              }
+              text_color: '#259B6C'
+              background_color: '#00000000'
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  theme: shelfoptix
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    grid_size: 20
+    auto_expand_vertically: true
+    block header {
+      position: pos(20, 20, 1260, 66)
+    }
+    block intro {
+      position: pos(20, 96, 1260, 130)
+    }
+    block f_date {
+      position: pos(20, 240, 240, 80)
+      layer: 1
+    }
+    block f_tenant {
+      position: pos(280, 240, 240, 80)
+      layer: 1
+    }
+    block f_category {
+      position: pos(540, 240, 220, 80)
+      layer: 1
+    }
+    block f_scantype {
+      position: pos(780, 240, 240, 80)
+      layer: 1
+    }
+    block f_region {
+      position: pos(1040, 240, 240, 80)
+      layer: 1
+    }
+    block kpi_availability {
+      position: pos(20, 340, 160, 80)
+      layer: 2
+    }
+    block kpi_gap {
+      position: pos(200, 340, 160, 80)
+      layer: 2
+    }
+    block kpi_oos_rate {
+      position: pos(380, 340, 160, 80)
+      layer: 2
+    }
+    block kpi_oos_count {
+      position: pos(560, 340, 160, 80)
+      layer: 2
+    }
+    block kpi_scans {
+      position: pos(740, 340, 180, 80)
+      layer: 2
+    }
+    block kpi_stores {
+      position: pos(940, 340, 160, 80)
+      layer: 2
+    }
+    block kpi_skus {
+      position: pos(1120, 340, 160, 80)
+      layer: 2
+    }
+    block sec_health {
+      position: pos(20, 440, 1260, 80)
+      layer: 3
+    }
+    block avail_trend {
+      position: pos(20, 540, 820, 300)
+      layer: 4
+    }
+    block scan_coverage {
+      position: pos(860, 540, 420, 300)
+      layer: 4
+    }
+    block avail_by_tenant {
+      position: pos(20, 860, 1260, 200)
+      layer: 4
+    }
+    block sec_where {
+      position: pos(20, 1080, 1260, 80)
+      layer: 5
+    }
+    block oos_by_category {
+      position: pos(20, 1180, 400, 300)
+      layer: 6
+    }
+    block oos_by_region {
+      position: pos(440, 1180, 400, 300)
+      layer: 6
+    }
+    block oos_by_banner {
+      position: pos(860, 1180, 420, 300)
+      layer: 6
+    }
+    block top_oos_skus {
+      position: pos(20, 1500, 620, 340)
+      layer: 8
+    }
+    block store_detail {
+      position: pos(660, 1500, 620, 340)
+      layer: 8
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+    height: 1860
+  }
+}
