@@ -140,6 +140,7 @@ Rules:
 - State what's translated vs. not (esp. dimension **data values**, which stay in source language
   unless case-mapped dimensions are added — offer that as a follow-up).
 
+<<<<<<< HEAD
 ## Quick reference — what to translate where (all via `.extend()`)
 | Text | Override point | How |
 |---|---|---|
@@ -151,3 +152,14 @@ Rules:
 | metrics catalog Name/Description | `block X.extend({ … })` | `${dict('cat_x_name')('spa')}` + `cat_*` keys |
 | dataset/metric inherited labels | `Dataset <orig>_<lang> = <orig>.extend({ metric x { label } })` | point blocks at extended dataset |
 | dimension data values (US, delivered, …) | model/dataset | case-mapped dimension (separate task) |
+=======
+## Quick reference — what to translate where
+| Text | Where | How |
+|---|---|---|
+| title, block/field/filter labels, metric headings | dashboard | `dict('k')('spa')` |
+| heading/page-header Func args | dashboard | `block_ha_heading(dict('k')('spa'))` |
+| chart axis/legend/series name with no explicit label | dashboard | add `label: dict('k')('spa')` (re-declare arrays fully) |
+| MarkdownViz prose | `content:` | `${dict('k')('spa')}`, keep `{{ }}` bindings |
+| metrics catalog Name/Description | localized catalog block | `${dict('cat_x_name')('spa')}` + `cat_*` keys |
+| dimension data values (US, delivered, …) | model/dataset | case-mapped dimension (separate task) |
+>>>>>>> origin/dong-ln-dev
