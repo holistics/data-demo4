@@ -1,0 +1,145 @@
+Model shelfoptix_store_scan_sample {
+  type: 'table'
+  label: 'Shelfoptix store scan sample'
+  description: ''
+  data_source_name: 'demodb'
+  dimension project_id_no {
+    label: 'Project id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.project_id_no }};;
+  }
+  dimension store_id_no {
+    label: 'Store id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_id_no }};;
+  }
+  dimension store_no {
+    label: 'Store no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_no }};;
+  }
+  dimension order_control_id_no {
+    label: 'Order control id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_control_id_no }};;
+  }
+  dimension scanned_upc {
+    label: 'Scanned upc'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.scanned_upc }};;
+  }
+  dimension order_date {
+    label: 'Order date'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+  dimension order_line_item_no {
+    label: 'Order line item no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_line_item_no }};;
+  }
+  dimension order_line_type {
+    label: 'Order line type'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_line_type }};;
+  }
+  dimension upc_no {
+    label: 'Upc no'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.upc_no }};;
+  }
+  dimension class_id_no {
+    label: 'Class id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.class_id_no }};;
+  }
+  dimension class_description {
+    label: 'Class description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.class_description }};;
+  }
+  dimension primary_sku_no {
+    label: 'Primary sku no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_sku_no }};;
+  }
+  dimension primary_sku_description {
+    label: 'Primary sku description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_sku_description }};;
+  }
+  dimension item_sku_no {
+    label: 'Item sku no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.item_sku_no }};;
+  }
+  dimension item_sku_description {
+    label: 'Item sku description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.item_sku_description }};;
+  }
+  dimension stocking_quantity {
+    label: 'Stocking quantity'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.stocking_quantity }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'shelfoptix_store_scan_sample_1000.csv'
+    uploaded_at: '2026-07-02 03:42:09'
+    hash: '0aa4407dd2b05dbc2493793c0c98efe01e2d565a2b8c231375d398e20ff0d60e'
+    column_configs: [
+      H.imports.column_config("project_id_no", "project_id_no", "number"),
+      H.imports.column_config("store_id_no", "store_id_no", "number"),
+      H.imports.column_config("store_no", "store_no", "number"),
+      H.imports.column_config("order_control_id_no", "order_control_id_no", "number"),
+      H.imports.column_config("scanned_upc", "scanned_upc", "text"),
+      H.imports.column_config("order_date", "order_date", "datetime"),
+      H.imports.column_config("order_line_item_no", "order_line_item_no", "number"),
+      H.imports.column_config("order_line_type", "order_line_type", "text"),
+      H.imports.column_config("upc_no", "upc_no", "text"),
+      H.imports.column_config("class_id_no", "class_id_no", "number"),
+      H.imports.column_config("class_description", "class_description", "text"),
+      H.imports.column_config("primary_sku_no", "primary_sku_no", "number"),
+      H.imports.column_config("primary_sku_description", "primary_sku_description", "text"),
+      H.imports.column_config("item_sku_no", "item_sku_no", "number"),
+      H.imports.column_config("item_sku_description", "item_sku_description", "text"),
+      H.imports.column_config("stocking_quantity", "stocking_quantity", "number")
+    ]
+  }
+  owner: 'dong.ln@holistics.io'
+  table_name: '"demo_shelfoptix"."holistics_shelfoptix_st_70025_202607020342"'
+}
