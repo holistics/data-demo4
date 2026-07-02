@@ -1,0 +1,902 @@
+// Tournament tab blocks. Styling lives in theme wc_pitch_day; shared keyframes in header_rail.
+// (Group standings cards = wc_group_standings_card; knockout = wc_knockout_*.)
+
+Func wc_jumbotron() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      values: [
+        VizFieldFull {
+          ref: r(worldcup.avg_attendance)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          ref: r(worldcup.matches_played)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          ref: r(worldcup.total_matches)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          ref: r(worldcup.total_goals)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          ref: r(worldcup.goals_per_match)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          ref: r(worldcup.hist_goals_per_match_modern)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        }
+      ]
+      content: @md
+<style>
+/* mounted stadium board: centered + narrower than the pitch (so the LED text reads big), tilted in 3D,
+   chrome bezel on mounting arms. Side/bottom padding keeps the tilt + shadow inside the clipped block. */
+.wc-jumbo { display:flex; justify-content:center; padding:18px 16px 24px; }
+.wc-jumbo-bezel { position:relative; width:min(1040px,100%); border-radius:14px; padding:11px;
+  background:linear-gradient(180deg, var(--board-bezel-a), var(--board-bezel-b));
+  box-shadow:0 14px 26px -14px rgba(0,0,0,.6), 0 3px 0 rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 5px rgba(0,0,0,.22);
+  transform:perspective(1400px) rotateX(5deg); transform-origin:top center; }
+/* metal mounting arms hanging the board */
+.wc-jumbo-bezel::before, .wc-jumbo-bezel::after { content:""; position:absolute; top:-15px; width:8px; height:17px;
+  background:linear-gradient(180deg,#9aa6ab,#5e696e); border-radius:3px 3px 0 0; }
+.wc-jumbo-bezel::before { left:24%; }
+.wc-jumbo-bezel::after { right:24%; }
+.wc-jumbo-screen { position:relative; border-radius:8px; overflow:hidden; padding:14px 26px;
+  background:radial-gradient(120% 140% at 50% -20%, rgba(120,255,180,.18), transparent 55%), var(--board-bg);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 40px rgba(0,0,0,.6);
+  animation: wc-power-on .6s ease-out .2s 1; }
+/* jumbotron "power on" flicker — keyframe lives in the theme (shared by all LED boards) */
+@media (prefers-reduced-motion: reduce) { .wc-jumbo-screen { animation:none; } }
+.wc-jumbo-screen::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); }
+.wc-jumbo-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; position:relative; }
+.wc-jumbo-title { font-family:var(--font-disp); font-weight:700; text-transform:uppercase; letter-spacing:.14em;
+  font-size:15px; color:var(--board-ink); text-shadow:0 0 10px var(--board-glow); }
+.wc-jumbo-asof { font-size:11px; color:rgba(234,255,242,.72); letter-spacing:.02em; }
+.wc-kpis { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; position:relative; }
+.wc-kpi { text-align:center; padding:4px 2px; }
+.wc-kpi .v { font-family:var(--font-disp); font-weight:800; font-size:52px; line-height:.92; color:var(--gold-2);
+  text-shadow:0 0 16px var(--board-glow), 0 2px 0 rgba(0,0,0,.45); }
+.wc-kpi .v:empty::after { content:"0"; }
+.wc-kpi .v small { font-size:.5em; color:rgba(234,255,242,.6); font-weight:700; }
+.wc-kpi .l { font-size:11px; text-transform:uppercase; letter-spacing:.13em; color:rgba(234,255,242,.78); margin-top:6px; }
+/* historical baseline under a KPI — dimmer LED row so the live number stays the headline */
+.wc-kpi .bl { font-size:9.5px; letter-spacing:.08em; color:rgba(234,255,242,.45); margin-top:4px; }
+</style>
+<div class="wc-jumbo"><div class="wc-jumbo-bezel"><div class="wc-jumbo-screen">
+  <div class="wc-jumbo-head">
+    <span class="wc-jumbo-title">Tournament scoreboard</span>
+    <span class="wc-jumbo-asof"><span class="wc-pulse"></span> Group stage · opening day</span>
+  </div>
+  <div class="wc-kpis">
+    <div class="wc-kpi"><div class="v wc-num">{{ rows[0].values.`Matches Played`.formatted }}<small>/{{ rows[0].values.`Total Matches`.formatted }}</small></div><div class="l">Matches played</div></div>
+    <div class="wc-kpi"><div class="v wc-num">{{ rows[0].values.`Total Goals`.formatted }}</div><div class="l">Goals</div></div>
+    <div class="wc-kpi"><div class="v wc-num">{{ rows[0].values.`Goals per Match`.formatted }}</div><div class="l">Goals / match</div><div class="bl wc-num">’98–’22 avg: {{ rows[0].values.`Goals per Match Since 1998`.formatted }}</div></div>
+    <div class="wc-kpi"><div class="v wc-num">{{ rows[0].values.`Average Attendance`.formatted }}</div><div class="l">Avg attendance</div></div>
+  </div>
+</div></div></div>
+;;
+    }
+  }
+}
+
+Func wc_match_cards() {
+  VizBlock {
+    label: 'MatchNum, Home and 12 more'
+    viz: MarkdownViz {
+      dataset: worldcup
+      // "Upcoming fixtures" = matches not yet finished AND not the featured match (the hero above shows
+      // the next match; the band lists the upcoming fixtures after it, so neither shows it twice). Soonest
+      // first (kickoff asc, below), rolling forward to the next 12 as matches play. in_fixture_band carries
+      // both conditions because a viz takes a single inline filter.
+      filter {
+        field: r(wc_matches.in_fixture_band)
+        operator: 'is'
+        value: true
+      }
+      // Soonest 12 upcoming fixtures. row_limit is dropped on MarkdownViz shareable links, so the
+      // cap lives in the query as a Bottom-12 rank on kickoff (earliest 12), matching the kickoff-asc
+      // sort below. The band already excludes finished + featured matches.
+      filter {
+        field: r(wc_matches.match_num)
+        operator: 'bottom'
+        value: 12
+        options {
+          rank_by {
+            field: r(wc_matches.kickoff_utc)
+            aggregation: 'min'
+            logic: 'standard'
+          }
+        }
+      }
+      rows: [
+        VizFieldFull {
+          label: 'MatchNum'
+          ref: r(wc_matches.match_num)
+        },
+        VizFieldFull { label: 'HomeCode' ref: r(wc_home_teams.code) },
+        VizFieldFull { label: 'AwayCode' ref: r(wc_away_teams.code) },
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeFlag'
+          ref: r(wc_home_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'HomeColor'
+          ref: r(wc_home_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayFlag'
+          ref: r(wc_away_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'AwayColor'
+          ref: r(wc_away_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'HomeScore'
+          ref: r(wc_matches.home_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'AwayScore'
+          ref: r(wc_matches.away_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'StatusText'
+          ref: r(wc_matches.status_label)
+        },
+        VizFieldFull {
+          label: 'StatusColor'
+          ref: r(wc_matches.status_color)
+        },
+        VizFieldFull {
+          label: 'Grp'
+          ref: r(wc_matches.group_code)
+        },
+        VizFieldFull {
+          label: 'KO'
+          ref: r(wc_matches.kickoff_utc)
+          hidden: true
+          uname: 'kickoff'
+        },
+        VizFieldFull {
+          label: 'KODay'
+          ref: r(wc_matches.kickoff_day)
+        },
+        VizFieldFull {
+          label: 'KOTime'
+          ref: r(wc_matches.kickoff_time)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_matches.city)
+        },
+        VizFieldFull {
+          label: 'PHome'
+          ref: r(wc_match_odds.p_home_pct)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'PDraw'
+          ref: r(wc_match_odds.p_draw_pct)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull {
+          label: 'PAway'
+          ref: r(wc_match_odds.p_away_pct)
+          format { type: 'number' pattern: '#,##0' }
+        },
+        VizFieldFull { label: 'ExpScore' ref: r(wc_match_odds.exp_score_label) },
+        VizFieldFull { label: 'OddsRun' ref: r(wc_match_odds.run_label) },
+        VizFieldFull { label: 'OddsNote' ref: r(wc_match_odds.status_note) }
+      ]
+      content: @md <style>
+.wc-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0 0 14px; }
+/* fixed 6 cols (not auto-fit) → 12 cards = exactly 2 rows, independent of container-width guesswork.
+   At the 1280px block: card = (1280 − 5×12)/6 ≈ 203px. */
+.match-row { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:12px; }
+.mcard { position:relative; background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid var(--panel-line);
+  border-radius:12px; padding:12px 13px 11px; color:var(--panel-ink); overflow:hidden;
+  box-shadow:0 1px 1px rgba(0,0,0,.18), 0 14px 28px -18px var(--shadow-dir), inset 0 1px 0 rgba(255,255,255,.4); }
+/* team kit colours live on each team row (.mteam border-left), not the card edge */
+.mcard-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:11px; }
+.mbadge { flex:none; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-disp); font-weight:700;
+  font-size:10px; letter-spacing:.07em; text-transform:uppercase; padding:3px 9px; border-radius:999px; color:#fff;
+  box-shadow:0 1px 2px rgba(0,0,0,.18); }
+.mmeta { flex:none; display:flex; flex-direction:column; align-items:flex-end; text-align:right; gap:2px; line-height:1.1; }
+.mmeta .mgrp { font-family:var(--font-disp); font-weight:700; font-size:9px; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--panel-muted); }
+.mmeta .mko { font-size:11px; font-weight:600; color:var(--panel-ink); white-space:nowrap; letter-spacing:.01em; }
+.mmeta .mko .t { color:var(--panel-muted); font-weight:500; }
+.mteam { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 0; min-width:0; }
+.mteam .side { display:flex; align-items:center; gap:8px; min-width:0; line-height:1; }
+.mteam .kit { flex:0 0 auto; align-self:center; display:block; width:4px; height:16px; border-radius:2px; }
+.mcard .mteam .side img { display:block !important; align-self:center !important; margin:0 !important; width:26px !important; height:18px !important; border-radius:2px !important; object-fit:cover; flex:none; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.mteam .tn { align-self:center; line-height:1; font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mteam .sc { font-family:var(--font-disp); font-weight:800; font-size:22px; line-height:1; color:var(--panel-ink); min-width:14px; text-align:right; }
+.mteam .sc:empty::after { content:"–"; color:var(--panel-muted); }
+.mvenue { font-size:10.5px; color:var(--panel-muted); margin-top:8px; display:flex; align-items:center; gap:5px; }
+.mvenue::before { content:""; flex:none; width:7px; height:7px; margin:0 2px 2px 0; background:currentColor; opacity:.7;
+  border-radius:50% 50% 50% 0; transform:rotate(45deg); }
+/* ── motion: fixtures dealt onto the turf — L→R across the top row, then the
+   bottom (12-card stagger). fill:backwards holds each off-stage until its turn
+   then releases, so the hover lift works. */
+.mcard { animation:wc-deal-in .5s cubic-bezier(.2,.7,.3,1) backwards;
+  transition:transform .2s cubic-bezier(.2,.7,.3,1.05), box-shadow .2s ease, border-color .2s ease; }
+.match-row .mcard:nth-child(1){animation-delay:.06s} .match-row .mcard:nth-child(2){animation-delay:.10s}
+.match-row .mcard:nth-child(3){animation-delay:.14s} .match-row .mcard:nth-child(4){animation-delay:.18s}
+.match-row .mcard:nth-child(5){animation-delay:.22s} .match-row .mcard:nth-child(6){animation-delay:.26s}
+.match-row .mcard:nth-child(7){animation-delay:.30s} .match-row .mcard:nth-child(8){animation-delay:.34s}
+.match-row .mcard:nth-child(9){animation-delay:.38s} .match-row .mcard:nth-child(10){animation-delay:.42s}
+.match-row .mcard:nth-child(11){animation-delay:.46s} .match-row .mcard:nth-child(12){animation-delay:.50s}
+.mcard:hover { transform:translateY(-3px); border-color:rgba(12,36,24,.30);
+  box-shadow:0 2px 2px rgba(0,0,0,.2), 0 20px 34px -16px var(--shadow-dir), inset 0 1px 0 rgba(255,255,255,.5); }
+@media (prefers-reduced-motion: reduce) {
+  .mcard { animation:none !important; opacity:1 !important; transform:none !important; }
+  .mcard:hover { transform:none !important; } }
+/* ── match-prediction popover: tap a fixture → the model's win-probability forecast.
+   A floating dark broadcast card (same popover family as the player profile), escaping the
+   card's overflow:hidden via the top layer; kit-coloured probability bar + gold expected score.
+   The overlay button makes the whole card the tap target without disturbing the deal-in stagger. */
+.mcard-hit { position:absolute; inset:0; z-index:3; appearance:none; -webkit-appearance:none; border:none;
+  background:none; padding:0; margin:0; cursor:pointer; border-radius:12px; }
+.mcard-hit:focus-visible { outline:2px solid var(--gold); outline-offset:-2px; }
+.mp-card { margin:auto; border:none; padding:0 0 14px; width:384px; color:#eaf1f8; border-radius:16px; overflow:hidden;
+  background:linear-gradient(180deg,#1b2735,#0e151f);
+  box-shadow:0 26px 52px -18px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(0,0,0,.5); }
+.mp-card::backdrop { background:rgba(8,11,15,.5); }
+@supports (anchor-name:--a) {
+  .mp-card { margin:8px; inset:auto; position-area:top; position-try-fallbacks:flip-block, flip-inline, flip-block flip-inline; } }
+.mp-card:popover-open { animation:mp-in .2s cubic-bezier(.2,.7,.25,1) both; }
+@keyframes mp-in { from { opacity:0; transform:translateY(7px) scale(.96); } to { opacity:1; transform:none; } }
+.mp-hd { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:14px 16px 0; }
+.mp-ey { font-family:var(--font-disp); font-weight:800; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-2); }
+.mp-run { font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:rgba(234,241,248,.5); white-space:nowrap; }
+.mp-mu { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:13px 16px 2px; }
+.mp-side { display:flex; align-items:center; gap:8px; min-width:0; }
+.mp-side.r { justify-content:flex-end; }
+.mp-card .mp-side img { width:30px !important; height:20px !important; border-radius:3px !important; margin:0 !important;
+  display:block !important; object-fit:cover; box-shadow:0 1px 3px rgba(0,0,0,.5); }
+.mp-nm { font-family:var(--font-disp); font-weight:800; font-size:15px; text-transform:uppercase; letter-spacing:.02em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-xg { font-family:var(--font-disp); font-weight:800; font-size:23px; color:var(--gold-2); letter-spacing:.02em; line-height:1; white-space:nowrap; }
+.mp-xg:empty::after { content:"—"; color:rgba(234,241,248,.4); }
+.mp-bar { display:flex; height:8px; border-radius:4px; overflow:hidden; margin:11px 16px 0;
+  background:rgba(255,255,255,.08); box-shadow:inset 0 1px 2px rgba(0,0,0,.4); }
+.mp-bar i { display:block; height:100%; }
+.mp-lg { display:flex; justify-content:space-between; gap:10px; padding:10px 16px 0; }
+.mp-lg .s { display:flex; flex-direction:column; gap:1px; flex:1; }
+.mp-lg .s.h { align-items:flex-start; } .mp-lg .s.d { align-items:center; } .mp-lg .s.a { align-items:flex-end; }
+.mp-lg .pc { font-family:var(--font-disp); font-weight:800; font-size:16px; font-variant-numeric:tabular-nums; }
+.mp-lg .pc::after { content:"%"; font-size:.6em; font-weight:700; color:rgba(234,241,248,.5); margin-left:1px; }
+.mp-lg .pc:empty::after { content:"—"; font-size:1em; }
+.mp-lg .l { font-size:8.5px; letter-spacing:.12em; text-transform:uppercase; color:rgba(234,241,248,.55); white-space:nowrap; }
+.mp-note { font-size:10px; font-style:italic; color:rgba(234,241,248,.5); padding:11px 16px 0; }
+.mp-note:empty { display:none; }
+</style>
+<p class="wc-zone-label">Around midfield · upcoming fixtures</p>
+<div class="match-row">
+{% map(rows) %}
+  <article class="mcard">
+    <button class="mcard-hit" type="button" popovertarget="mp-{{ `MatchNum`.raw }}" style="anchor-name:--mp-{{ `MatchNum`.raw }};" aria-label="Model prediction"></button>
+    <div class="mcard-top">
+      <span class="mbadge" style="background:{{ `StatusColor`.raw }};">{{ `StatusText`.formatted }}</span>
+      <span class="mmeta">
+        <span class="mgrp">Group {{ `Grp`.formatted }}</span>
+        <span class="mko">{{ `KODay`.formatted }} <span class="t">· {{ `KOTime`.formatted }}</span></span>
+      </span>
+    </div>
+    <div class="mteam">
+      <span class="side"><span class="kit" style="background:{{ `HomeColor`.raw }};"></span><img src="{{ `HomeFlag`.raw }}" alt="" /><span class="tn">{{ `Home`.formatted }}</span></span>
+      <span class="sc wc-num">{{ `HomeScore`.formatted }}</span>
+    </div>
+    <div class="mteam">
+      <span class="side"><span class="kit" style="background:{{ `AwayColor`.raw }};"></span><img src="{{ `AwayFlag`.raw }}" alt="" /><span class="tn">{{ `Away`.formatted }}</span></span>
+      <span class="sc wc-num">{{ `AwayScore`.formatted }}</span>
+    </div>
+    <div class="mvenue">{{ `City`.formatted }}</div>
+    <div id="mp-{{ `MatchNum`.raw }}" popover class="mp-card" style="position-anchor:--mp-{{ `MatchNum`.raw }};">
+      <div class="mp-hd"><span class="mp-ey">Model prediction</span><span class="mp-run">{{ `OddsRun`.formatted }}</span></div>
+      <div class="mp-mu">
+        <span class="mp-side"><img src="{{ `HomeFlag`.raw }}" alt="" /><span class="mp-nm">{{ `Home`.formatted }}</span></span>
+        <span class="mp-xg wc-num">{{ `ExpScore`.formatted }}</span>
+        <span class="mp-side r"><span class="mp-nm">{{ `Away`.formatted }}</span><img src="{{ `AwayFlag`.raw }}" alt="" /></span>
+      </div>
+      <div class="mp-bar"><i style="width:{{ `PHome`.raw }}%; background:{{ `HomeColor`.raw }};"></i><i style="width:{{ `PDraw`.raw }}%; background:#9AA4B2;"></i><i style="width:{{ `PAway`.raw }}%; background:{{ `AwayColor`.raw }};"></i></div>
+      <div class="mp-lg">
+        <span class="s h"><span class="pc wc-num">{{ `PHome`.formatted }}</span><span class="l">{{ `HomeCode`.formatted }} win</span></span>
+        <span class="s d"><span class="pc wc-num">{{ `PDraw`.formatted }}</span><span class="l">Draw</span></span>
+        <span class="s a"><span class="pc wc-num">{{ `PAway`.formatted }}</span><span class="l">{{ `AwayCode`.formatted }} win</span></span>
+      </div>
+      <div class="mp-note">{{ `OddsNote`.formatted }}</div>
+    </div>
+  </article>
+{% end %}
+</div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'kickoff'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 12
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+}
+
+Func wc_featured_match() {
+  VizBlock {
+    viz: MarkdownViz {
+      dataset: worldcup
+      // The hero = the single featured match (live, else soonest upcoming). Filtering on is_featured
+      // (rather than just sort+limit) keys it to the SAME match the fixtures band excludes, so they agree.
+      filter {
+        field: r(wc_matches.is_featured)
+        operator: 'is'
+        value: true
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeFlag'
+          ref: r(wc_home_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'HomeColor'
+          ref: r(wc_home_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayFlag'
+          ref: r(wc_away_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'AwayColor'
+          ref: r(wc_away_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'StatusText'
+          ref: r(wc_matches.status_label)
+        },
+        VizFieldFull {
+          label: 'StatusColor'
+          ref: r(wc_matches.status_color)
+        },
+        VizFieldFull {
+          label: 'StageLabel'
+          ref: r(wc_matches.stage_label)
+        },
+        VizFieldFull {
+          label: 'FeaturedSort'
+          ref: r(wc_matches.featured_sort)
+          uname: 'featured'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Display'
+          ref: r(wc_matches.featured_display)
+        },
+        VizFieldFull {
+          label: 'DisplaySub'
+          ref: r(wc_matches.featured_display_sub)
+        },
+        VizFieldFull {
+          label: 'Note'
+          ref: r(wc_matches.featured_note)
+        },
+        VizFieldFull {
+          label: 'KODay'
+          ref: r(wc_matches.kickoff_day)
+        },
+        VizFieldFull {
+          label: 'KOTime'
+          ref: r(wc_matches.kickoff_time)
+        },
+        VizFieldFull {
+          label: 'Venue'
+          ref: r(wc_matches.venue)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_matches.city)
+        },
+        VizFieldFull {
+          label: 'PHome'
+          ref: r(wc_match_odds.p_home_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'PDraw'
+          ref: r(wc_match_odds.p_draw_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'PAway'
+          ref: r(wc_match_odds.p_away_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'ExpScore'
+          ref: r(wc_match_odds.exp_score_label)
+        },
+        VizFieldFull {
+          label: 'OddsRun'
+          ref: r(wc_match_odds.run_label)
+        },
+        VizFieldFull {
+          label: 'OddsNote'
+          ref: r(wc_match_odds.status_note)
+        }
+      ]
+      content: @md <style>
+/* full-height wrapper: centers the card in the (transparent) block + its padding gives the card's outer
+   glow/shadow room so the block's overflow:hidden doesn't clip it. Surplus is just turf around the card. */
+.kwrap { width:100%; height:100%; box-sizing:border-box; display:flex; align-items:center; justify-content:center; padding:30px; }
+.kcard { position:relative; width:100%; text-align:center; color:var(--panel-ink);
+  background:radial-gradient(120% 120% at 50% 0%, rgba(242,200,75,.16), var(--panel) 48%), var(--panel);
+  border:1px solid var(--panel-line); border-radius:22px; padding:16px 26px 18px;
+  box-shadow:0 16px 34px -18px var(--shadow-dir), 0 0 0 6px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.5); }
+.kcard::after { content:""; position:absolute; inset:0; border-radius:22px; pointer-events:none;
+  box-shadow:inset 0 0 50px rgba(242,200,75,.16); }
+.ko-rail { position:relative; display:flex; height:4px; border-radius:3px; overflow:hidden; margin-bottom:14px; }
+.ko-rail i { flex:1; }
+.ko-tag { position:relative; display:inline-flex; align-items:center; gap:8px; font-family:var(--font-disp); font-weight:700;
+  text-transform:uppercase; letter-spacing:.16em; font-size:10.5px; color:var(--panel-muted); margin-bottom:13px; }
+.ko-tag .kbadge { font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.07em;
+  padding:3px 9px; border-radius:999px; color:#fff; box-shadow:0 1px 2px rgba(0,0,0,.18); }
+.ko-grid { position:relative; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:22px; }
+.ko-team { display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0; }
+.kcard .ko-grid .ko-team img { width:74px !important; height:auto !important; border-radius:4px !important;
+  margin:0 !important; display:block !important; box-shadow:0 6px 16px -6px rgba(0,0,0,.5); }
+.ko-team .name { font-family:var(--font-disp); font-weight:800; font-size:22px; letter-spacing:.02em;
+  text-transform:uppercase; line-height:1; }
+.ko-team .sub { font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--panel-muted); }
+.ko-score { display:flex; flex-direction:column; align-items:center; line-height:1; }
+.ko-score .kt { font-family:var(--font-disp); font-weight:800; font-size:46px; color:var(--gold); letter-spacing:.02em; }
+.ko-score .ksub { font-size:9px; text-transform:uppercase; letter-spacing:.16em; color:var(--panel-muted); margin-top:5px; }
+.ko-minute { position:relative; font-family:var(--font-disp); font-weight:700; color:var(--panel-ink); font-size:13px;
+  letter-spacing:.05em; text-transform:uppercase; margin-top:14px; }
+.ko-venue { position:relative; font-size:11px; color:var(--panel-muted); margin-top:7px; }
+.ko-note { position:relative; font-size:11px; color:var(--panel-muted); margin-top:13px; padding-top:12px;
+  border-top:1px solid var(--panel-line); }
+/* model prediction strip: the win-probability rail + expected score, rendered in the card's own
+   material (kit-coloured segments, gold expected score). Gracefully shows "—" + a status note for
+   fixtures with no sim run (knockout slots / matches played before the model went live). */
+.ko-odds { position:relative; margin-top:14px; padding-top:13px; border-top:1px solid var(--panel-line); }
+.koo-cap { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:9px;
+  font-size:9.5px; text-transform:uppercase; letter-spacing:.14em; color:var(--panel-muted); }
+.koo-cap b { color:var(--gold); font-weight:700; }
+.koo-cap .xg { font-family:var(--font-disp); font-weight:800; color:var(--panel-ink); letter-spacing:.02em; }
+.koo-cap .xg:empty::after { content:"—"; color:var(--panel-muted); }
+.koo-bar { display:flex; height:7px; border-radius:4px; overflow:hidden; background:rgba(0,0,0,.07);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.22); }
+.koo-bar i { display:block; height:100%; }
+.koo-legend { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-top:9px; }
+.koo-legend .s { display:inline-flex; align-items:baseline; gap:6px; min-width:0; }
+.koo-legend .nm { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+  font-size:11.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.koo-legend .pc { font-family:var(--font-disp); font-weight:800; font-size:14px; font-variant-numeric:tabular-nums;
+  color:var(--panel-ink); }
+.koo-legend .pc::after { content:"%"; font-size:.62em; font-weight:700; color:var(--panel-muted); margin-left:1px; }
+.koo-legend .pc:empty::after { content:"—"; font-size:1em; }
+.koo-legend .mid { display:inline-flex; align-items:baseline; gap:6px; font-size:10.5px; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--panel-muted); }
+.koo-note { margin-top:9px; font-size:10.5px; font-style:italic; color:var(--panel-muted); }
+.koo-note:empty { display:none; }
+/* ── motion: the hero lands on the centre spot, then breathes a gold inner glow.
+   ko-in uses fill:backwards so the resting card releases to base and :hover lifts.
+   The idle breathe animates the existing ::after inner-glow (0%/100% = its base). */
+.kcard { animation:ko-in .6s cubic-bezier(.2,.7,.25,1.12) .12s backwards;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1.05), box-shadow .3s ease; }
+@keyframes ko-in { 0% { opacity:0; transform:translateY(24px) scale(.9); } 100% { opacity:1; transform:none; } }
+.kcard::after { animation:ko-glow 4s ease-in-out 1.1s infinite; }
+@keyframes ko-glow {
+  0%,100% { box-shadow:inset 0 0 50px rgba(242,200,75,.16); }
+  50% { box-shadow:inset 0 0 66px rgba(242,200,75,.32); } }
+.kcard:hover { transform:translateY(-4px) scale(1.012);
+  box-shadow:0 24px 44px -18px var(--shadow-dir), 0 0 0 6px rgba(255,255,255,.13), inset 0 1px 0 rgba(255,255,255,.5); }
+/* the probability rail wipes in from the left as the card settles — the model "reporting in" */
+.koo-bar { transform-origin:left center; animation:koo-wipe .55s cubic-bezier(.22,.61,.36,1) .5s backwards; }
+@keyframes koo-wipe { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .kcard, .kcard::after, .koo-bar { animation:none !important; }
+  .kcard, .koo-bar { opacity:1 !important; transform:none !important; }
+  .kcard:hover { transform:none !important; } }
+</style>
+<div class="kwrap">
+<article class="kcard" style="--home:{{ rows[0].`HomeColor`.raw }}; --away:{{ rows[0].`AwayColor`.raw }};">
+  <div class="ko-rail"><i style="background:{{ rows[0].`HomeColor`.raw }};"></i><i style="background:{{ rows[0].`AwayColor`.raw }};"></i></div>
+  <div class="ko-tag">
+    <span class="kbadge" style="background:{{ rows[0].`StatusColor`.raw }};">{{ rows[0].`StatusText`.formatted }}</span>
+    <span>{{ rows[0].`StageLabel`.formatted }} · featured</span>
+  </div>
+  <div class="ko-grid">
+    <div class="ko-team"><img src="{{ rows[0].`HomeFlag`.raw }}" alt="" /><span class="name">{{ rows[0].`Home`.formatted }}</span><span class="sub">Home</span></div>
+    <div class="ko-score"><span class="kt wc-num">{{ rows[0].`Display`.formatted }}</span><span class="ksub">{{ rows[0].`DisplaySub`.formatted }}</span></div>
+    <div class="ko-team"><img src="{{ rows[0].`AwayFlag`.raw }}" alt="" /><span class="name">{{ rows[0].`Away`.formatted }}</span><span class="sub">Away</span></div>
+  </div>
+  <div class="ko-odds">
+    <div class="koo-cap"><span>Win <b>probability</b> · {{ rows[0].`OddsRun`.formatted }}</span><span>Exp. score <span class="xg wc-num">{{ rows[0].`ExpScore`.formatted }}</span></span></div>
+    <div class="koo-bar">
+      <i style="width:{{ rows[0].`PHome`.raw }}%; background:{{ rows[0].`HomeColor`.raw }};"></i>
+      <i style="width:{{ rows[0].`PDraw`.raw }}%; background:#9AA4B2;"></i>
+      <i style="width:{{ rows[0].`PAway`.raw }}%; background:{{ rows[0].`AwayColor`.raw }};"></i>
+    </div>
+    <div class="koo-legend">
+      <span class="s"><span class="nm" style="color:{{ rows[0].`HomeColor`.raw }};">{{ rows[0].`Home`.formatted }}</span><span class="pc wc-num">{{ rows[0].`PHome`.formatted }}</span></span>
+      <span class="mid">Draw <span class="pc wc-num">{{ rows[0].`PDraw`.formatted }}</span></span>
+      <span class="s"><span class="pc wc-num">{{ rows[0].`PAway`.formatted }}</span><span class="nm" style="color:{{ rows[0].`AwayColor`.raw }};">{{ rows[0].`Away`.formatted }}</span></span>
+    </div>
+    <div class="koo-note">{{ rows[0].`OddsNote`.formatted }}</div>
+  </div>
+  <div class="ko-minute">{{ rows[0].`KODay`.formatted }} · {{ rows[0].`KOTime`.formatted }} UTC</div>
+  <div class="ko-venue">{{ rows[0].`Venue`.formatted }} · {{ rows[0].`City`.formatted }}</div>
+  <div class="ko-note">{{ rows[0].`Note`.formatted }}</div>
+</article>
+</div> ;;
+      settings {
+        pagination_size: 1
+        sorts: [
+          SortSetting {
+            key: 'featured'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+}
+
+Func wc_boot_podium() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      // Top 3 scorers via a 3rd-rank filter (not row_limit — that is dropped on MarkdownViz
+      // shareable links). The goals>0 guard stops zero-goal players (collapsed into one tie rank)
+      // from flooding the podium before anyone has scored.
+      filter {
+        field: r(wc_player_stats.goals)
+        operator: 'greater_than'
+        value: 0
+      }
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'less_than'
+        value: 4
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Scorer'
+          ref: r(wc_player_stats.name)
+        },
+        VizFieldFull {
+          label: 'Photo'
+          ref: r(wc_player_stats.picture_url)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'TeamColor'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_player_stats.team_code)
+        },
+        VizFieldFull {
+          label: 'Rank'
+          ref: r(wc_player_stats.goals_rank)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Pens'
+          ref: r(wc_player_stats.penalty_goals)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(wc_player_stats.goals)
+          uname: 'goals'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md <style>
+.bp-title { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9;
+  margin:0 0 24px; }
+/* podium order with 3 cards: leader centre (raised + scaled), runner-up left, third right.
+   With exactly 2 (a tie or thin data) both render equal — no false hero. Count-aware via CSS:
+   :first-child:nth-last-child(2) = first of exactly two; :nth-child(2):nth-last-child(2) = middle of three. */
+.bp-row { flex:1; min-height:0; display:flex; justify-content:center; align-items:flex-end; gap:24px; }
+.bp-row .fut:first-child { --rest:perspective(900px) translateY(0) rotateY(0deg) scale(1.12); transform-origin:bottom center; z-index:2;
+  filter:drop-shadow(0 12px 14px rgba(7,30,18,.45)) drop-shadow(0 0 18px rgba(242,200,75,.5)); }
+.bp-row .fut:first-child:nth-last-child(2), .bp-row .fut:first-child:last-child { --rest:perspective(900px) translateY(0) rotateY(0deg) scale(1); }
+.bp-row .fut:nth-child(2):nth-last-child(2) { order:-1; }
+/* The shared .fut card material (shield, foil, tiers t1/t2/t3, deal + foil-hover) lives in
+   header_rail so the podium and the Players gallery are one identical component. Only the
+   podium LAYOUT is here: deal stagger (leader lands last) + the leader's bigger hover. */
+.bp-row .fut:nth-child(1) { animation-delay:.34s; }
+.bp-row .fut:nth-child(2) { animation-delay:.08s; }
+.bp-row .fut:nth-child(3) { animation-delay:.20s; }
+.bp-row .fut:first-child:hover { transform:perspective(900px) translateY(-12px) rotateY(0deg) scale(1.18); }
+</style>
+<p class="bp-title">Golden Boot race</p>
+<div class="bp-row mt-12">
+{% map(rows) %}
+  <article class="fut t{{ `Rank`.formatted }}" style="--teamc:{{ `TeamColor`.raw }};">
+    <svg class="fut-frame" viewBox="0 0 176 232" aria-hidden="true">
+      <path d="M 0 34 C 0 18 10 8 26 7 L 64 7 C 74 7 80 2 88 2 C 96 2 102 7 112 7 L 150 7 C 166 8 176 18 176 34 L 176 168 C 176 192 168 204 146 214 C 124 223 102 230 88 230 C 74 230 52 223 30 214 C 8 204 0 192 0 168 Z" fill="none" stroke="#a37920" stroke-width="5"/>
+    </svg>
+    <span class="fut-medal wc-num">{{ `Rank`.formatted }}</span>
+    <div class="fut-body">
+      <div class="fut-top">
+        <div class="fut-rate"><span class="n wc-num">{{ `Goals`.formatted }}</span><span class="u">Goals</span><img class="fut-flag" src="{{ `Flag`.raw }}" alt="" /></div>
+        <div class="fut-ph"><img src="{{ `Photo`.raw }}" alt="" /></div>
+      </div>
+      <div class="fut-name">{{ `Scorer`.formatted }}</div>
+      <div class="fut-meta">{{ `Team`.formatted }} · <b class="wc-num">{{ `Goals`.formatted }}</b> gls · <b class="wc-num">{{ `Pens`.formatted }}</b> pen</div>
+    </div>
+  </article>
+{% end %}
+</div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'goals'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 3
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+}
+
+Func wc_boot_rack() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      // The chasing pack = ranks 4–10. Bound both ends with rank filters (row_limit is dropped on
+      // MarkdownViz shareable links). The goals>0 guard is essential: zero-goal players collapse into
+      // one shared tie rank, which can fall inside 4–10 when few have scored and would flood the rack.
+      filter {
+        field: r(wc_player_stats.goals)
+        operator: 'greater_than'
+        value: 0
+      }
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'greater_than'
+        value: 3
+      }
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'less_than'
+        value: 11
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Scorer'
+          ref: r(wc_player_stats.name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_player_stats.team_code)
+        },
+        VizFieldFull {
+          label: 'Rank'
+          ref: r(wc_player_stats.goals_rank)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(wc_player_stats.goals)
+          uname: 'goals'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'BarPct'
+          ref: r(wc_player_stats.goals_bar_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md <style>
+.brk-rack { width:100%; height:100%; box-sizing:border-box; overflow:hidden;
+  background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid var(--panel-line);
+  border-radius:12px; padding:12px 14px; color:var(--panel-ink);
+  box-shadow:0 1px 1px rgba(0,0,0,.18), 0 14px 28px -18px var(--shadow-dir), inset 0 1px 0 rgba(255,255,255,.4); }
+.brk-h { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:10px; }
+.brk-h .t { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.07em; font-size:13px; }
+.brk-h .s { font-size:9px; text-transform:uppercase; letter-spacing:.12em; color:var(--panel-muted); white-space:nowrap; }
+.brk-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.brk-list li { display:flex; align-items:center; gap:8px; min-width:0; }
+.brk-list .rk { font-family:var(--font-disp); font-weight:800; width:18px; text-align:right; color:var(--panel-muted); flex:none; font-size:12px; }
+.brk-list img { width:20px !important; height:14px !important; border-radius:2px !important; object-fit:cover;
+  flex:none; display:block !important; margin:0 !important; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+.brk-list .pn { font-weight:600; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.brk-list .pn small { color:var(--panel-muted); font-weight:500; font-size:9px; }
+.brk-list .bar { flex:1; height:8px; border-radius:5px; background:var(--panel-line); overflow:hidden; min-width:24px; }
+.brk-list .bar i { display:block; height:100%; background:linear-gradient(90deg, var(--gold), var(--gold-2)); }
+.brk-list .gl { font-family:var(--font-disp); font-weight:800; font-size:14px; width:16px; text-align:right; flex:none; color:var(--gold); }
+</style>
+<div class="brk-rack">
+  <div class="brk-h"><span class="t">Chasing pack</span><span class="s">rank 4+ · goals</span></div>
+  <ul class="brk-list wc-num">
+{% map(rows) %}
+  <li><span class="rk">{{ `Rank`.formatted }}</span><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" /><span class="pn">{{ `Scorer`.formatted }} <small>{{ `Team`.formatted }}</small></span><span class="bar"><i style="width:{{ `BarPct`.raw }}%"></i></span><span class="gl">{{ `Goals`.formatted }}</span></li>
+{% end %}
+  </ul>
+</div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'goals'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 7
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+}
+
+Func wc_pitch() {
+  TextBlock {
+    content: @md
+<div class="wc-pitch">
+  <i class="pl pl-bound"></i>
+  <i class="pl pl-half"></i>
+  <i class="pl pl-circle"></i>
+  <i class="pl pl-spot"></i>
+  <i class="pl pl-corner tl"></i><i class="pl pl-corner tr"></i>
+  <i class="pl pl-corner bl"></i><i class="pl pl-corner br"></i>
+  <i class="pen tl"></i><i class="pen tr"></i>
+  <i class="pen bl"></i><i class="pen br"></i>
+  <svg class="pl-endtop" viewBox="0 0 1480 250" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+    <g fill="none" stroke="#e6f0ea" stroke-width="4" stroke-linejoin="round">
+      <path d="M410 32 V212 H1070 V32"/>
+      <path d="M580 32 V112 H900 V32"/>
+      <path d="M660 212 A100 100 0 0 0 820 212"/>
+    </g>
+    <circle cx="740" cy="152" r="6" fill="#e6f0ea"/>
+  </svg>
+</div>
+;;
+  }
+}
+
+Func wc_goal_prize() {
+  TextBlock {
+    content: @md
+<div class="goal-wrap">
+  <div class="goal-funnel">Toward goal · the Final</div>
+  <div class="goal">
+    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/1/17/2026_FIFA_World_Cup_emblem.svg/500px-2026_FIFA_World_Cup_emblem.svg.png" alt="FIFA World Cup 26 — the prize" />
+  </div>
+</div>
+;;
+  }
+}
+
+Func wc_knockout_label() {
+  TextBlock {
+    content: @md
+<style>
+.kbr-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="kbr-zone-label">Run on goal · knockout bracket</p>
+;;
+  }
+}

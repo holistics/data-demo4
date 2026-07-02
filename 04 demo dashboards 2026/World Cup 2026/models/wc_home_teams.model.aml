@@ -1,0 +1,14 @@
+// Role-playing alias of wc_teams for the HOME side of a match.
+// Inherits the wc_teams table + dimensions; relabels for distinct match-card display.
+Model wc_home_teams = wc_teams.extend({
+  label: 'Home Team'
+  dimension name {
+    label: 'Home Team'
+  }
+  dimension flag_url {
+    label: 'Home Flag'
+  }
+  dimension color_hex {
+    label: 'Home Color'
+  }
+})

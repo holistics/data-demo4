@@ -1,0 +1,360 @@
+// Contender Index tab blocks.
+
+Func wc_ci_zone() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">The contender index · who's actually good</p>
+;;
+  }
+}
+
+Func wc_ci_board() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      // Top 10 by title odds via a 10th-rank filter — row_limit is dropped on MarkdownViz shareable
+      // links, so the cap lives in the query. odds_rank is a unique 1..N rank (no tie collapse).
+      filter {
+        field: r(wc_contender_board.odds_rank)
+        operator: 'less_than'
+        value: 11
+      }
+      rows: [
+        VizFieldFull {
+          label: 'OddsRank'
+          ref: r(wc_contender_board.odds_rank)
+          uname: 'orank'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Grp'
+          ref: r(wc_teams.group_code)
+        },
+        VizFieldFull {
+          label: 'Spark'
+          ref: r(wc_contender_board.spark_points)
+        },
+        VizFieldFull {
+          label: 'Elo'
+          ref: r(wc_contender_board.elo)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'EloRank'
+          ref: r(wc_contender_board.elo_rank)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'D30'
+          ref: r(wc_contender_board.d30_label)
+        },
+        VizFieldFull {
+          label: 'D30Color'
+          ref: r(wc_contender_board.d30_color)
+        },
+        VizFieldFull {
+          label: 'OddsPct'
+          ref: r(wc_contender_board.p_champion_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'DChamp'
+          ref: r(wc_contender_board.d_champ_label)
+        },
+        VizFieldFull {
+          label: 'DChampColor'
+          ref: r(wc_contender_board.d_champ_color)
+        },
+        VizFieldFull {
+          label: 'RunLabel'
+          ref: r(wc_contender_board.run_label)
+        }
+      ]
+      content: @md
+<style>
+.chk { width:100%; height:100%; box-sizing:border-box; border-radius:7px; padding:12px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 11px),
+    linear-gradient(180deg,#9a6b3c,#7c5026 60%,#6b431f);
+  box-shadow:0 18px 30px -16px rgba(4,18,11,.55), 0 2px 0 rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.35); }
+.chk-slate { height:100%; box-sizing:border-box; border-radius:3px; padding:16px 18px;
+  display:flex; flex-direction:column;
+  background:
+    radial-gradient(120% 90% at 28% 8%, rgba(255,255,255,.05), transparent 60%),
+    linear-gradient(180deg,#1d3027,#152620);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 0 30px rgba(0,0,0,.45); }
+.chk-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+  padding-bottom:9px; margin-bottom:9px; border-bottom:1px dashed rgba(238,244,238,.3); }
+.chk-t { font-family:var(--font-disp); font-weight:800; font-size:16px; letter-spacing:.16em;
+  text-transform:uppercase; color:#eef4ee; text-shadow:0 0 1px rgba(255,255,255,.5); }
+.chk-t b { color:var(--gold-2); }
+.chk-s { font-size:10px; color:rgba(238,244,238,.55); letter-spacing:.04em; white-space:nowrap; }
+.cib-row { display:grid; grid-template-columns:26px 30px minmax(0,1fr) 200px 96px 104px;
+  gap:14px; align-items:center; padding:5px 2px; }
+.cib-row + .cib-row { border-top:1px solid rgba(238,244,238,.1); }
+.cib-rk { font-family:var(--font-disp); font-weight:800; font-size:16px; color:rgba(238,244,238,.6); text-align:center; }
+.cib-row:first-of-type .cib-rk { color:var(--gold-2); }
+.chk .cib-row img { width:26px !important; height:18px !important; border-radius:2px !important;
+  margin:0 !important; display:block !important; object-fit:cover; box-shadow:0 1px 3px rgba(0,0,0,.5); }
+.cib-nm { min-width:0; }
+.cib-nm .n { display:block; font-family:var(--font-disp); font-weight:700; font-size:14px; letter-spacing:.04em;
+  text-transform:uppercase; color:#eef4ee; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cib-nm .g { display:block; font-size:8.5px; text-transform:uppercase; letter-spacing:.14em;
+  color:rgba(238,244,238,.45); margin-top:2px; }
+.cib-spark { width:200px; height:30px; display:block; margin:0 !important; }
+.cib-spark polyline { fill:none; stroke:rgba(238,244,238,.8); stroke-width:1.6; vector-effect:non-scaling-stroke;
+  stroke-linejoin:round; stroke-linecap:round; }
+.cib-cell { text-align:right; line-height:1; }
+.cib-cell .v { display:block; font-family:var(--font-disp); font-weight:800; font-size:16px; color:#eef4ee;
+  font-variant-numeric:tabular-nums; white-space:nowrap; }
+.cib-cell .v b { font-size:.6em; font-weight:700; color:rgba(238,244,238,.5); }
+.cib-cell.gold .v { color:var(--gold-2); text-shadow:0 0 8px rgba(242,200,75,.3); }
+.cib-cell .d { display:block; font-family:var(--font-disp); font-weight:700; font-size:10px;
+  margin-top:3px; white-space:nowrap; }
+.cib-cell .d:empty { display:none; }
+.cib-cell .bl { display:block; font-size:8.5px; color:rgba(238,244,238,.4); letter-spacing:.06em;
+  margin-top:3px; white-space:nowrap; }
+.chk-foot { margin-top:auto; padding-top:9px; border-top:1px dashed rgba(238,244,238,.2);
+  display:flex; justify-content:space-between; gap:10px; font-size:9px; text-transform:uppercase;
+  letter-spacing:.09em; color:rgba(238,244,238,.45); }
+/* the big board deals in (sparklines + rows arrive with it); wc-deal-in keyframe from header_rail */
+.chk-slate { animation:wc-deal-in .5s cubic-bezier(.2,.7,.3,1) backwards; }
+/* each contender's 24-month chalk curve draws itself in, staggered down the board
+   (rows are :nth-child 2..11 — child 1 is .chk-head). dasharray 600 > any path length. */
+.cib-spark polyline { stroke-dasharray:600; animation:spark-draw .9s ease-out .5s both; }
+@keyframes spark-draw { from { stroke-dashoffset:600; } to { stroke-dashoffset:0; } }
+.cib-row:nth-child(2) .cib-spark polyline{animation-delay:.50s} .cib-row:nth-child(3) .cib-spark polyline{animation-delay:.56s}
+.cib-row:nth-child(4) .cib-spark polyline{animation-delay:.62s} .cib-row:nth-child(5) .cib-spark polyline{animation-delay:.68s}
+.cib-row:nth-child(6) .cib-spark polyline{animation-delay:.74s} .cib-row:nth-child(7) .cib-spark polyline{animation-delay:.80s}
+.cib-row:nth-child(8) .cib-spark polyline{animation-delay:.86s} .cib-row:nth-child(9) .cib-spark polyline{animation-delay:.92s}
+.cib-row:nth-child(10) .cib-spark polyline{animation-delay:.98s} .cib-row:nth-child(11) .cib-spark polyline{animation-delay:1.04s}
+@media (prefers-reduced-motion: reduce) {
+  .chk-slate { animation:none !important; opacity:1 !important; transform:none !important; }
+  .cib-spark polyline { animation:none !important; stroke-dashoffset:0 !important; } }
+</style>
+<div class="chk"><div class="chk-slate">
+  <div class="chk-head">
+    <span class="chk-t">The big <b>board</b></span>
+    <span class="chk-s">Top 10 by title odds · {{ rows[0].`RunLabel`.formatted }} · field average 2.1%</span>
+  </div>
+{% map(rows) %}
+  <div class="cib-row">
+    <span class="cib-rk wc-num">{{ `OddsRank`.formatted }}</span>
+    <img src="{{ `Flag`.raw }}" alt="" />
+    <span class="cib-nm"><span class="n">{{ `Team`.formatted }}</span><span class="g">Group {{ `Grp`.formatted }}</span></span>
+    <svg class="cib-spark" viewBox="0 0 100 30" preserveAspectRatio="none" style="margin:0 !important;" aria-hidden="true"><polyline points="{{ `Spark`.raw }}" /></svg>
+    <span class="cib-cell"><span class="v wc-num">{{ `Elo`.formatted }}</span><span class="d wc-num" style="color:{{ `D30Color`.raw }};">{{ `D30`.formatted }}</span><span class="bl wc-num">#{{ `EloRank`.formatted }} by Elo</span></span>
+    <span class="cib-cell gold"><span class="v wc-num">{{ `OddsPct`.formatted }}<b>%</b></span><span class="d wc-num" style="color:{{ `DChampColor`.raw }};">{{ `DChamp`.formatted }}</span><span class="bl">title odds</span></span>
+  </div>
+{% end %}
+  <div class="chk-foot">
+    <span>Chalk curve = 24 months of Elo · same scale per pixel, centred per team</span>
+    <span>Δ vs 30 days ago · odds Δ day-over-day</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'orank'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 10
+      }
+    }
+  }
+}
+
+Func wc_ci_ladder() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_contender_board.odds_rank)
+        operator: 'less_than'
+        value: 7
+      }
+      rows: [
+        VizFieldFull {
+          label: 'OddsRank'
+          ref: r(wc_contender_board.odds_rank)
+          uname: 'lrank'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'W'
+          ref: r(wc_contender_board.p_champion_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'F'
+          ref: r(wc_contender_board.p_final_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'SF'
+          ref: r(wc_contender_board.p_sf_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'QF'
+          ref: r(wc_contender_board.p_qf_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'R16'
+          ref: r(wc_contender_board.p_r16_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'R32'
+          ref: r(wc_contender_board.p_r32_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md
+<style>
+.chk2 { width:100%; height:100%; box-sizing:border-box; border-radius:7px; padding:12px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 11px),
+    linear-gradient(180deg,#9a6b3c,#7c5026 60%,#6b431f);
+  box-shadow:0 18px 30px -16px rgba(4,18,11,.55), 0 2px 0 rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.35); }
+.chk2-slate { height:100%; box-sizing:border-box; border-radius:3px; padding:16px 18px;
+  display:flex; flex-direction:column;
+  background:
+    radial-gradient(120% 90% at 28% 8%, rgba(255,255,255,.05), transparent 60%),
+    linear-gradient(180deg,#1d3027,#152620);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 0 30px rgba(0,0,0,.45); }
+.chk2-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+  padding-bottom:9px; margin-bottom:10px; border-bottom:1px dashed rgba(238,244,238,.3); }
+.chk2-t { font-family:var(--font-disp); font-weight:800; font-size:16px; letter-spacing:.16em;
+  text-transform:uppercase; color:#eef4ee; text-shadow:0 0 1px rgba(255,255,255,.5); }
+.chk2-t b { color:var(--gold-2); }
+.chk2-s { font-size:10px; color:rgba(238,244,238,.55); letter-spacing:.04em; white-space:nowrap; }
+.lad { padding:4px 0 6px; }
+.lad + .lad { border-top:1px solid rgba(238,244,238,.1); }
+.lad-hd { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.chk2 .lad-hd img { width:22px !important; height:15px !important; border-radius:2px !important;
+  margin:0 !important; display:block !important; object-fit:cover; box-shadow:0 1px 3px rgba(0,0,0,.5); }
+.lad-hd .n { font-family:var(--font-disp); font-weight:700; font-size:13px; letter-spacing:.05em;
+  text-transform:uppercase; color:#eef4ee; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lad-hd .w { margin-left:auto; font-family:var(--font-disp); font-weight:800; font-size:14px;
+  color:var(--gold-2); white-space:nowrap; }
+.lad-hd .w small { font-size:.65em; color:rgba(238,244,238,.5); font-weight:700; letter-spacing:.08em; }
+.lad-cols { display:flex; gap:8px; align-items:flex-end; }
+.lad-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
+.lad-bar { width:100%; height:36px; display:flex; align-items:flex-end; border-radius:2px;
+  background:rgba(238,244,238,.06); box-shadow:inset 0 0 0 1px rgba(238,244,238,.07); }
+.lad-bar i { display:block; width:100%; border-radius:2px 2px 0 0; background:rgba(238,244,238,.55); }
+.lad-col.win .lad-bar i { background:linear-gradient(180deg, var(--gold-2), var(--gold));
+  box-shadow:0 0 8px rgba(242,200,75,.4); }
+.lad-col .pv { font-family:var(--font-disp); font-weight:800; font-size:10.5px; color:#eef4ee;
+  font-variant-numeric:tabular-nums; }
+.lad-col.win .pv { color:var(--gold-2); }
+.lad-col .pl { font-size:8px; text-transform:uppercase; letter-spacing:.1em; color:rgba(238,244,238,.45); }
+.chk2-foot { margin-top:auto; padding-top:9px; border-top:1px dashed rgba(238,244,238,.2);
+  display:flex; justify-content:space-between; gap:10px; font-size:9px; text-transform:uppercase;
+  letter-spacing:.09em; color:rgba(238,244,238,.45); }
+/* the advance ladder deals in, then each stage's bar grows up (R32→Win) */
+.chk2-slate { animation:wc-deal-in .5s cubic-bezier(.2,.7,.3,1) backwards; }
+.lad-bar i { transform-origin:bottom; animation:bar-rise .55s cubic-bezier(.2,.7,.3,1.05) backwards; }
+@keyframes bar-rise { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+.lad-col:nth-child(1) .lad-bar i{animation-delay:.30s} .lad-col:nth-child(2) .lad-bar i{animation-delay:.37s}
+.lad-col:nth-child(3) .lad-bar i{animation-delay:.44s} .lad-col:nth-child(4) .lad-bar i{animation-delay:.51s}
+.lad-col:nth-child(5) .lad-bar i{animation-delay:.58s} .lad-col:nth-child(6) .lad-bar i{animation-delay:.65s}
+@media (prefers-reduced-motion: reduce) {
+  .chk2-slate, .lad-bar i { animation:none !important; opacity:1 !important; transform:none !important; } }
+</style>
+<div class="chk2"><div class="chk2-slate">
+  <div class="chk2-head">
+    <span class="chk2-t">Road <b>survival</b></span>
+    <span class="chk2-s">P(reach stage) · top 6 contenders</span>
+  </div>
+{% map(rows) %}
+  <div class="lad">
+    <div class="lad-hd"><img src="{{ `Flag`.raw }}" alt="" /><span class="n">{{ `Team`.formatted }}</span><span class="w wc-num">{{ `W`.formatted }}% <small>TITLE</small></span></div>
+    <div class="lad-cols">
+      <div class="lad-col"><div class="lad-bar"><i style="height:{{ `R32`.raw }}%;"></i></div><span class="pv wc-num">{{ `R32`.formatted }}</span><span class="pl">R32</span></div>
+      <div class="lad-col"><div class="lad-bar"><i style="height:{{ `R16`.raw }}%;"></i></div><span class="pv wc-num">{{ `R16`.formatted }}</span><span class="pl">R16</span></div>
+      <div class="lad-col"><div class="lad-bar"><i style="height:{{ `QF`.raw }}%;"></i></div><span class="pv wc-num">{{ `QF`.formatted }}</span><span class="pl">QF</span></div>
+      <div class="lad-col"><div class="lad-bar"><i style="height:{{ `SF`.raw }}%;"></i></div><span class="pv wc-num">{{ `SF`.formatted }}</span><span class="pl">SF</span></div>
+      <div class="lad-col"><div class="lad-bar"><i style="height:{{ `F`.raw }}%;"></i></div><span class="pv wc-num">{{ `F`.formatted }}</span><span class="pl">Final</span></div>
+      <div class="lad-col win"><div class="lad-bar"><i style="height:{{ `W`.raw }}%;"></i></div><span class="pv wc-num">{{ `W`.formatted }}</span><span class="pl">Win</span></div>
+    </div>
+  </div>
+{% end %}
+  <div class="chk2-foot">
+    <span>Every column starts from the group stage</span>
+    <span>Gold = lift the trophy</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'lrank'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 6
+      }
+    }
+  }
+}

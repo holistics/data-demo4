@@ -59,7 +59,7 @@ Dataset demo_ecommerce_version_2 {
     param_model_demo,
     dim_dates,
     ecommerce_employees,
-  // ecommerce_product_images,
+    ecommerce_product_images,
   ]
   relationships: [
     relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
@@ -76,12 +76,7 @@ Dataset demo_ecommerce_version_2 {
     relationship(ecommerce_orders.created_date > dim_dates.date_key, true),
     relationship(ecommerce_users.sign_up_date > dim_dates.date_key, false), // optional: secondary date relationship
     relationship(ecommerce_employees.merchant_id > ecommerce_merchants.id, true),
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // DISABLED RELATIONSHIPS
-  // ═══════════════════════════════════════════════════════════════════════════
-  // relationship(ecommerce_products.id - ecommerce_product_images.product_id, true),
-
+    relationship(ecommerce_products.id - ecommerce_product_images.product_id, true),
   ]
 
   // ═══════════════════════════════════════════════════════════════════════════

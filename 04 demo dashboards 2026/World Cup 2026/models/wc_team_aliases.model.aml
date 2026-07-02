@@ -1,0 +1,79 @@
+Model wc_team_aliases {
+  type: 'table'
+  label: 'Team Aliases'
+  description: 'Every team code in WC history → display name + canonical (modern successor) code. Bridge between historical rollups and wc_teams.'
+  data_source_name: 'demo_worldcup'
+  dimension alias_code {
+    label: 'Alias Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.alias_code }};;
+    primary_key: true
+  }
+  dimension display_name {
+    label: 'Display Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.display_name }};;
+  }
+  dimension canonical_code {
+    label: 'Canonical Code'
+    type: 'text'
+    description: 'Modern FIFA code (FRG→GER, URS→RUS, …); NULL when no successor (GDR).'
+    definition: @sql {{ #SOURCE.canonical_code }};;
+  }
+  // ---- All-time entity rollup (FIFA / Wikipedia all-time-table convention) ----
+  // The history models are keyed by raw historical code; these dimensions collapse defunct
+  // nations onto their modern successor for all-time aggregation. Group every all-time stat on
+  // entity_code — NEVER on display_name: display_name carries the bare 3-letter code for most
+  // nations and a real name only for ~10 defunct ones, so grouping on it splits West Germany
+  // (3 titles) from Germany (1) and shows codes. canonical_code is the true successor key
+  // (FRG/GER→GER=4, URS/RUS→RUS, TCH/CZE→CZE, YUG/SCG/SRB→SRB); coalescing to alias_code keeps
+  // null-successor sides (East Germany) alive as their own entity instead of dropping to null.
+  dimension entity_code {
+    label: 'All-time Entity'
+    type: 'text'
+    description: 'Successor-rollup key for all-time history: canonical_code where it exists, else the alias code. Group all-time team stats on this.'
+    definition: @aql coalesce(wc_team_aliases.canonical_code, wc_team_aliases.alias_code) ;;
+  }
+  dimension entity_name {
+    label: 'All-time Team'
+    type: 'text'
+    description: 'Readable name for the all-time entity. Prefers the official 2026 name (canonical → wc_teams) so spellings stay canonical; falls back to a curated map of marquee nations the dataset has no name for (only 3-letter codes), then the alias display name. Constant per entity_code so grouping never splits a row.'
+    definition: @aql coalesce(
+      wc_teams.name,
+      case(
+        when: wc_team_aliases.entity_code == 'ITA', then: 'Italy',
+        when: wc_team_aliases.entity_code == 'RUS', then: 'Russia',
+        when: wc_team_aliases.entity_code == 'SRB', then: 'Serbia',
+        when: wc_team_aliases.entity_code == 'HUN', then: 'Hungary',
+        when: wc_team_aliases.entity_code == 'POL', then: 'Poland',
+        when: wc_team_aliases.entity_code == 'CHI', then: 'Chile',
+        when: wc_team_aliases.entity_code == 'BUL', then: 'Bulgaria',
+        when: wc_team_aliases.entity_code == 'PER', then: 'Peru',
+        when: wc_team_aliases.entity_code == 'DEN', then: 'Denmark',
+        when: wc_team_aliases.entity_code == 'GRE', then: 'Greece',
+        when: wc_team_aliases.entity_code == 'CMR', then: 'Cameroon',
+        when: wc_team_aliases.entity_code == 'CRC', then: 'Costa Rica',
+        when: wc_team_aliases.entity_code == 'IRL', then: 'Rep. of Ireland',
+        when: wc_team_aliases.entity_code == 'CHN', then: 'China PR',
+        when: wc_team_aliases.entity_code == 'CUB', then: 'Cuba',
+        when: wc_team_aliases.entity_code == 'HON', then: 'Honduras',
+        when: wc_team_aliases.entity_code == 'BOL', then: 'Bolivia',
+        when: wc_team_aliases.entity_code == 'ANG', then: 'Angola',
+        when: wc_team_aliases.entity_code == 'JAM', then: 'Jamaica',
+        when: wc_team_aliases.entity_code == 'ISR', then: 'Israel',
+        else: wc_team_aliases.display_name
+      )
+    ) ;;
+  }
+  dimension entity_flag {
+    label: 'All-time Flag'
+    type: 'text'
+    description: 'Flag for the all-time entity: official 2026 crest (canonical → wc_teams) where available, else the FIFA flag CDN templated on the entity code (resolves for any current federation; defunct codes 404 → hidden img).'
+    definition: @aql coalesce(
+      wc_teams.flag_url,
+      concat('https://api.fifa.com/api/v3/picture/flags-sq-4/', wc_team_aliases.entity_code)
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_team_aliases"'
+}

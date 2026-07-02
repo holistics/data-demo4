@@ -22,6 +22,12 @@ Model public_dim_staff {
     hidden: false
     definition: @sql {{ #SOURCE.eh_last_name }};;
   }
+  dimension eh_last_name222 {
+    label: 'Eh Last Name 222'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.eh_last_name }};;
+  }
   dimension eh_external_id {
     label: 'Eh External Id'
     type: 'text'

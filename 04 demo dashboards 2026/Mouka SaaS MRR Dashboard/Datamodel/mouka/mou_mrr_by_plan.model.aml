@@ -41,7 +41,7 @@ Model mou_mrr_by_plan {
       GROUP BY report_month
     )
     SELECT
-      pt.report_month::DATE AS report_month,
+      (pt.report_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day')::DATE AS report_month,
       pt.plan_name,
       pt.mrr,
       ROUND(pt.mrr * 100.0 / mt.total_mrr, 1) AS mrr_pct

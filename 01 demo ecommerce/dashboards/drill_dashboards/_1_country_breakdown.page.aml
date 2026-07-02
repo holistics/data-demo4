@@ -17,17 +17,20 @@ Dashboard _1_country_breakdown {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_countries', 'name')
+      field: r(ecommerce_countries.name)
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
