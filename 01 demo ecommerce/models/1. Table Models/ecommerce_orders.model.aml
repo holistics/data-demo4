@@ -79,38 +79,33 @@ Model ecommerce_orders {
   measure delivered_orders_count {
     label: "Delivered Orders Count"
     type: "number"
-    definition: @sql count( case when {{#SOURCE.status}} = 'delivered' then 1 else null end);;
+    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'delivered');;
     description: "The total number of orders we delivered this period."
-    aggregation_type: "custom"
   }
   measure cancelled_orders_count {
     label: 'Cancelled Orders Count'
     type: 'number'
-    definition: @sql count( case when {{#SOURCE.status}} = 'cancelled' then 1 else null end);;
+    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'cancelled');;
     description: "The total number of orders we canceled this period."
-    aggregation_type: "custom"
   }
   measure refunded_orders_count {
     label: 'Refunded Orders Count'
     type: 'number'
-    definition: @sql count(distinct case when {{status}} = 'refunded' then {{id}} else null end);;
+    definition: @aql count_distinct(ecommerce_orders.id) | where(ecommerce_orders.status == 'refunded');;
     description: "The total number of orders we refunded this period."
-    aggregation_type: "custom"
   }
   measure total_order {
     label: "Total Orders Count"
     type: "number"
-    definition: @sql {{ id }};;
+    definition: @aql count(ecommerce_orders.id);;
     description: "The total number of orders"
-    aggregation_type: "count"
   }
   measure total_orders_count {
     label: "Total Orders Count"
     type: "number"
     description: "**Total number of orders recorded in the system.**  \nThis field counts every order entry regardless of status or other attributes.  \nFor example, if there are 150 orders placed by customers, this value will be 150."
     hidden: true
-    definition: @sql {{ id }};;
-    aggregation_type: "count"
+    definition: @aql count(ecommerce_orders.id);;
   }
 
   measure first_order_date {
@@ -118,15 +113,13 @@ Model ecommerce_orders {
     type: "datetime"
     description: "The date and time when the very first order was placed in the system.  \nThis field helps identify the starting point of order activity for analysis of user acquisition and sales trends.  \nFor example, if the earliest order was placed on `2022-01-15 10:30:00`, this value will reflect that timestamp."
     hidden: false
-    definition: @sql min({{ created_at }}) ;;
-    aggregation_type: "custom"
+    definition: @aql min(ecommerce_orders.created_at) ;;
   }
 
   measure days_since_last_order {
     label: "Days Since Last Order"
     type: "number"
-    definition: @sql DATE_PART('Day', CURRENT_TIMESTAMP - max({{ created_at }}));;
-    aggregation_type: "custom"
+    definition: @aql date_diff('day', max(ecommerce_orders.created_at), @now);;
   }
 
   measure orders_2023 {

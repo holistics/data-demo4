@@ -1,0 +1,150 @@
+// Team HQ — Elo rating trajectory: a native LineChart on a crafted "rating monitor" chrome.
+// Showcases the date-drill control (DateDrillBlock → snapshot_date granularity) + period-over-period
+// (added later). Two stacked blocks (frame TextBlock = material, no dataset; chart VizBlock = data),
+// same pattern as the Match Center momentum monitor. The chart is scoped to the Nation filter via
+// wc_team_ratings → wc_teams (so it follows the selected team); disabled on the Match filter.
+// Dark screen on purpose: native chart ticks/grid render light, so they need a dark backdrop to read.
+
+Func wc_hq_zone_rating() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">Rating trajectory · two years of Elo</p>
+;;
+  }
+}
+
+Func wc_hq_rating_frame() {
+  TextBlock {
+    content: @md
+<style>
+/* rating monitor — a navy analytics console (its own material): a deep screen the native Elo trace
+   plots onto, with a gold graticule glow, a brushed header rail + status LED, and corner reticle
+   ticks. Dark so the native chart's light ticks + white grid read; gold accent (rating), distinct
+   from the green momentum oscilloscope and from the LED nameplate / clipboard / sticker materials. */
+.rt-wrap { width:100%; height:100%; box-sizing:border-box; padding:0 2px; }
+.rt-card { position:relative; width:100%; height:100%; box-sizing:border-box; border-radius:13px;
+  background:linear-gradient(180deg,#1a2336,#121a2a 55%,#0c1320); border:1px solid #0a1018;
+  box-shadow:0 18px 32px -16px rgba(4,12,28,.7), 0 2px 0 rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.10), inset 0 -3px 8px rgba(0,0,0,.45);
+  padding:11px 14px 9px; display:flex; flex-direction:column; }
+.rt-head { display:flex; align-items:center; gap:9px; padding:0 2px 8px; }
+.rt-led { width:8px; height:8px; border-radius:50%; flex:none;
+  background:radial-gradient(circle at 35% 30%, #ffe79a, var(--gold)); box-shadow:0 0 8px rgba(242,200,75,.8); }
+.rt-title { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.16em;
+  font-size:14px; line-height:1; color:rgba(234,240,255,.9); }
+.rt-title b { color:var(--gold-2); }
+.rt-sub { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:rgba(210,222,245,.5); white-space:nowrap; }
+/* deep screen — the native chart (white grid + light ticks + gold trace) draws onto this */
+.rt-screen { position:relative; flex:1; border-radius:8px; overflow:hidden;
+  background:radial-gradient(120% 120% at 50% -10%, rgba(242,200,75,.08), transparent 55%), #0a1120;
+  box-shadow:inset 0 0 0 1px rgba(242,200,75,.14), inset 0 0 40px rgba(0,0,0,.55); }
+/* corner reticle accents (not a full grid — the native chart supplies that) */
+.rt-screen::before, .rt-screen::after { content:""; position:absolute; width:14px; height:14px; pointer-events:none;
+  border-color:rgba(242,200,75,.4); }
+.rt-screen::before { top:7px; left:7px; border-top:1.5px solid rgba(242,200,75,.4); border-left:1.5px solid rgba(242,200,75,.4); border-top-left-radius:3px; }
+.rt-screen::after { bottom:7px; right:7px; border-bottom:1.5px solid rgba(242,200,75,.4); border-right:1.5px solid rgba(242,200,75,.4); border-bottom-right-radius:3px; }
+.rt-foot { display:flex; gap:9px; padding:7px 2px 0; font-size:8px; text-transform:uppercase;
+  letter-spacing:.05em; color:rgba(210,222,245,.42); }
+.rt-foot .sp { margin-left:auto; font-style:italic; opacity:.9; text-transform:none; letter-spacing:.02em; }
+</style>
+<div class="rt-wrap"><div class="rt-card">
+  <div class="rt-head"><span class="rt-led"></span><span class="rt-title">Rating <b>trajectory</b></span><span class="rt-sub">Elo · monthly since 2024</span></div>
+  <div class="rt-screen"></div>
+  <div class="rt-foot"><span>Higher = stronger</span><span class="sp">Set the granularity top-right · scoped to the selected nation</span></div>
+</div></div>
+;;
+  }
+}
+
+Func wc_hq_rating_chart() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: LineChart {
+      dataset: worldcup
+      x_axis: VizFieldFull {
+        label: 'Snapshot'
+        ref: r(wc_team_ratings.snapshot_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Elo'
+            ref: r(wc_team_ratings.elo)
+            aggregation: 'avg'
+            format {
+              type: 'number'
+              pattern: '#,##0'
+            }
+          }
+          settings {
+            color: '#f2c84b'
+            line_interpolation: 'smooth'
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+        row_limit: 500
+      }
+    }
+  }
+}
+
+// Period comparison done cleanly (no confusing overlay): a "30-day movement" readout parked in the
+// monitor header — signed Elo + rank deltas from wc_team_rating_movement (labels/colour pre-built in
+// SQL). Now vs ~a month ago; scoped to the Nation filter via wc_team_rating_movement → wc_teams.
+Func wc_hq_rating_move() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'EloD'
+          ref: r(wc_team_rating_movement.delta_30d_label)
+        },
+        VizFieldFull {
+          label: 'EloDColor'
+          ref: r(wc_team_rating_movement.delta_30d_color)
+        },
+        VizFieldFull {
+          label: 'RankD'
+          ref: r(wc_team_rating_movement.rank_delta_label)
+        }
+      ]
+      content: @md
+<style>
+.rtm { display:flex; gap:18px; justify-content:flex-end; align-items:center; height:100%; padding:0 4px; }
+.rtm-chip { display:flex; flex-direction:column; align-items:flex-end; line-height:1.05; }
+.rtm-k { font-family:var(--font-disp); font-weight:700; font-size:8px; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(210,222,245,.5); margin-bottom:3px; white-space:nowrap; }
+.rtm-v { font-family:var(--font-disp); font-weight:800; font-size:15px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+</style>
+<div class="rtm">
+{% map(rows) %}
+  <div class="rtm-chip"><span class="rtm-k">Elo · 30d</span><span class="rtm-v" style="color:{{ `EloDColor`.raw }};">{{ `EloD`.formatted }}</span></div>
+  <div class="rtm-chip"><span class="rtm-k">Rank · 30d</span><span class="rtm-v" style="color:rgba(234,240,255,.92);">{{ `RankD`.formatted }}</span></div>
+{% end %}
+</div>
+;;
+    }
+  }
+}

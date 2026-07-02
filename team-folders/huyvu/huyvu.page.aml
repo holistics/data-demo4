@@ -2,7 +2,6 @@ Dashboard huyvu {
   title: 'huyvu'
   description: ''
   owner: 'huy.vu@holistics.io'
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -13,36 +12,33 @@ Dashboard huyvu {
       mode: 'auto'
     }
     block v_qunu {
-      position: pos(80, 40, 620, 420)
+      position: pos(40, 20, 620, 420)
     }
   }
-
   theme: H.themes.vanilla
   block v_qunu: VizBlock {
     label: 'HuyVu testing viz'
-    viz: ColumnChart {
+    viz: DataTable {
       dataset: huyvu_dataset
-      x_axis: VizFieldFull {
-        ref: r(public_dim_staff.location_type)
-        format {
-          type: 'text'
-        }
-      }
-      y_axis {
-        series {
-          field: VizFieldFull {
-            ref: r(public_dim_staff.staff_id)
-            aggregation: 'count'
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
+      fields: [
+        VizFieldFull {
+          ref: r(public_dim_staff.location_type)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(public_dim_staff.staff_id)
+          aggregation: 'count'
+          format {
+            type: 'number'
+            pattern: 'inherited'
           }
         }
-      }
+      ]
       settings {
+        show_row_number: true
         row_limit: 5000
-        x_axis_show_null_datetime: false
         aggregate_awareness {
           enabled: true
           debug_comments: true
