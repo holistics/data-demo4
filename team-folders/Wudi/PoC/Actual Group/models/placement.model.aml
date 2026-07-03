@@ -1,0 +1,129 @@
+Model ag_placement {
+  type: 'table'
+  label: 'Placement'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension placement_id {
+    label: 'Placement Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_id }};;
+  }
+  dimension application_id {
+    label: 'Application Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.application_id }};;
+  }
+  dimension job_order_id {
+    label: 'Job Order Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.job_order_id }};;
+  }
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension recruiter_employee_id {
+    label: 'Recruiter Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.recruiter_employee_id }};;
+  }
+  dimension placement_code {
+    label: 'Placement Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_code }};;
+  }
+  dimension employment_type {
+    label: 'Employment Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.employment_type }}::text;;
+  }
+  dimension placement_status {
+    label: 'Placement Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_status }}::text;;
+  }
+  dimension placed_at {
+    label: 'Placed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.placed_at }};;
+  }
+  dimension start_date {
+    label: 'Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.start_date }};;
+  }
+  dimension expected_end_date {
+    label: 'Expected End Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.expected_end_date }};;
+  }
+  dimension actual_end_date {
+    label: 'Actual End Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.actual_end_date }};;
+  }
+  dimension bill_rate {
+    label: 'Bill Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.bill_rate }};;
+  }
+  dimension pay_rate {
+    label: 'Pay Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.pay_rate }};;
+  }
+  dimension expected_hours_per_week {
+    label: 'Expected Hours Per Week'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.expected_hours_per_week }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension termination_reason {
+    label: 'Termination Reason'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.termination_reason }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."placement"'
+}

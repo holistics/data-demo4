@@ -1,0 +1,81 @@
+Model ag_target_plan {
+  type: 'table'
+  label: 'Target Plan'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension target_plan_id {
+    label: 'Target Plan Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.target_plan_id }};;
+  }
+  dimension agency_id {
+    label: 'Agency Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.agency_id }};;
+  }
+  dimension employee_id {
+    label: 'Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.employee_id }};;
+  }
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+  }
+  dimension target_month {
+    label: 'Target Month'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.target_month }};;
+  }
+  dimension revenue_target_amount {
+    label: 'Revenue Target Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.revenue_target_amount }};;
+  }
+  dimension gross_margin_target_amount {
+    label: 'Gross Margin Target Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.gross_margin_target_amount }};;
+  }
+  dimension placement_target_count {
+    label: 'Placement Target Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_target_count }};;
+  }
+  dimension fill_rate_target {
+    label: 'Fill Rate Target'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.fill_rate_target }};;
+  }
+  dimension active_client_target_count {
+    label: 'Active Client Target Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.active_client_target_count }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."target_plan"'
+}

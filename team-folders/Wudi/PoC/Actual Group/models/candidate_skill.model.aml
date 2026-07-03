@@ -1,0 +1,39 @@
+Model ag_candidate_skill {
+  type: 'table'
+  label: 'Candidate Skill'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension skill_id {
+    label: 'Skill Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.skill_id }};;
+  }
+  dimension proficiency_level {
+    label: 'Proficiency Level'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.proficiency_level }};;
+  }
+  dimension years_experience {
+    label: 'Years Experience'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.years_experience }};;
+  }
+  dimension verified_flag {
+    label: 'Verified Flag'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.verified_flag }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."candidate_skill"'
+}

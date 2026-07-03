@@ -1,0 +1,63 @@
+Model ag_data_quality_event {
+  type: 'table'
+  label: 'Data Quality Event'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension data_quality_event_id {
+    label: 'Data Quality Event Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.data_quality_event_id }};;
+  }
+  dimension source_table {
+    label: 'Source Table'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_table }};;
+  }
+  dimension source_record_id {
+    label: 'Source Record Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_record_id }};;
+  }
+  dimension issue_type {
+    label: 'Issue Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.issue_type }};;
+  }
+  dimension severity {
+    label: 'Severity'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.severity }};;
+  }
+  dimension detected_at {
+    label: 'Detected At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.detected_at }};;
+  }
+  dimension resolved_at {
+    label: 'Resolved At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.resolved_at }};;
+  }
+  dimension owner_employee_id {
+    label: 'Owner Employee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_employee_id }};;
+  }
+  dimension details {
+    label: 'Details'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.details }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."data_quality_event"'
+}

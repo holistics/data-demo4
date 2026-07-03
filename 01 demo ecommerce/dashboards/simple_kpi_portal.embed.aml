@@ -1,0 +1,9 @@
+EmbedPortal simple_kpi_portal {
+  description: 'Embed portal exposing the Simple KPI Dashboard.'
+  objects: [
+    // Dashboards
+    simple_kpi_dashboard,
+    // Datasets
+    demo_ecommerce_version_2,
+  ]
+}

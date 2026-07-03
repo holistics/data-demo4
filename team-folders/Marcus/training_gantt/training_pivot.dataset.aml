@@ -1,0 +1,22 @@
+Dataset training_pivot {
+  label: 'Training Pivot'
+  description: 'Adaptive pivot gantt: rows = training, columns = full_date (the axis), values = blue/red presence as 0/1 (used as CSS opacity to color cells without template conditionals).'
+  data_source_name: 'demodb'
+  models: [
+    training_gantt_base
+  ]
+  relationships: []
+
+  metric blue_on {
+    label: 'Blue On'
+    type: 'number'
+    description: '1 if any day in this cell is ongoing/blue, else 0.'
+    definition: @aql max(training_gantt_base.blue_flag) ;;
+  }
+  metric red_on {
+    label: 'Red On'
+    type: 'number'
+    description: '1 if any day in this cell is late/red, else 0.'
+    definition: @aql max(training_gantt_base.red_flag) ;;
+  }
+}

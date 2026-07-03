@@ -1,0 +1,75 @@
+Model ag_candidate_training {
+  type: 'table'
+  label: 'Candidate Training'
+  description: ''
+  data_source_name: 'demo_actual_group_poc'
+  dimension candidate_training_id {
+    label: 'Candidate Training Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_training_id }};;
+  }
+  dimension candidate_id {
+    label: 'Candidate Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension training_program_id {
+    label: 'Training Program Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.training_program_id }};;
+  }
+  dimension enrolled_at {
+    label: 'Enrolled At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.enrolled_at }};;
+  }
+  dimension completed_at {
+    label: 'Completed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.completed_at }};;
+  }
+  dimension completion_status {
+    label: 'Completion Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.completion_status }};;
+  }
+  dimension score {
+    label: 'Score'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.score }};;
+  }
+  dimension certification_issued_flag {
+    label: 'Certification Issued Flag'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.certification_issued_flag }};;
+  }
+  dimension training_cost_amount {
+    label: 'Training Cost Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.training_cost_amount }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  owner: 'chukwudi@holistics.io'
+  table_name: '"actual_group_poc"."candidate_training"'
+}

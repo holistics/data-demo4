@@ -1,0 +1,158 @@
+// =====================================================================
+// Actual Group PoC — Recruitment Funnel dataset
+// Supports: Recruitment Funnel / Candidate Ops, Workforce Quality,
+// and source-channel attribution questions.
+// Funnel: candidate -> application -> submission -> interview -> offer -> placement
+// =====================================================================
+Dataset ag_recruitment_funnel {
+  __engine__: 'aql'
+  label: '[AG] Recruitment Funnel'
+  description: 'Application-to-placement funnel, conversion rates, recruiter productivity, and source-channel quality.'
+  data_source_name: 'demo_actual_group_poc'
+
+  models: [
+    ag_candidate,
+    ag_candidate_application,
+    ag_candidate_submission,
+    ag_interview,
+    ag_offer,
+    ag_placement,
+    ag_job_order,
+    ag_job_family,
+    ag_source_channel,
+    ag_employee,
+    ag_client,
+    ag_agency,
+    ag_region
+  ]
+  relationships: [
+    relationship(ag_agency_region_id, true),
+    relationship(ag_candidate_application_candidate_id, true),
+    relationship(ag_candidate_application_job_order_id, true),
+    relationship(ag_candidate_application_source_channel_id, true),
+    relationship(ag_candidate_source_channel_id, true),
+    relationship(ag_candidate_submission_application_id, true),
+    relationship(ag_candidate_submission_submitted_by_employee_id, true),
+    relationship(ag_client_owner_employee_id, true),
+    relationship(ag_employee_agency_id, false),  // pinned off (redundant join path)
+    relationship(ag_interview_submission_id, true),
+    relationship(ag_job_order_agency_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_client_id, false),  // pinned off (redundant join path)
+    relationship(ag_job_order_job_family_id, true),
+    relationship(ag_job_order_owner_employee_id, true),
+    relationship(ag_offer_application_id, true),
+    relationship(ag_placement_agency_id, true),
+    relationship(ag_placement_application_id, true),
+    relationship(ag_placement_candidate_id, true),
+    relationship(ag_placement_client_id, true),
+    relationship(ag_placement_job_order_id, true),
+    relationship(ag_placement_recruiter_employee_id, true),
+  ]
+
+  // ---- Funnel volumes ----
+  metric total_candidates {
+    label: 'Total Candidates'
+    type: 'number'
+    definition: @aql count(ag_candidate.candidate_id);;
+  }
+  metric total_applications {
+    label: 'Total Applications'
+    type: 'number'
+    definition: @aql count(ag_candidate_application.application_id);;
+  }
+  metric total_submissions {
+    label: 'Total Submissions'
+    type: 'number'
+    definition: @aql count(ag_candidate_submission.submission_id);;
+  }
+  metric total_interviews {
+    label: 'Total Interviews'
+    type: 'number'
+    definition: @aql count(ag_interview.interview_id);;
+  }
+  metric total_offers {
+    label: 'Total Offers'
+    type: 'number'
+    definition: @aql count(ag_offer.offer_id);;
+  }
+  metric total_placements {
+    label: 'Total Placements'
+    type: 'number'
+    definition: @aql count(ag_placement.placement_id);;
+  }
+  metric placed_applications {
+    label: 'Placed Applications'
+    type: 'number'
+    definition: @aql count(ag_candidate_application.application_id) | where(ag_candidate_application.application_status is 'placed');;
+  }
+
+  // ---- Conversion rates ----
+  metric application_to_submission_rate {
+    label: 'Application → Submission Rate'
+    type: 'number'
+    definition: @aql safe_divide(total_submissions, total_applications);;
+    format: '0.0%'
+  }
+  metric submission_to_interview_rate {
+    label: 'Submission → Interview Rate'
+    type: 'number'
+    definition: @aql safe_divide(total_interviews, total_submissions);;
+    format: '0.0%'
+  }
+  metric application_to_placement_rate {
+    label: 'Application → Placement Rate'
+    type: 'number'
+    definition: @aql safe_divide(total_placements, total_applications);;
+    format: '0.0%'
+  }
+  metric offer_to_placement_rate {
+    label: 'Offer → Placement Rate'
+    type: 'number'
+    definition: @aql safe_divide(total_placements, total_offers);;
+    format: '0.0%'
+  }
+
+  // ---- Recruiter productivity ----
+  metric recruiters_count {
+    label: 'Active Recruiters'
+    type: 'number'
+    definition: @aql count_distinct(ag_employee.employee_id) | where(ag_employee.is_active is true);;
+  }
+  metric placements_per_recruiter {
+    label: 'Placements per Recruiter'
+    type: 'number'
+    definition: @aql safe_divide(total_placements, recruiters_count);;
+    format: '#,##0.0'
+  }
+  metric candidates_handled {
+    label: 'Distinct Candidates Handled'
+    type: 'number'
+    definition: @aql count_distinct(ag_candidate_application.candidate_id);;
+  }
+  metric placement_conversion_per_candidate {
+    label: 'Placement Conversion per Candidate Handled'
+    type: 'number'
+    definition: @aql safe_divide(total_placements, candidates_handled);;
+    format: '0.0%'
+  }
+
+  // ---- Funnel duration ----
+  // NOTE: "application -> placement" duration is a multi-hop metric. placement
+  // and candidate_application are connected by several paths (application_id,
+  // candidate_id, job_order_id), so it needs an explicit join path to be
+  // unambiguous. Scaffolded here as a clean single-model duration; extend with
+  // an explicit path when wiring the funnel-timing question.
+  metric avg_days_placed_to_start {
+    label: 'Avg Days: Placed → Start'
+    type: 'number'
+    definition: @aql avg(ag_placement, date_diff('day', ag_placement.placed_at, ag_placement.start_date));;
+    format: '#,##0.0'
+  }
+
+  // ---- Period comparison ----
+  metric placements_prev_quarter {
+    label: 'Placements (Prev Quarter)'
+    type: 'number'
+    definition: @aql total_placements | relative_period(ag_placement.placed_at, interval(-1 quarter));;
+  }
+}

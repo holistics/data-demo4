@@ -133,6 +133,115 @@ Dashboard testing_claude {
     }
   }
 
+  block v3: VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Scorer'
+          ref: r(wc_scorers.player_name)
+        },
+        VizFieldFull {
+          label: 'Photo'
+          ref: r(wc_players.picture_url)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'TeamColor'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_scorers.team_code)
+        },
+        VizFieldFull {
+          label: 'Rank'
+          ref: r(wc_scorers.boot_rank)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Pens'
+          ref: r(wc_scorers.penalty_goals)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(wc_scorers.goals)
+          uname: 'goals'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md <style>
+.bp-title { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9;
+  margin:0 0 24px; }
+/* podium order with 3 cards: leader centre (raised + scaled), runner-up left, third right.
+   With exactly 2 (a tie or thin data) both render equal — no false hero. Count-aware via CSS:
+   :first-child:nth-last-child(2) = first of exactly two; :nth-child(2):nth-last-child(2) = middle of three. */
+.bp-row { flex:1; min-height:0; display:flex; justify-content:center; align-items:flex-end; gap:24px; }
+.bp-row .fut:first-child { --rest:perspective(900px) translateY(0) rotateY(0deg) scale(1.12); transform-origin:bottom center; z-index:2;
+  filter:drop-shadow(0 12px 14px rgba(7,30,18,.45)) drop-shadow(0 0 18px rgba(242,200,75,.5)); }
+.bp-row .fut:first-child:nth-last-child(2), .bp-row .fut:first-child:last-child { --rest:perspective(900px) translateY(0) rotateY(0deg) scale(1); }
+.bp-row .fut:nth-child(2):nth-last-child(2) { order:-1; }
+/* The shared .fut card material (shield, foil, tiers t1/t2/t3, deal + foil-hover) lives in
+   header_rail so the podium and the Players gallery are one identical component. Only the
+   podium LAYOUT is here: deal stagger (leader lands last) + the leader's bigger hover. */
+.bp-row .fut:nth-child(1) { animation-delay:.34s; }
+.bp-row .fut:nth-child(2) { animation-delay:.08s; }
+.bp-row .fut:nth-child(3) { animation-delay:.20s; }
+.bp-row .fut:first-child:hover { transform:perspective(900px) translateY(-12px) rotateY(0deg) scale(1.18); }
+</style>
+<p class="bp-title">Golden Boot race</p>
+<div class="bp-row mt-12">
+{% map(rows) %}
+  <article class="fut t{{ `Rank`.formatted }}" style="--teamc:{{ `TeamColor`.raw }};">
+    <svg class="fut-frame" viewBox="0 0 176 232" aria-hidden="true">
+      <path d="M 0 34 C 0 18 10 8 26 7 L 64 7 C 74 7 80 2 88 2 C 96 2 102 7 112 7 L 150 7 C 166 8 176 18 176 34 L 176 168 C 176 192 168 204 146 214 C 124 223 102 230 88 230 C 74 230 52 223 30 214 C 8 204 0 192 0 168 Z" fill="none" stroke="#a37920" stroke-width="5"/>
+    </svg>
+    <span class="fut-medal wc-num">{{ `Rank`.formatted }}</span>
+    <div class="fut-body">
+      <div class="fut-top">
+        <div class="fut-rate"><span class="n wc-num">{{ `Goals`.formatted }}</span><span class="u">Goals</span><img class="fut-flag" src="{{ `Flag`.raw }}" alt="" /></div>
+        <div class="fut-ph"><img src="{{ `Photo`.raw }}" alt="" /></div>
+      </div>
+      <div class="fut-name">{{ `Scorer`.formatted }}</div>
+      <div class="fut-meta">{{ `Team`.formatted }} · <b class="wc-num">{{ `Goals`.formatted }}</b> gls · <b class="wc-num">{{ `Pens`.formatted }}</b> pen</div>
+    </div>
+  </article>
+{% end %}
+</div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'goals'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 3
+        row_limit: 3
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -145,8 +254,8 @@ Dashboard testing_claude {
     block v2 {
       position: pos(660, 20, 620, 400)
     }
-    block v_dzoj {
-      position: pos(400, 460, 620, 400)
+    block v3 {
+      position: pos(60, 440, 620, 420)
     }
   }
 }

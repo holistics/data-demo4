@@ -1,0 +1,226 @@
+Model wc_team_next_h2h {
+  type: 'query'
+  label: 'Next Opponent H2H'
+  description: 'Per team: the next unplayed fixture (opponent, kickoff, venue) joined to every historical World Cup meeting against that opponent, scored from the team\'s perspective. One row per past meeting; teams that never met their next opponent keep a single row with null meeting columns. Exists because "home OR away" cannot be expressed through the dataset filter graph.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_matches, wc_history_matches, wc_teams]
+  query: @sql
+    with sides as (
+      select {{ #m.match_num }} as match_num, {{ #m.home_code }} as team_code, {{ #m.away_code }} as opponent_code,
+             {{ #m.kickoff_utc }} as kickoff_utc, {{ #m.status }} as status, {{ #m.stage }} as stage,
+             {{ #m.group_code }} as group_code, {{ #m.venue }} as venue, {{ #m.city }} as city
+      from {{ #wc_matches as m }}
+      union all
+      select {{ #m2.match_num }}, {{ #m2.away_code }}, {{ #m2.home_code }},
+             {{ #m2.kickoff_utc }}, {{ #m2.status }}, {{ #m2.stage }},
+             {{ #m2.group_code }}, {{ #m2.venue }}, {{ #m2.city }}
+      from {{ #wc_matches as m2 }}
+    ),
+    next_fixture as (
+      select distinct on (team_code) *
+      from sides
+      where status <> 'FT' and team_code is not null and opponent_code is not null
+      order by team_code, kickoff_utc
+    ),
+    hist as (
+      select {{ #h.fifa_match_id }} as h2h_match_id,
+             {{ #h.home_canonical }} as h_home, {{ #h.away_canonical }} as h_away,
+             {{ #h.year }} as year, {{ #h.stage_name }} as stage_name, {{ #h.match_date }} as match_date,
+             {{ #h.home_score }} as home_score, {{ #h.away_score }} as away_score,
+             {{ #h.home_pen }} as home_pen, {{ #h.away_pen }} as away_pen
+      from {{ #wc_history_matches as h }}
+    )
+    select
+      nf.team_code || '-' || coalesce(hh.h2h_match_id, 'none') as h2h_key,
+      nf.team_code,
+      nf.opponent_code,
+      {{ #opp.name }} as opponent_name,
+      {{ #opp.flag_url }} as opponent_flag,
+      {{ #opp.color_hex }} as opponent_color,
+      nf.match_num as next_match_num,
+      nf.kickoff_utc as next_kickoff,
+      nf.stage as next_stage,
+      nf.group_code as next_group,
+      nf.venue as next_venue,
+      nf.city as next_city,
+      hh.h2h_match_id,
+      hh.year,
+      (hh.year)::text as year_text,
+      hh.stage_name,
+      hh.match_date,
+      case when hh.h_home = nf.team_code then hh.home_score else hh.away_score end as team_score,
+      case when hh.h_home = nf.team_code then hh.away_score else hh.home_score end as opp_score,
+      case when hh.h_home = nf.team_code then hh.home_pen else hh.away_pen end as team_pen,
+      case when hh.h_home = nf.team_code then hh.away_pen else hh.home_pen end as opp_pen,
+      case when hh.h2h_match_id is null then null
+           when (case when hh.h_home = nf.team_code then hh.home_score else hh.away_score end)
+              > (case when hh.h_home = nf.team_code then hh.away_score else hh.home_score end) then 'W'
+           when (case when hh.h_home = nf.team_code then hh.home_score else hh.away_score end)
+              < (case when hh.h_home = nf.team_code then hh.away_score else hh.home_score end) then 'L'
+           else 'D' end as result,
+      case when hh.h2h_match_id is null then null
+           else (case when hh.h_home = nf.team_code then hh.home_score else hh.away_score end)::text
+                || '–'
+                || (case when hh.h_home = nf.team_code then hh.away_score else hh.home_score end)::text
+                || case when coalesce(hh.home_pen, 0) + coalesce(hh.away_pen, 0) > 0
+                        then ' (' || (case when hh.h_home = nf.team_code then hh.home_pen else hh.away_pen end)::text
+                             || '–'
+                             || (case when hh.h_home = nf.team_code then hh.away_pen else hh.home_pen end)::text
+                             || ' p)'
+                        else '' end
+           end as score_label
+    from next_fixture nf
+    left join {{ #wc_teams as opp }} on {{ #opp.code }} = nf.opponent_code
+    left join hist hh on (hh.h_home = nf.team_code and hh.h_away = nf.opponent_code)
+                      or (hh.h_home = nf.opponent_code and hh.h_away = nf.team_code);;
+  dimension h2h_key {
+    label: 'H2H Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+  }
+  dimension opponent_code {
+    label: 'Opponent Code'
+    type: 'text'
+  }
+  dimension opponent_name {
+    label: 'Opponent'
+    type: 'text'
+  }
+  dimension opponent_flag {
+    label: 'Opponent Flag URL'
+    type: 'text'
+  }
+  dimension opponent_color {
+    label: 'Opponent Color'
+    type: 'text'
+  }
+  dimension next_match_num {
+    label: 'Next Match Number'
+    type: 'number'
+  }
+  dimension next_kickoff {
+    label: 'Next Kickoff (UTC)'
+    type: 'datetime'
+  }
+  dimension next_stage {
+    label: 'Next Stage'
+    type: 'text'
+  }
+  dimension next_group {
+    label: 'Next Group'
+    type: 'text'
+  }
+  dimension next_venue {
+    label: 'Next Venue'
+    type: 'text'
+  }
+  dimension next_city {
+    label: 'Next City'
+    type: 'text'
+  }
+  dimension h2h_match_id {
+    label: 'H2H Match Id'
+    type: 'text'
+    hidden: true
+  }
+  dimension year {
+    label: 'Edition'
+    type: 'number'
+  }
+  dimension year_text {
+    label: 'Edition Label'
+    type: 'text'
+    description: 'Ungrouped edition year for display ("1998", never "1,998") — cast in SQL because AQL cast() reapplies digit grouping.'
+  }
+  dimension stage_name {
+    label: 'Stage'
+    type: 'text'
+  }
+  dimension match_date {
+    label: 'Meeting Date'
+    type: 'datetime'
+  }
+  dimension team_score {
+    label: 'Team Score'
+    type: 'number'
+  }
+  dimension opp_score {
+    label: 'Opponent Score'
+    type: 'number'
+  }
+  dimension team_pen {
+    label: 'Team Pens'
+    type: 'number'
+  }
+  dimension opp_pen {
+    label: 'Opponent Pens'
+    type: 'number'
+  }
+  dimension result {
+    label: 'Result'
+    type: 'text'
+  }
+  dimension score_label {
+    label: 'Scoreline'
+    type: 'text'
+    description: 'Team-perspective scoreline, e.g. "2–1" or "1–1 (4–3 p)".'
+  }
+  dimension result_color {
+    label: 'Result Color'
+    type: 'text'
+    description: 'Driver field: meeting chip color (win=green, draw=amber, loss=red, never-met=grey).'
+    definition: @aql case(
+      when: wc_team_next_h2h.result == 'W', then: '#1FA36B',
+      when: wc_team_next_h2h.result == 'D', then: '#E0A23B',
+      when: wc_team_next_h2h.result == 'L', then: '#E5362B',
+      else: '#9AA4B2'
+    ) ;;
+  }
+  dimension next_ko_label {
+    label: 'Next Kickoff Label'
+    type: 'text'
+    description: 'Pre-formatted kickoff for card display, e.g. "Sat 13 Jun · 19:00" (UTC).'
+    definition: @aql date_format(wc_team_next_h2h.next_kickoff, '%a %d %b · %H:%M') ;;
+  }
+  dimension next_stage_label {
+    label: 'Next Stage Label'
+    type: 'text'
+    definition: @aql case(
+      when: wc_team_next_h2h.next_stage == 'group', then: concat('Group ', wc_team_next_h2h.next_group),
+      when: wc_team_next_h2h.next_stage == 'r32', then: 'Round of 32',
+      when: wc_team_next_h2h.next_stage == 'r16', then: 'Round of 16',
+      when: wc_team_next_h2h.next_stage == 'qf', then: 'Quarter-final',
+      when: wc_team_next_h2h.next_stage == 'sf', then: 'Semi-final',
+      when: wc_team_next_h2h.next_stage == 'third_place', then: 'Third place',
+      when: wc_team_next_h2h.next_stage == 'final', then: 'Final',
+      else: wc_team_next_h2h.next_stage
+    ) ;;
+  }
+  measure meetings {
+    label: 'Previous Meetings'
+    type: 'number'
+    description: 'Historical World Cup meetings vs the next opponent (null meeting rows do not count).'
+    definition: @aql count(wc_team_next_h2h.h2h_match_id) ;;
+  }
+  measure h2h_wins {
+    label: 'H2H Wins'
+    type: 'number'
+    definition: @aql count_if(wc_team_next_h2h.result == 'W') ;;
+  }
+  measure h2h_draws {
+    label: 'H2H Draws'
+    type: 'number'
+    definition: @aql count_if(wc_team_next_h2h.result == 'D') ;;
+  }
+  measure h2h_losses {
+    label: 'H2H Losses'
+    type: 'number'
+    definition: @aql count_if(wc_team_next_h2h.result == 'L') ;;
+  }
+  owner: 'hung.dd@holistics.io'
+}

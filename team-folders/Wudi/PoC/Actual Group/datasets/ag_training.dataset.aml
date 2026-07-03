@@ -1,0 +1,83 @@
+// =====================================================================
+// Actual Group PoC — Training & Skills dataset
+// Supports: Training / Skills Development questions (completion, post-training
+// placement, training cost, trained-vs-untrained outcomes).
+// =====================================================================
+Dataset ag_training {
+  __engine__: 'aql'
+  label: '[AG] Training & Skills'
+  description: 'Training enrolment, completion, cost and downstream placement outcomes for candidates.'
+  data_source_name: 'demo_actual_group_poc'
+
+  models: [
+    ag_candidate_training,
+    ag_training_program,
+    ag_candidate,
+    ag_placement,
+    ag_job_order,
+    ag_job_family
+  ]
+  relationships: []
+
+  // ---- Enrolment & completion ----
+  metric total_enrollments {
+    label: 'Total Training Enrollments'
+    type: 'number'
+    definition: @aql count(ag_candidate_training.candidate_training_id);;
+  }
+  metric completed_trainings {
+    label: 'Completed Trainings'
+    type: 'number'
+    definition: @aql count(ag_candidate_training.candidate_training_id) | where(ag_candidate_training.completion_status is 'completed');;
+  }
+  metric completion_rate {
+    label: 'Training Completion Rate'
+    type: 'number'
+    definition: @aql safe_divide(completed_trainings, total_enrollments);;
+    format: '0.0%'
+  }
+  metric certifications_issued {
+    label: 'Certifications Issued'
+    type: 'number'
+    definition: @aql count(ag_candidate_training.candidate_training_id) | where(ag_candidate_training.certification_issued_flag is true);;
+  }
+
+  // ---- Cost ----
+  metric total_training_cost {
+    label: 'Total Training Cost'
+    type: 'number'
+    definition: @aql sum(ag_candidate_training.training_cost_amount);;
+    format: '[$$]#,##0'
+  }
+  metric avg_training_score {
+    label: 'Avg Training Score'
+    type: 'number'
+    definition: @aql avg(ag_candidate_training.score);;
+    format: '#,##0.0'
+  }
+
+  // ---- Trained-candidate reach & downstream outcomes ----
+  metric trained_candidates {
+    label: 'Distinct Trained Candidates'
+    type: 'number'
+    definition: @aql count_distinct(ag_candidate_training.candidate_id);;
+  }
+  metric placements_of_trained {
+    label: 'Placements (trained candidates)'
+    type: 'number'
+    definition: @aql count_distinct(ag_placement.candidate_id);;
+    description: 'Distinct placed candidates within this training-scoped dataset; pair with trained_candidates for post-training placement rate.'
+  }
+  metric post_training_placement_rate {
+    label: 'Post-training Placement Rate'
+    type: 'number'
+    definition: @aql safe_divide(placements_of_trained, trained_candidates);;
+    format: '0.0%'
+  }
+  metric training_cost_per_completion {
+    label: 'Training Cost per Completion'
+    type: 'number'
+    definition: @aql safe_divide(total_training_cost, completed_trainings);;
+    format: '[$$]#,##0'
+  }
+}

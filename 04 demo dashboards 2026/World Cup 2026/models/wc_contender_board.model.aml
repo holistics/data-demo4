@@ -1,0 +1,192 @@
+Model wc_contender_board {
+  type: 'query'
+  label: 'Contender Board'
+  description: 'One row per team for the Contender Index: latest Elo + 30-day move, a pre-scaled SVG polyline string of the 24-month Elo curve (field-wide y-bounds so curves are comparable), and the latest Monte Carlo run probabilities with day-over-day deltas vs the previous run. Spark/delta strings are built in SQL — templates cannot loop into a polyline attribute and AQL cast() re-applies digit grouping.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_team_ratings, wc_advance_probs]
+  query: @sql
+    with snaps as (
+      select {{ #r.team_code }} as team_code, {{ #r.snapshot_date }} as snapshot_date, {{ #r.elo }} as elo
+      from {{ #wc_team_ratings as r }}
+      where {{ #r.snapshot_date }} >= current_date - interval '24 months'
+    ),
+    bounds as (
+      select min(snapshot_date) as d0, max(snapshot_date) as d1 from snaps
+    ),
+    team_bounds as (
+      select team_code, min(elo) as tlo, max(elo) as thi from snaps group by team_code
+    ),
+    gspan as (
+      -- one Elo-per-pixel scale for every curve: the widest per-team swing fills the height
+      select greatest(max(thi - tlo), 1) as span from team_bounds
+    ),
+    spark as (
+      -- polyline points in a 100x30 viewBox: x is time-true; y is centred on each team's own
+      -- midpoint but shares the field's Elo-per-pixel scale, so SHAPE/SLOPE compare across
+      -- teams while flat-looking curves mean genuinely stable ratings (a field-wide min/max
+      -- y-axis squeezed all top-10 curves into the same flat band)
+      select s.team_code,
+        string_agg(
+          round((s.snapshot_date - b.d0)::numeric / nullif((b.d1 - b.d0), 0) * 100, 1) || ',' ||
+          round((2 + (1 - ((s.elo - ((tb.tlo + tb.thi) / 2 - g.span / 2)) / g.span)) * 26)::numeric, 1),
+          ' ' order by s.snapshot_date
+        ) as spark_points
+      from snaps s
+      join team_bounds tb using (team_code)
+      cross join bounds b
+      cross join gspan g
+      group by s.team_code
+    ),
+    latest as (
+      select distinct on (team_code) team_code, elo, snapshot_date as elo_date
+      from snaps order by team_code, snapshot_date desc
+    ),
+    prior30 as (
+      select distinct on (team_code) team_code, elo as elo_30d
+      from snaps where snapshot_date <= current_date - 30
+      order by team_code, snapshot_date desc
+    ),
+    runs as (
+      select {{ #p.team_code }} as team_code, {{ #p.run_date }} as run_date,
+        {{ #p.p_champion }} as p_champion, {{ #p.p_final }} as p_final, {{ #p.p_sf }} as p_sf,
+        {{ #p.p_qf }} as p_qf, {{ #p.p_r16 }} as p_r16, {{ #p.p_r32 }} as p_r32,
+        row_number() over (partition by {{ #p.team_code }} order by {{ #p.run_date }} desc) as rn
+      from {{ #wc_advance_probs as p }}
+    )
+    select
+      l.team_code,
+      l.elo,
+      l.elo_date,
+      rank() over (order by l.elo desc) as elo_rank,
+      sp.spark_points,
+      case when p30.elo_30d is null then ''
+           when l.elo - p30.elo_30d >= 0.5 then '▲ ' || round((l.elo - p30.elo_30d)::numeric)::text
+           when p30.elo_30d - l.elo >= 0.5 then '▼ ' || round((p30.elo_30d - l.elo)::numeric)::text
+           else '· 0' end as d30_label,
+      case when p30.elo_30d is null or abs(l.elo - p30.elo_30d) < 0.5 then '#9AA4B2'
+           when l.elo > p30.elo_30d then '#1FA36B' else '#E5362B' end as d30_color,
+      c.run_date,
+      case when c.run_date is null then 'no run recorded'
+           else 'run ' || to_char(c.run_date, 'DD Mon') end as run_label,
+      rank() over (order by c.p_champion desc nulls last) as odds_rank,
+      c.p_champion, c.p_final, c.p_sf, c.p_qf, c.p_r16, c.p_r32,
+      case when c.run_date is null or pr.run_date is null then ''
+           when c.p_champion - pr.p_champion > 0.0005 then '▲ ' || to_char((c.p_champion - pr.p_champion) * 100, 'FM990.0')
+           when pr.p_champion - c.p_champion > 0.0005 then '▼ ' || to_char((pr.p_champion - c.p_champion) * 100, 'FM990.0')
+           else '· 0.0' end as d_champ_label,
+      case when c.run_date is null or pr.run_date is null or abs(c.p_champion - pr.p_champion) <= 0.0005 then '#9AA4B2'
+           when c.p_champion > pr.p_champion then '#1FA36B' else '#E5362B' end as d_champ_color
+    from latest l
+    left join prior30 p30 using (team_code)
+    left join spark sp using (team_code)
+    left join (select * from runs where rn = 1) c using (team_code)
+    left join (select * from runs where rn = 2) pr using (team_code);;
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    primary_key: true
+  }
+  dimension elo {
+    label: 'Elo (latest)'
+    type: 'number'
+  }
+  dimension elo_date {
+    label: 'Elo As Of'
+    type: 'date'
+  }
+  dimension elo_rank {
+    label: 'Elo Rank'
+    type: 'number'
+  }
+  dimension spark_points {
+    label: 'Elo Spark Points'
+    type: 'text'
+    description: 'Driver field: pre-scaled "x,y x,y …" polyline for a 100×30 SVG viewBox — 24 months of Elo, centred per team on a shared Elo-per-pixel scale (slopes comparable, absolute heights not).'
+  }
+  dimension d30_label {
+    label: 'Elo 30d Move'
+    type: 'text'
+    description: 'Driver field: signed Elo move over the last 30 days ("▲ 12"); empty when no 30-day-old snapshot exists.'
+  }
+  dimension d30_color {
+    label: 'Elo 30d Color'
+    type: 'text'
+  }
+  dimension run_date {
+    label: 'Sim Run Date'
+    type: 'date'
+  }
+  dimension run_label {
+    label: 'Run Label'
+    type: 'text'
+  }
+  dimension odds_rank {
+    label: 'Odds Rank'
+    type: 'number'
+    description: 'Rank by latest P(champion) — the board order.'
+  }
+  dimension p_champion {
+    label: 'P Champion'
+    type: 'number'
+  }
+  dimension p_champion_pct {
+    label: 'Title Odds %'
+    type: 'number'
+    definition: @aql wc_contender_board.p_champion * 100 ;;
+  }
+  dimension p_final {
+    label: 'P Reach Final'
+    type: 'number'
+  }
+  dimension p_final_pct {
+    label: 'P Final %'
+    type: 'number'
+    definition: @aql wc_contender_board.p_final * 100 ;;
+  }
+  dimension p_sf {
+    label: 'P Reach SF'
+    type: 'number'
+  }
+  dimension p_sf_pct {
+    label: 'P SF %'
+    type: 'number'
+    definition: @aql wc_contender_board.p_sf * 100 ;;
+  }
+  dimension p_qf {
+    label: 'P Reach QF'
+    type: 'number'
+  }
+  dimension p_qf_pct {
+    label: 'P QF %'
+    type: 'number'
+    definition: @aql wc_contender_board.p_qf * 100 ;;
+  }
+  dimension p_r16 {
+    label: 'P Reach R16'
+    type: 'number'
+  }
+  dimension p_r16_pct {
+    label: 'P R16 %'
+    type: 'number'
+    definition: @aql wc_contender_board.p_r16 * 100 ;;
+  }
+  dimension p_r32 {
+    label: 'P Reach R32'
+    type: 'number'
+  }
+  dimension p_r32_pct {
+    label: 'P R32 %'
+    type: 'number'
+    definition: @aql wc_contender_board.p_r32 * 100 ;;
+  }
+  dimension d_champ_label {
+    label: 'Title Odds Delta'
+    type: 'text'
+    description: 'Driver field: day-over-day move in percentage points ("▲ 2.4"); empty until a second run exists.'
+  }
+  dimension d_champ_color {
+    label: 'Title Odds Delta Color'
+    type: 'text'
+  }
+  owner: 'hung.dd@holistics.io'
+}
