@@ -39,16 +39,7 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-  block intro: TextBlock {
-    content: @md On-shelf availability from ShelfOptix scans — metric definitions below are pulled live from the semantic layer:
-
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 28px; max-width:900px; font-size:12px; line-height:1.35; color:#374151; margin-top:4px;">
-  <div><b>Availability_rate</b> — Share of scanned facings in stock (100 − OOS Rate %).</div>
-  <div><b>OOS_rate</b> — Out-of-stock facings ÷ total scanned facings (0–100).</div>
-  <div><b>OOS_count</b> — Facings scanned with zero shelf quantity (stocking_quantity = 0).</div>
-  <div><b>avail_gap</b> — Availability % minus the user-set target (pts); negative = below target.</div>
-</div>;;
-  }
+  block intro: block_shelfoptix_definitions()
   block f_target: FilterBlock {
     label: 'Target Availability %'
     type: 'field'
