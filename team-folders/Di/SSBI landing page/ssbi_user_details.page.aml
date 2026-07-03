@@ -62,7 +62,7 @@ Dashboard ssbi_user_details {
             }
           }
           settings {
-            color: '#259B6C'
+            color: '#23a672'
             color_palette: 0
           }
         }
@@ -209,7 +209,7 @@ Dashboard ssbi_user_details {
             }
           }
           settings {
-            color: '#8DA2BBFF'
+            color: '#5298b8'
           }
         }
         series {
@@ -222,7 +222,7 @@ Dashboard ssbi_user_details {
             }
           }
           settings {
-            color: '#003A61'
+            color: '#05264C'
           }
         }
       }
@@ -401,21 +401,10 @@ Dashboard ssbi_user_details {
           }
         }
         settings {
-          point {
-            value: '1. Under 20'
-            color: '#05264C'
-          }
-          point {
-            value: '2. From 20 to 29'
-            color: '#00767B'
-          }
-          point {
-            value: '3. 30 and above'
-            color: '#259B6C'
-          }
+          color_palette: 42883
           point {
             value: 'Male'
-            color: '#008976'
+            color: '#396385'
           }
         }
       }
@@ -464,17 +453,18 @@ Dashboard ssbi_user_details {
             }
           }
           settings {
+            color_palette: 42883
             point {
-              value: '2. From 20 to 29'
-              color: '#00767B'
+              value: '1. Under 20'
+              color: '#55c5c9'
             }
             point {
               value: '3. 30 and above'
-              color: '#259B6C'
+              color: '#23a672'
             }
             point {
-              value: 'Male'
-              color: '#259B6C'
+              value: '2. From 20 to 29'
+              color: '#396385'
             }
           }
         }
