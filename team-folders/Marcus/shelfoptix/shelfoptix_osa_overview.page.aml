@@ -774,10 +774,10 @@ Dashboard shelfoptix_osa_overview {
       position: pos(20, 20, 1260, 80)
     }
     block intro {
-      position: pos(20, 100, 940, 120)
+      position: pos(20, 100, 1000, 120)
     }
     block f_target {
-      position: pos(980, 120, 300, 80)
+      position: pos(1040, 120, 240, 80)
       layer: 1
     }
     block f_date {
