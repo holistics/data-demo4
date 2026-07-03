@@ -1,0 +1,27 @@
+// Library block for the ShelfOptix definitions panel.
+// Kept as a separate reusable block on purpose: the page only stores the
+// `block_shelfoptix_definitions()` call, so editing the dashboard in the GUI
+// can't flatten the ${...metric...description} references baked in here.
+// Edit metric descriptions in the shelfoptix_osa dataset and they flow through live.
+@template(
+  title='ShelfOptix — Definitions',
+  description='OSA/OOS metric definitions, pulled live from the semantic layer.',
+  thumbnail='',
+  metadata={
+    group: 'ShelfOptix'
+    block_width: 920
+    block_height: 140
+  }
+)
+Func block_shelfoptix_definitions() {
+  TextBlock {
+    content: @md On-shelf availability from ShelfOptix scans — metric definitions below are pulled live from the semantic layer:
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 28px; max-width:900px; font-size:12px; line-height:1.35; color:#374151; margin-top:4px;">
+  <div><b>Availability %</b> — ${shelfoptix_osa.metric.availability_rate.description}</div>
+  <div><b>OOS Rate %</b> — ${shelfoptix_osa.metric.oos_rate.description}</div>
+  <div><b>OOS Count</b> — ${shelfoptix_osa.metric.oos_count.description}</div>
+  <div><b>&Delta; to Target</b> — ${shelfoptix_osa.metric.avail_gap.description}</div>
+</div> ;;
+  }
+}
