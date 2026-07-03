@@ -15,9 +15,10 @@ EmbedPortal shelfoptix_portal {
     customization {
       global {
         assistant_name: 'ShelfOptix Assistant'
-        icon: 'https://media.holistics.io/ShelfOptix-Logos-full-col-H.png'
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
       }
       chat_page {
+        icon: 'https://media.holistics.io/shelfoptix-assistant.png'
         intro {
           header: 'Ask about on-shelf availability, out-of-stocks, stores, categories or SKUs.'
           body: @md
@@ -29,10 +30,10 @@ EmbedPortal shelfoptix_portal {
         prompt_placeholder: 'e.g. Which stores are below 90% availability this month?'
       }
       toolbar {
-        icon: 'https://media.holistics.io/ShelfOptix-Logos-full-col-H.png'
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
       }
       left_panel {
-        icon: 'https://media.holistics.io/ShelfOptix-Logos-full-col-H.png'
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
       }
     }
   }
