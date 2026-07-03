@@ -49,22 +49,7 @@ Dashboard ssbi_demo {
           }
           settings {
             color: '#05264C'
-            point {
-              value: 'Asia'
-              color: '#07326C'
-            }
-            point {
-              value: 'Europe'
-              color: '#00767B'
-            }
-            point {
-              value: 'Oceania'
-              color: '#00B8D5FF'
-            }
-            point {
-              value: 'North America'
-              color: '#259B6C'
-            }
+            color_palette: 42883
           }
         }
       }
@@ -224,18 +209,7 @@ Dashboard ssbi_demo {
           ref: r(ecommerce_orders.total_orders_count)
         }
         settings {
-          point {
-            value: 'cancelled'
-            color: '#05264C'
-          }
-          point {
-            value: 'delivered'
-            color: '#00767B'
-          }
-          point {
-            value: 'refunded'
-            color: '#259B6C'
-          }
+          color_palette: 42883
         }
       }
       settings {
@@ -304,21 +278,10 @@ Dashboard ssbi_demo {
           }
           settings {
             color: '#05264C'
-            point {
-              value: 'Asia'
-              color: '#07326C'
-            }
-            point {
-              value: 'Europe'
-              color: '#00767B'
-            }
+            color_palette: 42883
             point {
               value: 'Oceania'
-              color: '#00B8D5FF'
-            }
-            point {
-              value: 'North America'
-              color: '#259B6C'
+              color: '#55c5c9'
             }
           }
         }
@@ -359,18 +322,7 @@ Dashboard ssbi_demo {
           ref: r(ecommerce_orders.total_orders_count)
         }
         settings {
-          point {
-            value: 'cancelled'
-            color: '#05264C'
-          }
-          point {
-            value: 'delivered'
-            color: '#00767B'
-          }
-          point {
-            value: 'refunded'
-            color: '#259B6C'
-          }
+          color_palette: 42883
         }
       }
       settings {
