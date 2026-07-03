@@ -6,7 +6,8 @@ Dataset shelfoptix_osa {
     shelfoptix_store_scan_sample,
     shelfoptix_dim_store_sample,
     shelfoptix_dim_tenant_sample,
-    shelfoptix_dim_product_sample
+    shelfoptix_dim_product_sample,
+    shelfoptix_params
   ]
   relationships: [
     relationship(shelfoptix_store_scan_sample.store_no > shelfoptix_dim_store_sample.store_no, true),
@@ -47,7 +48,7 @@ Dataset shelfoptix_osa {
   metric oos_count {
     label: 'OOS Count'
     type: 'number'
-    description: 'Facings observed out of stock (stocking_quantity = 0).'
+    description: 'Facings scanned with zero shelf quantity (stocking_quantity = 0).'
     definition: @aql sum(shelfoptix_store_scan_sample.is_oos) ;;
   }
   metric in_stock_count {
@@ -58,13 +59,13 @@ Dataset shelfoptix_osa {
   metric oos_rate {
     label: 'OOS Rate %'
     type: 'number'
-    description: 'OOS facings / total facings, in percentage points (0-100).'
+    description: 'Out-of-stock facings ÷ total scanned facings (0–100).'
     definition: @aql (sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no) ;;
   }
   metric availability_rate {
     label: 'Availability %'
     type: 'number'
-    description: 'Observed on-shelf availability = 100 - OOS rate (of scanned facings), in percentage points.'
+    description: 'Share of scanned facings in stock (100 − OOS Rate %).'
     definition: @aql 100.0 - ((sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no)) ;;
   }
   metric total_units {
@@ -97,13 +98,13 @@ Dataset shelfoptix_osa {
   metric avail_target {
     label: 'Target %'
     type: 'number'
-    description: 'Constant availability target (90%). Used as a straight reference line.'
-    definition: @aql (sum(shelfoptix_store_scan_sample.is_oos) * 0.0) + 90.0 ;;
+    description: 'User-set availability target (from the Target Availability % parameter). Straight reference line.'
+    definition: @aql (sum(shelfoptix_store_scan_sample.is_oos) * 0.0) + (shelfoptix_params.target_availability | first()) ;;
   }
   metric avail_gap {
     label: 'Δ to Target'
     type: 'number'
-    description: 'Availability % minus 90% target (percentage points). Negative = below target.'
-    definition: @aql 10.0 - ((sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no)) ;;
+    description: 'Availability % minus the user-set target (pts); negative = below target.'
+    definition: @aql (100.0 - ((sum(shelfoptix_store_scan_sample.is_oos) * 100.0) / count(shelfoptix_store_scan_sample.order_line_item_no))) - (shelfoptix_params.target_availability | first()) ;;
   }
 }
