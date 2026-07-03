@@ -1,7 +1,6 @@
 Dashboard shelfoptix_osa_overview {
   title: 'ShelfOptix — OSA / OOS Overview'
   description: 'Shelf availability story: are we on target (health), where are we losing availability (diagnosis), and what/who to fix (action). OOS = stocking_quantity 0; Availability = 100 - OOS Rate. Enriched via tenant/store/product dimensions.'
-
   block header: VizBlock {
     label: 'Header'
     viz: MarkdownViz {
@@ -44,15 +43,14 @@ Dashboard shelfoptix_osa_overview {
     content: @md On-shelf availability from ShelfOptix scans — metric definitions below are pulled live from the semantic layer:
 
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 28px; max-width:900px; font-size:12px; line-height:1.35; color:#374151; margin-top:4px;">
-  <div><b>${shelfoptix_osa.metric.availability_rate.__meta__.name}</b> — ${shelfoptix_osa.metric.availability_rate.description}</div>
-  <div><b>${shelfoptix_osa.metric.oos_rate.__meta__.name}</b> — ${shelfoptix_osa.metric.oos_rate.description}</div>
-  <div><b>${shelfoptix_osa.metric.oos_count.__meta__.name}</b> — ${shelfoptix_osa.metric.oos_count.description}</div>
-  <div><b>${shelfoptix_osa.metric.avail_gap.__meta__.name}</b> — ${shelfoptix_osa.metric.avail_gap.description}</div>
+  <div><b>Availability_rate</b> — Share of scanned facings in stock (100 − OOS Rate %).</div>
+  <div><b>OOS_rate</b> — Out-of-stock facings ÷ total scanned facings (0–100).</div>
+  <div><b>OOS_count</b> — Facings scanned with zero shelf quantity (stocking_quantity = 0).</div>
+  <div><b>avail_gap</b> — Availability % minus the user-set target (pts); negative = below target.</div>
 </div>
 
 <span style="font-size:11px; color:#6b7280;">Tenant = customer org · reporting grain = primary SKU</span>;;
   }
-
   block f_target: FilterBlock {
     label: 'Target Availability %'
     type: 'field'
@@ -77,7 +75,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block f_date: FilterBlock {
     label: 'Scan Date'
     type: 'field'
@@ -188,7 +185,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block kpi_availability: VizBlock {
     label: 'Availability %'
     viz: MetricKpi {
@@ -374,7 +370,6 @@ Dashboard shelfoptix_osa_overview {
   block sec_health: TextBlock {
     content: @md ## ① OSA - are we hitting the target?;;
   }
-
   block avail_trend: VizBlock {
     label: 'Availability % vs Target by Week'
     viz: CombinationChart {
@@ -428,7 +423,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block scan_coverage: VizBlock {
     label: 'Scan Coverage by Type'
     viz: ColumnChart {
@@ -544,7 +538,6 @@ Dashboard shelfoptix_osa_overview {
   block sec_where: TextBlock {
     content: @md ## ② OOS - Where are we losing availability?;;
   }
-
   block oos_by_category: VizBlock {
     label: 'OOS Rate % by Category'
     viz: ColumnChart {
@@ -573,7 +566,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block oos_by_region: VizBlock {
     label: 'OOS Rate % by Region'
     viz: ColumnChart {
@@ -602,7 +594,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block oos_by_banner: VizBlock {
     label: 'OOS Rate % by Retailer Banner'
     viz: ColumnChart {
@@ -631,7 +622,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block top_oos_skus: VizBlock {
     label: 'Top OOS SKUs — replenishment shortlist'
     viz: DataTable {
@@ -699,7 +689,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   block store_detail: VizBlock {
     label: 'Store Detail — worst first'
     viz: DataTable {
@@ -786,9 +775,7 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-
   theme: shelfoptix
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -892,7 +879,6 @@ Dashboard shelfoptix_osa_overview {
       position: pos(660, 1500, 620, 340)
       layer: 8
     }
-
     mobile {
       mode: 'auto'
     }
