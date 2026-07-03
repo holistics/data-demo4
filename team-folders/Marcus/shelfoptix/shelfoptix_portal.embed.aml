@@ -18,7 +18,7 @@ EmbedPortal shelfoptix_portal {
         icon: 'https://media.holistics.io/shelfoptix-icon.png'
       }
       chat_page {
-        icon: 'https://media.holistics.io/shelfoptix-assistant.png'
+        icon: 'https://media.holistics.io/shelfoptix_assistant.png'
         intro {
           header: 'Ask about on-shelf availability, out-of-stocks, stores, categories or SKUs.'
           body: @md
