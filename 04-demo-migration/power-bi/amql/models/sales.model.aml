@@ -74,10 +74,13 @@ Model sales {
   }
 
   dimension sales_territory_key {
-    label: 'Sales Territory Key'
+    label: 'Formated price'
     type: 'number'
-    hidden: true
+    description: ""
+    hidden: false
     definition: @sql {{ #SOURCE.sales_territory_key }};;
+    primary_key: false
+    format: "#,###[\$NOK]"
   }
 
   dimension order_quantity {
