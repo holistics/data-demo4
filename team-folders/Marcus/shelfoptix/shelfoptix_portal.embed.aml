@@ -1,0 +1,40 @@
+// Internal explore + Ask AI portal over the ShelfOptix OSA/OOS dataset (all tenants).
+// Paired with the single-dashboard embed (customer-facing, tenant-scoped) — this portal
+// is the ShelfOptix-internal, all-access self-serve view, so it needs no row-level
+// permission (which would otherwise conflict with the single-dashboard embed's row_based).
+EmbedPortal shelfoptix_portal {
+  description: 'ShelfOptix internal self-serve exploration + Ask AI over OSA/OOS (all tenants).'
+  objects: [
+    // Dashboards
+    shelfoptix_osa_overview,
+    // Datasets (self-serve exploration + AI)
+    shelfoptix_osa,
+  ]
+  initial_object: 'ai'
+  ai {
+    customization {
+      global {
+        assistant_name: 'ShelfOptix Assistant'
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
+      }
+      chat_page {
+        icon: 'https://media.holistics.io/shelfoptix_assistant.png'
+        intro {
+          header: 'Ask about on-shelf availability, out-of-stocks, stores, categories or SKUs.'
+          body: @md
+            ## 🟢 Track on-shelf availability & out-of-stock trends
+            ## 🏬 Drill by tenant, store, region, category or SKU
+            ## 📌 Save any insight to your dashboard
+          ;;
+        }
+        prompt_placeholder: 'e.g. Which stores are below 90% availability this month?'
+      }
+      toolbar {
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
+      }
+      left_panel {
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
+      }
+    }
+  }
+}

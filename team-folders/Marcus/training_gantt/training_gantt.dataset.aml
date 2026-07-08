@@ -1,0 +1,9 @@
+Dataset training_gantt {
+  label: 'Training Gantt'
+  description: 'Flat one-row-per-training dataset feeding the Markdown Gantt viz.'
+  data_source_name: 'demodb'
+  models: [
+    training_gantt_bars
+  ]
+  relationships: []
+}

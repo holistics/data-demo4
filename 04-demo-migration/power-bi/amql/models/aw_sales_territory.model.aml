@@ -1,0 +1,29 @@
+Model aw_sales_territory {
+  type: 'table'
+  label: 'Sales Territory'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.sales_territory'
+
+  dimension sales_territory_key {
+    label: 'Sales Territory Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.SalesTerritoryKey }};;
+  }
+  dimension region {
+    label: 'Region'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Region }};;
+  }
+  dimension country {
+    label: 'Country'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Country }};;
+  }
+  dimension group_name {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Group }};;
+  }
+}
