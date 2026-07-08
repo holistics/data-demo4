@@ -1,0 +1,528 @@
+Dashboard fanserv_demo_dashboard {
+  title: 'FanServ Stadium Demo Dashboard'
+  description: '''FanServ-branded standalone dashboard for validating the reusable Stadium theme with real finance and operating-performance content.'''
+  theme: fanserv_stadium_light
+
+  block hero_bg: TextBlock {
+    content: @md <div style="width:100%;height:100%;border-radius:12px;background:var(--fanserv-hero-bg);border:1px solid var(--fanserv-hero-border);"></div>;;
+    theme: fanserv_transparent_block
+  }
+
+  block hero_copy: TextBlock {
+    content: @md <h1 class="fanserv-hero-title">FanServ Stadium Analytics</h1>
+<p class="fanserv-muted" style="max-width:780px;margin-top:12px;font-size:15px;line-height:1.5;">Campaign, revenue, and audience operating signals for sports media teams that need game-day clarity without spreadsheet handoffs.</p>;;
+    theme: fanserv_transparent_block
+  }
+
+  block live_chip: TextBlock {
+    content: @md <span class="fanserv-live-chip" style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,146,71,0.24);border-radius:999px;padding:4px 10px;background:rgba(0,146,71,0.10);color:#045C30;font:700 12px Inter, Manrope, sans-serif;letter-spacing:0.08em;text-transform:uppercase;"><img src="data:image/gif;base64,R0lGODlhHAAcAPIFAAAAAACSRwCSRwCSRwCSR////wAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJMgAAACwAAAAAHAAcAAADOAi63P4wykmrvTjrzbv/WCAQQuANRJoOXKC+pja+qbDR7zbTtubiMQ3qxeqISEGQcslsOp/QKCQBACH5BAkyAAAALAAAAAAcABwAgwAAAACSRwCSRwCSRwCSRwCSRwCSRwCSRwCSR////wAAAAAAAAAAAAAAAAAAAAAAAARPEMhJq7046827/2AojmRpboEwCEFJDIWBGMVAjMOB7PsxiIECb1hogQSy4c4gCA2Uw98xqWSGglBEUZRT+kav2Kx2I6VWxpN6zW673/BSBAAh+QQJMgAAACwAAAAAHAAcAIMAAAAAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkf///8AAAAAAAAAAAAEZRDISau9OOvNu/9gKI5kSQXCQAxCQBbGIctGIRYykiwJItufQEyxKBYVB4PLIzggjFCf4DM47KDFxGHwIRyw0AOBagXztp/mEywNDrFIJQjn3PV+t9gsCRShVCxLJoOEhYaHiIkRACH5BAkyAAAALAAAAAAcABwAgwAAAACSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSR////wAAAAAAAAR7EMhJq7046827/2AojmEgDMQgBGRhvLBRiAN8EAc8gK5BIAlGAkF4zTqBF0HBaDYVRQOLI3ghnFjES9CpHYLYZiK34xQJYey5a/imheRO1XBNaw1cTtLHxEJfUxw9P0FDUUceNS83OS9lPDEwiCUnCyqBJJmam5ydnh4RACH5BAkyAAAALAAAAAAcABwAhAAAAACSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSRwCSR////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAW4ICCOZGmeaKqubOu+8CsMREEMQiwaB+L/iIMBNgAmCgngwFVEKBaBUWCh8C1XBl+CcWIkEUNVT8EFNBwQR0PEqB5UAt9C9IDY7Q/RwpdDNaMNd4JrAVYpBAgJImiCdg4iSQQpBQgFIo2CIpSWKIiKAIyNjwCRKX9mmBCEhihxCHMAdYJ5AHsIfShjZWdpawBtQVhaZSVePmEqTU9RIlNVCFcsTVpISjA8QD9COgAzNTe43OLj5OUuIQAh+QQJMgAAACwAAAAAHAAcAIQAAAAAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkf///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFvSAgjmRpnmiqrmzrvqMwEAUxCPBoHEjvIwfDK1H4KQqKXyHBSix6CkaJkUQsmKoiYpAa9AoqQ4+r8iKEKJ6C1HBAHA1S8oAS9KSiB2S/f4wYPTgmZgEiDXyIcQABYycECGsiboh7DiNJBCdFYCKUiCObjpAjk5SWIpgnhIaeEIqMWyd2CHgAeoh+IoAIgiZqbG5wckApYrFlPWgoWmSqXytOULW6VVdNWlBISlgtOz8+QTkiMjQ2veLo6eotIQAh+QQJMgAAACwAAAAAHAAcAIQAAAAAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkf///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF2CAgjmRpnmiqrmw7BsJAFMQgBO47GEfvH4YBriVA+BKKgiLhQwhYCx+BUWIQfAuVoJd4ogTMg9cUMCYaqwYTMSwNemNtb0DmEUqOR+ThKF0NbSJbB1QjEBGIiBAkDHBuBwkkDomUfSNMdCRXCiR6lIgPJAoHdyQFBwUkn5SmqH4HnCOen6Ejo6Ujb5Ejk6uWIpglg4Uih5SLI41iJQF2eHp8r4Amb8ssg5nMZmgqagdsX1xxwmHjJVE9U1VXPVkrRUdJS03mKAE7Pz5BgS0wMjQ2+OUYSJBFCAAh+QQJMgAAACwAAAAAHAAcAIQAAAAAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkcAkkf///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF3CAgjmRpnmiqroEwEAUxCMFqGgei7/th2KIET7EoLBS8BIuwG/xIhsGOUEMxEYXnyVDQEVBCxAGYQyhLBl0BKOoitKIyfJUWkwK6gYnReDQYJlIIVQACOnMOD4qKDmg6AiNSCiUMi5aAJEh6IkwLJX2Wig0lCwhfbVgloZYlXWucCJ4koKGjJKWnAJKUqw+YI5ojhm8liZaNUI8jeAibJHx+v5E6hABybAB1Y8mpbG5zAGHbK2VnJldZKVxeKQFXzXNRU9UnYTpERkg75nRlPD3gWLiAIYMGtoMmQgAAIfkECTIAAAAsAAAAABwAHAAAAzgIutz+MMpJq7046827/1ggEELgDUSaDlygvqY2vqmw0e8207bm4jEN6sXqiEhBkHLJbDqf0CgkAQAh+QQJMgAAACwAAAAAHAAcAAADOAi63P4wykmrvTjrzbv/WCAQQuANRJoOXKC+pja+qbDR7zbTtubiMQ3qxeqISEGQcslsOp/QKCQBADs=" alt="" aria-hidden="true" style="width:20px;height:20px;display:block;flex:none;" />Stadium Live</span>;;
+    theme: fanserv_transparent_block
+  }
+
+  block f_date: FilterBlock {
+    label: 'Date Range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_finance_extended
+      field: ref('dim_dates', 'date_key')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block kpi_gmv: VizBlock {
+    label: 'Booked Media Value'
+    viz: MetricKpi {
+      dataset: demo_finance_extended
+      value: VizFieldFull {
+        label: 'Booked Media Value'
+        ref: 'gmv'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: ref('dim_dates', 'date_key')
+        duration: 1
+        granularity: 'year'
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_nmv: VizBlock {
+    label: 'Net Media Value'
+    viz: MetricKpi {
+      dataset: demo_finance_extended
+      value: VizFieldFull {
+        label: 'Net Media Value'
+        ref: 'nmv'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: ref('dim_dates', 'date_key')
+        duration: 1
+        granularity: 'year'
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_profit: VizBlock {
+    label: 'Net Profit'
+    viz: MetricKpi {
+      dataset: demo_finance_extended
+      value: VizFieldFull {
+        label: 'Net Profit'
+        ref: 'net_profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: ref('dim_dates', 'date_key')
+        duration: 1
+        granularity: 'year'
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_cash: VizBlock {
+    label: 'Cash Balance'
+    viz: MetricKpi {
+      dataset: demo_finance_extended
+      value: VizFieldFull {
+        label: 'Cash Balance'
+        ref: 'total_cash_balance'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: ref('dim_dates', 'date_key')
+        duration: 1
+        granularity: 'year'
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block revenue_trend_title: TextBlock {
+    content: @md <h2 style="margin:0;color:var(--fanserv-heading);font:700 24px Inter, Manrope, sans-serif;letter-spacing:-0.03em;">Revenue Playbook</h2>;;
+    theme: fanserv_transparent_block
+  }
+
+  block cost_trend_title: TextBlock {
+    content: @md <h2 style="margin:0;color:var(--fanserv-heading);font:700 24px Inter, Manrope, sans-serif;letter-spacing:-0.03em;">Cost Control</h2>;;
+    theme: fanserv_transparent_block
+  }
+
+  block revenue_trend: VizBlock {
+    label: 'Revenue, Cost, and Profit Trend'
+    viz: CombinationChart {
+      dataset: demo_finance_extended
+      filter {
+        field: ref('dim_dates', 'date_key')
+        operator: 'after'
+        value: '2024-01-01'
+      }
+      x_axis: VizFieldFull {
+        ref: ref('dim_dates', 'date_key')
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Net Media Value'
+            ref: 'nmv'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Total Cost'
+            ref: 'total_cost'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Profit'
+            ref: 'net_profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#00E66F'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block cost_budget_trend: VizBlock {
+    label: 'COGS, Operating Cost, and Budget'
+    viz: CombinationChart {
+      dataset: demo_finance_extended
+      x_axis: VizFieldFull {
+        ref: ref('dim_dates', 'date_key')
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Cost of Goods Sold'
+            ref: 'cost_of_goods_sold'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Operating Cost'
+            ref: 'cost_of_operations'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Expense Budget'
+            ref: 'expense_budgets'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#F59E0B'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block expense_mix: VizBlock {
+    label: 'Operating Expenses by Category'
+    viz: ColumnChart {
+      dataset: demo_finance_extended
+      x_axis: VizFieldFull {
+        ref: ref('dim_dates', 'date_key')
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: ref('ecommerce_operating_expenses', 'category')
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_stack_total: true
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Operating Cost'
+            ref: 'cost_of_operations'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block monthly_table: VizBlock {
+    label: 'Monthly Performance Detail'
+    viz: DataTable {
+      dataset: demo_finance_extended
+      fields: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(dim_dates.date_key)
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'month'
+        },
+        VizFieldFull {
+          label: 'Booked Media Value'
+          ref: r(demo_finance_extended.gmv)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_gmv'
+        },
+        VizFieldFull {
+          label: 'Net Media Value'
+          ref: r(demo_finance_extended.nmv)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_nmv'
+        },
+        VizFieldFull {
+          label: 'Total Cost'
+          ref: r(demo_finance_extended.total_cost)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_total_cost'
+        },
+        VizFieldFull {
+          label: 'Net Profit'
+          ref: r(demo_finance_extended.net_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_net_profit'
+        },
+        VizFieldFull {
+          label: 'Cash Balance'
+          ref: r(demo_finance_extended.total_cash_balance)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_total_cash_balance'
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'month'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'month'
+            width: 106
+          },
+          ColumnStyle {
+            key: 'custom_gmv'
+            width: 187
+          },
+          ColumnStyle {
+            key: 'custom_nmv'
+            width: 164
+          },
+          ColumnStyle {
+            key: 'custom_total_cost'
+            width: 127
+          },
+          ColumnStyle {
+            key: 'custom_net_profit'
+            width: 124
+          },
+          ColumnStyle {
+            key: 'custom_total_cash_balance'
+            width: 148
+          }
+        ]
+      }
+    }
+  }
+
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'Tab 1'
+      width: 1440
+      height: 1580
+      block hero_bg {
+        position: pos(20, 20, 1400, 220)
+        layer: -1
+      }
+      block hero_copy {
+        position: pos(60, 72, 880, 110)
+        layer: 1
+      }
+      block live_chip {
+        position: pos(1258, 36, 220, 60)
+        layer: 1
+      }
+      block f_date {
+        position: pos(1148, 138, 260, 90)
+        layer: 1
+      }
+      block kpi_gmv {
+        position: pos(20, 270, 350, 120)
+      }
+      block kpi_nmv {
+        position: pos(390, 270, 350, 120)
+      }
+      block kpi_profit {
+        position: pos(750, 270, 320, 120)
+      }
+      block kpi_cash {
+        position: pos(1090, 270, 340, 120)
+      }
+      block revenue_trend_title {
+        position: pos(20, 420, 650, 40)
+      }
+      block cost_trend_title {
+        position: pos(740, 420, 650, 40)
+      }
+      block revenue_trend {
+        position: pos(20, 480, 690, 410)
+      }
+      block cost_budget_trend {
+        position: pos(730, 480, 690, 410)
+      }
+      block expense_mix {
+        position: pos(20, 930, 690, 660)
+      }
+      block monthly_table {
+        position: pos(730, 930, 690, 660)
+      }
+      default_zoom: 'fit_to_page'
+    }
+    tab tab_4ehm: CanvasLayout {
+      label: 'Tab 2'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: [
+        CustomMapping {
+          block: [
+            'kpi_gmv',
+            'kpi_nmv',
+            'kpi_profit',
+            'kpi_cash',
+            'revenue_trend',
+            'cost_budget_trend',
+            'expense_mix',
+            'monthly_table'
+          ]
+          field: ref('dim_dates', 'date_key')
+        }
+      ]
+    }
+  ]
+
+  settings {
+    autorun_on_open: true
+  }
+}
