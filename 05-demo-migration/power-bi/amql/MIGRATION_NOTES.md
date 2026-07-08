@@ -1,7 +1,7 @@
 # AdventureWorks Sales Power BI → Holistics Migration Notes
 
-Source: `04-demo-migration/power-bi/AdventureWorksSales.SemanticModel` + `AdventureWorksSales.Report`
-Target: `04-demo-migration/power-bi/amql/` (data source `md_adventure_works_sales`, schema `main`)
+Source: `05-demo-migration/power-bi/AdventureWorksSales.SemanticModel` + `AdventureWorksSales.Report`
+Target: `05-demo-migration/power-bi/amql/` (data source `md_adventure_works_sales`, schema `main`)
 
 ## Artifacts produced
 
@@ -18,7 +18,7 @@ Target: `04-demo-migration/power-bi/amql/` (data source `md_adventure_works_sale
 | Dataset | `datasets/adventure_works_sales.dataset.aml` | Semantic model |
 | Dashboard | `dashboards/aw_sales_dashboard.page.aml` | Report pages combined as `TabLayout` tabs |
 
-All files validated: `holistics aml validate 04-demo-migration/power-bi/amql/` → `No compilation errors found.`
+All files validated: `holistics aml validate 05-demo-migration/power-bi/amql/` → `No compilation errors found.`
 
 ## Mapping decisions
 

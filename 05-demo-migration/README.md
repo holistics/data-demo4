@@ -5,7 +5,7 @@ This folder contains Holistics AMQL migration examples grouped by source BI or a
 Use one subdirectory per source platform so future migration projects can follow the same shape.
 
 ```text
-04-demo-migration/
+05-demo-migration/
 ├── power-bi/
 │   ├── README.md
 │   └── amql/

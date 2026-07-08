@@ -100,11 +100,25 @@ Model ecommerce_products {
     hidden: false
     definition: @sql {{ #SOURCE.product_image_url }};;
   }
+  dimension untitled_dimension {
+    label: "Untitled dimension"
+    type: "text"
+    description: ""
+    definition: @aql concat(
+  '<img src="',
+  ecommerce_products.product_image_url,
+  '" style="text-align:center;height:100px;width:100px;object-fit:cover" />'
+);;
+  }
 
   measure total_products {
     label: 'Total Products'
     type: 'number'
+    description: ""
+    hidden: false
     definition: @sql count( {{ id }} ) ;;
+    aggregation_type: "custom"
+    format: "#,###0.00 [\$\m\²]"
   }
 
   owner: 'vincent+demo4@holistics.io'

@@ -13,12 +13,12 @@ https://github.com/microsoft/powerbi-desktop-samples/blob/main/AdventureWorks%20
 1. Open `AdventureWorks Sales.pbix` in Power BI Desktop.
 2. Use **File → Save As**.
 3. Choose **Power BI Project (`.pbip`)** format.
-4. Save the generated project under `04-demo-migration/power-bi/`.
+4. Save the generated project under `05-demo-migration/power-bi/`.
 
 Expected generated assets:
 
 ```text
-04-demo-migration/power-bi/
+05-demo-migration/power-bi/
 ├── AdventureWorksSales.Report/
 └── AdventureWorksSales.SemanticModel/
 ```
@@ -30,7 +30,7 @@ The converted Power BI assets are source inputs for migration only. They are ign
 The migrated Holistics assets live in:
 
 ```text
-04-demo-migration/power-bi/amql/
+05-demo-migration/power-bi/amql/
 ├── dashboards/
 ├── datasets/
 ├── models/

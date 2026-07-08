@@ -1,0 +1,15 @@
+Dataset slack_dashboard {
+  label: 'Slack Dashboard'
+  description: 'Thin dataset for the migrated Superset Slack Dashboard. No relationships — Superset export contained no joins.'
+  data_source_name: 'demodb'
+
+  models: [
+    messages,
+    messages_channels,
+    threads,
+    slack_users,
+    new_members_daily
+  ]
+
+  relationships: []
+}

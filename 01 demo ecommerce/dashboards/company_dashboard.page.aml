@@ -1994,7 +1994,7 @@ Uncover trends by comparing current performance against a previous period.
         layer: 19
       }
       block v20 {
-        position: pos(1020, 640, 220, 120)
+        position: pos(1000, 640, 220, 120)
         layer: 1
       }
       block v21 {
