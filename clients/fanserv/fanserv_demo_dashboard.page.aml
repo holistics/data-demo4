@@ -440,7 +440,7 @@ Dashboard fanserv_demo_dashboard {
     tab view_1: CanvasLayout {
       label: 'Tab 1'
       width: 1440
-      height: 1580
+      height: 1600
       block hero_bg {
         position: pos(20, 20, 1400, 220)
         layer: -1
