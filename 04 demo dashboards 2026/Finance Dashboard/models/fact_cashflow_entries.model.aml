@@ -36,14 +36,14 @@ Model fact_cashflow_entries {
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.amount }};;
+    definition: @sql CAST({{ #SOURCE.amount }} AS numeric);;
   }
   dimension cash_balance_eop {
     label: 'Cash balance eop'
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.cash_balance_eop }};;
+    definition: @sql CAST({{ #SOURCE.cash_balance_eop }} AS numeric);;
   }
   dimension scenario {
     label: 'Scenario'
@@ -69,5 +69,5 @@ Model fact_cashflow_entries {
     ]
   }
   owner: 'di.hoang+20166@holistics.io'
-  table_name: '"persisted"."holistics_fact_cashflow_31eae_202603050300"'
+  table_name: '"demo_saas_finance"."difin_fact_cashflow_entries"'
 }

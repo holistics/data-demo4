@@ -104,7 +104,7 @@ Model ecommerce_products {
   measure total_products {
     label: 'Total Products'
     type: 'number'
-    definition: @sql count( {{ id }} ) ;;
+    definition: @aql count(ecommerce_products.id) ;;
   }
 
   owner: 'vincent+demo4@holistics.io'

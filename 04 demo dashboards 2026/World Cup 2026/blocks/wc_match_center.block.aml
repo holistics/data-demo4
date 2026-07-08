@@ -1,0 +1,1239 @@
+// Match Center tab blocks. Match filter (mc_match_filter) stays inline in the page.
+
+Func wc_mc_filter_hint() {
+  TextBlock {
+    content: @md
+<style>
+.mc-hint { font-size:10.5px; line-height:1.5; color:rgba(234,255,242,.62); padding:2px 4px; }
+.mc-hint b { color:rgba(234,255,242,.85); font-weight:600; }
+</style>
+<div class="mc-hint"><b>Pick a match</b> — scoreboard, ticker, team sheets and the odds board all re-arm. Ticker and sheets fill at kickoff; odds refresh with the nightly sim run.</div>
+;;
+  }
+}
+
+Func wc_mc_scoreboard() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeFlag'
+          ref: r(wc_home_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'HomeColor'
+          ref: r(wc_home_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayFlag'
+          ref: r(wc_away_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'AwayColor'
+          ref: r(wc_away_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'StatusText'
+          ref: r(wc_matches.status_label)
+        },
+        VizFieldFull {
+          label: 'StatusColor'
+          ref: r(wc_matches.status_color)
+        },
+        VizFieldFull {
+          label: 'StageLabel'
+          ref: r(wc_matches.stage_label)
+        },
+        VizFieldFull {
+          label: 'FeaturedSort'
+          ref: r(wc_matches.featured_sort)
+          uname: 'mc_featured'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Display'
+          ref: r(wc_matches.featured_display)
+        },
+        VizFieldFull {
+          label: 'DisplaySub'
+          ref: r(wc_matches.featured_display_sub)
+        },
+        VizFieldFull {
+          label: 'KODay'
+          ref: r(wc_matches.kickoff_day)
+        },
+        VizFieldFull {
+          label: 'KOTime'
+          ref: r(wc_matches.kickoff_time)
+        },
+        VizFieldFull {
+          label: 'Venue'
+          ref: r(wc_matches.venue)
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(wc_matches.city)
+        },
+        VizFieldFull {
+          label: 'Att'
+          ref: r(wc_matches.attendance)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md
+<style>
+.sb { display:flex; justify-content:center; padding:8px 10px 16px; }
+.sb-bezel { position:relative; width:100%; border-radius:14px; padding:10px;
+  background:linear-gradient(180deg, var(--board-bezel-a), var(--board-bezel-b));
+  box-shadow:0 14px 26px -14px rgba(0,0,0,.6), 0 3px 0 rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 5px rgba(0,0,0,.22); }
+.sb-screen { position:relative; border-radius:8px; overflow:hidden; padding:12px 26px 13px;
+  background:radial-gradient(120% 140% at 50% -20%, rgba(120,255,180,.18), transparent 55%), var(--board-bg);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 40px rgba(0,0,0,.6); }
+.sb-screen::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); }
+.sb-head { position:relative; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.sb-stage { display:inline-flex; align-items:center; gap:8px; font-family:var(--font-disp); font-weight:700;
+  text-transform:uppercase; letter-spacing:.14em; font-size:11px; color:rgba(234,255,242,.78); }
+.sb-badge { font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.07em;
+  text-transform:uppercase; padding:3px 9px; border-radius:999px; color:#fff; box-shadow:0 1px 2px rgba(0,0,0,.3); }
+.sb-ko { font-size:11px; color:rgba(234,255,242,.72); letter-spacing:.02em; white-space:nowrap; }
+.sb-row { position:relative; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:18px; }
+.sb-team { display:flex; align-items:center; gap:14px; min-width:0; }
+.sb-team.away { flex-direction:row-reverse; }
+.sb-team .sb-kit { flex:none; width:6px; height:44px; border-radius:3px; box-shadow:0 0 12px rgba(255,255,255,.18); }
+.sb-screen .sb-team img { width:62px !important; height:42px !important; border-radius:3px !important; margin:0 !important;
+  display:block !important; object-fit:cover; flex:none; box-shadow:0 6px 16px -6px rgba(0,0,0,.6); }
+.sb-screen .sb-team img[src=""], .sb-screen .sb-team img:not([src]) { display:none !important; }
+.sb-name { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.03em;
+  font-size:34px; line-height:1; color:var(--board-ink); text-shadow:0 0 14px var(--board-glow);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sb-team.away .sb-name { text-align:right; }
+.sb-name:empty::after { content:"TBD"; opacity:.5; font-style:italic; }
+.sb-mid { text-align:center; min-width:170px; }
+.sb-score { font-family:var(--font-disp); font-weight:800; font-size:54px; line-height:.95; color:var(--gold-2);
+  text-shadow:0 0 16px var(--board-glow), 0 2px 0 rgba(0,0,0,.45); white-space:nowrap; }
+.sb-sub { font-size:9.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(234,255,242,.6); margin-top:5px; }
+.sb-venue { position:relative; text-align:center; font-size:11px; color:rgba(234,255,242,.66); margin-top:9px;
+  padding-top:8px; border-top:1px solid rgba(234,255,242,.14); }
+.sb-att:empty { display:none; }
+.sb-att::before { content:" · "; }
+.sb-att::after { content:" in the stands"; }
+/* scoreboard powers on like the jumbotron (wc-power-on keyframe from header_rail) */
+.sb-screen { animation:wc-power-on .6s ease-out .2s 1; }
+@media (prefers-reduced-motion: reduce) { .sb-screen { animation:none !important; } }
+</style>
+<div class="sb"><div class="sb-bezel"><div class="sb-screen">
+{% map(rows) %}
+  <div class="sb-head">
+    <span class="sb-stage"><span class="sb-badge" style="background:{{ `StatusColor`.raw }};">{{ `StatusText`.formatted }}</span>{{ `StageLabel`.formatted }} · match center</span>
+    <span class="sb-ko">{{ `KODay`.formatted }} · {{ `KOTime`.formatted }} UTC</span>
+  </div>
+  <div class="sb-row">
+    <div class="sb-team home"><span class="sb-kit" style="background:{{ `HomeColor`.raw }};"></span><img src="{{ `HomeFlag`.raw }}" alt="" /><span class="sb-name">{{ `Home`.formatted }}</span></div>
+    <div class="sb-mid"><div class="sb-score wc-num">{{ `Display`.formatted }}</div><div class="sb-sub">{{ `DisplaySub`.formatted }}</div></div>
+    <div class="sb-team away"><span class="sb-kit" style="background:{{ `AwayColor`.raw }};"></span><img src="{{ `AwayFlag`.raw }}" alt="" /><span class="sb-name">{{ `Away`.formatted }}</span></div>
+  </div>
+  <div class="sb-venue">{{ `Venue`.formatted }} · {{ `City`.formatted }}<span class="sb-att wc-num">{{ `Att`.formatted }}</span></div>
+{% end %}
+</div></div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'mc_featured'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 1
+      }
+    }
+  }
+}
+
+Func wc_mc_zone_ticker() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">Starting XI · how it unfolded</p>
+;;
+  }
+}
+
+Func wc_mc_zone_odds() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">The odds board · what the sim says</p>
+;;
+  }
+}
+
+Func wc_mc_timeline() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_events.is_key_event)
+        operator: 'is'
+        value: true
+      }
+      rows: [
+        VizFieldFull {
+          label: 'TS'
+          ref: r(wc_events.ts)
+          uname: 'ets'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Minute'
+          ref: r(wc_events.match_minute)
+        },
+        VizFieldFull {
+          label: 'Side'
+          ref: r(wc_events.side)
+        },
+        VizFieldFull {
+          label: 'Kind'
+          ref: r(wc_events.event_kind)
+        },
+        VizFieldFull {
+          label: 'MS'
+          ref: r(wc_events.milestone_label)
+        },
+        VizFieldFull {
+          label: 'MSScore'
+          ref: r(wc_events.milestone_score)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Desc'
+          ref: r(wc_events.description)
+        },
+        VizFieldFull {
+          label: 'ScoreChip'
+          ref: r(wc_events.score_chip)
+        }
+      ]
+      content: @md
+<style>
+/* ticker hierarchy: goals = gold hero cards, red cards = alert slips, bookings/subs = quiet
+   slips. Kit colour rides the card's spine-side edge; structural rows are dark referee-board
+   chips sitting on the spine. All variants are driven by Side/Kind classes — no conditionals. */
+.tl-body { position:relative; padding:4px 0 2px; }
+/* spine starts/ends at the first/last marker's midline, not the clipboard edge */
+.tl-body::before { content:""; position:absolute; left:50%; top:22px; bottom:22px; width:2px;
+  background:var(--panel-line); transform:translateX(-50%); }
+.tl-row { position:relative; display:grid; grid-template-columns:1fr 64px 1fr; align-items:center; }
+.tl-row + .tl-row { margin-top:7px; }
+.tl-spine { grid-column:2; grid-row:1; display:flex; justify-content:center; }
+/* one station-stop chip per event: minute INSIDE an opaque pill, so it covers the line and
+   its midline == the card's midline (single child + grid align-items:center) */
+.tl-stop { display:inline-flex; align-items:center; justify-content:center; min-width:42px;
+  padding:3px 9px; border-radius:999px; background:#fbfdfb; border:1px solid var(--panel-line);
+  font-family:var(--font-disp); font-weight:800; font-size:11px; line-height:1.2; color:var(--panel-ink);
+  box-shadow:0 1px 3px rgba(0,0,0,.14); white-space:nowrap; }
+.tl-row.k-yellow .tl-stop { border-color:var(--draw); }
+.tl-row.k-red .tl-stop { border-color:var(--loss); color:#7e1f18; }
+.tl-card { grid-row:1; display:flex; align-items:center; gap:8px; min-width:0; padding:6px 10px;
+  background:linear-gradient(180deg,#fbfdfb,#f0f5f1); border:1px solid var(--panel-line); border-radius:9px;
+  box-shadow:0 6px 14px -10px var(--shadow-dir); }
+.tl-row.home .tl-card { grid-column:1; justify-self:end; flex-direction:row-reverse; }
+.tl-row.away .tl-card { grid-column:3; justify-self:start; }
+.tl .tl-card img { width:20px !important; height:14px !important; border-radius:2px !important; margin:0 !important;
+  display:block !important; object-fit:cover; flex:none; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+/* crafted CSS glyphs (no emoji, no mockup SVGs — paths blur at 14px, CSS shapes stay crisp):
+   every card carries all four, the row's Kind class shows one; .show forces one on (legend) */
+.tl-ico { flex:none; display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; }
+/* glyph–label alignment: flex centres the text's LINE BOX, and inherited line-height
+   (~1.45) makes that box taller than the capitals, floating icons off the visual midline.
+   line-height:1 collapses the box to the glyphs, so centring becomes optical. */
+.tl .cb-foot { align-items:center; }
+.tl .cb-foot .lg { display:inline-flex; align-items:center; line-height:1; }
+.tl .cb-foot .sp { line-height:1.3; }
+/* every glyph lives in an IDENTICAL 16×16 centred box — shapes are drawn inside it, so
+   icons and labels share one midline everywhere (cards, legend) regardless of shape size */
+.ick { position:relative; flex:none; width:16px; height:16px; display:none;
+  align-items:center; justify-content:center; gap:2px; }
+.ick.show { display:inline-flex; }
+.tl-row.k-goal .tl-ico .ick-ball,
+.tl-row.k-yellow .tl-ico .ick-card.yellow,
+.tl-row.k-red .tl-ico .ick-card.red,
+.tl-row.k-sub .tl-ico .ick-sub { display:inline-flex; }
+/* football: verified truncated-icosahedron glyph (see SVG in markup).
+   margin:0 !important beats MarkdownViz's built-in svg margin-top (same fight as img). */
+.ick-ball svg { display:block; width:15px; height:15px; margin:0 !important; }
+/* referee cards: tilted enamel rectangle drawn inside the box */
+.ick-card::before { content:""; width:9px; height:12px; border-radius:2px; transform:rotate(8deg);
+  background:linear-gradient(160deg, #f7ce53, #d99412);
+  box-shadow:0 1px 2px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4); }
+.ick-card.red::before { background:linear-gradient(160deg, #f0655c, #c52e24); }
+/* substitution: the conventional pair — green on, red off */
+.ick-sub::before { content:""; width:0; height:0; border-left:3.5px solid transparent;
+  border-right:3.5px solid transparent; border-bottom:8px solid #1FA36B; }
+.ick-sub::after { content:""; width:0; height:0; border-left:3.5px solid transparent;
+  border-right:3.5px solid transparent; border-top:8px solid #E5362B; }
+.tl-desc { font-size:11px; line-height:1.35; color:var(--panel-ink); min-width:0; }
+.tl-chip { flex:none; font-family:var(--font-disp); font-weight:800; font-size:12px; color:var(--gold-2);
+  background:linear-gradient(180deg,#16352a,#0c2418); border-radius:6px; padding:2px 8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.12); }
+.tl-chip:empty { display:none; }
+/* goals: the hero moment — gold foil card, bold line, glowing spine marker */
+.tl-row.k-goal .tl-card { background:
+    linear-gradient(120deg, transparent 38%, rgba(255,255,255,.35) 47%, transparent 58%),
+    linear-gradient(180deg,#f8ecc0,#ecd592);
+  border-color:rgba(163,121,32,.5); padding:9px 12px;
+  box-shadow:0 10px 20px -10px rgba(120,85,15,.55), inset 0 1px 0 rgba(255,255,255,.55); }
+.tl-row.k-goal .tl-desc { font-weight:700; font-size:12px; color:#4a3608; }
+.tl-row.k-goal .tl-stop { background:linear-gradient(180deg, var(--gold-2), var(--gold));
+  border-color:rgba(163,121,32,.6); color:#3c2c06; font-size:12px;
+  box-shadow:0 0 12px rgba(242,200,75,.6), 0 1px 2px rgba(0,0,0,.2); }
+/* red card: alert slip */
+.tl-row.k-red .tl-card { background:linear-gradient(180deg,#fdf2f1,#f8e2df); border-color:rgba(229,54,43,.45); }
+.tl-row.k-red .tl-desc { font-weight:700; color:#7e1f18; }
+/* structural rows: dark fourth-official board chip on the spine — no full-width rule */
+.tl-ms { display:none; }
+.tl-row.mid { display:block; padding:6px 0; }
+.tl-row.mid .tl-spine, .tl-row.mid .tl-card { display:none; }
+.tl-row.mid .tl-ms { display:flex; justify-content:center; }
+.tl-ms-pill { display:inline-flex; align-items:baseline; gap:7px;
+  font-family:var(--font-disp); font-weight:800; font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:#eafff2; background:linear-gradient(180deg,#1a3c2e,#0c2418); border-radius:999px; padding:4px 15px;
+  box-shadow:0 3px 8px -3px rgba(7,30,18,.6), inset 0 1px 0 rgba(255,255,255,.14); }
+.tl-ms-pill .m { color:var(--gold-2); }
+.tl-ms-pill .sc:empty { display:none; }
+.tl-ms-pill .sc::before { content:"· "; opacity:.55; }
+/* ── motion: the ticker comes to life after the board hinges in — the spine
+   draws top→down, then each event pops in along it in minute order. */
+.tl-body::before { transform-origin:50% 0; animation:tl-spine .5s ease-out .45s backwards; }
+@keyframes tl-spine { from { transform:translateX(-50%) scaleY(0); } to { transform:translateX(-50%) scaleY(1); } }
+.tl-row { animation:tl-pop .4s cubic-bezier(.2,.7,.3,1.05) backwards; }
+@keyframes tl-pop { from { opacity:0; transform:translateY(9px); } to { opacity:1; transform:none; } }
+.tl-body .tl-row:nth-child(1){animation-delay:.50s} .tl-body .tl-row:nth-child(2){animation-delay:.55s}
+.tl-body .tl-row:nth-child(3){animation-delay:.60s} .tl-body .tl-row:nth-child(4){animation-delay:.65s}
+.tl-body .tl-row:nth-child(5){animation-delay:.70s} .tl-body .tl-row:nth-child(6){animation-delay:.75s}
+.tl-body .tl-row:nth-child(7){animation-delay:.80s} .tl-body .tl-row:nth-child(8){animation-delay:.85s}
+.tl-body .tl-row:nth-child(9){animation-delay:.90s} .tl-body .tl-row:nth-child(10){animation-delay:.95s}
+.tl-body .tl-row:nth-child(n+11){animation-delay:1s}
+@media (prefers-reduced-motion: reduce) {
+  .tl-body::before { animation:none !important; transform:translateX(-50%) !important; }
+  .tl-row { animation:none !important; opacity:1 !important; transform:none !important; } }
+</style>
+<div class="cb-wrap"><div class="clipboard tl">
+  <div class="cb-head">
+    <span class="cb-grp">Match <b>ticker</b></span>
+    <span class="cb-sub">Home left · away right · match minutes</span>
+  </div>
+  <div class="tl-body">
+{% map(rows) %}
+  <div class="tl-row {{ `Side`.formatted }} k-{{ `Kind`.formatted }}">
+    <div class="tl-ms"><span class="tl-ms-pill">{{ `MS`.formatted }} <span class="m wc-num">{{ `Minute`.formatted }}</span> <span class="sc wc-num">{{ `MSScore`.formatted }}</span></span></div>
+    <div class="tl-spine"><span class="tl-stop wc-num">{{ `Minute`.formatted }}</span></div>
+    <div class="tl-card"><span class="tl-ico"><span class="ick ick-ball"><svg viewBox="0 0 24 24" style="margin:0 !important;" aria-hidden="true"><circle cx="12" cy="12" r="9.8" fill="#f6f9f6" stroke="#22302a" stroke-width="1.6"/><path d="M12 7.6 7.82 10.64 9.41 15.56 14.59 15.56 16.18 10.64Z" fill="#22302a"/><path d="M12 7.6 12 5M7.82 10.64 5.34 9.84M9.41 15.56 7.89 17.66M14.59 15.56 16.11 17.66M16.18 10.64 18.66 9.84" stroke="#22302a" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M14.62 2.87 9.38 2.87 12 4.8Z" fill="#22302a"/><path d="M4.12 6.69 2.51 11.67 5.15 9.78Z" fill="#22302a"/><path d="M4.51 17.85 8.75 20.93 7.77 17.82Z" fill="#22302a"/><path d="M15.25 20.93 19.49 17.85 16.23 17.82Z" fill="#22302a"/><path d="M21.49 11.67 19.88 6.69 18.85 9.78Z" fill="#22302a"/></svg></span><span class="ick ick-card yellow"></span><span class="ick ick-card red"></span><span class="ick ick-sub"></span></span><img src="{{ `Flag`.raw }}" alt="" /><span class="tl-desc">{{ `Desc`.formatted }}</span><span class="tl-chip wc-num">{{ `ScoreChip`.formatted }}</span></div>
+  </div>
+{% end %}
+  </div>
+  <div class="cb-foot">
+    <span class="lg"><span class="ick ick-ball show"><svg viewBox="0 0 24 24" style="margin:0 !important;" aria-hidden="true"><circle cx="12" cy="12" r="9.8" fill="#f6f9f6" stroke="#22302a" stroke-width="1.6"/><path d="M12 7.6 7.82 10.64 9.41 15.56 14.59 15.56 16.18 10.64Z" fill="#22302a"/><path d="M12 7.6 12 5M7.82 10.64 5.34 9.84M9.41 15.56 7.89 17.66M14.59 15.56 16.11 17.66M16.18 10.64 18.66 9.84" stroke="#22302a" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M14.62 2.87 9.38 2.87 12 4.8Z" fill="#22302a"/><path d="M4.12 6.69 2.51 11.67 5.15 9.78Z" fill="#22302a"/><path d="M4.51 17.85 8.75 20.93 7.77 17.82Z" fill="#22302a"/><path d="M15.25 20.93 19.49 17.85 16.23 17.82Z" fill="#22302a"/><path d="M21.49 11.67 19.88 6.69 18.85 9.78Z" fill="#22302a"/></svg></span>Goal</span>
+    <span class="lg"><span class="ick ick-card yellow show"></span>Booking</span>
+    <span class="lg"><span class="ick ick-card red show"></span>Sent off</span>
+    <span class="lg"><span class="ick ick-sub show"></span>Substitution</span>
+    <span class="sp">A quiet stretch between whistles is a quiet match, not missing data</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'ets'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 40
+      }
+    }
+  }
+}
+
+Func wc_mc_lineup_home() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_lineups.side)
+        operator: 'is'
+        value: 'home'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'Kit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Formation'
+          ref: r(wc_matches.home_formation)
+        },
+        VizFieldFull {
+          label: 'Num'
+          ref: r(wc_players.shirt_number)
+          uname: 'shirt'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Name'
+          ref: r(wc_players.name)
+        },
+        VizFieldFull {
+          label: 'Pos'
+          ref: r(wc_players.position_group)
+        },
+        VizFieldFull {
+          label: 'PosSort'
+          ref: r(wc_players.position)
+          uname: 'psort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Role'
+          ref: r(wc_lineups.role)
+        },
+        VizFieldFull {
+          label: 'RoleSort'
+          ref: r(wc_lineups.role_sort)
+          uname: 'rsort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Cap'
+          ref: r(wc_lineups.captain_tag)
+        },
+        VizFieldFull { label: 'Pid' ref: r(wc_lineups.fifa_player_id) },
+        VizFieldFull { label: 'Flag' ref: r(wc_teams.flag_url) },
+        VizFieldFull { label: 'Photo' ref: r(wc_player_stats.picture_url) },
+        VizFieldFull { label: 'Goals' ref: r(wc_player_stats.goals) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Assists' ref: r(wc_player_stats.assists) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Apps' ref: r(wc_player_stats.apps) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Starts' ref: r(wc_player_stats.starts) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Yellows' ref: r(wc_player_stats.yellows) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Reds' ref: r(wc_player_stats.reds) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Age' ref: r(wc_player_bio.age) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Club' ref: r(wc_player_bio.club) },
+        VizFieldFull { label: 'PosDetail' ref: r(wc_player_bio.position_detail) },
+        VizFieldFull { label: 'Height' ref: r(wc_player_bio.height) },
+        VizFieldFull { label: 'Log' ref: r(wc_player_stats.goal_log_html) },
+        VizFieldFull { label: 'GoalSvg' ref: r(wc_player_stats.goal_placement_svg) }
+      ]
+      content: @md
+<style>
+.lp-row + .lp-row { border-top:1px solid var(--panel-line); }
+/* the row is now a popover trigger — the grid moves onto the button so each player opens their profile */
+.lp-hit { display:grid; grid-template-columns:26px minmax(0,1fr) 18px 26px; gap:7px; align-items:center;
+  width:100%; padding:4px 4px; appearance:none; -webkit-appearance:none; border:none; background:none;
+  font:inherit; color:inherit; text-align:left; cursor:pointer; border-radius:6px; transition:background .14s ease; }
+.lp-hit:hover, .lp-hit:focus-visible { background:rgba(12,36,24,.07); outline:none; }
+.lp-num { width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-disp); font-weight:800; font-size:11px; color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.3); }
+.lp-name { font-weight:600; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lp-cap { width:16px; height:16px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-disp); font-weight:800; font-size:9px; color:#4a3608;
+  background:linear-gradient(180deg, var(--gold-2), var(--gold)); box-shadow:0 1px 2px rgba(0,0,0,.25); }
+.lp-cap:empty { visibility:hidden; }
+.lp-pos { font-family:var(--font-disp); font-weight:700; font-size:9px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--panel-muted); text-align:right; }
+.lp-row.bench { opacity:.62; }
+.lp-row.bench .lp-name { font-weight:500; font-size:11px; }
+.lp-row.bench .lp-num { width:20px; height:20px; font-size:10px; }
+.lp-row.xi + .lp-row.bench { border-top:2px dashed var(--panel-line); margin-top:5px; padding-top:8px; }
+</style>
+<div class="cb-wrap"><div class="clipboard lp">
+  <div class="cb-head">
+    <span class="cb-grp">{{ rows[0].`Team`.formatted }}</span>
+    <span class="cb-sub">{{ rows[0].`Formation`.formatted }} · starting XI</span>
+  </div>
+{% map(rows) %}
+  <div class="lp-row {{ `Role`.formatted }}">
+  <button class="lp-hit" type="button" popovertarget="ppl-{{ `Pid`.raw }}" style="anchor-name:--ppl-{{ `Pid`.raw }};">
+    <span class="lp-num wc-num" style="background:{{ `Kit`.raw }};">{{ `Num`.formatted }}</span>
+    <span class="lp-name">{{ `Name`.formatted }}</span>
+    <span class="lp-cap">{{ `Cap`.formatted }}</span>
+    <span class="lp-pos">{{ `Pos`.formatted }}</span>
+  </button>
+  <div id="ppl-{{ `Pid`.raw }}" popover class="pp-card" style="position-anchor:--ppl-{{ `Pid`.raw }}; --ppc:{{ `Kit`.raw }};">
+  <div class="pp-top">
+  <div class="pp-fig"><img src="{{ `Photo`.raw }}" alt="" style="margin:0 !important" /></div>
+  <div class="pp-id">
+  <div class="pp-nm">{{ `Name`.formatted }}</div>
+  <div class="pp-sub"><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />{{ `Team`.formatted }} &middot; #{{ `Num`.formatted }} &middot; {{ `Pos`.formatted }}</div>
+  <div class="pp-chips"><span class="pp-chip cl-age">{{ `Age`.formatted }}</span><span class="pp-chip cl-pos">{{ `PosDetail`.formatted }}</span><span class="pp-chip cl-club">{{ `Club`.formatted }}</span><span class="pp-chip cl-ht">{{ `Height`.formatted }}</span></div>
+  </div>
+  </div>
+  <div class="pp-stats"><div class="pp-stat hl"><b class="wc-num">{{ `Goals`.formatted }}</b><i>Goals</i></div><div class="pp-stat"><b class="wc-num">{{ `Assists`.formatted }}</b><i>Assists</i></div><div class="pp-stat"><b class="wc-num">{{ `Apps`.formatted }}</b><i>Apps</i></div><div class="pp-stat"><b class="wc-num">{{ `Starts`.formatted }}</b><i>Starts</i></div><div class="pp-stat"><b class="wc-num">{{ `Yellows`.formatted }}</b><i>Yellow</i></div><div class="pp-stat"><b class="wc-num">{{ `Reds`.formatted }}</b><i>Red</i></div></div>
+  <div class="pp-goal"><div class="pp-goal-box"><svg class="pp-net" viewBox="0 0 120 58" aria-hidden="true" style="margin:0 !important"><defs><linearGradient id="pplPost-{{ `Pid`.raw }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#aeb9c4"/></linearGradient><pattern id="pplnet-{{ `Pid`.raw }}" width="6.5" height="6.5" patternUnits="userSpaceOnUse"><path d="M0 0 L6.5 6.5 M6.5 0 L0 6.5" stroke="rgba(226,233,242,.15)" stroke-width=".5"/></pattern></defs><polygon class="pp-depth" points="11,9 19,3 101,3 109,9"/><rect x="19" y="3" width="82" height="6" fill="url(#pplnet-{{ `Pid`.raw }})" opacity=".45"/><rect x="11" y="9" width="98" height="43" fill="url(#pplnet-{{ `Pid`.raw }})"/><rect x="0" y="52" width="120" height="6" fill="rgba(74,128,86,.16)"/><line class="ground" x1="6" y1="52" x2="114" y2="52"/><rect x="8" y="6" width="104" height="3" rx="1.5" fill="url(#pplPost-{{ `Pid`.raw }})"/><rect x="8" y="6" width="3" height="46" rx="1.5" fill="url(#pplPost-{{ `Pid`.raw }})"/><rect x="109" y="6" width="3" height="46" rx="1.5" fill="url(#pplPost-{{ `Pid`.raw }})"/><g class="pp-dots">{{ `GoalSvg`.raw }}</g></svg></div></div>
+  <ul class="pp-gl">{{ `Log`.raw }}</ul>
+  </div>
+  </div>
+{% end %}
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--gold);"></span>C — captain</span>
+    <span class="sp">Bench below the dashed cut</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'rsort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'psort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'shirt'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 26
+      }
+    }
+  }
+}
+
+Func wc_mc_lineup_away() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_lineups.side)
+        operator: 'is'
+        value: 'away'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'Kit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Formation'
+          ref: r(wc_matches.away_formation)
+        },
+        VizFieldFull {
+          label: 'Num'
+          ref: r(wc_players.shirt_number)
+          uname: 'shirt'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Name'
+          ref: r(wc_players.name)
+        },
+        VizFieldFull {
+          label: 'Pos'
+          ref: r(wc_players.position_group)
+        },
+        VizFieldFull {
+          label: 'PosSort'
+          ref: r(wc_players.position)
+          uname: 'psort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Role'
+          ref: r(wc_lineups.role)
+        },
+        VizFieldFull {
+          label: 'RoleSort'
+          ref: r(wc_lineups.role_sort)
+          uname: 'rsort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Cap'
+          ref: r(wc_lineups.captain_tag)
+        },
+        VizFieldFull { label: 'Pid' ref: r(wc_lineups.fifa_player_id) },
+        VizFieldFull { label: 'Flag' ref: r(wc_teams.flag_url) },
+        VizFieldFull { label: 'Photo' ref: r(wc_player_stats.picture_url) },
+        VizFieldFull { label: 'Goals' ref: r(wc_player_stats.goals) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Assists' ref: r(wc_player_stats.assists) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Apps' ref: r(wc_player_stats.apps) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Starts' ref: r(wc_player_stats.starts) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Yellows' ref: r(wc_player_stats.yellows) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Reds' ref: r(wc_player_stats.reds) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Age' ref: r(wc_player_bio.age) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Club' ref: r(wc_player_bio.club) },
+        VizFieldFull { label: 'PosDetail' ref: r(wc_player_bio.position_detail) },
+        VizFieldFull { label: 'Height' ref: r(wc_player_bio.height) },
+        VizFieldFull { label: 'Log' ref: r(wc_player_stats.goal_log_html) },
+        VizFieldFull { label: 'GoalSvg' ref: r(wc_player_stats.goal_placement_svg) }
+      ]
+      content: @md
+<style>
+.lp-row + .lp-row { border-top:1px solid var(--panel-line); }
+/* the row is now a popover trigger — the grid moves onto the button so each player opens their profile */
+.lp-hit { display:grid; grid-template-columns:26px minmax(0,1fr) 18px 26px; gap:7px; align-items:center;
+  width:100%; padding:4px 4px; appearance:none; -webkit-appearance:none; border:none; background:none;
+  font:inherit; color:inherit; text-align:left; cursor:pointer; border-radius:6px; transition:background .14s ease; }
+.lp-hit:hover, .lp-hit:focus-visible { background:rgba(12,36,24,.07); outline:none; }
+.lp-num { width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-disp); font-weight:800; font-size:11px; color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.3); }
+.lp-name { font-weight:600; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lp-cap { width:16px; height:16px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-disp); font-weight:800; font-size:9px; color:#4a3608;
+  background:linear-gradient(180deg, var(--gold-2), var(--gold)); box-shadow:0 1px 2px rgba(0,0,0,.25); }
+.lp-cap:empty { visibility:hidden; }
+.lp-pos { font-family:var(--font-disp); font-weight:700; font-size:9px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--panel-muted); text-align:right; }
+.lp-row.bench { opacity:.62; }
+.lp-row.bench .lp-name { font-weight:500; font-size:11px; }
+.lp-row.bench .lp-num { width:20px; height:20px; font-size:10px; }
+.lp-row.xi + .lp-row.bench { border-top:2px dashed var(--panel-line); margin-top:5px; padding-top:8px; }
+</style>
+<div class="cb-wrap"><div class="clipboard lp">
+  <div class="cb-head">
+    <span class="cb-grp">{{ rows[0].`Team`.formatted }}</span>
+    <span class="cb-sub">{{ rows[0].`Formation`.formatted }} · starting XI</span>
+  </div>
+{% map(rows) %}
+  <div class="lp-row {{ `Role`.formatted }}">
+  <button class="lp-hit" type="button" popovertarget="ppl-{{ `Pid`.raw }}" style="anchor-name:--ppl-{{ `Pid`.raw }};">
+    <span class="lp-num wc-num" style="background:{{ `Kit`.raw }};">{{ `Num`.formatted }}</span>
+    <span class="lp-name">{{ `Name`.formatted }}</span>
+    <span class="lp-cap">{{ `Cap`.formatted }}</span>
+    <span class="lp-pos">{{ `Pos`.formatted }}</span>
+  </button>
+  <div id="ppl-{{ `Pid`.raw }}" popover class="pp-card" style="position-anchor:--ppl-{{ `Pid`.raw }}; --ppc:{{ `Kit`.raw }};">
+  <div class="pp-top">
+  <div class="pp-fig"><img src="{{ `Photo`.raw }}" alt="" style="margin:0 !important" /></div>
+  <div class="pp-id">
+  <div class="pp-nm">{{ `Name`.formatted }}</div>
+  <div class="pp-sub"><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />{{ `Team`.formatted }} &middot; #{{ `Num`.formatted }} &middot; {{ `Pos`.formatted }}</div>
+  <div class="pp-chips"><span class="pp-chip cl-age">{{ `Age`.formatted }}</span><span class="pp-chip cl-pos">{{ `PosDetail`.formatted }}</span><span class="pp-chip cl-club">{{ `Club`.formatted }}</span><span class="pp-chip cl-ht">{{ `Height`.formatted }}</span></div>
+  </div>
+  </div>
+  <div class="pp-stats"><div class="pp-stat hl"><b class="wc-num">{{ `Goals`.formatted }}</b><i>Goals</i></div><div class="pp-stat"><b class="wc-num">{{ `Assists`.formatted }}</b><i>Assists</i></div><div class="pp-stat"><b class="wc-num">{{ `Apps`.formatted }}</b><i>Apps</i></div><div class="pp-stat"><b class="wc-num">{{ `Starts`.formatted }}</b><i>Starts</i></div><div class="pp-stat"><b class="wc-num">{{ `Yellows`.formatted }}</b><i>Yellow</i></div><div class="pp-stat"><b class="wc-num">{{ `Reds`.formatted }}</b><i>Red</i></div></div>
+  <div class="pp-goal"><div class="pp-goal-box"><svg class="pp-net" viewBox="0 0 120 58" aria-hidden="true" style="margin:0 !important"><defs><linearGradient id="pplPost-{{ `Pid`.raw }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#aeb9c4"/></linearGradient><pattern id="pplnet-{{ `Pid`.raw }}" width="6.5" height="6.5" patternUnits="userSpaceOnUse"><path d="M0 0 L6.5 6.5 M6.5 0 L0 6.5" stroke="rgba(226,233,242,.15)" stroke-width=".5"/></pattern></defs><polygon class="pp-depth" points="11,9 19,3 101,3 109,9"/><rect x="19" y="3" width="82" height="6" fill="url(#pplnet-{{ `Pid`.raw }})" opacity=".45"/><rect x="11" y="9" width="98" height="43" fill="url(#pplnet-{{ `Pid`.raw }})"/><rect x="0" y="52" width="120" height="6" fill="rgba(74,128,86,.16)"/><line class="ground" x1="6" y1="52" x2="114" y2="52"/><rect x="8" y="6" width="104" height="3" rx="1.5" fill="url(#pplPost-{{ `Pid`.raw }})"/><rect x="8" y="6" width="3" height="46" rx="1.5" fill="url(#pplPost-{{ `Pid`.raw }})"/><rect x="109" y="6" width="3" height="46" rx="1.5" fill="url(#pplPost-{{ `Pid`.raw }})"/><g class="pp-dots">{{ `GoalSvg`.raw }}</g></svg></div></div>
+  <ul class="pp-gl">{{ `Log`.raw }}</ul>
+  </div>
+  </div>
+{% end %}
+  <div class="cb-foot">
+    <span class="lg"><span class="dot" style="background:var(--gold);"></span>C — captain</span>
+    <span class="sp">Bench below the dashed cut</span>
+  </div>
+</div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'rsort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'psort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'shirt'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 26
+      }
+    }
+  }
+}
+
+Func wc_mc_odds() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Home'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeColor'
+          ref: r(wc_home_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayColor'
+          ref: r(wc_away_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'FeaturedSort'
+          ref: r(wc_matches.featured_sort)
+          uname: 'ofeat'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'HomePct'
+          ref: r(wc_match_odds.p_home_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'DrawPct'
+          ref: r(wc_match_odds.p_draw_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'AwayPct'
+          ref: r(wc_match_odds.p_away_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'ExpScore'
+          ref: r(wc_match_odds.exp_score_label)
+        },
+        VizFieldFull {
+          label: 'RunLabel'
+          ref: r(wc_match_odds.run_label)
+        },
+        VizFieldFull {
+          label: 'StatusNote'
+          ref: r(wc_match_odds.status_note)
+        },
+        VizFieldFull {
+          label: 'DeltaNote'
+          ref: r(wc_match_odds.delta_note)
+        },
+        VizFieldFull {
+          label: 'DHome'
+          ref: r(wc_match_odds.d_home_label)
+        },
+        VizFieldFull {
+          label: 'DDraw'
+          ref: r(wc_match_odds.d_draw_label)
+        },
+        VizFieldFull {
+          label: 'DAway'
+          ref: r(wc_match_odds.d_away_label)
+        },
+        VizFieldFull {
+          label: 'DHomeColor'
+          ref: r(wc_match_odds.d_home_color)
+        },
+        VizFieldFull {
+          label: 'DDrawColor'
+          ref: r(wc_match_odds.d_draw_color)
+        },
+        VizFieldFull {
+          label: 'DAwayColor'
+          ref: r(wc_match_odds.d_away_color)
+        }
+      ]
+      content: @md
+<style>
+/* split-flap odds board: a mechanical departure-board housing — graphite metal case,
+   one flap tile per outcome with the horizontal split line and side hinges, printed
+   name plates above each tile. A new object on this page: not clipboard paper, not
+   LED glass. Matches without a sim run keep their row (wc_match_odds emits all 104):
+   flaps fall back to "—" and status_note says why, so the platform pill never appears.
+   HEIGHT BUDGET (block = 320px): housing pad 16+14 + head 20 + meter 7 + plates 16
+   + flaps 64 + meta 14 + note ≤16 + foot 13 + flex gaps 5×10 = ~230 used, ~90 spare. */
+.fb { width:100%; height:100%; box-sizing:border-box; display:flex; padding:0 2px; }
+.fb-case { flex:1; min-width:0; border-radius:13px; padding:16px 26px 14px;
+  display:flex; flex-direction:column; justify-content:center; gap:10px;
+  background:linear-gradient(180deg,#31383c,#23282b 55%,#1a1e21);
+  border:1px solid #121517;
+  box-shadow:0 18px 32px -16px rgba(4,18,11,.7), 0 2px 0 rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.16), inset 0 -3px 8px rgba(0,0,0,.45); }
+.fb-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+.fb-title { font-family:var(--font-disp); font-weight:800; font-size:14px; letter-spacing:.2em;
+  text-transform:uppercase; color:#e8edef; }
+.fb-title b { color:var(--gold-2); }
+.fb-sub { font-size:10px; color:rgba(232,237,239,.55); letter-spacing:.04em; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; }
+.fb-meter { display:flex; height:7px; border-radius:4px; overflow:hidden;
+  background:rgba(255,255,255,.08); box-shadow:inset 0 1px 2px rgba(0,0,0,.5); }
+.fb-meter i { display:block; height:100%; }
+.fb-row { display:grid; grid-template-columns:1fr 1fr 1fr 230px; gap:18px; }
+.fb-cell { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.fb-plate { display:flex; align-items:center; gap:8px; min-width:0; }
+.fb-plate .tab { flex:none; width:10px; height:10px; border-radius:2px; background:var(--bandc);
+  box-shadow:0 0 0 1px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.25); }
+.fb-plate .nm { font-family:var(--font-disp); font-weight:700; font-size:11px; letter-spacing:.1em;
+  text-transform:uppercase; color:rgba(232,237,239,.85); white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; }
+.fb-plate .nm:empty::after { content:"TBD"; opacity:.5; font-style:italic; }
+/* the flap tile: split line across the middle + hinge notches on both edges */
+.fb-flap { position:relative; height:64px; border-radius:8px; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg,#15181a 0%,#1e2326 47%,#0c0e10 53%,#15181a 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 -10px 16px rgba(0,0,0,.45),
+    0 3px 5px rgba(0,0,0,.4); }
+.fb-flap::before { content:""; position:absolute; left:0; right:0; top:50%; height:2px;
+  margin-top:-1px; background:rgba(0,0,0,.85); box-shadow:0 1px 0 rgba(255,255,255,.07); }
+.fb-flap::after { content:""; position:absolute; top:50%; left:0; right:0; height:16px;
+  margin-top:-8px; pointer-events:none;
+  background:linear-gradient(90deg, #0a0c0d 0 7px, transparent 7px calc(100% - 7px), #0a0c0d calc(100% - 7px)); }
+.fb-pct { font-family:var(--font-disp); font-weight:800; font-size:40px; line-height:1;
+  color:#f4f7f8; text-shadow:0 2px 3px rgba(0,0,0,.65); font-variant-numeric:tabular-nums; }
+.fb-pct:empty::after { content:"—"; color:rgba(232,237,239,.3); text-shadow:none; }
+.fb-pct b { font-size:.45em; font-weight:700; color:rgba(232,237,239,.5); }
+.fb-meta { display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  font-size:9.5px; text-transform:uppercase; letter-spacing:.1em; color:rgba(232,237,239,.45); }
+.fb-d { font-family:var(--font-disp); font-weight:800; font-size:11.5px; letter-spacing:.02em; white-space:nowrap; }
+.fb-d:empty { display:none; }
+/* expected score: gold-lit digits, same mechanical flap */
+.fb-cell.exp .fb-pct { color:var(--gold-2); text-shadow:0 2px 3px rgba(0,0,0,.65), 0 0 14px rgba(242,200,75,.35); }
+.fb-foot { display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:rgba(232,237,239,.4); }
+.fb-note { font-style:italic; text-transform:none; letter-spacing:.02em; font-size:10.5px;
+  color:rgba(232,237,239,.6); }
+.fb-note:empty { display:none; }
+/* ── motion: split-flap reveal ───────────────────────────────────────────
+   The board boots like a real departure board — the probability bar draws in
+   from the left, then each flap clacks down from its top hinge (L→R), the
+   printed figure snapping visible as the flap lands. The gold expected-score
+   keeps a slow idle glow. --fd staggers the cells (CSS vars inherit down into
+   the flap + its digit). perspective() is baked into the flip so no ancestor
+   needs a perspective context. */
+.fb-cell:nth-child(1) { --fd:.34s; }
+.fb-cell:nth-child(2) { --fd:.46s; }
+.fb-cell:nth-child(3) { --fd:.58s; }
+.fb-cell:nth-child(4) { --fd:.70s; }
+.fb-meter { transform-origin:left center; animation:fb-wipe .5s cubic-bezier(.22,.61,.36,1) .08s both; }
+.fb-flap { transform-origin:top center; backface-visibility:hidden;
+  animation:fb-flip .46s cubic-bezier(.3,.72,.32,1) var(--fd) both; }
+.fb-flap .fb-pct { animation:fb-digit .46s steps(1,end) var(--fd) both; }
+.fb-cell.exp .fb-pct { animation:fb-digit .46s steps(1,end) var(--fd) both,
+  fb-expglow 3.4s ease-in-out 1.3s infinite; }
+@keyframes fb-wipe { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+@keyframes fb-flip { 0% { transform:perspective(620px) rotateX(-92deg); }
+  70% { transform:perspective(620px) rotateX(6deg); }
+  100% { transform:perspective(620px) rotateX(0); } }
+@keyframes fb-digit { 0%,62% { opacity:0; } 70%,100% { opacity:1; } }
+@keyframes fb-expglow {
+  0%,100% { text-shadow:0 2px 3px rgba(0,0,0,.65), 0 0 14px rgba(242,200,75,.32); }
+  50% { text-shadow:0 2px 3px rgba(0,0,0,.65), 0 0 24px rgba(242,200,75,.75); } }
+@media (prefers-reduced-motion: reduce) {
+  .fb-meter, .fb-flap, .fb-flap .fb-pct, .fb-cell.exp .fb-pct {
+    animation:none !important; transform:none !important; opacity:1 !important; } }
+</style>
+<div class="fb">
+{% map(rows) %}
+  <div class="fb-case">
+    <div class="fb-head">
+      <span class="fb-title">Win <b>probability</b></span>
+      <span class="fb-sub">Elo→Poisson · 10k sims · {{ `RunLabel`.formatted }} · {{ `DeltaNote`.formatted }}</span>
+    </div>
+    <div class="fb-meter">
+      <i style="width:{{ `HomePct`.raw }}%; background:{{ `HomeColor`.raw }};"></i>
+      <i style="width:{{ `DrawPct`.raw }}%; background:#9AA4B2;"></i>
+      <i style="width:{{ `AwayPct`.raw }}%; background:{{ `AwayColor`.raw }};"></i>
+    </div>
+    <div class="fb-row">
+      <div class="fb-cell" style="--bandc:{{ `HomeColor`.raw }};">
+        <div class="fb-plate"><span class="tab"></span><span class="nm">{{ `Home`.formatted }}</span></div>
+        <div class="fb-flap"><span class="fb-pct wc-num">{{ `HomePct`.formatted }}<b>%</b></span></div>
+        <div class="fb-meta"><span>Home win</span><span class="fb-d wc-num" style="color:{{ `DHomeColor`.raw }};">{{ `DHome`.formatted }}</span></div>
+      </div>
+      <div class="fb-cell" style="--bandc:#9AA4B2;">
+        <div class="fb-plate"><span class="tab"></span><span class="nm">Draw</span></div>
+        <div class="fb-flap"><span class="fb-pct wc-num">{{ `DrawPct`.formatted }}<b>%</b></span></div>
+        <div class="fb-meta"><span>After 90 minutes</span><span class="fb-d wc-num" style="color:{{ `DDrawColor`.raw }};">{{ `DDraw`.formatted }}</span></div>
+      </div>
+      <div class="fb-cell" style="--bandc:{{ `AwayColor`.raw }};">
+        <div class="fb-plate"><span class="tab"></span><span class="nm">{{ `Away`.formatted }}</span></div>
+        <div class="fb-flap"><span class="fb-pct wc-num">{{ `AwayPct`.formatted }}<b>%</b></span></div>
+        <div class="fb-meta"><span>Away win</span><span class="fb-d wc-num" style="color:{{ `DAwayColor`.raw }};">{{ `DAway`.formatted }}</span></div>
+      </div>
+      <div class="fb-cell exp" style="--bandc:var(--gold);">
+        <div class="fb-plate"><span class="tab"></span><span class="nm">Expected score</span></div>
+        <div class="fb-flap"><span class="fb-pct wc-num">{{ `ExpScore`.formatted }}</span></div>
+        <div class="fb-meta"><span>Poisson means</span></div>
+      </div>
+    </div>
+    <div class="fb-foot">
+      <span>▲▼ day-over-day move in percentage points</span>
+      <span class="fb-note">{{ `StatusNote`.formatted }}</span>
+      <span>Probabilities, never a predicted winner</span>
+    </div>
+  </div>
+{% end %}
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'ofeat'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 1
+      }
+    }
+  }
+}
+
+Func wc_mc_formations() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Seq'
+          ref: r(wc_lineup_grid.seq)
+          uname: 'gseq'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'SideG'
+          ref: r(wc_lineup_grid.side)
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'StageX'
+          ref: r(wc_lineup_grid.stage_x)
+        },
+        VizFieldFull {
+          label: 'Y'
+          ref: r(wc_lineup_grid.y_pct)
+        },
+        VizFieldFull {
+          label: 'Delay'
+          ref: r(wc_lineup_grid.reveal_delay)
+        },
+        VizFieldFull {
+          label: 'Shirt'
+          ref: r(wc_lineup_grid.shirt_number)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Player'
+          ref: r(wc_lineup_grid.name)
+        },
+        VizFieldFull {
+          label: 'Photo'
+          ref: r(wc_lineup_grid.picture_url)
+        },
+        VizFieldFull {
+          label: 'Role'
+          ref: r(wc_lineup_grid.role)
+        },
+        VizFieldFull {
+          label: 'Cap'
+          ref: r(wc_lineup_grid.cap_tag)
+        },
+        VizFieldFull {
+          label: 'Kit'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'HomeName'
+          ref: r(wc_home_teams.name)
+        },
+        VizFieldFull {
+          label: 'AwayName'
+          ref: r(wc_away_teams.name)
+        },
+        VizFieldFull {
+          label: 'HomeForm'
+          ref: r(wc_matches.home_formation)
+        },
+        VizFieldFull {
+          label: 'AwayForm'
+          ref: r(wc_matches.away_formation)
+        }
+      ]
+      content: @md
+<style>
+/* broadcast frame: night-stadium glass panel — floodlit night turf, glass sheen and
+   corner blooms so the graphic pops off the day pitch behind it (TV line-up board) */
+.fmx { position:relative; width:100%; height:100%; box-sizing:border-box; display:flex;
+  flex-direction:column; border-radius:14px; padding:12px 14px 14px; overflow:hidden;
+  background:
+    radial-gradient(55% 45% at 6% 0%, rgba(150,255,195,.13), transparent 65%),
+    radial-gradient(55% 45% at 94% 0%, rgba(150,255,195,.13), transparent 65%),
+    radial-gradient(130% 100% at 50% 110%, rgba(0,0,0,.4), transparent 60%),
+    linear-gradient(180deg, #14301f, #0b1d14);
+  box-shadow:0 22px 38px -18px rgba(4,18,11,.75), 0 0 0 1px rgba(234,255,242,.14),
+    inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 8px rgba(0,0,0,.4); }
+/* glass sheen sweep across the whole board */
+.fmx::before { content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:linear-gradient(115deg, transparent 32%, rgba(255,255,255,.05) 44%, transparent 58%); }
+.fmx-caps { display:grid; grid-template-columns:46% 1fr 46%; padding-bottom:8px; margin-bottom:10px;
+  border-bottom:1px solid rgba(234,255,242,.14); }
+.fmx-cap { text-align:center; font-family:var(--font-disp); font-weight:800; font-size:12.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:#eafff2;
+  text-shadow:0 0 10px rgba(120,255,180,.25); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fmx-cap small { color:var(--gold-2); font-size:.85em; letter-spacing:.14em; }
+.fmx-stage { position:relative; flex:1; min-height:0; }
+.fmx-pitch { position:absolute; top:0; bottom:0; width:46%; border-radius:9px; overflow:hidden;
+  background:
+    radial-gradient(120% 60% at 50% -5%, rgba(160,255,200,.09), transparent 60%),
+    repeating-linear-gradient(180deg, #16402a 0 28px, #1a4a31 28px 56px);
+  box-shadow:inset 0 0 0 1px rgba(234,255,242,.16), inset 0 0 30px rgba(0,0,0,.4); }
+/* turf grain */
+.fmx-pitch::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.05;
+  background-image:radial-gradient(rgba(255,255,255,.9) .5px, transparent .6px); background-size:4px 4px; }
+.fmx-pitch.home { left:0; }
+.fmx-pitch.away { right:0; }
+/* markings: touchline box, halfway arc at the attacking end, penalty area + six-yard + spot */
+.fmx-pitch i { position:absolute; display:block; border:2px solid rgba(234,255,242,.32); }
+.fmx-pitch .tlb { inset:7px; border-radius:6px; }
+.fmx-pitch .cca { top:7px; left:50%; width:88px; height:42px; transform:translateX(-50%);
+  border-top:0; border-radius:0 0 999px 999px; }
+.fmx-pitch .pa { left:17%; right:17%; bottom:7px; height:21%; border-bottom:0; }
+.fmx-pitch .gb { left:31%; right:31%; bottom:7px; height:10%; border-bottom:0; }
+.fmx-pitch .ps { left:50%; bottom:16%; width:5px; height:5px; margin-left:-2.5px; border:0;
+  border-radius:50%; background:rgba(234,255,242,.5); }
+.fmt { position:absolute; z-index:2; width:58px; margin-left:-29px; transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  opacity:0; animation:fmt-pop .5s cubic-bezier(.18,.89,.32,1.28) forwards; }
+@keyframes fmt-pop {
+  from { opacity:0; transform:translateY(-50%) scale(.25); }
+  to { opacity:1; transform:translateY(-50%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .fmt { animation:none; opacity:1; } }
+.fmt-bust { position:relative; }
+.fmt-ph { display:block; width:40px; height:40px; border-radius:50%; overflow:hidden;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='xMidYMax meet'><g fill='%23a7bfae'><circle cx='50' cy='36' r='15'/><path d='M20 100c1-24 14-36 30-36s29 12 30 36z'/></g></svg>") center bottom / 70% no-repeat,
+    radial-gradient(120% 90% at 50% 0%, #e8f1ea, #c9d8cd);
+  box-shadow:0 0 0 2.5px var(--kitc), 0 0 0 4.5px rgba(255,255,255,.85), 0 5px 10px -3px rgba(0,0,0,.55); }
+.fmx .fmt-ph img { width:100% !important; height:100% !important; object-fit:cover;
+  object-position:top center; transform:scale(1.8); transform-origin:top center;
+  display:block !important; margin:0 !important; }
+.fmx .fmt-ph img[src=""], .fmx .fmt-ph img:not([src]) { display:none !important; }
+.fmt.gk .fmt-ph { box-shadow:0 0 0 2.5px var(--gold-2), 0 0 0 4.5px rgba(255,255,255,.85),
+  0 0 14px rgba(242,200,75,.55), 0 5px 10px -3px rgba(0,0,0,.55); }
+.fmt-num { position:absolute; bottom:-3px; right:-6px; z-index:3; min-width:17px; height:17px;
+  padding:0 3px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-disp); font-weight:800; font-size:9.5px; color:#fff; background:var(--kitc);
+  box-shadow:0 1px 3px rgba(0,0,0,.45), inset 0 0 0 1.5px rgba(255,255,255,.65); }
+.fmt.gk .fmt-num { background:linear-gradient(180deg, var(--gold-2), var(--gold)); color:#3c2c06; }
+.fmt-cap { position:absolute; top:-4px; right:-6px; z-index:3; width:13px; height:13px; border-radius:4px;
+  display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-disp);
+  font-weight:800; font-size:8px; color:#4a3608; background:linear-gradient(180deg, var(--gold-2), var(--gold));
+  box-shadow:0 1px 2px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5); }
+.fmt-cap:empty { display:none; }
+.fmt-nm { max-width:58px; font-size:8.5px; font-weight:700; line-height:1.2; color:#eafff2;
+  background:rgba(4,18,10,.55); border-radius:999px; padding:1px 6px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; box-sizing:border-box; }
+</style>
+<div class="fmx">
+  <div class="fmx-caps">
+    <span class="fmx-cap">{{ rows[0].`HomeName`.formatted }} <small class="wc-num">{{ rows[0].`HomeForm`.formatted }}</small></span>
+    <span></span>
+    <span class="fmx-cap">{{ rows[0].`AwayName`.formatted }} <small class="wc-num">{{ rows[0].`AwayForm`.formatted }}</small></span>
+  </div>
+  <div class="fmx-stage">
+    <div class="fmx-pitch home"><i class="tlb"></i><i class="cca"></i><i class="pa"></i><i class="gb"></i><i class="ps"></i></div>
+    <div class="fmx-pitch away"><i class="tlb"></i><i class="cca"></i><i class="pa"></i><i class="gb"></i><i class="ps"></i></div>
+{% map(rows) %}
+  <div class="fmt {{ `Role`.formatted }}" style="left:{{ `StageX`.raw }}%; top:{{ `Y`.raw }}%; animation-delay:{{ `Delay`.raw }}s; --kitc:{{ `Kit`.raw }};">
+    <span class="fmt-bust"><span class="fmt-ph"><img src="{{ `Photo`.raw }}" alt="" /></span><span class="fmt-num wc-num">{{ `Shirt`.formatted }}</span><span class="fmt-cap">{{ `Cap`.formatted }}</span></span>
+    <span class="fmt-nm">{{ `Player`.formatted }}</span>
+  </div>
+{% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'gseq'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 22
+      }
+    }
+  }
+}
+
+// ---- Momentum: in-match swing as a native trace on a crafted "plotter" chrome ----
+// FIRST native-viz-on-crafted-chrome surface (the reusable pattern). Two stacked blocks:
+//   (1) wc_mc_momentum_frame() — a crafted light chart-recorder card (TextBlock = no dataset,
+//       so it never entangles with filters); it owns the MATERIAL + title + plot well + labels.
+//   (2) wc_mc_momentum_chart() — a transparent native LineChart drawing the gold step trace of
+//       wc_events.score_margin (running home−away) over minute_num; it owns the DATA + axes +
+//       built-in tooltip/hover. Layered on top of the frame's plot well.
+// Light well on purpose: native axis-tick text colour isn't themeable in AML, so dark ticks need
+// a light backdrop to read. The chart auto-maps to the Match filter via wc_events→wc_matches.
+Func wc_mc_zone_momentum() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">Momentum · the swing of the match</p>
+;;
+  }
+}
+
+Func wc_mc_momentum_frame() {
+  TextBlock {
+    content: @md
+<style>
+/* momentum monitor — a dark telemetry instrument: graphite housing + a phosphor screen the
+   native trace plots onto (its white graticule + light ticks read as an oscilloscope grid, so
+   no hand-drawn grid is needed). Own material — a graph readout, distinct from the LED numeric
+   scoreboard, the clipboard ticker, and the split-flap odds board; shares the panel typography. */
+.mom-wrap { width:100%; height:100%; box-sizing:border-box; padding:0 2px; }
+.mom-card { position:relative; width:100%; height:100%; box-sizing:border-box; border-radius:13px;
+  background:linear-gradient(180deg,#2b3134,#1f2427 55%,#15191b); border:1px solid #0f1214;
+  box-shadow:0 18px 32px -16px rgba(4,18,11,.7), 0 2px 0 rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.14), inset 0 -3px 8px rgba(0,0,0,.45);
+  padding:11px 13px 9px; display:flex; flex-direction:column; }
+.mom-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:0 3px 8px; }
+.mom-title { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.16em;
+  font-size:14px; line-height:1; color:rgba(234,255,242,.86); text-shadow:0 0 10px var(--board-glow); }
+.mom-title b { color:var(--gold-2); }
+.mom-sub { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:rgba(234,255,242,.5); white-space:nowrap; }
+/* phosphor screen — the native chart (white grid + light ticks + gold trace) draws onto this; no
+   baked grid or centre rule, so the native 0-gridline stays the single authoritative baseline. */
+.mom-screen { position:relative; flex:1; border-radius:8px; overflow:hidden;
+  background:radial-gradient(130% 120% at 50% -12%, rgba(80,200,140,.12), transparent 58%), var(--board-bg);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 0 44px rgba(0,0,0,.6); }
+.mom-screen::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.32;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); }
+/* home/away read hints, parked in the screen's right gutter (the chart's right margin) */
+.mom-flag { position:absolute; right:8px; z-index:1; font-family:var(--font-disp); font-weight:700;
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase; }
+.mom-flag.up { top:7px; color:rgba(110,240,170,.82); }
+.mom-flag.dn { bottom:7px; color:rgba(255,150,140,.85); }
+.mom-foot { display:flex; gap:9px; padding:7px 3px 0; font-size:8px; text-transform:uppercase;
+  letter-spacing:.05em; color:rgba(234,255,242,.45); }
+.mom-foot .sp { margin-left:auto; font-style:italic; opacity:.9; text-transform:none; letter-spacing:.02em; }
+</style>
+<div class="mom-wrap"><div class="mom-card">
+  <div class="mom-head"><span class="mom-title">Momentum <b>trace</b></span><span class="mom-sub">Running goal margin · by minute</span></div>
+  <div class="mom-screen"><span class="mom-flag up">&#9650; Home ahead</span><span class="mom-flag dn">&#9660; Away ahead</span></div>
+  <div class="mom-foot"><span>Each step = a goal</span><span class="sp">A flat line is a tight game, not missing data</span></div>
+</div></div>
+;;
+  }
+}
+
+Func wc_mc_momentum_chart() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: LineChart {
+      dataset: worldcup
+      filter {
+        field: r(wc_events.is_key_event)
+        operator: 'is'
+        value: true
+      }
+      x_axis: VizFieldFull {
+        label: 'Minute'
+        ref: r(wc_events.minute_num)
+        format {
+          type: 'number'
+          pattern: '0'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Margin'
+            ref: r(wc_events.score_margin)
+            aggregation: 'max'
+            format {
+              type: 'number'
+              pattern: '0'
+            }
+          }
+          settings {
+            color: '#f2c84b'
+            line_interpolation: 'step_after'
+          }
+        }
+        settings {
+          axis_min: -3
+          axis_max: 3
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        show_data_points: true
+        connect_discontinuous_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+        row_limit: 100
+      }
+    }
+  }
+}

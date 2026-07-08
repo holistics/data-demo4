@@ -1,0 +1,119 @@
+Model wc_team_rating_movement {
+  type: 'query'
+  label: 'Team Rating Movement'
+  description: 'One row per team comparing the LATEST Elo snapshot against the previous snapshot and the nearest snapshot ~30 days earlier, with rank movement. Period comparison cannot be expressed as an AQL dimension (it needs a row-offset lag over snapshot dates), so it is materialised here. Signed delta labels/colours are built in SQL (AQL has no signed to_char). Snapshots are monthly since 2024-07 then daily during the tournament, so "previous" tightens to day-over-day once play starts.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_team_ratings]
+  query: @sql
+    with snaps as (
+      select {{ #r.team_code }} as team_code, {{ #r.snapshot_date }} as snapshot_date, {{ #r.elo }} as elo,
+        row_number() over (partition by {{ #r.team_code }} order by {{ #r.snapshot_date }} desc) as rn
+      from {{ #wc_team_ratings as r }}
+    ),
+    latest as (select team_code, elo, snapshot_date from snaps where rn = 1),
+    prev as (select team_code, elo, snapshot_date from snaps where rn = 2),
+    d30 as (
+      select distinct on (s.team_code) s.team_code, s.elo, s.snapshot_date
+      from snaps s
+      join latest l on l.team_code = s.team_code
+      where s.snapshot_date <= l.snapshot_date - interval '30 days'
+      order by s.team_code, s.snapshot_date desc
+    ),
+    joined as (
+      select
+        l.team_code,
+        l.elo, l.snapshot_date as rating_date,
+        p.elo as elo_prev, p.snapshot_date as prev_date,
+        d.elo as elo_30d, d.snapshot_date as date_30d,
+        round(l.elo - p.elo, 1) as delta_prev,
+        round(l.elo - coalesce(d.elo, p.elo), 1) as delta_30d,
+        rank() over (order by l.elo desc) as elo_rank,
+        rank() over (order by p.elo desc nulls last) as elo_rank_prev
+      from latest l
+      left join prev p on p.team_code = l.team_code
+      left join d30 d on d.team_code = l.team_code
+    )
+    select
+      team_code, elo, rating_date, elo_prev, prev_date, elo_30d, date_30d,
+      delta_prev, delta_30d, elo_rank, elo_rank_prev,
+      (elo_rank_prev - elo_rank) as rank_delta,
+      case when delta_30d > 0.05 then '▲ ' || to_char(delta_30d, 'FM990.0')
+           when delta_30d < -0.05 then '▼ ' || to_char(abs(delta_30d), 'FM990.0')
+           else '· 0' end as delta_30d_label,
+      case when delta_30d > 0.05 then '#1FA36B'
+           when delta_30d < -0.05 then '#E5362B'
+           else '#9AA4B2' end as delta_30d_color,
+      case when (elo_rank_prev - elo_rank) > 0 then '▲ ' || (elo_rank_prev - elo_rank)::text
+           when (elo_rank_prev - elo_rank) < 0 then '▼ ' || abs(elo_rank_prev - elo_rank)::text
+           else '·' end as rank_delta_label
+    from joined;;
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    primary_key: true
+  }
+  dimension elo {
+    label: 'Elo (latest)'
+    type: 'number'
+  }
+  dimension rating_date {
+    label: 'Rating As Of'
+    type: 'date'
+  }
+  dimension elo_prev {
+    label: 'Elo (previous snapshot)'
+    type: 'number'
+  }
+  dimension prev_date {
+    label: 'Previous Snapshot Date'
+    type: 'date'
+  }
+  dimension elo_30d {
+    label: 'Elo (~30d ago)'
+    type: 'number'
+    description: 'Elo at the nearest snapshot at least 30 days before the latest; null very early in the backfill (falls back to the previous snapshot in delta_30d).'
+  }
+  dimension date_30d {
+    label: '~30d-ago Snapshot Date'
+    type: 'date'
+  }
+  dimension delta_prev {
+    label: 'Elo Δ vs previous'
+    type: 'number'
+  }
+  dimension delta_30d {
+    label: 'Elo Δ vs ~30d'
+    type: 'number'
+    description: 'Latest Elo minus the ~30-days-ago Elo (or the previous snapshot when no 30-day-old one exists yet).'
+  }
+  dimension elo_rank {
+    label: 'Elo Rank (latest)'
+    type: 'number'
+    description: 'Rank among the 48 teams by latest Elo (1 = strongest).'
+  }
+  dimension elo_rank_prev {
+    label: 'Elo Rank (previous)'
+    type: 'number'
+  }
+  dimension rank_delta {
+    label: 'Rank Movement'
+    type: 'number'
+    description: 'Positions climbed since the previous snapshot (positive = moved up the table).'
+  }
+  dimension delta_30d_label {
+    label: 'Elo Δ Label'
+    type: 'text'
+    description: 'Driver field: signed 30-day Elo move, e.g. "▲ 12.4" / "▼ 5.0" / "· 0".'
+  }
+  dimension delta_30d_color {
+    label: 'Elo Δ Color'
+    type: 'text'
+    description: 'Driver field: rising green / falling red / flat grey.'
+  }
+  dimension rank_delta_label {
+    label: 'Rank Movement Label'
+    type: 'text'
+    description: 'Driver field: signed rank move vs previous snapshot, e.g. "▲ 2" / "▼ 1" / "·".'
+  }
+  owner: 'hung.dd@holistics.io'
+}
