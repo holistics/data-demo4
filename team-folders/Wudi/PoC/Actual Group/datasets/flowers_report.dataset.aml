@@ -1,0 +1,448 @@
+Dataset flowers_report {
+  label: 'Flowers Report (Live)'
+  data_source_name: 'demodb'
+  models: [
+    ecommerce_order_items,
+    ecommerce_orders,
+    ecommerce_users,
+    ecommerce_products,
+    ecommerce_merchants,
+    flowers_report_params,
+  ]
+  relationships: [
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_orders.user_id > ecommerce_users.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+    relationship(ecommerce_products.merchant_id > ecommerce_merchants.id, true),
+  ]
+  metric fr_placed {
+    label: 'fr_placed'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0);;
+  }
+  metric fr_placed_on {
+    label: 'fr_placed_on'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_users.gender is 'Female');;
+  }
+  metric fr_cancelled {
+    label: 'fr_cancelled'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'cancelled');;
+  }
+  metric fr_cancelled_on {
+    label: 'fr_cancelled_on'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'cancelled' and ecommerce_users.gender is 'Female');;
+  }
+  metric fr_delivered {
+    label: 'fr_delivered'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_delivered_on {
+    label: 'fr_delivered_on'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'delivered' and ecommerce_users.gender is 'Female');;
+  }
+  metric fr_dval {
+    label: 'fr_dval'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_dval_on {
+    label: 'fr_dval_on'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'delivered' and ecommerce_users.gender is 'Female');;
+  }
+  metric fr_dcost {
+    label: 'fr_dcost'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.cost) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_dcost_on {
+    label: 'fr_dcost_on'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.cost) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'delivered' and ecommerce_users.gender is 'Female');;
+  }
+  metric fr_refunds {
+    label: 'fr_refunds'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0 and ecommerce_orders.status is 'refunded');;
+  }
+  metric fr_units {
+    label: 'fr_units'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0);;
+  }
+  metric fr_placed_p {
+    label: 'fr_placed_p'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1);;
+  }
+  metric fr_delivered_p {
+    label: 'fr_delivered_p'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_dval_p {
+    label: 'fr_dval_p'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_dcost_p {
+    label: 'fr_dcost_p'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.cost) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_refunds_p {
+    label: 'fr_refunds_p'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1 and ecommerce_orders.status is 'refunded');;
+  }
+  metric fr_units_p {
+    label: 'fr_units_p'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1);;
+  }
+  metric fr_active_p {
+    label: 'fr_active_p'
+    type: 'number'
+    definition: @aql count_distinct(ecommerce_merchants.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 1);;
+  }
+  metric fr_placed_ly {
+    label: 'fr_placed_ly'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12);;
+  }
+  metric fr_cancelled_ly {
+    label: 'fr_cancelled_ly'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12 and ecommerce_orders.status is 'cancelled');;
+  }
+  metric fr_delivered_ly {
+    label: 'fr_delivered_ly'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_dval_ly {
+    label: 'fr_dval_ly'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_dcost_ly {
+    label: 'fr_dcost_ly'
+    type: 'number'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.cost) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12 and ecommerce_orders.status is 'delivered');;
+  }
+  metric fr_refunds_ly {
+    label: 'fr_refunds_ly'
+    type: 'number'
+    definition: @aql count(ecommerce_orders.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12 and ecommerce_orders.status is 'refunded');;
+  }
+  metric fr_active_ly {
+    label: 'fr_active_ly'
+    type: 'number'
+    definition: @aql count_distinct(ecommerce_merchants.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 12);;
+  }
+  metric v_avgcheck_prev {
+    label: 'v_avgcheck_prev'
+    type: 'number'
+    definition: @aql fr_dval_p / fr_delivered_p;;
+  }
+  metric v_profit_prev {
+    label: 'v_profit_prev'
+    type: 'number'
+    definition: @aql (fr_dval_p - fr_dcost_p) / fr_dval_p;;
+  }
+  metric v_refunds_pct_prev {
+    label: 'v_refunds_pct_prev'
+    type: 'number'
+    definition: @aql fr_refunds_p * 1.0 / fr_placed_p;;
+  }
+  metric v_cr_prev {
+    label: 'v_cr_prev'
+    type: 'number'
+    definition: @aql fr_delivered_p * 1.0 / fr_placed_p;;
+  }
+  metric v_units_per_outlet_prev {
+    label: 'v_units_per_outlet_prev'
+    type: 'number'
+    definition: @aql fr_units_p * 1.0 / fr_active_p;;
+  }
+  metric fr_new_outlets {
+    label: 'fr_new_outlets'
+    type: 'number'
+    definition: @aql 0;;
+  }
+  metric fr_active {
+    label: 'fr_active'
+    type: 'number'
+    definition: @aql count_distinct(ecommerce_merchants.id) | where(date_diff('month', ecommerce_orders.created_at, (flowers_report_params.ref_month | first())) == 0);;
+  }
+  metric v_placed {
+    label: 'v_placed'
+    type: 'number'
+    definition: @aql fr_placed;;
+  }
+  metric v_cancelled {
+    label: 'v_cancelled'
+    type: 'number'
+    definition: @aql fr_cancelled;;
+  }
+  metric v_delivered {
+    label: 'v_delivered'
+    type: 'number'
+    definition: @aql fr_delivered;;
+  }
+  metric v_pct_delivered {
+    label: 'v_pct_delivered'
+    type: 'number'
+    definition: @aql fr_delivered * 1.0 / fr_placed;;
+  }
+  metric v_avgcheck {
+    label: 'v_avgcheck'
+    type: 'number'
+    definition: @aql fr_dval / fr_delivered;;
+  }
+  metric v_profit {
+    label: 'v_profit'
+    type: 'number'
+    definition: @aql (fr_dval - fr_dcost) / fr_dval;;
+  }
+  metric v_refunds_qty {
+    label: 'v_refunds_qty'
+    type: 'number'
+    definition: @aql fr_refunds;;
+  }
+  metric v_refunds_pct {
+    label: 'v_refunds_pct'
+    type: 'number'
+    definition: @aql fr_refunds * 1.0 / fr_placed;;
+  }
+  metric v_placed_on {
+    label: 'v_placed_on'
+    type: 'number'
+    definition: @aql fr_placed_on;;
+  }
+  metric v_cancelled_on {
+    label: 'v_cancelled_on'
+    type: 'number'
+    definition: @aql fr_cancelled_on;;
+  }
+  metric v_delivered_on {
+    label: 'v_delivered_on'
+    type: 'number'
+    definition: @aql fr_delivered_on;;
+  }
+  metric v_share_on {
+    label: 'v_share_on'
+    type: 'number'
+    definition: @aql fr_placed_on * 1.0 / fr_placed;;
+  }
+  metric v_avgcheck_on {
+    label: 'v_avgcheck_on'
+    type: 'number'
+    definition: @aql fr_dval_on / fr_delivered_on;;
+  }
+  metric v_profit_on {
+    label: 'v_profit_on'
+    type: 'number'
+    definition: @aql (fr_dval_on - fr_dcost_on) / fr_dval_on;;
+  }
+  metric v_placed_off {
+    label: 'v_placed_off'
+    type: 'number'
+    definition: @aql fr_placed - fr_placed_on;;
+  }
+  metric v_cancelled_off {
+    label: 'v_cancelled_off'
+    type: 'number'
+    definition: @aql fr_cancelled - fr_cancelled_on;;
+  }
+  metric v_delivered_off {
+    label: 'v_delivered_off'
+    type: 'number'
+    definition: @aql fr_delivered - fr_delivered_on;;
+  }
+  metric v_share_off {
+    label: 'v_share_off'
+    type: 'number'
+    definition: @aql (fr_placed - fr_placed_on) * 1.0 / fr_placed;;
+  }
+  metric v_avgcheck_off {
+    label: 'v_avgcheck_off'
+    type: 'number'
+    definition: @aql (fr_dval - fr_dval_on) / (fr_delivered - fr_delivered_on);;
+  }
+  metric v_profit_off {
+    label: 'v_profit_off'
+    type: 'number'
+    definition: @aql ((fr_dval - fr_dval_on) - (fr_dcost - fr_dcost_on)) / (fr_dval - fr_dval_on);;
+  }
+  metric v_placed_ly {
+    label: 'v_placed_ly'
+    type: 'number'
+    definition: @aql fr_placed_ly;;
+  }
+  metric v_cancelled_ly {
+    label: 'v_cancelled_ly'
+    type: 'number'
+    definition: @aql fr_cancelled_ly;;
+  }
+  metric v_delivered_ly {
+    label: 'v_delivered_ly'
+    type: 'number'
+    definition: @aql fr_delivered_ly;;
+  }
+  metric v_pct_delivered_ly {
+    label: 'v_pct_delivered_ly'
+    type: 'number'
+    definition: @aql fr_delivered_ly * 1.0 / fr_placed_ly;;
+  }
+  metric v_avgcheck_ly {
+    label: 'v_avgcheck_ly'
+    type: 'number'
+    definition: @aql fr_dval_ly / fr_delivered_ly;;
+  }
+  metric v_profit_ly {
+    label: 'v_profit_ly'
+    type: 'number'
+    definition: @aql (fr_dval_ly - fr_dcost_ly) / fr_dval_ly;;
+  }
+  metric v_refunds_qty_ly {
+    label: 'v_refunds_qty_ly'
+    type: 'number'
+    definition: @aql fr_refunds_ly;;
+  }
+  metric v_refunds_pct_ly {
+    label: 'v_refunds_pct_ly'
+    type: 'number'
+    definition: @aql fr_refunds_ly * 1.0 / fr_placed_ly;;
+  }
+  metric v_units_per_outlet {
+    label: 'v_units_per_outlet'
+    type: 'number'
+    definition: @aql fr_units * 1.0 / fr_active;;
+  }
+  metric v_active_growth_yoy {
+    label: 'v_active_growth_yoy'
+    type: 'number'
+    definition: @aql (fr_active - fr_active_ly) * 1.0 / fr_active_ly;;
+  }
+  metric v_placed_mom {
+    label: 'v_placed_mom'
+    type: 'number'
+    definition: @aql (fr_placed - fr_placed_p) * 1.0 / fr_placed_p;;
+  }
+  metric v_placed_yoy {
+    label: 'v_placed_yoy'
+    type: 'number'
+    definition: @aql (fr_placed - fr_placed_ly) * 1.0 / fr_placed_ly;;
+  }
+  metric v_cancelled_yoy {
+    label: 'v_cancelled_yoy'
+    type: 'number'
+    definition: @aql (fr_cancelled - fr_cancelled_ly) * 1.0 / fr_cancelled_ly;;
+  }
+  metric v_delivered_mom {
+    label: 'v_delivered_mom'
+    type: 'number'
+    definition: @aql (fr_delivered - fr_delivered_p) * 1.0 / fr_delivered_p;;
+  }
+  metric v_delivered_yoy {
+    label: 'v_delivered_yoy'
+    type: 'number'
+    definition: @aql (fr_delivered - fr_delivered_ly) * 1.0 / fr_delivered_ly;;
+  }
+  metric v_avgcheck_mom {
+    label: 'v_avgcheck_mom'
+    type: 'number'
+    definition: @aql (v_avgcheck - v_avgcheck_prev) / v_avgcheck_prev;;
+  }
+  metric v_avgcheck_yoy {
+    label: 'v_avgcheck_yoy'
+    type: 'number'
+    definition: @aql (v_avgcheck - v_avgcheck_ly) / v_avgcheck_ly;;
+  }
+  metric v_orders_mom {
+    label: 'v_orders_mom'
+    type: 'number'
+    definition: @aql (fr_placed - fr_placed_p) * 1.0 / fr_placed_p;;
+  }
+  metric a_profit_mom {
+    label: 'a_profit_mom'
+    type: 'text'
+    definition: @aql case(when: v_profit >= v_profit_prev, then: '↑', else: '↓');;
+  }
+  metric a_profit_mom_cls {
+    label: 'a_profit_mom_cls'
+    type: 'text'
+    definition: @aql case(when: v_profit >= v_profit_prev, then: 'rep-upg', else: 'rep-red');;
+  }
+  metric a_profit_yoy {
+    label: 'a_profit_yoy'
+    type: 'text'
+    definition: @aql case(when: v_profit >= v_profit_ly, then: '↑', else: '↓');;
+  }
+  metric a_profit_yoy_cls {
+    label: 'a_profit_yoy_cls'
+    type: 'text'
+    definition: @aql case(when: v_profit >= v_profit_ly, then: 'rep-upg', else: 'rep-red');;
+  }
+  metric a_refunds_qty_yoy {
+    label: 'a_refunds_qty_yoy'
+    type: 'text'
+    definition: @aql case(when: fr_refunds >= fr_refunds_ly, then: '↑', else: '↓');;
+  }
+  metric a_refunds_qty_yoy_cls {
+    label: 'a_refunds_qty_yoy_cls'
+    type: 'text'
+    definition: @aql case(when: fr_refunds >= fr_refunds_ly, then: 'rep-red', else: 'rep-upg');;
+  }
+  metric a_refunds_pct_mom {
+    label: 'a_refunds_pct_mom'
+    type: 'text'
+    definition: @aql case(when: v_refunds_pct >= v_refunds_pct_prev, then: '↑', else: '↓');;
+  }
+  metric a_refunds_pct_mom_cls {
+    label: 'a_refunds_pct_mom_cls'
+    type: 'text'
+    definition: @aql case(when: v_refunds_pct >= v_refunds_pct_prev, then: 'rep-red', else: 'rep-upg');;
+  }
+  metric a_refunds_pct_yoy {
+    label: 'a_refunds_pct_yoy'
+    type: 'text'
+    definition: @aql case(when: v_refunds_pct >= v_refunds_pct_ly, then: '↑', else: '↓');;
+  }
+  metric a_refunds_pct_yoy_cls {
+    label: 'a_refunds_pct_yoy_cls'
+    type: 'text'
+    definition: @aql case(when: v_refunds_pct >= v_refunds_pct_ly, then: 'rep-red', else: 'rep-upg');;
+  }
+  metric a_units {
+    label: 'a_units'
+    type: 'text'
+    definition: @aql case(when: v_units_per_outlet >= v_units_per_outlet_prev, then: '↑', else: '↓');;
+  }
+  metric a_units_cls {
+    label: 'a_units_cls'
+    type: 'text'
+    definition: @aql case(when: v_units_per_outlet >= v_units_per_outlet_prev, then: 'rep-upg', else: 'rep-red');;
+  }
+  metric a_cr {
+    label: 'a_cr'
+    type: 'text'
+    definition: @aql case(when: v_pct_delivered >= v_cr_prev, then: '↑', else: '↓');;
+  }
+  metric a_cr_cls {
+    label: 'a_cr_cls'
+    type: 'text'
+    definition: @aql case(when: v_pct_delivered >= v_cr_prev, then: 'rep-upg', else: 'rep-red');;
+  }
+  metric v_ref_month {
+    label: 'v_ref_month'
+    type: 'date'
+    definition: @aql (flowers_report_params.ref_month | first());;
+  }
+}
