@@ -1,0 +1,1125 @@
+Dashboard iceye_finance_dashboard {
+  title: 'ICEYE Finance'
+  description: 'Finance demo for ICEYE — Budget vs Actual, P&L, Balance Sheet / Fixed Assets, Production. Built on the dbt-backed prod_reporting_finance_* marts (data source demo_dbt_test).'
+  owner: 'dong.ln@holistics.io'
+
+  // ===================== TIME FILTERS (one per tab, bound to that tab's date field) =====================
+  block t1_date_filter: FilterBlock {
+    label: 'Posting Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: pl_actuals_plan_monthly
+      field: ref('iceye_fact_pl_budget_vs_actual', 'posting_period_date')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 5 years to today'
+    }
+  }
+  block t2_date_filter: FilterBlock {
+    label: 'Posting Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: profit_loss_statement_dataset
+      field: ref('iceye_fact_pl_statements', 'resolved_posting_date')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 5 years to today'
+    }
+  }
+  block t3_date_filter: FilterBlock {
+    label: 'Posting Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: balance_sheet
+      field: ref('iceye_fact_balance_sheet', 'posting_date')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 5 years to today'
+    }
+  }
+  block t4_date_filter: FilterBlock {
+    label: 'Posting Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: product_inventory
+      field: ref('iceye_fact_production_inventory', 'posting_period_date')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 5 years to today'
+    }
+  }
+
+  // ===================== TAB 1 — Budget vs Actual =====================
+  block t1_title: TextBlock {
+    content: @md <h1 style="font-size:26px; font-weight:600; color:#ffffff; margin:0; padding:0 24px; display:flex; align-items:center; height:100%; box-sizing:border-box; background:linear-gradient(97deg, #051527 15%, #123c4a 85%); border-radius:8px;">Budget vs Actual — Department Performance</h1>;;
+  }
+
+  block t1_kpi_actual: VizBlock {
+    label: 'Actual (EUR)'
+    viz: MetricKpi {
+      dataset: pl_actuals_plan_monthly
+      value: VizFieldFull {
+        label: 'Actual (EUR)'
+        ref: r(pl_actuals_plan_monthly.total_actual_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t1_kpi_plan: VizBlock {
+    label: 'Plan (EUR)'
+    viz: MetricKpi {
+      dataset: pl_actuals_plan_monthly
+      value: VizFieldFull {
+        label: 'Plan (EUR)'
+        ref: r(pl_actuals_plan_monthly.total_plan_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t1_kpi_variance: VizBlock {
+    label: 'Variance (EUR)'
+    viz: MetricKpi {
+      dataset: pl_actuals_plan_monthly
+      value: VizFieldFull {
+        label: 'Variance (EUR)'
+        ref: r(pl_actuals_plan_monthly.total_variance_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t1_kpi_delta: VizBlock {
+    label: 'Variance %'
+    viz: MetricKpi {
+      dataset: pl_actuals_plan_monthly
+      value: VizFieldFull {
+        label: 'Variance %'
+        ref: r(pl_actuals_plan_monthly.variance_pct)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+
+  block t1_trend: VizBlock {
+    label: 'Actual vs Plan by Month'
+    viz: LineChart {
+      dataset: pl_actuals_plan_monthly
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_pl_budget_vs_actual.posting_period_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Actual'
+            ref: r(iceye_fact_pl_budget_vs_actual.actual_amount_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Plan'
+            ref: r(iceye_fact_pl_budget_vs_actual.plan_amount_eur)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#F59E0B'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t1_by_dept: VizBlock {
+    label: 'Actual vs Plan by Department'
+    viz: BarChart {
+      dataset: pl_actuals_plan_monthly
+      x_axis: VizFieldFull {
+        ref: r(iceye_dim_departments.department_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Actual'
+            ref: r(iceye_fact_pl_budget_vs_actual.actual_amount_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Plan'
+            ref: r(iceye_fact_pl_budget_vs_actual.plan_amount_eur)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#F59E0B'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t1_by_group: VizBlock {
+    label: 'Variance by Account Group'
+    viz: BarChart {
+      dataset: pl_actuals_plan_monthly
+      x_axis: VizFieldFull {
+        ref: r(iceye_account_hierarchy_map.account_group_level_1)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Variance'
+            ref: r(iceye_fact_pl_budget_vs_actual.variance_vs_plan_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t1_table: VizBlock {
+    label: 'Line-level Budget vs Actual (drill-down)'
+    viz: DataTable {
+      dataset: pl_actuals_plan_monthly
+      fields: [
+        VizFieldFull {
+          ref: r(iceye_fact_pl_budget_vs_actual.posting_period_date)
+          format {
+            type: 'date'
+            pattern: 'yyyy-MM'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_dim_departments.department_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_budget_vs_actual.account_number)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_budget_vs_actual.actual_amount_eur)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_budget_vs_actual.plan_amount_eur)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_budget_vs_actual.variance_amount_eur)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_budget_vs_actual.variance_status)
+          format {
+            type: 'text'
+          }
+        },
+      ]
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  // ===================== TAB 2 — Profit & Loss =====================
+  block t2_title: TextBlock {
+    content: @md <h1 style="font-size:26px; font-weight:600; color:#ffffff; margin:0; padding:0 24px; display:flex; align-items:center; height:100%; box-sizing:border-box; background:linear-gradient(97deg, #051527 15%, #123c4a 85%); border-radius:8px;">Profit & Loss Statement</h1>;;
+  }
+
+  block t2_kpi_net: VizBlock {
+    label: 'Net Amount (EUR)'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'Net Amount (EUR)'
+        ref: r(profit_loss_statement_dataset.total_net_amount_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t2_kpi_credit: VizBlock {
+    label: 'Credit (EUR)'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'Credit (EUR)'
+        ref: r(profit_loss_statement_dataset.total_credit_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t2_kpi_debit: VizBlock {
+    label: 'Debit (EUR)'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'Debit (EUR)'
+        ref: r(profit_loss_statement_dataset.total_debit_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+
+  block t2_by_group: VizBlock {
+    label: 'Net Amount by Account Group'
+    viz: BarChart {
+      dataset: profit_loss_statement_dataset
+      x_axis: VizFieldFull {
+        ref: r(iceye_account_hierarchy_map.account_group_level_1)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Net EUR'
+            ref: r(iceye_fact_pl_statements.net_amount_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t2_trend: VizBlock {
+    label: 'Net Amount by Month'
+    viz: LineChart {
+      dataset: profit_loss_statement_dataset
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_pl_statements.resolved_posting_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Net EUR'
+            ref: r(iceye_fact_pl_statements.net_amount_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t2_by_dept: VizBlock {
+    label: 'Net Amount by Department'
+    viz: BarChart {
+      dataset: profit_loss_statement_dataset
+      x_axis: VizFieldFull {
+        ref: r(iceye_dim_departments.department_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Net EUR'
+            ref: r(iceye_fact_pl_statements.net_amount_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t2_table: VizBlock {
+    label: 'P&L lines (drill-down)'
+    viz: DataTable {
+      dataset: profit_loss_statement_dataset
+      fields: [
+        VizFieldFull {
+          ref: r(iceye_fact_pl_statements.resolved_posting_date)
+          format {
+            type: 'date'
+            pattern: 'yyyy-MM'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_statements.account_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_statements.department_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_statements.net_amount_eur)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  // ===================== TAB 3 — Balance Sheet / Fixed Assets =====================
+  block t3_title: TextBlock {
+    content: @md <h1 style="font-size:26px; font-weight:600; color:#ffffff; margin:0; padding:0 24px; display:flex; align-items:center; height:100%; box-sizing:border-box; background:linear-gradient(97deg, #051527 15%, #123c4a 85%); border-radius:8px;">Balance Sheet &amp; Fixed Assets</h1>;;
+  }
+
+  block t3_kpi_net: VizBlock {
+    label: 'Net Amount (EUR)'
+    viz: MetricKpi {
+      dataset: balance_sheet
+      value: VizFieldFull {
+        label: 'Total Assets (EUR)'
+        ref: r(balance_sheet.total_assets_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t3_kpi_credit: VizBlock {
+    label: 'Credit (EUR)'
+    viz: MetricKpi {
+      dataset: balance_sheet
+      value: VizFieldFull {
+        label: 'Total Liabilities (EUR)'
+        ref: r(balance_sheet.total_liabilities_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t3_kpi_debit: VizBlock {
+    label: 'Debit (EUR)'
+    viz: MetricKpi {
+      dataset: balance_sheet
+      value: VizFieldFull {
+        label: 'Total Equity (EUR)'
+        ref: r(balance_sheet.total_equity_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+
+  block t3_by_group: VizBlock {
+    label: 'Balance by Category (Assets / Liabilities / Equity)'
+    viz: BarChart {
+      dataset: balance_sheet
+      x_axis: VizFieldFull {
+        ref: r(iceye_account_hierarchy_map.account_group_level_1)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Balance EUR'
+            ref: r(iceye_fact_balance_sheet.balance_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t3_fixed: VizBlock {
+    label: 'Balance by Account (Fixed assets & more)'
+    viz: BarChart {
+      dataset: balance_sheet
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_balance_sheet.account_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Balance EUR'
+            ref: r(iceye_fact_balance_sheet.balance_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t3_table: VizBlock {
+    label: 'Balance-sheet lines (drill-down)'
+    viz: DataTable {
+      dataset: balance_sheet
+      fields: [
+        VizFieldFull {
+          ref: r(iceye_fact_balance_sheet.account_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_balance_sheet.department_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_balance_sheet.account_type)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_balance_sheet.net_amount_eur_line_level)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  // ===================== TAB 4 — Production / Inventory =====================
+  block t4_title: TextBlock {
+    content: @md <h1 style="font-size:26px; font-weight:600; color:#ffffff; margin:0; padding:0 24px; display:flex; align-items:center; height:100%; box-sizing:border-box; background:linear-gradient(97deg, #051527 15%, #123c4a 85%); border-radius:8px;">Production &amp; Inventory</h1>;;
+  }
+
+  block t4_kpi_value: VizBlock {
+    label: 'Production Value (EUR)'
+    viz: MetricKpi {
+      dataset: product_inventory
+      value: VizFieldFull {
+        label: 'Production Value (EUR)'
+        ref: r(product_inventory.total_production_value_eur)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t4_kpi_qty: VizBlock {
+    label: 'Quantity'
+    viz: MetricKpi {
+      dataset: product_inventory
+      value: VizFieldFull {
+        label: 'Quantity'
+        ref: r(product_inventory.total_quantity)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t4_kpi_lines: VizBlock {
+    label: 'Work Order Lines'
+    viz: MetricKpi {
+      dataset: product_inventory
+      value: VizFieldFull {
+        label: 'Work Order Lines'
+        ref: r(product_inventory.total_work_order_lines)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+
+  block t4_by_assembly: VizBlock {
+    label: 'Production Value by Top-level Assembly'
+    viz: BarChart {
+      dataset: product_inventory
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_production_inventory.top_level_assembly_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Value EUR'
+            ref: r(iceye_fact_production_inventory.accounting_line_debit_amount_eur)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t4_trend: VizBlock {
+    label: 'Production Value by Month'
+    viz: LineChart {
+      dataset: product_inventory
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_production_inventory.posting_period_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Value EUR'
+            ref: r(iceye_fact_production_inventory.accounting_line_debit_amount_eur)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t4_by_dept: VizBlock {
+    label: 'Production Value by Department'
+    viz: BarChart {
+      dataset: product_inventory
+      x_axis: VizFieldFull {
+        ref: r(iceye_dim_departments.department_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Value EUR'
+            ref: r(iceye_fact_production_inventory.accounting_line_debit_amount_eur)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t4_table: VizBlock {
+    label: 'Work-order lines (drill-down)'
+    viz: DataTable {
+      dataset: product_inventory
+      fields: [
+        VizFieldFull {
+          ref: r(iceye_fact_production_inventory.posting_period_date)
+          format {
+            type: 'date'
+            pattern: 'yyyy-MM'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_production_inventory.tl_item_display_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_production_inventory.top_level_assembly_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_production_inventory.tl_quantity)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_production_inventory.accounting_line_debit_amount_eur)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  // ===================== LAYOUT =====================
+  view: TabLayout {
+    label: 'ICEYE Finance'
+
+    tab budget_vs_actual: CanvasLayout {
+      label: 'Budget vs Actual'
+      width: 1320
+      height: 1570
+      grid_size: 20
+      auto_expand_vertically: true
+      block t1_title {
+        position: pos(20, 20, 1280, 64)
+      }
+      block t1_date_filter {
+        position: pos(20, 100, 360, 40)
+      }
+      block t1_kpi_actual {
+        position: pos(20, 170, 300, 160)
+      }
+      block t1_kpi_plan {
+        position: pos(340, 170, 300, 160)
+      }
+      block t1_kpi_variance {
+        position: pos(660, 170, 300, 160)
+      }
+      block t1_kpi_delta {
+        position: pos(980, 170, 300, 160)
+      }
+      block t1_trend {
+        position: pos(20, 350, 640, 400)
+      }
+      block t1_by_dept {
+        position: pos(680, 350, 600, 400)
+      }
+      block t1_by_group {
+        position: pos(20, 770, 1260, 320)
+      }
+      block t1_table {
+        position: pos(20, 1110, 1260, 440)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab profit_loss: CanvasLayout {
+      label: 'Profit & Loss'
+      width: 1320
+      height: 1570
+      grid_size: 20
+      auto_expand_vertically: true
+      block t2_title {
+        position: pos(20, 20, 1280, 64)
+      }
+      block t2_date_filter {
+        position: pos(20, 100, 360, 40)
+      }
+      block t2_kpi_net {
+        position: pos(20, 170, 400, 160)
+      }
+      block t2_kpi_credit {
+        position: pos(440, 170, 400, 160)
+      }
+      block t2_kpi_debit {
+        position: pos(860, 170, 400, 160)
+      }
+      block t2_by_group {
+        position: pos(20, 350, 640, 400)
+      }
+      block t2_trend {
+        position: pos(680, 350, 600, 400)
+      }
+      block t2_by_dept {
+        position: pos(20, 770, 1260, 320)
+      }
+      block t2_table {
+        position: pos(20, 1110, 1260, 440)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab balance_sheet: CanvasLayout {
+      label: 'Balance Sheet & Fixed Assets'
+      width: 1320
+      height: 1230
+      grid_size: 20
+      auto_expand_vertically: true
+      block t3_title {
+        position: pos(20, 20, 1280, 64)
+      }
+      block t3_date_filter {
+        position: pos(20, 100, 360, 40)
+      }
+      block t3_kpi_net {
+        position: pos(20, 170, 400, 160)
+      }
+      block t3_kpi_credit {
+        position: pos(440, 170, 400, 160)
+      }
+      block t3_kpi_debit {
+        position: pos(860, 170, 400, 160)
+      }
+      block t3_by_group {
+        position: pos(20, 350, 640, 400)
+      }
+      block t3_fixed {
+        position: pos(680, 350, 600, 400)
+      }
+      block t3_table {
+        position: pos(20, 770, 1260, 440)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab production: CanvasLayout {
+      label: 'Production & Inventory'
+      width: 1320
+      height: 1570
+      grid_size: 20
+      auto_expand_vertically: true
+      block t4_title {
+        position: pos(20, 20, 1280, 64)
+      }
+      block t4_date_filter {
+        position: pos(20, 100, 360, 40)
+      }
+      block t4_kpi_value {
+        position: pos(20, 170, 400, 160)
+      }
+      block t4_kpi_qty {
+        position: pos(440, 170, 400, 160)
+      }
+      block t4_kpi_lines {
+        position: pos(860, 170, 400, 160)
+      }
+      block t4_by_assembly {
+        position: pos(20, 350, 640, 400)
+      }
+      block t4_trend {
+        position: pos(680, 350, 600, 400)
+      }
+      block t4_by_dept {
+        position: pos(20, 770, 1260, 320)
+      }
+      block t4_table {
+        position: pos(20, 1110, 1260, 440)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+
+  theme: ICEYE
+}

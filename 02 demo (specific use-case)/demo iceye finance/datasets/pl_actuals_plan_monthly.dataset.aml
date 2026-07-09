@@ -1,0 +1,57 @@
+Dataset pl_actuals_plan_monthly {
+  label: 'P&L: Actuals vs Plan (Monthly)'
+  description: 'Plan vs Actual financial numbers at monthly level.'
+  data_source_name: 'demo_dbt_test'
+  owner: 'dong.ln@holistics.io'
+  models: [
+    iceye_dim_accounts,
+    iceye_dim_departments,
+    iceye_department_hierarchy_map,
+    iceye_account_hierarchy_map,
+    iceye_fact_pl_budget_vs_actual,
+  ]
+
+  relationships: [
+    relationship(iceye_fact_pl_budget_vs_actual.account_number > iceye_dim_accounts.acct_number, true),
+    relationship(iceye_fact_pl_budget_vs_actual.department_number > iceye_dim_departments.department_number, true),
+    relationship(iceye_account_hierarchy_map.account_number > iceye_dim_accounts.acct_number, true),
+    relationship(iceye_department_hierarchy_map.department_number > iceye_dim_departments.department_number, true),
+  ]
+
+  metric negative_net_actual_amount_eur {
+    label: 'Negative Net Actual Amount EUR'
+    type: 'number'
+    description: 'Net Actual Amount EUR × -1.'
+    definition: @aql iceye_fact_pl_budget_vs_actual.net_actual_amount_eur_agg * -1;;
+    format: '[€]#,###0.00'
+  }
+
+  metric variance_pct {
+    label: 'Variance %'
+    type: 'number'
+    description: 'Variance as a percentage of Plan = (Plan − Actual) / Plan.'
+    definition: @aql total_variance_eur / total_plan_eur;;
+    format: '0.00%'
+  }
+
+  // --- metrics added to power the demo dashboard (beyond ICEYE's provided spec) ---
+  metric total_actual_eur {
+    label: 'Total Actual EUR'
+    type: 'number'
+    description: 'Total booked activity in EUR (positive), comparable to Plan.'
+    definition: @aql iceye_fact_pl_budget_vs_actual.actual_amount_eur_agg;;
+    format: '[€]#,###0.00'
+  }
+  metric total_plan_eur {
+    label: 'Total Plan EUR'
+    type: 'number'
+    definition: @aql sum(iceye_fact_pl_budget_vs_actual.plan_amount_eur);;
+    format: '[€]#,###0.00'
+  }
+  metric total_variance_eur {
+    label: 'Total Variance EUR'
+    type: 'number'
+    definition: @aql iceye_fact_pl_budget_vs_actual.variance_vs_plan_eur_agg;;
+    format: '[€]#,###0.00'
+  }
+}
