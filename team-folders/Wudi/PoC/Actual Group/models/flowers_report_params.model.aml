@@ -1,0 +1,15 @@
+Model flowers_report_params {
+  type: 'query'
+  label: 'Flowers Report Params'
+  description: 'Holds the Reference Month parameter for the monthly report replica.'
+  data_source_name: 'demodb'
+  owner: 'chukwudi@holistics.io'
+  query: @sql select 1;;
+  models: [
+  ]
+
+  param ref_month {
+    label: 'Reference Month'
+    type: 'date'
+  }
+}

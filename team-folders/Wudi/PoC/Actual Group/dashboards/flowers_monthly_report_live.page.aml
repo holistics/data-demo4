@@ -1,0 +1,665 @@
+Dashboard flowers_monthly_report_live {
+  title: 'Monthly Report (Live)'
+  description: 'Live, month-selectable replica of the customer monthly scorecard on the demo ecommerce data. Pick a Reference Month; all values, M/M and Y/Y recompute. ONLINE/OFFLINE = Female/Male buyers (proxy); retail outlets = merchants.'
+  owner: 'chukwudi@holistics.io'
+  block f_ref_month: FilterBlock {
+    label: 'Reference Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: flowers_report
+      field: r(flowers_report_params.ref_month)
+    }
+    default {
+      operator: 'is'
+      value: '2026-02-01'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block v_report: VizBlock {
+    label: 'Monthly Report'
+    viz: MarkdownViz {
+      dataset: flowers_report
+      values: [
+        VizFieldFull {
+          label: 'fr_new_outlets'
+          ref: r(flowers_report.fr_new_outlets)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'fr_active'
+          ref: r(flowers_report.fr_active)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_placed'
+          ref: r(flowers_report.v_placed)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_cancelled'
+          ref: r(flowers_report.v_cancelled)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_delivered'
+          ref: r(flowers_report.v_delivered)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_pct_delivered'
+          ref: r(flowers_report.v_pct_delivered)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_avgcheck'
+          ref: r(flowers_report.v_avgcheck)
+          format {
+            type: 'number'
+            pattern: '#,##0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'v_profit'
+          ref: r(flowers_report.v_profit)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_refunds_qty'
+          ref: r(flowers_report.v_refunds_qty)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_refunds_pct'
+          ref: r(flowers_report.v_refunds_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_placed_on'
+          ref: r(flowers_report.v_placed_on)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_cancelled_on'
+          ref: r(flowers_report.v_cancelled_on)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_delivered_on'
+          ref: r(flowers_report.v_delivered_on)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_share_on'
+          ref: r(flowers_report.v_share_on)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_avgcheck_on'
+          ref: r(flowers_report.v_avgcheck_on)
+          format {
+            type: 'number'
+            pattern: '#,##0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'v_profit_on'
+          ref: r(flowers_report.v_profit_on)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_placed_off'
+          ref: r(flowers_report.v_placed_off)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_cancelled_off'
+          ref: r(flowers_report.v_cancelled_off)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_delivered_off'
+          ref: r(flowers_report.v_delivered_off)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_share_off'
+          ref: r(flowers_report.v_share_off)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_avgcheck_off'
+          ref: r(flowers_report.v_avgcheck_off)
+          format {
+            type: 'number'
+            pattern: '#,##0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'v_profit_off'
+          ref: r(flowers_report.v_profit_off)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_placed_ly'
+          ref: r(flowers_report.v_placed_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_cancelled_ly'
+          ref: r(flowers_report.v_cancelled_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_delivered_ly'
+          ref: r(flowers_report.v_delivered_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_pct_delivered_ly'
+          ref: r(flowers_report.v_pct_delivered_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_avgcheck_ly'
+          ref: r(flowers_report.v_avgcheck_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'v_profit_ly'
+          ref: r(flowers_report.v_profit_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_refunds_qty_ly'
+          ref: r(flowers_report.v_refunds_qty_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'v_refunds_pct_ly'
+          ref: r(flowers_report.v_refunds_pct_ly)
+          format {
+            type: 'number'
+            pattern: '#,##0.00%'
+          }
+        },
+        VizFieldFull {
+          label: 'v_units_per_outlet'
+          ref: r(flowers_report.v_units_per_outlet)
+          format {
+            type: 'number'
+            pattern: '#,##0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'v_active_growth_yoy'
+          ref: r(flowers_report.v_active_growth_yoy)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_placed_mom'
+          ref: r(flowers_report.v_placed_mom)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_placed_yoy'
+          ref: r(flowers_report.v_placed_yoy)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_cancelled_yoy'
+          ref: r(flowers_report.v_cancelled_yoy)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_delivered_mom'
+          ref: r(flowers_report.v_delivered_mom)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_delivered_yoy'
+          ref: r(flowers_report.v_delivered_yoy)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_avgcheck_mom'
+          ref: r(flowers_report.v_avgcheck_mom)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_avgcheck_yoy'
+          ref: r(flowers_report.v_avgcheck_yoy)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'v_orders_mom'
+          ref: r(flowers_report.v_orders_mom)
+          format {
+            type: 'number'
+            pattern: "+#,##0.0%;-#,##0.0%"
+          }
+        },
+        VizFieldFull {
+          label: 'a_profit_mom'
+          ref: r(flowers_report.a_profit_mom)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_profit_mom_cls'
+          ref: r(flowers_report.a_profit_mom_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_profit_yoy'
+          ref: r(flowers_report.a_profit_yoy)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_profit_yoy_cls'
+          ref: r(flowers_report.a_profit_yoy_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_refunds_qty_yoy'
+          ref: r(flowers_report.a_refunds_qty_yoy)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_refunds_qty_yoy_cls'
+          ref: r(flowers_report.a_refunds_qty_yoy_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_refunds_pct_mom'
+          ref: r(flowers_report.a_refunds_pct_mom)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_refunds_pct_mom_cls'
+          ref: r(flowers_report.a_refunds_pct_mom_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_refunds_pct_yoy'
+          ref: r(flowers_report.a_refunds_pct_yoy)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_refunds_pct_yoy_cls'
+          ref: r(flowers_report.a_refunds_pct_yoy_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_units'
+          ref: r(flowers_report.a_units)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_units_cls'
+          ref: r(flowers_report.a_units_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_cr'
+          ref: r(flowers_report.a_cr)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'a_cr_cls'
+          ref: r(flowers_report.a_cr_cls)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'v_ref_month'
+          ref: r(flowers_report.v_ref_month)
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        }
+      ]
+      content: @md <style>
+.rep-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
+.rep-wrap { width: 100%; display: flex; justify-content: center; background: #ffffff; padding: 8px 0; }
+.rep-table { border-collapse: collapse; font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; color: #000; }
+.rep-table td { border: 1px solid #b7b7b7; padding: 2px 6px; height: 26px; white-space: nowrap; }
+.rep-darkgreen { background: #4f7a36; color: #fff; font-weight: bold; text-align: center; }
+.rep-medgreen { background: #5fa845; color: #fff; font-weight: bold; text-align: center; }
+.rep-side-fl { background: #4cb050; color: #fff; font-weight: bold; text-align: center; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 2px; font-size: 15px; width: 22px; }
+.rep-side-off { background: #111111; color: #fff; font-weight: bold; text-align: center; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 2px; font-size: 15px; width: 22px; }
+.rep-hblue { background: #dae3f3; color: #1f3864; font-weight: bold; text-align: center; }
+.rep-hwhite { background: #ffffff; color: #000; font-weight: bold; text-align: center; }
+.rep-hpurple { background: #d9d2e9; color: #3c1361; font-weight: bold; text-align: center; }
+.rep-greenrow { background: #c6e0b4; }
+.rep-yellow { background: #ffff00; }
+.rep-rownum { background: #4cb050; color: #fff; text-align: center; font-size: 11px; }
+.rep-darkcell { background: #111111; }
+.rep-greysub { background: #3f3f3f; }
+.rep-num { text-align: center; }
+.rep-bold { font-weight: bold; }
+.rep-blue { color: #0070c0; font-weight: bold; }
+.rep-red { color: #ff0000; font-weight: bold; }
+.rep-upg { color: #00b050; font-weight: bold; }
+.rep-title { background: #ffffff; color: #000; font-weight: bold; text-align: center; font-size: 14px; }
+.rep-topbar { background: #4cb050; height: 6px; padding: 0; }
+</style>
+<div class="rep-wrap">
+<table class="rep-table">
+  <tr><td class="rep-topbar" colspan="9"></td></tr>
+  <tr>
+    <td class="rep-darkgreen" style="width:22px;"></td>
+    <td class="rep-rownum" style="width:34px;"></td>
+    <td class="rep-title" style="width:300px;"></td>
+    <td class="rep-title" colspan="6">{{ rows[0].values.`v_ref_month` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-darkgreen"></td>
+    <td class="rep-darkgreen" style="text-align:center;">1</td>
+    <td class="rep-darkgreen" style="font-size:14px;letter-spacing:1px;">ORDERS</td>
+    <td class="rep-darkgreen" style="width:88px;">FLOWERS</td>
+    <td class="rep-medgreen" style="width:92px;">ONLINE</td>
+    <td class="rep-medgreen" style="width:92px;">OFFLINE</td>
+    <td class="rep-hblue" style="width:54px;">M/M</td>
+    <td class="rep-hwhite" style="width:60px;">2025</td>
+    <td class="rep-hpurple" style="width:64px;">Y/Y</td>
+  </tr>
+  <tr>
+    <td class="rep-side-fl" rowspan="9">FLOWERS</td>
+    <td class="rep-rownum">1.1</td>
+    <td>Number placed</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_placed` }}</td>
+    <td class="rep-num rep-yellow">{{ rows[0].values.`v_placed_on` }}</td>
+    <td class="rep-num rep-yellow">{{ rows[0].values.`v_placed_off` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_placed_mom` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_placed_ly` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_placed_yoy` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.2</td>
+    <td>Number cancelled</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_cancelled` }}</td>
+    <td class="rep-num rep-yellow">{{ rows[0].values.`v_cancelled_on` }}</td>
+    <td class="rep-num rep-yellow">{{ rows[0].values.`v_cancelled_off` }}</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">{{ rows[0].values.`v_cancelled_ly` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_cancelled_yoy` }}</td>
+  </tr>
+  <tr class="rep-greenrow">
+    <td class="rep-rownum">1.3</td>
+    <td>Number paid &amp; delivered</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_delivered` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_delivered_on` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_delivered_off` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_delivered_mom` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_delivered_ly` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_delivered_yoy` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.4</td>
+    <td>Share</td>
+    <td class="rep-num">100%</td>
+    <td class="rep-num">{{ rows[0].values.`v_share_on` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_share_off` }}</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">100%</td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.5</td>
+    <td>% paid &amp; delivered</td>
+    <td class="rep-num">{{ rows[0].values.`v_pct_delivered` }}</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">{{ rows[0].values.`v_pct_delivered_ly` }}</td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr class="rep-greenrow">
+    <td class="rep-rownum">1.6</td>
+    <td>Avg. check, paid &amp; delivered</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_avgcheck` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_avgcheck_on` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_avgcheck_off` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_avgcheck_mom` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_avgcheck_ly` }}</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_avgcheck_yoy` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.7</td>
+    <td class="rep-bold">% profit</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_profit` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_profit_on` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_profit_off` }}</td>
+    <td class="rep-num {{ rows[0].values.`a_profit_mom_cls` }}">{{ rows[0].values.`a_profit_mom` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_profit_ly` }}</td>
+    <td class="rep-num {{ rows[0].values.`a_profit_yoy_cls` }}">{{ rows[0].values.`a_profit_yoy` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.8</td>
+    <td>Cash refunds, qty</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_refunds_qty` }}</td>
+    <td class="rep-num">&ndash;</td>
+    <td class="rep-num">&ndash;</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">{{ rows[0].values.`v_refunds_qty_ly` }}</td>
+    <td class="rep-num {{ rows[0].values.`a_refunds_qty_yoy_cls` }}">{{ rows[0].values.`a_refunds_qty_yoy` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.9</td>
+    <td>Cash refunds, %</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_refunds_pct` }}</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num {{ rows[0].values.`a_refunds_pct_mom_cls` }}">{{ rows[0].values.`a_refunds_pct_mom` }}</td>
+    <td class="rep-num">{{ rows[0].values.`v_refunds_pct_ly` }}</td>
+    <td class="rep-num {{ rows[0].values.`a_refunds_pct_yoy_cls` }}">{{ rows[0].values.`a_refunds_pct_yoy` }}</td>
+  </tr>
+  <tr>
+    <td class="rep-side-off" rowspan="8">OFFLINE</td>
+    <td class="rep-greysub"></td>
+    <td class="rep-greysub"></td>
+    <td class="rep-medgreen" colspan="3">FLOWERS</td>
+    <td class="rep-greysub"></td>
+    <td class="rep-greysub"></td>
+    <td class="rep-greysub"></td>
+  </tr>
+  <tr>
+    <td></td><td>New retail outlets opened (qty)</td>
+    <td class="rep-num">{{ rows[0].values.`fr_new_outlets` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td><td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td><td>Active retail outlets (qty)</td>
+    <td class="rep-num">{{ rows[0].values.`fr_active` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td><td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td><td>Number of orders</td>
+    <td class="rep-num">{{ rows[0].values.`v_placed` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_orders_mom` }}</td>
+    <td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td><td>Avg. check</td>
+    <td class="rep-num">{{ rows[0].values.`v_avgcheck` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td><td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td><td>Avg. sales (units) per 1 active outlet</td>
+    <td class="rep-num">{{ rows[0].values.`v_units_per_outlet` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num {{ rows[0].values.`a_units_cls` }}">{{ rows[0].values.`a_units` }}</td>
+    <td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td><td>Active outlets growth (YoY)</td>
+    <td class="rep-num rep-blue">{{ rows[0].values.`v_active_growth_yoy` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td><td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td><td class="rep-bold">%cr</td>
+    <td class="rep-num rep-bold">{{ rows[0].values.`v_pct_delivered` }}</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num {{ rows[0].values.`a_cr_cls` }}">{{ rows[0].values.`a_cr` }}</td>
+    <td class="rep-num"></td><td class="rep-num"></td>
+  </tr>
+</table>
+</div> ;;
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 700
+    auto_expand_vertically: true
+    block f_ref_month {
+      position: pos(10, 10, 320, 80)
+    }
+    block v_report {
+      position: pos(0, 90, 1220, 620)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}
