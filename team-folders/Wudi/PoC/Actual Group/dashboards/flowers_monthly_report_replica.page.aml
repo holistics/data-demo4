@@ -1,0 +1,246 @@
+Dashboard flowers_monthly_report_replica {
+  title: 'Monthly Report (Replica) - February 2026'
+  description: 'Visual replica of a customer monthly scorecard, backed by the demo ecommerce dataset. ONLINE/OFFLINE = repeat/new buyers; retail outlets = merchants. Snapshot of Feb 2026.'
+  owner: 'chukwudi@holistics.io'
+  block v_report: VizBlock {
+    label: 'Monthly Report'
+    viz: MarkdownViz {
+      dataset: demo_ecommerce_version_2
+      values: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md <style>
+.rep-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
+.rep-wrap { width: 100%; display: flex; justify-content: center; background: #ffffff; padding: 8px 0; }
+.rep-table { border-collapse: collapse; font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; color: #000; }
+.rep-table td { border: 1px solid #b7b7b7; padding: 2px 6px; height: 26px; white-space: nowrap; }
+.rep-darkgreen { background: #4f7a36; color: #fff; font-weight: bold; text-align: center; }
+.rep-medgreen { background: #5fa845; color: #fff; font-weight: bold; text-align: center; }
+.rep-side-fl { background: #4cb050; color: #fff; font-weight: bold; text-align: center; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 2px; font-size: 15px; width: 22px; }
+.rep-side-off { background: #111111; color: #fff; font-weight: bold; text-align: center; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 2px; font-size: 15px; width: 22px; }
+.rep-hblue { background: #dae3f3; color: #1f3864; font-weight: bold; text-align: center; }
+.rep-hwhite { background: #ffffff; color: #000; font-weight: bold; text-align: center; }
+.rep-hpurple { background: #d9d2e9; color: #3c1361; font-weight: bold; text-align: center; }
+.rep-greenrow { background: #c6e0b4; }
+.rep-yellow { background: #ffff00; }
+.rep-rownum { background: #4cb050; color: #fff; text-align: center; font-size: 11px; }
+.rep-darkcell { background: #111111; }
+.rep-greysub { background: #3f3f3f; }
+.rep-num { text-align: center; }
+.rep-bold { font-weight: bold; }
+.rep-blue { color: #0070c0; font-weight: bold; }
+.rep-red { color: #ff0000; font-weight: bold; }
+.rep-upg { color: #00b050; font-weight: bold; }
+.rep-title { background: #ffffff; color: #000; font-weight: bold; text-align: center; font-size: 14px; }
+.rep-topbar { background: #4cb050; height: 6px; padding: 0; }
+</style>
+<div class="rep-wrap">
+<table class="rep-table">
+  <tr><td class="rep-topbar" colspan="9"></td></tr>
+  <tr>
+    <td class="rep-darkgreen" style="width:22px;"></td>
+    <td class="rep-rownum" style="width:34px;"></td>
+    <td class="rep-title" style="width:300px;"></td>
+    <td class="rep-title" colspan="6">February 2026</td>
+  </tr>
+  <tr>
+    <td class="rep-darkgreen"></td>
+    <td class="rep-darkgreen" style="text-align:center;">1</td>
+    <td class="rep-darkgreen" style="font-size:14px;letter-spacing:1px;">ORDERS</td>
+    <td class="rep-darkgreen" style="width:88px;">FLOWERS</td>
+    <td class="rep-medgreen" style="width:92px;">ONLINE</td>
+    <td class="rep-medgreen" style="width:92px;">OFFLINE</td>
+    <td class="rep-hblue" style="width:54px;">M/M</td>
+    <td class="rep-hwhite" style="width:60px;">2025</td>
+    <td class="rep-hpurple" style="width:64px;">Y/Y</td>
+  </tr>
+  <tr>
+    <td class="rep-side-fl" rowspan="9">FLOWERS</td>
+    <td class="rep-rownum">1.1</td>
+    <td>Number placed</td>
+    <td class="rep-num rep-bold">1,731</td>
+    <td class="rep-num rep-yellow">1,637</td>
+    <td class="rep-num rep-yellow">94</td>
+    <td class="rep-num rep-blue">+2.5%</td>
+    <td class="rep-num">463</td>
+    <td class="rep-num rep-blue">+273.9%</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.2</td>
+    <td>Number cancelled</td>
+    <td class="rep-num rep-bold">451</td>
+    <td class="rep-num rep-yellow">420</td>
+    <td class="rep-num rep-yellow">31</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">84</td>
+    <td class="rep-num rep-blue">+436.9%</td>
+  </tr>
+  <tr class="rep-greenrow">
+    <td class="rep-rownum">1.3</td>
+    <td>Number paid &amp; delivered</td>
+    <td class="rep-num rep-bold">1,195</td>
+    <td class="rep-num">1,138</td>
+    <td class="rep-num">57</td>
+    <td class="rep-num rep-blue">+0.3%</td>
+    <td class="rep-num">360</td>
+    <td class="rep-num rep-blue">+231.9%</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.4</td>
+    <td>Share</td>
+    <td class="rep-num">100%</td>
+    <td class="rep-num">94.57%</td>
+    <td class="rep-num">5.43%</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">100%</td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.5</td>
+    <td>% paid &amp; delivered</td>
+    <td class="rep-num">69.03%</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">77.75%</td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr class="rep-greenrow">
+    <td class="rep-rownum">1.6</td>
+    <td>Avg. check, paid &amp; delivered</td>
+    <td class="rep-num rep-bold">355.04</td>
+    <td class="rep-num">357.51</td>
+    <td class="rep-num">305.89</td>
+    <td class="rep-num rep-blue">+1.5%</td>
+    <td class="rep-num">353.79</td>
+    <td class="rep-num rep-blue">+0.4%</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.7</td>
+    <td class="rep-bold">% profit</td>
+    <td class="rep-num rep-bold">69.94%</td>
+    <td class="rep-num">69.95%</td>
+    <td class="rep-num">69.93%</td>
+    <td class="rep-num rep-upg">&uarr;</td>
+    <td class="rep-num">69.90%</td>
+    <td class="rep-num rep-upg">&uarr;</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.8</td>
+    <td>Cash refunds, qty</td>
+    <td class="rep-num rep-bold">85</td>
+    <td class="rep-num">&ndash;</td>
+    <td class="rep-num">&ndash;</td>
+    <td class="rep-num"></td>
+    <td class="rep-num">19</td>
+    <td class="rep-num rep-red">&uarr;</td>
+  </tr>
+  <tr>
+    <td class="rep-rownum">1.9</td>
+    <td>Cash refunds, %</td>
+    <td class="rep-num rep-bold">4.91%</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num">&ndash;%</td>
+    <td class="rep-num rep-red">&uarr;</td>
+    <td class="rep-num">4.10%</td>
+    <td class="rep-num rep-red">&uarr;</td>
+  </tr>
+  <tr>
+    <td class="rep-side-off" rowspan="8">OFFLINE</td>
+    <td class="rep-greysub"></td>
+    <td class="rep-greysub"></td>
+    <td class="rep-medgreen" colspan="3">FLOWERS</td>
+    <td class="rep-greysub"></td>
+    <td class="rep-greysub"></td>
+    <td class="rep-greysub"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>New retail outlets opened (qty)</td>
+    <td class="rep-num">0</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Active retail outlets (qty)</td>
+    <td class="rep-num">716</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Number of orders</td>
+    <td class="rep-num">1,731</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num rep-blue">+2.5%</td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Avg. check</td>
+    <td class="rep-num">355.04</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Avg. sales (units) per 1 active outlet</td>
+    <td class="rep-num">13.64</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num rep-red">&darr;</td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Active outlets growth (YoY)</td>
+    <td class="rep-num rep-blue">+56.7%</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td class="rep-bold">%cr</td>
+    <td class="rep-num rep-bold">69.03%</td>
+    <td class="rep-darkcell" colspan="2"></td>
+    <td class="rep-num rep-red">&darr;</td>
+    <td class="rep-num"></td>
+    <td class="rep-num"></td>
+  </tr>
+</table>
+</div> ;;
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 640
+    auto_expand_vertically: true
+    block v_report {
+      position: pos(0, 0, 1220, 620)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}
