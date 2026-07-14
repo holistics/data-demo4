@@ -1,0 +1,112 @@
+<style>
+  :root{
+    --blue900:#05264C; --green600:#259B6C; --green-ink:#1c7d55;
+    --ink:#16233b; --muted:#5b6472; --line:#e2e5ea; --card:#ffffff; --bg:#f7f8fa;
+    --warnbg:#fdf3f2; --warnline:#f0c9c4; --warnink:#b23a2e;
+    --chip:#eef6f1;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --ink:#e9ecf2; --muted:#9aa3b2; --line:#26303f; --card:#141b26; --bg:#0d1117;
+      --warnbg:#2a1a19; --warnline:#5a2f2a; --warnink:#f0a89f; --green-ink:#4cc38a; --chip:#16241d; }
+  }
+  :root[data-theme="dark"]{ --ink:#e9ecf2; --muted:#9aa3b2; --line:#26303f; --card:#141b26; --bg:#0d1117;
+    --warnbg:#2a1a19; --warnline:#5a2f2a; --warnink:#f0a89f; --green-ink:#4cc38a; --chip:#16241d; }
+  :root[data-theme="light"]{ --ink:#16233b; --muted:#5b6472; --line:#e2e5ea; --card:#ffffff; --bg:#f7f8fa;
+    --warnbg:#fdf3f2; --warnline:#f0c9c4; --warnink:#b23a2e; --green-ink:#1c7d55; --chip:#eef6f1; }
+
+  *{box-sizing:border-box}
+  .sheet{background:var(--bg);color:var(--ink);min-height:100%;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;padding-bottom:44px}
+  .hd{background:var(--blue900);color:#fff;padding:22px 30px;display:flex;align-items:center;gap:13px}
+  .hd .mk{width:26px;height:26px;border-radius:6px;background:var(--green600);flex:0 0 auto}
+  .hd h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.01em}
+  .hd .sub{margin-left:auto;font-size:12px;opacity:.82;text-align:right}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 30px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:16px 18px}
+  .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+    margin:0 0 11px;font-weight:700}
+  ol.ladder{margin:0;padding-left:20px} ol.ladder li{margin:5px 0}
+  ol.ladder b{color:var(--ink)}
+  .m{margin:9px 0} .m .n{font-weight:600} .m .d{color:var(--muted);font-size:13px}
+  .warn{grid-column:1/-1;background:var(--warnbg);border:1px solid var(--warnline);border-radius:9px;
+    padding:15px 18px;margin-top:16px}
+  .warn .eyebrow{color:var(--warnink)} .warn ul{margin:0;padding-left:20px} .warn li{margin:6px 0}
+  code{background:var(--chip);color:var(--green-ink);padding:1px 6px;border-radius:5px;
+    font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .pill{display:inline-block;background:var(--chip);color:var(--green-ink);font-size:10.5px;
+    font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:999px;margin-right:7px;min-width:52px;text-align:center}
+  .esc{margin:0;padding-left:19px;color:var(--muted);font-size:13px} .esc li{margin:6px 0}
+  .ft{max-width:1080px;margin:16px auto 0;padding:0 30px;color:var(--muted);font-size:12px}
+</style>
+
+<div class="sheet">
+  <div class="hd">
+    <span class="mk"></span>
+    <h1>Judi.ai&nbsp;·&nbsp;Holistics Cheatsheet</h1>
+    <span class="sub">Judi Dataset (test_v3)<br>one page — keep it open</span>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+      <div class="card">
+        <p class="eyebrow">The skill ladder — low → high effort</p>
+        <ol class="ladder">
+          <li><b>Read KPIs + ⓘ icons</b> — trust the number, tap ⓘ for its meaning</li>
+          <li><b>Ask AI</b> — type a plain-English question (start here)</li>
+          <li><b>Filter</b> — date, and client / tenant</li>
+          <li><b>Drill down</b> — see the applications behind a number</li>
+          <li><b>Cross-filter</b> — click one chart, the page re-scopes</li>
+          <li><b>Explore + save</b> — build your own view privately</li>
+          <li><b>Share</b> — send a link or add a viewer</li>
+        </ol>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Headline metrics</p>
+        <div class="m"><span class="n">Total Applications</span> — <span class="d">count of applications in view</span></div>
+        <div class="m"><span class="n">Funded / Agreement Signed Applications</span> — <span class="d">status 500 or 404</span></div>
+        <div class="m"><span class="n">Funded / Agreement Signed Loan Amount</span> — <span class="d">$ actually booked</span></div>
+        <div class="m"><span class="n">Funded Rate</span> — <span class="d">funded ÷ all applications</span></div>
+        <div class="m"><span class="n">Auto-Approval Rate</span> — <span class="d">approved ÷ auto-decisioned</span></div>
+        <div class="m"><span class="n">Applications (Current Decision)</span> — <span class="d">use when slicing by a decision field</span></div>
+      </div>
+
+      <div class="warn">
+        <p class="eyebrow">⚠ Two gotchas everyone must know</p>
+        <ul>
+          <li><b>One application has many decisions.</b> Slicing a plain count by an <i>adjudication</i>
+          field (auto-approval, policy, gate) over-counts. Use <code>Applications (Current Decision)</code> instead.</li>
+          <li><b>Credit scores are partial.</b> Every score average excludes no-hits (0); some are sparse
+          (~1.2k apps). Read the matching <code>Hit Rate</code> for coverage. Trial data is one tenant
+          (vancity), and the product list still has test rows — exclude them.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <div class="card">
+        <p class="eyebrow">Where to click</p>
+        <div class="m"><span class="pill">ASK AI</span><span class="d">top of the dashboard — type a question</span></div>
+        <div class="m"><span class="pill">ⓘ</span><span class="d">on any KPI / card — the definition</span></div>
+        <div class="m"><span class="pill">FILTER</span><span class="d">dashboard header — date &amp; client</span></div>
+        <div class="m"><span class="pill">DRILL</span><span class="d">right-click a value → view underlying records</span></div>
+        <div class="m"><span class="pill">SAVE</span><span class="d">explore → save to My Workspace</span></div>
+        <div class="m"><span class="pill">SHARE</span><span class="d">Share → copy link / add viewer</span></div>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Raise to the data team (not a training fix)</p>
+        <ul class="esc">
+          <li>A metric or field that doesn't exist yet</li>
+          <li>Multi-tenant / row-level security (each client sees only their data)</li>
+          <li>Scheduled email / Slack delivery &amp; alerts</li>
+          <li>The financial-transaction path fix (interim → pull-based)</li>
+          <li>"Can AI answer X?" gaps → a governed AI skill</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="ft">Definitions are the governed metric definitions from the Judi Dataset. When a number
+  looks off, check the ⓘ or the metrics glossary before assuming it's wrong.</p>
+</div>

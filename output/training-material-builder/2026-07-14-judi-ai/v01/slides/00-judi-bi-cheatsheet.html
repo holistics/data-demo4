@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judi.ai · Holistics Cheatsheet</title>
+<style>
+  :root{
+    --blue900:#05264C; --green600:#259B6C; --ink:#1A2156; --muted:#5A5A5A;
+    --line:#DDD9D0; --card:#FFFFFF; --bg:#FAF9F5; --pos:#3a7d0a; --posbg:#EAF4DC;
+    --warnbg:#FDF3F2; --warnink:#c0392b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --ink:#EAECF4; --muted:#A6ADBB; --line:#2B3547; --card:#141a24; --bg:#0d1117; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;padding:0 0 48px}
+  header{background:var(--blue900);color:#fff;padding:22px 32px;display:flex;align-items:center;gap:14px}
+  header .dot{width:26px;height:26px;border-radius:6px;background:var(--green600);flex:0 0 auto}
+  header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.01em}
+  header .sub{margin-left:auto;font-size:12px;opacity:.8}
+  main{max-width:1100px;margin:0 auto;padding:26px 32px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+  .card h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+    margin:0 0 10px;font-weight:700}
+  ol.ladder{margin:0;padding-left:20px} ol.ladder li{margin:4px 0}
+  ol.ladder b{color:var(--ink)}
+  .metric{margin:9px 0} .metric .n{font-weight:600}
+  .metric .d{color:var(--muted);font-size:13px}
+  .warn{background:var(--warnbg);border:1px solid #f0c9c4;border-radius:8px;padding:14px 16px;margin-top:2px}
+  .warn h2{color:var(--warnink)}
+  .warn li{margin:6px 0}
+  .full{grid-column:1 / -1}
+  code{background:rgba(127,127,127,.14);padding:1px 5px;border-radius:4px;font-size:12.5px}
+  .pill{display:inline-block;background:var(--posbg);color:var(--pos);font-size:11px;font-weight:700;
+    padding:2px 8px;border-radius:999px;margin-right:6px}
+  footer{max-width:1100px;margin:18px auto 0;padding:0 32px;color:var(--muted);font-size:12px}
+  @media print{ body{background:#fff} header{background:var(--blue900)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact} .card,.warn{break-inside:avoid} }
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header>
+  <span class="dot"></span>
+  <h1>Judi.ai · Holistics Cheatsheet</h1>
+  <span class="sub">Judi Dataset (test_v3) · one page, keep it open</span>
+</header>
+<main>
+  <div class="grid">
+    <div class="card">
+      <h2>The skill ladder — low → high effort</h2>
+      <ol class="ladder">
+        <li><b>Read KPIs + ⓘ icons</b> — trust the number, tap ⓘ for its meaning</li>
+        <li><b>Ask AI</b> — type a plain-English question (start here)</li>
+        <li><b>Filter</b> — date, and client/tenant</li>
+        <li><b>Drill down</b> — view the applications behind a number</li>
+        <li><b>Cross-filter</b> — click one chart, the page re-scopes</li>
+        <li><b>Explore + save</b> — build your own view privately</li>
+        <li><b>Share</b> — send a link or add a viewer</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>Headline metrics</h2>
+      <div class="metric"><span class="n">Total Applications</span> — <span class="d">count of applications in view</span></div>
+      <div class="metric"><span class="n">Funded / Agreement Signed Applications</span> — <span class="d">status 500 or 404</span></div>
+      <div class="metric"><span class="n">Funded / Agreement Signed Loan Amount</span> — <span class="d">$ actually booked</span></div>
+      <div class="metric"><span class="n">Funded Rate</span> — <span class="d">funded ÷ all applications</span></div>
+      <div class="metric"><span class="n">Auto-Approval Rate</span> — <span class="d">approved ÷ auto-decisioned</span></div>
+      <div class="metric"><span class="n">Applications (Current Decision)</span> — <span class="d">use when slicing by a decision field</span></div>
+    </div>
+  </div>
+
+  <div class="warn full" style="margin-top:18px">
+    <h2>⚠ Two gotchas everyone must know</h2>
+    <ul style="margin:0;padding-left:20px">
+      <li><b>One application has many decisions.</b> Slicing a plain count by an <i>adjudication</i>
+      field (auto-approval, policy, gate) over-counts. Use <code>Applications (Current Decision)</code> instead.</li>
+      <li><b>Credit scores are partial.</b> Every score average excludes no-hits (0); some are sparse
+      (~1.2k apps). Always read the matching <code>Hit Rate</code> for coverage. Trial data is one
+      tenant (vancity), and the product list still has test rows — exclude them.</li>
+    </ul>
+  </div>
+
+  <div class="grid" style="margin-top:18px">
+    <div class="card">
+      <h2>Where to click</h2>
+      <div class="metric"><span class="pill">ASK AI</span><span class="d">top of the dashboard — type a question</span></div>
+      <div class="metric"><span class="pill">ⓘ</span><span class="d">on any KPI/card — the definition</span></div>
+      <div class="metric"><span class="pill">FILTER</span><span class="d">dashboard header — date & client</span></div>
+      <div class="metric"><span class="pill">DRILL</span><span class="d">right-click a value → view underlying records</span></div>
+      <div class="metric"><span class="pill">SAVE</span><span class="d">explore → save to My Workspace</span></div>
+      <div class="metric"><span class="pill">SHARE</span><span class="d">Share → copy link / add viewer</span></div>
+    </div>
+    <div class="card">
+      <h2>Raise to the data team (not a training fix)</h2>
+      <ul style="margin:0;padding-left:20px;color:var(--muted);font-size:13px">
+        <li>A metric or field that doesn't exist yet</li>
+        <li>Multi-tenant / row-level security (each client sees only their data)</li>
+        <li>Scheduled email/Slack delivery &amp; alerts</li>
+        <li>The financial-transaction path fix (interim → pull-based)</li>
+        <li>"Can AI answer X?" gaps → a governed AI skill</li>
+      </ul>
+    </div>
+  </div>
+</main>
+<footer>Definitions are the governed metric definitions from the Judi Dataset. When a number looks
+off, check the ⓘ or the metrics glossary before assuming it's wrong.</footer>
+</body>
+</html>
