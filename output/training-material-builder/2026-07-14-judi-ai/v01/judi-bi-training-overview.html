@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judi.ai Holistics Enablement Program</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-50:#E8F2FD; --blue-100:#D1E5FA; --blue-400:#5EA3ED; --blue-600:#1B7CE4;
+    --blue-800:#104A89; --blue-900:#05264C;
+    --green-50:#EAF8F2; --green-400:#52C396; --green-500:#2CB67F; --green-600:#259B6C; --green-700:#1F815A;
+    --gray-50:#F9FBFC; --gray-100:#F5F8FA; --gray-200:#EDF1F5; --gray-300:#E3E7ED;
+    --gray-500:#989CA6; --gray-600:#727685; --gray-700:#505157; --gray-900:#13151A;
+    --white-a10:rgba(255,255,255,0.10); --white-a15:rgba(255,255,255,0.15);
+    --shadow-card:0 1px 3px rgba(5,38,76,.08),0 4px 16px rgba(5,38,76,.06);
+    --shadow-card-lg:0 8px 30px rgba(5,38,76,.12);
+    --r-card:16px; --r-btn:12px; --r-badge:9999px;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--gray-900);background:#fff;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  img,svg{max-width:100%}
+  nav{position:sticky;top:0;z-index:20;background:rgba(5,38,76,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--white-a10);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  nav .logo{height:30px;display:block}
+  nav .nav-tag{font-size:13px;color:var(--blue-100);font-weight:500;letter-spacing:.01em}
+  .hero{background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(37,155,108,.20), transparent 60%),
+      linear-gradient(160deg,#05264C 0%,#063059 45%,#072F5E 100%),
+      var(--blue-900);
+    background-color:var(--blue-900);color:#fff;padding:84px 0 92px;}
+  .hero .eyebrow{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green-400);background:var(--white-a10);border:1px solid var(--white-a15);padding:6px 14px;border-radius:var(--r-badge);margin-bottom:24px;}
+  .hero h1{font-size:46px;line-height:1.08;font-weight:700;letter-spacing:-.02em;max-width:16ch;margin-bottom:20px;text-wrap:balance;}
+  .hero p{font-size:19px;line-height:1.5;color:var(--blue-100);max-width:60ch;}
+  .hero .stats{display:flex;flex-wrap:wrap;gap:40px;margin-top:44px;}
+  .hero .stat .n{font-size:34px;font-weight:700;color:#fff;letter-spacing:-.02em}
+  .hero .stat .l{font-size:14px;color:var(--blue-100);margin-top:2px}
+  section{padding:72px 0}
+  .section-head{max-width:62ch;margin-bottom:40px}
+  .section-head .kicker{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--green-600);margin-bottom:12px}
+  h2{font-size:32px;font-weight:700;letter-spacing:-.02em;color:var(--blue-900);margin-bottom:14px;text-wrap:balance}
+  h2 + p{font-size:17px;color:var(--gray-700)}
+  .alt{background:var(--gray-50);border-top:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200)}
+  .grid{display:grid;gap:20px}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  .card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--r-card);padding:24px;box-shadow:var(--shadow-card);transition:box-shadow .2s,transform .2s;}
+  .card:hover{box-shadow:var(--shadow-card-lg);transform:translateY(-2px)}
+  .card .role{display:inline-block;font-size:12px;font-weight:600;color:var(--green-700);background:var(--green-50);padding:4px 10px;border-radius:var(--r-badge);margin-bottom:14px}
+  .card h3{font-size:18px;font-weight:600;color:var(--blue-900);margin-bottom:6px}
+  .card .who{font-size:13px;color:var(--gray-600);margin-bottom:12px}
+  .card .q{font-size:14px;color:var(--gray-700);font-style:italic;border-left:3px solid var(--green-400);padding-left:12px;margin-bottom:14px}
+  .card ul{list-style:none;font-size:13.5px;color:var(--gray-700)}
+  .card ul li{padding:5px 0 5px 22px;position:relative}
+  .card ul li::before{content:"";position:absolute;left:0;top:11px;width:7px;height:7px;border-radius:2px;background:var(--green-500)}
+  .card .dash{font-size:12px;color:var(--gray-500);margin-top:14px;font-weight:500}
+  .weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .week{background:#fff;border:1px solid var(--gray-200);border-radius:var(--r-card);padding:22px;position:relative;box-shadow:var(--shadow-card)}
+  .week .wk{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-600)}
+  .week h4{font-size:16px;font-weight:600;color:var(--blue-900);margin:8px 0 10px}
+  .week p{font-size:13.5px;color:var(--gray-700)}
+  .week .who{font-size:12px;color:var(--gray-500);margin-top:12px}
+  .assets{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .asset{background:#fff;border:1px solid var(--gray-200);border-radius:var(--r-card);padding:24px;box-shadow:var(--shadow-card)}
+  .asset h3{font-size:17px;color:var(--blue-900);margin-bottom:6px}
+  .asset code{font-family:var(--mono);font-size:12.5px;color:var(--green-700);background:var(--green-50);padding:2px 7px;border-radius:6px}
+  .asset p{font-size:14px;color:var(--gray-700);margin-top:10px}
+  .asset .list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .asset .li{font-size:13.5px;color:var(--gray-700);display:flex;gap:8px}
+  .asset .li b{color:var(--blue-900);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
+  thead th{background:var(--blue-900);color:#fff;text-align:left;padding:13px 16px;font-weight:600;font-size:13px}
+  tbody td{padding:12px 16px;border-top:1px solid var(--gray-200);color:var(--gray-700);vertical-align:top}
+  tbody td:first-child{font-family:var(--mono);font-size:12.5px;color:var(--blue-800);white-space:nowrap}
+  tbody tr:nth-child(even){background:var(--gray-50)}
+  .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .principle .num{font-family:var(--mono);font-size:13px;color:var(--green-600);font-weight:500;margin-bottom:8px}
+  .principle h4{font-size:16px;color:var(--blue-900);margin-bottom:6px}
+  .principle p{font-size:14px;color:var(--gray-700)}
+  .warn-band{background:#FDF3F2;border:1px solid #f3d0cb;border-radius:var(--r-card);padding:22px 26px}
+  .warn-band h4{color:#b23a2e;font-size:15px;margin-bottom:10px}
+  .warn-band ul{margin:0;padding-left:20px;color:var(--gray-700);font-size:14px}
+  .warn-band li{margin:6px 0}
+  .warn-band code{font-family:var(--mono);font-size:12.5px;color:#b23a2e;background:#fbe6e3;padding:1px 6px;border-radius:5px}
+  footer{background:var(--blue-900);color:var(--blue-100);padding:48px 0 40px}
+  footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  footer .logo{height:28px}
+  footer p{font-size:13px;color:var(--blue-100);max-width:48ch}
+  @media (max-width:860px){
+    .grid-2,.weeks,.assets,.principles{grid-template-columns:1fr}
+    .hero h1{font-size:34px}
+    section{padding:52px 0}
+  }
+</style>
+</head>
+<body>
+<nav><div class="wrap"><svg class="logo" viewBox="0 0 834.9 202.78" role="img" aria-label="Holistics"><rect fill="none" x="-1.95" y="-.96" width="838.8" height="204.7"/><path fill="#FFFFFF" d="M213,40.39h16.38v43.62c0,4.08-.3,7.07-.3,7.07h.3c3.7-8.27,14.58-19.02,31.57-19.02,20.08,0,29.37,10.95,29.37,32.67v54.58h-16.38v-50.79c0-11.95-2.5-21.41-16.18-21.41-12.89,0-23.47,8.76-27.07,21.11-1,3.39-1.4,7.27-1.4,11.25v39.94h-16.38V40.39h.1Z"/><path fill="#FFFFFF" d="M354.85,72.06c25.57,0,46.15,18.72,46.15,44.52s-20.58,44.82-46.15,44.82-46.15-18.92-46.15-44.82,20.58-44.52,46.15-44.52ZM354.85,147.25c16.18,0,29.37-12.85,29.37-30.67s-13.19-30.37-29.37-30.37-29.37,12.65-29.37,30.37c-.1,17.83,13.29,30.67,29.37,30.67Z"/><path fill="#FFFFFF" d="M419.38,40.39h16.38v92.82c0,10.26,4.1,12.15,9.09,12.15,1.5,0,2.9-.2,2.9-.2v14.54s-2.5.3-5.39.3c-9.29,0-22.98-2.49-22.98-23.9V40.39Z"/><path fill="#FFFFFF" d="M465.03,40.39h16.58v16.73h-16.58v-16.73ZM465.13,74.15h16.38v85.25h-16.38v-85.25Z"/><path fill="#FFFFFF" d="M508.28,137.29s9.59,9.96,24.47,9.96c7.09,0,14.18-3.68,14.18-10.66,0-15.64-43.95-12.45-43.95-40.23,0-15.54,13.88-24.3,30.97-24.3,18.78,0,27.57,9.46,27.57,9.46l-6.59,12.35s-7.59-7.57-21.18-7.57c-7.09,0-13.98,2.99-13.98,10.46,0,15.34,43.95,11.95,43.95,39.94,0,14.14-12.19,24.8-30.97,24.8-20.98,0-32.46-12.45-32.46-12.45l7.99-11.75Z"/><path fill="#FFFFFF" d="M586.49,88.39h-11.19v-13.15h11.69v-24.6h15.88v24.6h20.58v13.15h-20.58v37.94c0,17.03,11.99,19.22,18.28,19.22,2.4,0,3.9-.3,3.9-.3v14.54s-2.4.3-5.79.3c-10.99,0-32.76-3.39-32.76-31.87v-39.84Z"/><path fill="#FFFFFF" d="M643.33,40.39h16.58v16.73h-16.58v-16.73ZM643.43,74.15h16.38v85.25h-16.38v-85.25Z"/><path fill="#FFFFFF" d="M725.24,72.06c21.48,0,32.17,12.45,32.17,12.45l-7.79,11.55s-9.09-9.76-23.67-9.76c-17.28,0-29.77,12.85-29.77,30.37s12.49,30.67,30.27,30.67c15.88,0,26.37-11.45,26.37-11.45l6.59,11.95s-11.79,13.64-34.16,13.64c-26.87,0-45.85-19.02-45.85-44.62.1-25.4,18.98-44.82,45.85-44.82Z"/><path fill="#FFFFFF" d="M778.98,137.29s9.59,9.96,24.47,9.96c7.09,0,14.18-3.68,14.18-10.66,0-15.64-43.95-12.45-43.95-40.23,0-15.54,13.89-24.3,30.97-24.3,18.78,0,27.57,9.46,27.57,9.46l-6.59,12.35s-7.59-7.57-21.18-7.57c-7.09,0-13.98,2.99-13.98,10.46,0,15.34,43.95,11.95,43.95,39.94,0,14.14-12.19,24.8-30.97,24.8-20.98,0-32.46-12.45-32.46-12.45l7.99-11.75Z"/><g><g><path fill="#2CB67F" d="M144.6,47.94c1.32-4.45,3.96-8.33,7.47-11.18l-49.21-28.41c-5.31-3.06-11.84-3.06-17.15,0L18,47.44c-5.31,3.06-8.57,8.72-8.57,14.85v60.25c2.77-1.21,5.82-1.88,9.03-1.88h4.39s0-55.39,0-55.39c0-3.18,1.7-6.12,4.45-7.71l62.55-36.11c2.75-1.59,6.15-1.59,8.9,0l45.87,26.48Z"/><path fill="#FFFFFF" d="M166.36,77.06c-.21,0-.42-.01-.63-.02v60.45c0,3.18-1.7,6.12-4.45,7.71l-62.55,36.11c-2.75,1.59-6.15,1.59-8.9,0l-50.48-29.15c-1.82,4.3-4.93,7.92-8.85,10.39l55.2,31.87c5.31,3.06,11.84,3.06,17.15,0l67.72-39.1c5.31-3.06,8.57-8.72,8.57-14.85v-67.38c-3.64,2.5-8.05,3.96-12.79,3.96Z"/></g><path fill="#2CB67F" d="M166.36,38.54c-8.74,0-15.83,7.09-15.83,15.83,0,2.1.41,4.11,1.16,5.94l-49.76,46.49c-2.26-1.25-4.87-1.96-7.64-1.96-8.74,0-15.83,7.09-15.83,15.83,0,.16,0,.32.01.48l-46.47,14.01c-2.77-4.58-7.8-7.64-13.55-7.64-8.74,0-15.83,7.09-15.83,15.83s7.09,15.83,15.83,15.83,15.11-6.39,15.77-14.52l47.53-14.33c2.89,3.75,7.43,6.17,12.54,6.17,8.74,0,15.83-7.09,15.83-15.83,0-2.43-.55-4.72-1.52-6.78l49.36-46.11c2.44,1.53,5.32,2.42,8.41,2.42,8.74,0,15.83-7.09,15.83-15.83s-7.09-15.83-15.83-15.83ZM18.45,149.41c-3.34,0-6.06-2.72-6.06-6.06s2.72-6.06,6.06-6.06,6.06,2.72,6.06,6.06-2.72,6.06-6.06,6.06ZM94.29,126.73c-3.34,0-6.06-2.72-6.06-6.06s2.72-6.06,6.06-6.06,6.06,2.72,6.06,6.06-2.72,6.06-6.06,6.06ZM166.36,60.43c-3.34,0-6.06-2.72-6.06-6.06s2.72-6.06,6.06-6.06,6.06,2.72,6.06,6.06-2.72,6.06-6.06,6.06Z"/></g></svg><span class="nav-tag">Holistics Enablement for Judi.ai</span></div></nav>
+<header class="hero"><div class="wrap">
+  <span class="eyebrow">End-user enablement</span>
+  <h1>The Judi.ai Holistics enablement program</h1>
+  <p>A role-based path to get Customer Success and the analyst champions opening the Judi Dataset, trusting the numbers, and building their own client reports. Built on Judi's real loan-application data.</p>
+  <div class="stats">
+    <div class="stat"><div class="n">1</div><div class="l">governed dataset</div></div>
+    <div class="stat"><div class="n">34</div><div class="l">ready-made metrics</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">role tracks</div></div>
+    <div class="stat"><div class="n">4&nbsp;wk</div><div class="l">guided rollout</div></div>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <div class="section-head"><div class="kicker">The goal</div>
+    <h2>Adoption, not attendance</h2>
+    <p>Success is the Judi Dataset becoming the first place each person looks when a client asks how their applications are doing. Three things move that needle, in order, and every session lands the third before the person leaves.</p></div>
+  <div class="principles">
+    <div class="principle"><div class="num">01</div><h4>Confidence in the numbers</h4>
+      <p>People trust Funded Rate, Auto-Approval Rate, and the funded amount because they can read the definition straight from the info icon and the shared glossary.</p></div>
+    <div class="principle"><div class="num">02</div><h4>A question they already ask</h4>
+      <p>Start from the real question the role cares about — "how many applications funded last month?" — then show the view that answers it.</p></div>
+    <div class="principle"><div class="num">03</div><h4>One self-serve win</h4>
+      <p>The person filters, drills, or asks AI themselves and it works. That first win is what converts a hesitant user.</p></div>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <div class="section-head"><div class="kicker">Two role tracks</div>
+    <h2>Each role learns on the Judi Dataset</h2>
+    <p>Generic demos do not stick. Every track teaches a person on the data they will actually use, with a real client and a real month. Foundations (week 1) is for everyone; the tracks below go deeper.</p></div>
+  <div class="grid grid-2">
+    <div class="card">
+      <span class="role">Customer Success</span>
+      <h3>Your client report, self-served</h3>
+      <div class="who">CS team — they consume and build</div>
+      <div class="q">How are our applications doing this month, for this client?</div>
+      <ul>
+        <li>Read the funded scorecard and info icons</li>
+        <li>Ask AI a plain-English question</li>
+        <li>Filter to a client and a period, drill to the records</li>
+        <li>Explore, save a personal view, and share it</li>
+      </ul>
+      <div class="dash">Judi Dataset · 7 skills</div>
+    </div>
+    <div class="card">
+      <span class="role">Analysts &amp; champions</span>
+      <h3>Build it yourself</h3>
+      <div class="who">Niina and analyst power users</div>
+      <div class="q">How do I answer a question no dashboard covers yet?</div>
+      <ul>
+        <li>Explore the funnel and save to a workspace</li>
+        <li>Add calculations without SQL</li>
+        <li>Handle decision grain with Current Decision</li>
+        <li>Share, schedule, and feed the BI backlog</li>
+      </ul>
+      <div class="dash">Judi Dataset · self-service</div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="section-head"><div class="kicker">Guided rollout</div>
+    <h2>Four weeks to a weekly habit</h2>
+    <p>The aim is habit formation per role, reinforced by a clinic — not a single webinar everyone forgets.</p></div>
+  <div class="weeks">
+    <div class="week"><div class="wk">Week 1</div><h4>Foundations</h4><p>Log in, read a dashboard, ask AI, and understand the funded metrics. Everyone reads their headline KPIs with confidence.</p><div class="who">All trial users</div></div>
+    <div class="week"><div class="wk">Week 2</div><h4>Your client review</h4><p>Customer Success runs the weekly client review unaided and builds one report of their own.</p><div class="who">Customer Success</div></div>
+    <div class="week"><div class="wk">Week 3</div><h4>Build it yourself</h4><p>Champions create, save, and share their own reports, and learn to handle decision grain correctly.</p><div class="who">Niina, analysts</div></div>
+    <div class="week"><div class="wk">Week 4</div><h4>Clinic</h4><p>Office hours unblock stragglers and collect feature requests, which become the BI backlog.</p><div class="who">All, drop-in</div></div>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <div class="section-head"><div class="kicker">What we train on</div>
+    <h2>The Judi Dataset</h2>
+    <p>A dataset is the curated menu people build reports from. Every number traces back to this one governed, loan-application-centric dataset.</p></div>
+  <div class="assets">
+    <div class="asset">
+      <h3>Judi Dataset <code>test_v3</code></h3>
+      <p>20 models, loan-application-centric, from the <code>dw_test</code> warehouse. Relationship-wired and grouped into clear subject areas.</p>
+      <div class="list">
+        <div class="li"><b>Loan Applications</b> the spine — volumes, status, products requested</div>
+        <div class="li"><b>Credit Decision</b> adjudication, policies, gates, rejection reasons</div>
+        <div class="li"><b>Banking &amp; Transactions</b> accounts, transactions, pull reliability</div>
+        <div class="li"><b>Borrower &amp; Business</b> the business and its geography</div>
+      </div>
+    </div>
+    <div class="asset">
+      <h3>The metric library <code>34 metrics</code></h3>
+      <p>Governed, documented, ready to drag onto any report — grouped by the question they answer.</p>
+      <div class="list">
+        <div class="li"><b>Volume &amp; value</b> Total Applications, Funded Applications &amp; Amount</div>
+        <div class="li"><b>Funnel</b> Funded Rate, Auto-Approval Rate, Prequal funnel</div>
+        <div class="li"><b>Credit scores</b> FICO / BNI / Intelliscore / Vantage + Hit Rates</div>
+        <div class="li"><b>Ops</b> Gate Pass Rate, Pull Success Rate, Second-Look</div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="section-head"><div class="kicker">Read before you trust a number</div>
+    <h2>Two gotchas everyone must know</h2></div>
+  <div class="warn-band">
+    <h4>&#9888; The two things that surprise people</h4>
+    <ul>
+      <li><b>One application has many decisions.</b> Slicing a plain count by an adjudication field over-counts superseded decisions. Use <code>Applications (Current Decision)</code> instead.</li>
+      <li><b>Credit scores are partial.</b> Score averages exclude no-hits and some are sparse (~1.2k apps). Read the matching <code>Hit Rate</code> for coverage. The trial is one tenant (vancity), and test products should be excluded.</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="alt"><div class="wrap">
+  <div class="section-head"><div class="kicker">The package</div>
+    <h2>What is in the box</h2>
+    <p>Seven working documents plus the branded pages. Trainers run the facilitator guide and tracks; everyone keeps the glossary open.</p></div>
+  <table>
+    <thead><tr><th>File</th><th>What it is</th><th>Who reads it</th></tr></thead>
+    <tbody>
+      <tr><td>README.md</td><td>Program index and the rollout plan</td><td>Everyone, project lead</td></tr>
+      <tr><td>01-facilitator-guide.md</td><td>How to run sessions, tactics, agendas, objections</td><td>Trainer (Niina)</td></tr>
+      <tr><td>02-judi-metrics-glossary.md</td><td>Plain-English dictionary of every headline metric</td><td>Everyone</td></tr>
+      <tr><td>03-track-customer-success.md</td><td>Role track for CS — consume and build</td><td>Customer Success</td></tr>
+      <tr><td>04-track-analysts-champions.md</td><td>Role track for power users who build their own</td><td>Analysts, champions</td></tr>
+      <tr><td>05-capability-to-judi-map.md</td><td>Every Holistics capability mapped to a Judi example</td><td>Trainer reference</td></tr>
+      <tr><td>06-hands-on-labs.md</td><td>Drop-in exercises with answer keys</td><td>Trainer, trainees</td></tr>
+      <tr><td>slides/00-judi-bi-cheatsheet.html</td><td>One-page quick reference</td><td>Everyone</td></tr>
+    </tbody>
+  </table>
+</div></section>
+
+<footer><div class="wrap"><svg class="logo" viewBox="0 0 834.9 202.78" role="img" aria-label="Holistics"><rect fill="none" x="-1.95" y="-.96" width="838.8" height="204.7"/><path fill="#FFFFFF" d="M213,40.39h16.38v43.62c0,4.08-.3,7.07-.3,7.07h.3c3.7-8.27,14.58-19.02,31.57-19.02,20.08,0,29.37,10.95,29.37,32.67v54.58h-16.38v-50.79c0-11.95-2.5-21.41-16.18-21.41-12.89,0-23.47,8.76-27.07,21.11-1,3.39-1.4,7.27-1.4,11.25v39.94h-16.38V40.39h.1Z"/><path fill="#FFFFFF" d="M354.85,72.06c25.57,0,46.15,18.72,46.15,44.52s-20.58,44.82-46.15,44.82-46.15-18.92-46.15-44.82,20.58-44.52,46.15-44.52ZM354.85,147.25c16.18,0,29.37-12.85,29.37-30.67s-13.19-30.37-29.37-30.37-29.37,12.65-29.37,30.37c-.1,17.83,13.29,30.67,29.37,30.67Z"/><path fill="#FFFFFF" d="M419.38,40.39h16.38v92.82c0,10.26,4.1,12.15,9.09,12.15,1.5,0,2.9-.2,2.9-.2v14.54s-2.5.3-5.39.3c-9.29,0-22.98-2.49-22.98-23.9V40.39Z"/><path fill="#FFFFFF" d="M465.03,40.39h16.58v16.73h-16.58v-16.73ZM465.13,74.15h16.38v85.25h-16.38v-85.25Z"/><path fill="#FFFFFF" d="M508.28,137.29s9.59,9.96,24.47,9.96c7.09,0,14.18-3.68,14.18-10.66,0-15.64-43.95-12.45-43.95-40.23,0-15.54,13.88-24.3,30.97-24.3,18.78,0,27.57,9.46,27.57,9.46l-6.59,12.35s-7.59-7.57-21.18-7.57c-7.09,0-13.98,2.99-13.98,10.46,0,15.34,43.95,11.95,43.95,39.94,0,14.14-12.19,24.8-30.97,24.8-20.98,0-32.46-12.45-32.46-12.45l7.99-11.75Z"/><path fill="#FFFFFF" d="M586.49,88.39h-11.19v-13.15h11.69v-24.6h15.88v24.6h20.58v13.15h-20.58v37.94c0,17.03,11.99,19.22,18.28,19.22,2.4,0,3.9-.3,3.9-.3v14.54s-2.4.3-5.79.3c-10.99,0-32.76-3.39-32.76-31.87v-39.84Z"/><path fill="#FFFFFF" d="M643.33,40.39h16.58v16.73h-16.58v-16.73ZM643.43,74.15h16.38v85.25h-16.38v-85.25Z"/><path fill="#FFFFFF" d="M725.24,72.06c21.48,0,32.17,12.45,32.17,12.45l-7.79,11.55s-9.09-9.76-23.67-9.76c-17.28,0-29.77,12.85-29.77,30.37s12.49,30.67,30.27,30.67c15.88,0,26.37-11.45,26.37-11.45l6.59,11.95s-11.79,13.64-34.16,13.64c-26.87,0-45.85-19.02-45.85-44.62.1-25.4,18.98-44.82,45.85-44.82Z"/><path fill="#FFFFFF" d="M778.98,137.29s9.59,9.96,24.47,9.96c7.09,0,14.18-3.68,14.18-10.66,0-15.64-43.95-12.45-43.95-40.23,0-15.54,13.89-24.3,30.97-24.3,18.78,0,27.57,9.46,27.57,9.46l-6.59,12.35s-7.59-7.57-21.18-7.57c-7.09,0-13.98,2.99-13.98,10.46,0,15.34,43.95,11.95,43.95,39.94,0,14.14-12.19,24.8-30.97,24.8-20.98,0-32.46-12.45-32.46-12.45l7.99-11.75Z"/><g><g><path fill="#2CB67F" d="M144.6,47.94c1.32-4.45,3.96-8.33,7.47-11.18l-49.21-28.41c-5.31-3.06-11.84-3.06-17.15,0L18,47.44c-5.31,3.06-8.57,8.72-8.57,14.85v60.25c2.77-1.21,5.82-1.88,9.03-1.88h4.39s0-55.39,0-55.39c0-3.18,1.7-6.12,4.45-7.71l62.55-36.11c2.75-1.59,6.15-1.59,8.9,0l45.87,26.48Z"/><path fill="#FFFFFF" d="M166.36,77.06c-.21,0-.42-.01-.63-.02v60.45c0,3.18-1.7,6.12-4.45,7.71l-62.55,36.11c-2.75,1.59-6.15,1.59-8.9,0l-50.48-29.15c-1.82,4.3-4.93,7.92-8.85,10.39l55.2,31.87c5.31,3.06,11.84,3.06,17.15,0l67.72-39.1c5.31-3.06,8.57-8.72,8.57-14.85v-67.38c-3.64,2.5-8.05,3.96-12.79,3.96Z"/></g><path fill="#2CB67F" d="M166.36,38.54c-8.74,0-15.83,7.09-15.83,15.83,0,2.1.41,4.11,1.16,5.94l-49.76,46.49c-2.26-1.25-4.87-1.96-7.64-1.96-8.74,0-15.83,7.09-15.83,15.83,0,.16,0,.32.01.48l-46.47,14.01c-2.77-4.58-7.8-7.64-13.55-7.64-8.74,0-15.83,7.09-15.83,15.83s7.09,15.83,15.83,15.83,15.11-6.39,15.77-14.52l47.53-14.33c2.89,3.75,7.43,6.17,12.54,6.17,8.74,0,15.83-7.09,15.83-15.83,0-2.43-.55-4.72-1.52-6.78l49.36-46.11c2.44,1.53,5.32,2.42,8.41,2.42,8.74,0,15.83-7.09,15.83-15.83s-7.09-15.83-15.83-15.83ZM18.45,149.41c-3.34,0-6.06-2.72-6.06-6.06s2.72-6.06,6.06-6.06,6.06,2.72,6.06,6.06-2.72,6.06-6.06,6.06ZM94.29,126.73c-3.34,0-6.06-2.72-6.06-6.06s2.72-6.06,6.06-6.06,6.06,2.72,6.06,6.06-2.72,6.06-6.06,6.06ZM166.36,60.43c-3.34,0-6.06-2.72-6.06-6.06s2.72-6.06,6.06-6.06,6.06,2.72,6.06,6.06-2.72,6.06-6.06,6.06Z"/></g></svg>
+  <p>Prepared for the Judi.ai Holistics trial. Open the README to start, or jump straight to your role track.</p>
+</div></footer>
+</body></html>
