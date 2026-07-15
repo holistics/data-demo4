@@ -823,7 +823,7 @@ Dashboard ssbi_demo {
       ]
     }
   ]
-  theme: holistics_ant
+  theme: H.themes.classic
   settings {
     timezone: 'America/Los_Angeles'
     cache_duration: 4320
