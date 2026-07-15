@@ -512,6 +512,37 @@ Dashboard iceye_finance_dashboard {
       }
     }
   }
+  block t2_by_vendor: VizBlock {
+    label: 'Net Amount by Vendor'
+    viz: BarChart {
+      dataset: profit_loss_statement_dataset
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_pl_statements.vendor)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Net EUR'
+            ref: r(iceye_fact_pl_statements.net_amount_eur_agg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
   block t2_table: VizBlock {
     label: 'P&L lines (drill-down)'
     viz: DataTable {
@@ -532,6 +563,12 @@ Dashboard iceye_finance_dashboard {
         },
         VizFieldFull {
           ref: r(iceye_fact_pl_statements.department_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_pl_statements.vendor)
           format {
             type: 'text'
           }
@@ -702,6 +739,12 @@ Dashboard iceye_finance_dashboard {
         },
         VizFieldFull {
           ref: r(iceye_fact_balance_sheet.department_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(iceye_fact_balance_sheet.vendor)
           format {
             type: 'text'
           }
@@ -990,7 +1033,7 @@ Dashboard iceye_finance_dashboard {
     tab profit_loss: CanvasLayout {
       label: 'Profit & Loss'
       width: 1320
-      height: 1570
+      height: 1910
       grid_size: 20
       auto_expand_vertically: true
       block t2_title {
@@ -1017,8 +1060,11 @@ Dashboard iceye_finance_dashboard {
       block t2_by_dept {
         position: pos(20, 770, 1260, 320)
       }
+      block t2_by_vendor {
+        position: pos(20, 1110, 1260, 320)
+      }
       block t2_table {
-        position: pos(20, 1110, 1260, 440)
+        position: pos(20, 1450, 1260, 440)
       }
       mobile {
         mode: 'auto'

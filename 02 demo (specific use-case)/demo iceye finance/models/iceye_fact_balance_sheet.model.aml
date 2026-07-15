@@ -13,6 +13,7 @@ Model iceye_fact_balance_sheet {
   dimension transaction_display_name { label: 'Transaction Display Name' type: 'text' definition: @sql {{ #SOURCE.transaction_display_name }};; }
   dimension subsidiary_name { label: 'Subsidiary Name' type: 'text' definition: @sql {{ #SOURCE.subsidiary_name }};; }
   dimension transaction_entity_name { label: 'Transaction Entity Name' type: 'text' definition: @sql {{ #SOURCE.transaction_entity_name }};; }
+  dimension vendor { label: 'Vendor' type: 'text' description: 'Vendor name — ICEYE confirmed Transaction Entity Name represents the vendor.' definition: @sql {{ #SOURCE.transaction_entity_name }};; }
   dimension entity_project { label: 'Entity Project' type: 'text' definition: @sql {{ #SOURCE.entity_project }};; }
   dimension project_contract_type { label: 'Project Contract Type' type: 'text' definition: @sql {{ #SOURCE.project_contract_type }};; }
   dimension department_number { label: 'Department Number' type: 'text' definition: @sql {{ #SOURCE.department_number }};; }
