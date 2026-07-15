@@ -22,7 +22,15 @@ Dataset pl_actuals_plan_monthly {
     label: 'Negative Net Actual Amount EUR'
     type: 'number'
     description: 'Net Actual Amount EUR × -1.'
-    definition: @aql iceye_fact_pl_budget_vs_actual.net_actual_amount_eur_agg * -1;;
+    definition: @aql sum(iceye_fact_pl_budget_vs_actual.net_actual_amount_eur) * -1;;
+    format: '[€]#,###0.00'
+  }
+
+  metric delta_amount_eur {
+    label: 'Delta Amount EUR'
+    type: 'number'
+    description: 'Plan EUR minus Negative Net Actual EUR.'
+    definition: @aql sum(iceye_fact_pl_budget_vs_actual.plan_amount_eur) - negative_net_actual_amount_eur;;
     format: '[€]#,###0.00'
   }
 
