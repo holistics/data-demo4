@@ -1,0 +1,69 @@
+Dashboard test_vmvxi {
+  title: 'Test'
+  owner: 'nam.tran@holistics.io'
+  block v_37d7: VizBlock {
+    label: 'Revenue by Product Name'
+    viz: BarChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Product Name'
+        ref: r(ecommerce_products.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#4F46E5'
+          }
+        }
+      }
+      settings {
+        row_limit: 5
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'yaxis'
+        }
+        legend_label: 'hidden'
+        x_axis_label: 'Product Name'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_37d7 {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.vanilla
+  settings {
+    autorun_on_open: true
+  }
+}
