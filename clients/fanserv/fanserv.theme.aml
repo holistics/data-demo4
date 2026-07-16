@@ -1,0 +1,664 @@
+// =====================================================================
+// FanServ — Stadium dashboard theme
+// Source: fanserv.com landing page. Dark stadium UI, FanServ green,
+// live-status accent, Inter/Manrope type, and glassy operational cards.
+// Apply from a dashboard with: theme: fanserv_stadium
+// =====================================================================
+
+const fs_green = "#009247"
+const fs_green_dark = "#045C30"
+const fs_live = "#00E66F"
+const fs_black = "#000000"
+const fs_elevated = "#0A0A0A"
+const fs_card = "#111111"
+const fs_card_alt = "#1A1A1A"
+const fs_border = "#1F1F1F"
+const fs_border_strong = "#2A2A2A"
+const fs_text = "#FAFAFA"
+const fs_text_muted = "#A6A6A6"
+const fs_text_subtle = "#6F6F6F"
+const fs_success = "#00A85A"
+const fs_warning = "#F59E0B"
+const fs_danger = "#EF4444"
+const fs_info = "#38BDF8"
+const fs_font = "Inter, Manrope, -apple-system, system-ui, Segoe UI, Roboto, sans-serif"
+const fs_light_page = "#F3F8F5"
+const fs_light_canvas = "#FFFFFF"
+const fs_light_card = "#FFFFFF"
+const fs_light_card_alt = "#F7FBF8"
+const fs_light_border = "#DCEBE3"
+const fs_light_border_strong = "#BFD8CA"
+const fs_light_text = "#06140D"
+const fs_light_muted = "#4B6356"
+const fs_light_subtle = "#6C7F74"
+
+ColorPalette fanserv_categorical_palette {
+  title: "FanServ Stadium"
+  categorical {
+    colors: [
+      "#009247",
+      "#00E66F",
+      "#38BDF8",
+      "#2563EB",
+      "#F59E0B",
+      "#F97316",
+      "#EF4444",
+      "#A855F7",
+      "#14B8A6",
+      "#A6A6A6"
+    ]
+  }
+}
+
+PageTheme fanserv_stadium {
+  title: "FanServ Stadium"
+
+  color {
+    data: fanserv_categorical_palette
+  }
+
+  background {
+    bg_color: fs_black
+    bg_image: "radial-gradient(circle at 12% 0%, rgba(0, 146, 71, 0.20), transparent 34%), radial-gradient(circle at 88% 8%, rgba(56, 189, 248, 0.12), transparent 30%)"
+    bg_repeat: false
+    bg_size: "cover"
+  }
+
+  canvas {
+    background {
+      bg_color: fs_elevated
+      bg_image: "linear-gradient(180deg, rgba(0, 146, 71, 0.08), rgba(0, 0, 0, 0) 240px)"
+      bg_repeat: false
+      bg_size: "cover"
+    }
+    border {
+      border_width: 1
+      border_radius: 12
+      border_color: fs_border
+      border_style: "solid"
+    }
+    shadow: "md"
+    opacity: 1
+  }
+
+  block {
+    background {
+      bg_color: fs_card
+      bg_image: "linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0))"
+      bg_repeat: false
+      bg_size: "cover"
+    }
+    label {
+      font_family: fs_font
+      font_size: 14
+      font_color: fs_text
+      font_weight: "semibold"
+      letter_spacing: "0.01em"
+    }
+    text {
+      font_family: fs_font
+      font_size: 13
+      font_color: fs_text_muted
+      font_weight: "normal"
+    }
+    border {
+      border_width: 1
+      border_radius: 12
+      border_color: fs_border
+      border_style: "solid"
+    }
+    padding: 18
+    shadow: "sm"
+    opacity: 1
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: fs_card
+        hover_color: "rgba(0, 146, 71, 0.14)"
+        banding_color: fs_card_alt
+        cell_padding: 10
+        font_color: fs_text
+        font_family: fs_font
+        font_size: 13
+        border_color: fs_border
+        border_width: 1
+        grid_color: fs_border_strong
+      }
+      header {
+        bg_color: fs_green_dark
+        font_color: "#FFFFFF"
+        font_size: 12
+        font_weight: "bold"
+      }
+      sub_header {
+        bg_color: fs_card_alt
+        font_color: fs_live
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: fs_text_muted
+        font_size: 11
+        font_weight: "medium"
+      }
+      sparkline {
+        line {
+          color: fs_live
+          width: 2
+        }
+        column {
+          color: fs_green
+          width: 4
+        }
+      }
+    }
+
+    metric_kpi {
+      alignment: "center"
+      label {
+        font_family: fs_font
+        font_size: 12
+        font_color: fs_text_muted
+        font_weight: "semibold"
+        letter_spacing: "0.06em"
+        text_transform: "uppercase"
+      }
+      value {
+        font_family: fs_font
+        font_size: 32
+        font_color: fs_text
+        font_weight: "extrabold"
+      }
+      trend {
+        positive {
+          text {
+            font_color: fs_live
+            font_weight: "bold"
+          }
+          background {
+            bg_color: "rgba(0, 168, 90, 0.16)"
+          }
+        }
+        negative {
+          text {
+            font_color: "#FF8A8A"
+            font_weight: "bold"
+          }
+          background {
+            bg_color: "rgba(239, 68, 68, 0.16)"
+          }
+        }
+        neutral {
+          text {
+            font_color: fs_text_muted
+            font_weight: "semibold"
+          }
+          background {
+            bg_color: "rgba(166, 166, 166, 0.14)"
+          }
+        }
+      }
+      progress {
+        text {
+          font_color: fs_text_muted
+          font_size: 12
+        }
+        indicator {
+          bg_color: fs_green
+        }
+        track {
+          bg_color: fs_border_strong
+        }
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --fanserv-green: #009247;
+      --fanserv-green-dark: #045C30;
+      --fanserv-live: #00E66F;
+      --fanserv-card: #111111;
+      --fanserv-card-alt: #1A1A1A;
+      --fanserv-border: #1F1F1F;
+      --fanserv-text: #FAFAFA;
+      --fanserv-heading: #FAFAFA;
+      --fanserv-muted: #A6A6A6;
+      --fanserv-success: #00A85A;
+      --fanserv-warning: #F59E0B;
+      --fanserv-danger: #EF4444;
+      --fanserv-info: #38BDF8;
+      --fanserv-hero-bg: radial-gradient(circle at 16% 0%, rgba(0,230,111,0.20), transparent 34%), linear-gradient(135deg, rgba(0,146,71,0.22), rgba(17,17,17,0.94) 58%, rgba(0,0,0,0.98));
+      --fanserv-hero-border: rgba(0,146,71,0.30);
+      --fanserv-panel-bg: rgba(17,17,17,0.72);
+      --fanserv-panel-border: rgba(0,146,71,0.20);
+    }
+
+    .h-kpi-metric {
+      letter-spacing: -0.01em;
+    }
+
+    .h-kpi-metric-label {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: rgba(0, 168, 90, 0.16);
+      color: var(--fanserv-live);
+      border-color: rgba(0, 230, 111, 0.28);
+    }
+
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: rgba(239, 68, 68, 0.16);
+      color: #FF8A8A;
+      border-color: rgba(239, 68, 68, 0.28);
+    }
+
+    .h-theme-control-block .h-theme-dm-filter-container .dm-filter-form,
+    .dac-ic-block .hui-select-trigger,
+    .dac-ic-block .h-input {
+      background: rgba(17, 17, 17, 0.88);
+      border-color: rgba(0, 146, 71, 0.32);
+      color: var(--fanserv-text);
+      box-shadow: 0 0 0 1px rgba(0, 146, 71, 0.08);
+    }
+
+    .dac-ic-block .hui-select-trigger:focus,
+    .dac-ic-block .h-input:focus {
+      border-color: var(--fanserv-live);
+      box-shadow: 0 0 0 3px rgba(0, 230, 111, 0.14);
+    }
+
+    .fanserv-live-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(0, 230, 111, 0.32);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(0, 146, 71, 0.16);
+      color: var(--fanserv-live);
+      font: 700 12px Inter, Manrope, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .fanserv-live-chip::before {
+      content: none;
+    }
+
+    .fanserv-live-ping-gif {
+      position: relative;
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--fanserv-live);
+      box-shadow: 0 0 12px rgba(0, 230, 111, 0.72);
+      flex: none;
+    }
+
+    .fanserv-live-ping-gif::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border: 1px solid currentColor;
+      border-radius: inherit;
+      opacity: 0;
+      animation: fanserv-live-ping 5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes fanserv-live-ping {
+      0% {
+        opacity: 0.72;
+        transform: scale(0.65);
+      }
+      70%, 100% {
+        opacity: 0;
+        transform: scale(1.85);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fanserv-live-ping-gif::after {
+        animation: none;
+      }
+    }
+
+    .fanserv-hero-title {
+      margin: 0;
+      color: var(--fanserv-text);
+      font: 800 30px/1.1 Inter, Manrope, sans-serif;
+      letter-spacing: -0.04em;
+    }
+
+    .fanserv-muted {
+      color: var(--fanserv-muted);
+    }
+  ;;
+}
+
+PageTheme fanserv_stadium_light {
+  title: "FanServ Stadium Light"
+
+  color {
+    data: fanserv_categorical_palette
+  }
+
+  background {
+    bg_color: fs_light_page
+    bg_image: "radial-gradient(circle at 10% 0%, rgba(0, 146, 71, 0.14), transparent 32%), radial-gradient(circle at 88% 10%, rgba(56, 189, 248, 0.10), transparent 28%)"
+    bg_repeat: false
+    bg_size: "cover"
+  }
+
+  canvas {
+    background {
+      bg_color: fs_light_canvas
+      bg_image: "linear-gradient(180deg, rgba(0, 146, 71, 0.07), rgba(255, 255, 255, 0) 260px)"
+      bg_repeat: false
+      bg_size: "cover"
+    }
+    border {
+      border_width: 1
+      border_radius: 12
+      border_color: fs_light_border
+      border_style: "solid"
+    }
+    shadow: "md"
+    opacity: 1
+  }
+
+  block {
+    background {
+      bg_color: fs_light_card
+      bg_image: "linear-gradient(180deg, rgba(0, 146, 71, 0.035), rgba(255, 255, 255, 0))"
+      bg_repeat: false
+      bg_size: "cover"
+    }
+    label {
+      font_family: fs_font
+      font_size: 14
+      font_color: fs_light_text
+      font_weight: "semibold"
+      letter_spacing: "0.01em"
+    }
+    text {
+      font_family: fs_font
+      font_size: 13
+      font_color: fs_light_muted
+      font_weight: "normal"
+    }
+    border {
+      border_width: 1
+      border_radius: 12
+      border_color: fs_light_border
+      border_style: "solid"
+    }
+    padding: 18
+    shadow: "sm"
+    opacity: 1
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: fs_light_card
+        hover_color: "rgba(0, 146, 71, 0.10)"
+        banding_color: fs_light_card_alt
+        cell_padding: 10
+        font_color: fs_light_text
+        font_family: fs_font
+        font_size: 13
+        border_color: fs_light_border
+        border_width: 1
+        grid_color: fs_light_border
+      }
+      header {
+        bg_color: "#EAF7F1"
+        font_color: fs_green_dark
+        font_size: 12
+        font_weight: "bold"
+      }
+      sub_header {
+        bg_color: fs_light_card_alt
+        font_color: fs_green_dark
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: fs_light_muted
+        font_size: 11
+        font_weight: "medium"
+      }
+      sparkline {
+        line {
+          color: fs_green
+          width: 2
+        }
+        column {
+          color: fs_green
+          width: 4
+        }
+      }
+    }
+
+    metric_kpi {
+      alignment: "center"
+      label {
+        font_family: fs_font
+        font_size: 12
+        font_color: fs_light_muted
+        font_weight: "semibold"
+        letter_spacing: "0.06em"
+        text_transform: "uppercase"
+      }
+      value {
+        font_family: fs_font
+        font_size: 32
+        font_color: fs_light_text
+        font_weight: "extrabold"
+      }
+      trend {
+        positive {
+          text {
+            font_color: fs_green_dark
+            font_weight: "bold"
+          }
+          background {
+            bg_color: "rgba(0, 146, 71, 0.12)"
+          }
+        }
+        negative {
+          text {
+            font_color: "#B91C1C"
+            font_weight: "bold"
+          }
+          background {
+            bg_color: "rgba(239, 68, 68, 0.12)"
+          }
+        }
+        neutral {
+          text {
+            font_color: fs_light_muted
+            font_weight: "semibold"
+          }
+          background {
+            bg_color: "rgba(108, 127, 116, 0.12)"
+          }
+        }
+      }
+      progress {
+        text {
+          font_color: fs_light_muted
+          font_size: 12
+        }
+        indicator {
+          bg_color: fs_green
+        }
+        track {
+          bg_color: fs_light_border
+        }
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --fanserv-green: #009247;
+      --fanserv-green-dark: #045C30;
+      --fanserv-live: #009247;
+      --fanserv-card: #FFFFFF;
+      --fanserv-card-alt: #F7FBF8;
+      --fanserv-border: #DCEBE3;
+      --fanserv-text: #06140D;
+      --fanserv-heading: #06140D;
+      --fanserv-muted: #4B6356;
+      --fanserv-success: #00A85A;
+      --fanserv-warning: #B45309;
+      --fanserv-danger: #B91C1C;
+      --fanserv-info: #0369A1;
+      --fanserv-hero-bg: radial-gradient(circle at 16% 0%, rgba(0,146,71,0.18), transparent 34%), linear-gradient(135deg, rgba(234,247,241,0.98), rgba(255,255,255,0.96) 58%, rgba(246,251,248,0.98));
+      --fanserv-hero-border: rgba(0,146,71,0.24);
+      --fanserv-panel-bg: rgba(255,255,255,0.88);
+      --fanserv-panel-border: rgba(0,146,71,0.18);
+    }
+
+    .h-kpi-metric {
+      letter-spacing: -0.01em;
+    }
+
+    .h-kpi-metric-label {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: rgba(0, 146, 71, 0.12);
+      color: var(--fanserv-green-dark);
+      border-color: rgba(0, 146, 71, 0.22);
+    }
+
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: rgba(239, 68, 68, 0.12);
+      color: #B91C1C;
+      border-color: rgba(239, 68, 68, 0.22);
+    }
+
+    .h-theme-control-block .h-theme-dm-filter-container .dm-filter-form,
+    .dac-ic-block .hui-select-trigger,
+    .dac-ic-block .h-input {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: rgba(0, 146, 71, 0.24);
+      color: var(--fanserv-text);
+      box-shadow: 0 0 0 1px rgba(0, 146, 71, 0.05);
+    }
+
+    .dac-ic-block .hui-select-trigger:focus,
+    .dac-ic-block .h-input:focus {
+      border-color: var(--fanserv-green);
+      box-shadow: 0 0 0 3px rgba(0, 146, 71, 0.12);
+    }
+
+    .fanserv-live-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(0, 146, 71, 0.24);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(0, 146, 71, 0.10);
+      color: var(--fanserv-green-dark);
+      font: 700 12px Inter, Manrope, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .fanserv-live-chip::before {
+      content: none;
+    }
+
+    .fanserv-live-ping-gif {
+      position: relative;
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--fanserv-green);
+      box-shadow: 0 0 10px rgba(0, 146, 71, 0.45);
+      flex: none;
+    }
+
+    .fanserv-live-ping-gif::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border: 1px solid currentColor;
+      border-radius: inherit;
+      opacity: 0;
+      animation: fanserv-live-ping 5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes fanserv-live-ping {
+      0% {
+        opacity: 0.72;
+        transform: scale(0.65);
+      }
+      70%, 100% {
+        opacity: 0;
+        transform: scale(1.85);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fanserv-live-ping-gif::after {
+        animation: none;
+      }
+    }
+
+    .fanserv-hero-title {
+      margin: 0;
+      color: var(--fanserv-heading);
+      font: 800 30px/1.1 Inter, Manrope, sans-serif;
+      letter-spacing: -0.04em;
+    }
+
+    .fanserv-muted {
+      color: var(--fanserv-muted);
+    }
+  ;;
+}
+
+BlockTheme fanserv_transparent_block {
+  background {
+    bg_color: "transparent"
+  }
+  border {
+    border_width: 0
+    border_radius: 0
+    border_style: "none"
+  }
+  padding: 0
+  shadow: "none"
+}
+
+BlockTheme fanserv_glass_block {
+  background {
+    bg_color: "rgba(17, 17, 17, 0.72)"
+  }
+  border {
+    border_width: 1
+    border_radius: 12
+    border_color: "rgba(0, 146, 71, 0.28)"
+    border_style: "solid"
+  }
+  padding: 18
+  shadow: "sm"
+}

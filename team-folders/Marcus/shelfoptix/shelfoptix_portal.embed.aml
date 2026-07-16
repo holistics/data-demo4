@@ -1,7 +1,7 @@
-// Internal explore + Ask AI portal over the ShelfOptix OSA/OOS dataset (all tenants).
-// Paired with the single-dashboard embed (customer-facing, tenant-scoped) — this portal
-// is the ShelfOptix-internal, all-access self-serve view, so it needs no row-level
-// permission (which would otherwise conflict with the single-dashboard embed's row_based).
+// Tenant-scoped explore + Ask AI portal over the ShelfOptix OSA/OOS dataset.
+// Row-level security is enforced by the `tenant_access` permission on the shelfoptix_osa
+// dataset (matches_user_attribute on project_id_no), fed by the `project_id_no` user
+// attribute in the embed token. The corporate/all-tenants user passes `__ALL__` to bypass it.
 EmbedPortal shelfoptix_portal {
   description: 'ShelfOptix internal self-serve exploration + Ask AI over OSA/OOS (all tenants).'
   objects: [
