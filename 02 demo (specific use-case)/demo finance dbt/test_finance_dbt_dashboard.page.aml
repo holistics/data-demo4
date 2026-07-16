@@ -1,0 +1,284 @@
+Dashboard test_finance_dbt_dashboard {
+  title: 'Test Finance (dbt-powered)'
+  description: 'Pilot dashboard on the dbt-backed FX-normalised finance marts (demo_dbt_test). Mirrors demo_finance_use_cases style; parallel to the live demo.'
+  owner: 'dong.ln@holistics.io'
+
+  block title: TextBlock {
+    content: @md # Finance overview (dbt-powered, USD-normalised);;
+  }
+
+  block v_revenue_usd: VizBlock {
+    label: 'Total Revenue (USD)'
+    viz: MetricKpi {
+      dataset: test_finance_dbt
+      value: VizFieldFull {
+        label: 'Total Revenue (USD)'
+        ref: r(test_finance_dbt.total_revenue_usd)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_supplier_cost_usd: VizBlock {
+    label: 'Total Supplier Cost (USD)'
+    viz: MetricKpi {
+      dataset: test_finance_dbt
+      value: VizFieldFull {
+        label: 'Total Supplier Cost (USD)'
+        ref: r(test_finance_dbt.total_supplier_cost_usd)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_collected_usd: VizBlock {
+    label: 'Total Collected (USD)'
+    viz: MetricKpi {
+      dataset: test_finance_dbt
+      value: VizFieldFull {
+        label: 'Total Collected (USD)'
+        ref: r(test_finance_dbt.total_collected_usd)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_ar_usd: VizBlock {
+    label: 'Outstanding AR (USD)'
+    viz: MetricKpi {
+      dataset: test_finance_dbt
+      value: VizFieldFull {
+        label: 'Outstanding AR (USD)'
+        ref: r(test_finance_dbt.total_accounts_receivable_usd)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_ap_usd: VizBlock {
+    label: 'Outstanding AP (USD)'
+    viz: MetricKpi {
+      dataset: test_finance_dbt
+      value: VizFieldFull {
+        label: 'Outstanding AP (USD)'
+        ref: r(test_finance_dbt.total_accounts_payable_usd)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_revenue_by_month: VizBlock {
+    label: 'Revenue (USD) by Month'
+    viz: LineChart {
+      dataset: test_finance_dbt
+      x_axis: VizFieldFull {
+        ref: r(dbt_finance_invoices_usd.invoice_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Revenue (USD)'
+            ref: r(dbt_finance_invoices_usd.invoice_amount_usd)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  block v_revenue_by_currency: VizBlock {
+    label: 'Revenue (USD) by Currency'
+    viz: BarChart {
+      dataset: test_finance_dbt
+      x_axis: VizFieldFull {
+        ref: r(dbt_finance_invoices_usd.currency_code)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Revenue (USD)'
+            ref: r(dbt_finance_invoices_usd.invoice_amount_usd)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  block v_cost_by_department: VizBlock {
+    label: 'Supplier Cost (USD) by Department'
+    viz: BarChart {
+      dataset: test_finance_dbt
+      x_axis: VizFieldFull {
+        ref: r(dbt_finance_bills_usd.bill_department)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Supplier Cost (USD)'
+            ref: r(dbt_finance_bills_usd.bill_amount_usd)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  block v_cost_by_vendor: VizBlock {
+    label: 'Supplier Cost (USD) by Vendor'
+    viz: BarChart {
+      dataset: test_finance_dbt
+      x_axis: VizFieldFull {
+        ref: r(dbt_finance_vendors.vendor_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Supplier Cost (USD)'
+            ref: r(dbt_finance_bills_usd.bill_amount_usd)
+            aggregation: 'sum'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  view: TabLayout {
+    label: 'View 1'
+    tab overview: CanvasLayout {
+      label: 'Overview'
+      width: 1320
+      height: 1200
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block title { position: pos(20, 20, 1280, 60) }
+
+      block v_revenue_usd { position: pos(20, 100, 240, 160) }
+      block v_supplier_cost_usd { position: pos(280, 100, 240, 160) }
+      block v_collected_usd { position: pos(540, 100, 240, 160) }
+      block v_ar_usd { position: pos(800, 100, 240, 160) }
+      block v_ap_usd { position: pos(1060, 100, 240, 160) }
+
+      block v_revenue_by_month { position: pos(20, 280, 620, 420) }
+      block v_revenue_by_currency { position: pos(660, 280, 620, 420) }
+      block v_cost_by_department { position: pos(20, 720, 620, 420) }
+      block v_cost_by_vendor { position: pos(660, 720, 620, 420) }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+}

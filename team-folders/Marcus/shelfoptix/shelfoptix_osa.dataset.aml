@@ -15,6 +15,17 @@ Dataset shelfoptix_osa {
     relationship(shelfoptix_store_scan_sample.primary_sku_no > shelfoptix_dim_product_sample.primary_sku_no, true)
   ]
 
+  // Row-level security for the embed portal: restrict rows to the tenant passed in the
+  // embed token as the `project_id_no` user attribute. A token that omits it (e.g. the
+  // ShelfOptix corporate/all-tenants user) should send `__ALL__` to bypass this filter.
+  // NOTE: the `project_id_no` user attribute must exist in Holistics (Admin > User
+  // Attributes) or the value passed in the token is silently ignored.
+  permission tenant_access {
+    field: r(shelfoptix_store_scan_sample.project_id_no)
+    operator: 'matches_user_attribute'
+    value: 'project_id_no'
+  }
+
   // ---- helper row-level flags (0/1) so aggregates stay simple & portable ----
   dimension is_oos {
     label: 'Is OOS'

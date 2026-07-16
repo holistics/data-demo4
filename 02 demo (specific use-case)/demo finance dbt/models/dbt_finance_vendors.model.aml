@@ -1,0 +1,31 @@
+Model dbt_finance_vendors {
+  type: 'table'
+  label: 'Vendors (dbt)'
+  description: 'Vendor dimension from dbt staging (stg_finance__vendors).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension vendor_id {
+    label: 'Vendor Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.vendor_id }};;
+  }
+  dimension vendor_name {
+    label: 'Vendor Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.vendor_name }};;
+  }
+  dimension default_category_id {
+    label: 'Default Category Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.default_category_id }};;
+  }
+  dimension vendor_type {
+    label: 'Vendor Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.vendor_type }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_staging"."stg_finance__vendors"'
+}

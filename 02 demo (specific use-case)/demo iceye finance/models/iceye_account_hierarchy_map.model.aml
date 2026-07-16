@@ -1,0 +1,16 @@
+Model iceye_account_hierarchy_map {
+  type: 'table'
+  label: 'Account Hierarchy Map'
+  description: 'Account rollup hierarchy (prod_reporting_finance_account_hierarchy_map).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension account_number { label: 'Account Number' type: 'text' primary_key: true definition: @sql {{ #SOURCE.account_number }};; }
+  dimension account_name { label: 'Account Name' type: 'text' definition: @sql {{ #SOURCE.account_name }};; }
+  dimension account_type { label: 'Account Type' type: 'text' definition: @sql {{ #SOURCE.account_type }};; }
+  dimension account_group_level_1 { label: 'Account Group Level 1' type: 'text' definition: @sql {{ #SOURCE.account_group_level_1 }};; }
+  dimension account_group_level_2 { label: 'Account Group Level 2' type: 'text' definition: @sql {{ #SOURCE.account_group_level_2 }};; }
+  dimension is_intercompany { label: 'Is Intercompany' type: 'truefalse' definition: @sql {{ #SOURCE.is_intercompany }};; }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_account_hierarchy_map"'
+}

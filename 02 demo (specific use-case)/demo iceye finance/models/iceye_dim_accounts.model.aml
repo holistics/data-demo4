@@ -1,0 +1,38 @@
+Model iceye_dim_accounts {
+  type: 'table'
+  label: 'Accounts'
+  description: 'Account dimension (prod_reporting_finance_dim_accounts).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension acct_number { label: 'Acct Number' type: 'text' primary_key: true definition: @sql {{ #SOURCE.acct_number }};; }
+  dimension id { label: 'Id' type: 'number' definition: @sql {{ #SOURCE.id }};; }
+  dimension full_name { label: 'Full Name' type: 'text' definition: @sql {{ #SOURCE.full_name }};; }
+  dimension display_name_with_hierarchy { label: 'Display Name With Hierarchy' type: 'text' definition: @sql {{ #SOURCE.display_name_with_hierarchy }};; }
+  dimension account_search_display_name { label: 'Account Search Display Name' type: 'text' definition: @sql {{ #SOURCE.account_search_display_name }};; }
+  dimension external_id { label: 'External Id' type: 'text' definition: @sql {{ #SOURCE.external_id }};; }
+  dimension acct_type { label: 'Acct Type' type: 'text' definition: @sql {{ #SOURCE.acct_type }};; }
+  dimension account_description { label: 'Account Description' type: 'text' definition: @sql {{ #SOURCE.account_description }};; }
+  dimension subsidiary { label: 'Subsidiary' type: 'text' definition: @sql {{ #SOURCE.subsidiary }};; }
+  dimension currency { label: 'Currency' type: 'number' definition: @sql {{ #SOURCE.currency }};; }
+  dimension class { label: 'Class' type: 'number' definition: @sql {{ #SOURCE.class }};; }
+  dimension department { label: 'Department' type: 'number' definition: @sql {{ #SOURCE.department }};; }
+  dimension account_location { label: 'Account Location' type: 'number' definition: @sql {{ #SOURCE.account_location }};; }
+  dimension parent { label: 'Parent' type: 'number' definition: @sql {{ #SOURCE.parent }};; }
+  dimension unit { label: 'Unit' type: 'number' definition: @sql {{ #SOURCE.unit }};; }
+  dimension units_type { label: 'Units Type' type: 'number' definition: @sql {{ #SOURCE.units_type }};; }
+  dimension is_inactive { label: 'Is Inactive' type: 'truefalse' definition: @sql {{ #SOURCE.is_inactive }};; }
+  dimension is_summary { label: 'Is Summary' type: 'truefalse' definition: @sql {{ #SOURCE.is_summary }};; }
+  dimension include_children { label: 'Include Children' type: 'truefalse' definition: @sql {{ #SOURCE.include_children }};; }
+  dimension eliminate { label: 'Eliminate' type: 'truefalse' definition: @sql {{ #SOURCE.eliminate }};; }
+  dimension inventory { label: 'Inventory' type: 'truefalse' definition: @sql {{ #SOURCE.inventory }};; }
+  dimension revalue { label: 'Revalue' type: 'truefalse' definition: @sql {{ #SOURCE.revalue }};; }
+  dimension reconcile_with_matching { label: 'Reconcile With Matching' type: 'truefalse' definition: @sql {{ #SOURCE.reconcile_with_matching }};; }
+  dimension cash_flow_rate { label: 'Cash Flow Rate' type: 'text' definition: @sql {{ #SOURCE.cash_flow_rate }};; }
+  dimension general_rate { label: 'General Rate' type: 'text' definition: @sql {{ #SOURCE.general_rate }};; }
+  dimension restrict_to_accounting_book { label: 'Restrict To Accounting Book' type: 'text' definition: @sql {{ #SOURCE.restrict_to_accounting_book }};; }
+  dimension last_modified_date { label: 'Last Modified Date' type: 'datetime' definition: @sql {{ #SOURCE.last_modified_date }};; }
+  dimension dwh_created_at { label: 'Dwh Created At' type: 'datetime' definition: @sql {{ #SOURCE.dwh_created_at }};; }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_dim_accounts"'
+}

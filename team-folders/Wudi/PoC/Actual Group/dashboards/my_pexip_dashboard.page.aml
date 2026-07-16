@@ -1,0 +1,22 @@
+Dashboard my_pexip_dashboard {
+  title: 'My Pexip Dashboard'
+  owner: 'chukwudi@holistics.io'
+
+  block b_title: TextBlock {
+    content: @md # My Pexip Dashboard ;;
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1320
+    height: 924
+    grid_size: 20
+    auto_expand_vertically: true
+    block b_title {
+      position: pos(20, 20, 1280, 80)
+    }
+    mobile { mode: 'auto' }
+  }
+
+  theme: ag_actual_group
+}
