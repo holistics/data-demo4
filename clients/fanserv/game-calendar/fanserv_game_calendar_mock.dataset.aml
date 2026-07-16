@@ -1,0 +1,15 @@
+Dataset fanserv_game_calendar_mock {
+  __engine__: 'aql'
+  label: 'FanServ Game Calendar — Mock'
+  description: 'Temporary dataset for reproducing FanServ’s shared month and day calendar designs while tenant data access is pending.'
+  data_source_name: 'demodb'
+
+  models: [
+    fanserv_mock_games
+  ]
+  relationships: []
+
+  view {
+    model fanserv_mock_games { }
+  }
+}

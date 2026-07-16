@@ -1,0 +1,260 @@
+Model fanserv_mock_games {
+  type: 'query'
+  label: 'FanServ Mock Games'
+  description: 'Temporary one-row-per-game data for the FanServ Game Calendar POC. Replace this query model when FanServ provides its tenant dataset.'
+  data_source_name: 'demodb'
+
+  dimension game_id {
+    label: 'Game ID'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+
+  dimension game_date {
+    label: 'Game Date'
+    type: 'date'
+  }
+
+  dimension scheduled_start_at {
+    label: 'Scheduled Start (ET)'
+    type: 'datetime'
+  }
+
+  dimension scheduled_end_at {
+    label: 'Scheduled End (ET)'
+    type: 'datetime'
+  }
+
+  dimension timezone {
+    label: 'Timezone'
+    type: 'text'
+  }
+
+  dimension status {
+    label: 'Game Status'
+    type: 'text'
+  }
+
+  dimension live_period {
+    label: 'Live Period'
+    type: 'text'
+  }
+
+  dimension live_clock {
+    label: 'Live Clock'
+    type: 'text'
+  }
+
+  dimension original_scheduled_start_at {
+    label: 'Original Scheduled Start (ET)'
+    type: 'datetime'
+  }
+
+  dimension league_code {
+    label: 'League Code'
+    type: 'text'
+  }
+
+  dimension league_name {
+    label: 'League'
+    type: 'text'
+  }
+
+  dimension league_logo_url {
+    label: 'League Logo URL'
+    type: 'text'
+  }
+
+  dimension home_team_code {
+    label: 'Home Team Code'
+    type: 'text'
+  }
+
+  dimension home_team_name {
+    label: 'Home Team'
+    type: 'text'
+  }
+
+  dimension home_team_logo_url {
+    label: 'Home Team Logo URL'
+    type: 'text'
+  }
+
+  dimension home_score {
+    label: 'Home Score'
+    type: 'number'
+  }
+
+  dimension away_team_code {
+    label: 'Away Team Code'
+    type: 'text'
+  }
+
+  dimension away_team_name {
+    label: 'Away Team'
+    type: 'text'
+  }
+
+  dimension away_team_logo_url {
+    label: 'Away Team Logo URL'
+    type: 'text'
+  }
+
+  dimension away_score {
+    label: 'Away Score'
+    type: 'number'
+  }
+
+  dimension primary_network {
+    label: 'Primary Network'
+    type: 'text'
+  }
+
+  dimension secondary_network {
+    label: 'Secondary Network'
+    type: 'text'
+  }
+
+  dimension gamepulse_score {
+    label: 'GamePulse Score'
+    description: 'Mock display score. FanServ must confirm the canonical focal-team perspective before production use.'
+    type: 'number'
+  }
+
+  dimension gamepulse_focal_team_code {
+    label: 'GamePulse Focal Team Code'
+    type: 'text'
+  }
+
+  dimension gamepulse_band {
+    label: 'GamePulse Band'
+    type: 'text'
+  }
+
+  dimension matchup_label {
+    label: 'Matchup'
+    type: 'text'
+  }
+
+  dimension team_codes {
+    label: 'Team Codes'
+    type: 'text'
+  }
+
+  dimension search_text {
+    label: 'Game Search Text'
+    type: 'text'
+  }
+
+  dimension supply_team_codes {
+    label: 'Supply Team Codes'
+    description: 'Participating teams with a mocked FanServ supply affiliation; this does not assert inventory availability.'
+    type: 'text'
+  }
+
+  dimension has_supply_affiliation {
+    label: 'Has Supply Affiliation'
+    type: 'truefalse'
+  }
+
+  measure game_count {
+    label: 'Games'
+    type: 'number'
+    definition: @sql {{ game_id }};;
+    aggregation_type: 'count_distinct'
+  }
+
+  measure average_gamepulse_score {
+    label: 'Average GamePulse Score'
+    type: 'number'
+    definition: @sql {{ gamepulse_score }};;
+    aggregation_type: 'avg'
+  }
+
+  query: @sql
+    with mock_games (
+      game_id
+      , game_date
+      , scheduled_start_at
+      , scheduled_end_at
+      , timezone
+      , status
+      , live_period
+      , live_clock
+      , original_scheduled_start_at
+      , league_code
+      , league_name
+      , league_logo_url
+      , home_team_code
+      , home_team_name
+      , home_team_logo_url
+      , home_score
+      , away_team_code
+      , away_team_name
+      , away_team_logo_url
+      , away_score
+      , primary_network
+      , secondary_network
+      , gamepulse_score
+      , gamepulse_focal_team_code
+      , supply_team_codes
+    ) as (
+      values
+        ('nba-20260702-nyk-hou', '2026-07-02', '2026-07-02 19:30:00', '2026-07-02 22:00:00', 'America/New_York', 'final', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'HOU', 'Houston Rockets', 'https://cdn.nba.com/logos/nba/1610612745/primary/L/logo.svg', 91, 'NYK', 'New York Knicks', 'https://cdn.nba.com/logos/nba/1610612752/primary/L/logo.svg', 98, 'ESPN', 'TNT', 43, 'HOU', 'HOU')
+        , ('nba-20260703-den-phx', '2026-07-03', '2026-07-03 16:25:00', '2026-07-03 19:30:00', 'America/New_York', 'final', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'PHX', 'Phoenix Suns', 'https://cdn.nba.com/logos/nba/1610612756/primary/L/logo.svg', 108, 'DEN', 'Denver Nuggets', 'https://cdn.nba.com/logos/nba/1610612743/primary/L/logo.svg', 112, 'ESPN', 'TNT', 95, 'DEN', 'DEN')
+        , ('nba-20260704-gsw-lac', '2026-07-04', '2026-07-04 20:00:00', '2026-07-04 22:30:00', 'America/New_York', 'rescheduled', null, null, '2026-07-02 16:25:00', 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'LAC', 'Los Angeles Clippers', 'https://cdn.nba.com/logos/nba/1610612746/primary/L/logo.svg', null, 'GSW', 'Golden State Warriors', 'https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg', null, 'ESPN', 'TNT', 95, 'GSW', 'GSW,LAC')
+        , ('nba-20260705-lal-chi', '2026-07-05', '2026-07-05 18:00:00', '2026-07-05 20:30:00', 'America/New_York', 'final', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'CHI', 'Chicago Bulls', 'https://cdn.nba.com/logos/nba/1610612741/primary/L/logo.svg', 108, 'LAL', 'Los Angeles Lakers', 'https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg', 112, 'ESPN', null, 95, 'LAL', 'LAL,CHI')
+        , ('nba-20260707-lac-phx', '2026-07-07', '2026-07-07 19:00:00', '2026-07-07 21:30:00', 'America/New_York', 'final', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'PHX', 'Phoenix Suns', 'https://cdn.nba.com/logos/nba/1610612756/primary/L/logo.svg', 101, 'LAC', 'Los Angeles Clippers', 'https://cdn.nba.com/logos/nba/1610612746/primary/L/logo.svg', 104, 'ESPN', null, 73, 'LAC', 'LAC')
+        , ('nba-20260709-gsw-den', '2026-07-09', '2026-07-09 20:00:00', '2026-07-09 22:30:00', 'America/New_York', 'final', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'DEN', 'Denver Nuggets', 'https://cdn.nba.com/logos/nba/1610612743/primary/L/logo.svg', 114, 'GSW', 'Golden State Warriors', 'https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg', 117, 'ESPN', 'TNT', 88, 'GSW', 'GSW,DEN')
+        , ('nba-20260711-nyk-chi', '2026-07-11', '2026-07-11 19:30:00', '2026-07-11 22:00:00', 'America/New_York', 'final', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'CHI', 'Chicago Bulls', 'https://cdn.nba.com/logos/nba/1610612741/primary/L/logo.svg', 106, 'NYK', 'New York Knicks', 'https://cdn.nba.com/logos/nba/1610612752/primary/L/logo.svg', 109, 'ESPN', null, 68, 'CHI', 'CHI')
+        , ('nba-20260714-lal-chi', '2026-07-14', '2026-07-14 16:00:00', '2026-07-14 19:00:00', 'America/New_York', 'cancelled', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'CHI', 'Chicago Bulls', 'https://cdn.nba.com/logos/nba/1610612741/primary/L/logo.svg', null, 'LAL', 'Los Angeles Lakers', 'https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg', null, 'ESPN', null, 95, 'LAL', 'LAL,CHI')
+        , ('nba-20260715-gsw-hou', '2026-07-15', '2026-07-15 19:30:00', '2026-07-15 22:00:00', 'America/New_York', 'rescheduled', null, null, '2026-07-14 16:25:00', 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'HOU', 'Houston Rockets', 'https://cdn.nba.com/logos/nba/1610612745/primary/L/logo.svg', null, 'GSW', 'Golden State Warriors', 'https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg', null, 'ESPN', null, 95, 'GSW', 'GSW,HOU')
+        , ('nba-20260716-den-phx', '2026-07-16', '2026-07-16 16:25:00', '2026-07-16 19:30:00', 'America/New_York', 'live', 'Q3', '04:32', null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'PHX', 'Phoenix Suns', 'https://cdn.nba.com/logos/nba/1610612756/primary/L/logo.svg', 108, 'DEN', 'Denver Nuggets', 'https://cdn.nba.com/logos/nba/1610612743/primary/L/logo.svg', 112, 'ESPN', 'TNT', 95, 'DEN', 'DEN')
+        , ('nba-20260716-lal-chi', '2026-07-16', '2026-07-16 20:00:00', '2026-07-16 22:30:00', 'America/New_York', 'scheduled', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'CHI', 'Chicago Bulls', 'https://cdn.nba.com/logos/nba/1610612741/primary/L/logo.svg', null, 'LAL', 'Los Angeles Lakers', 'https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg', null, 'ESPN', 'TNT', 95, 'LAL', 'LAL,CHI')
+        , ('nba-20260717-lac-nyk', '2026-07-17', '2026-07-17 19:00:00', '2026-07-17 21:30:00', 'America/New_York', 'scheduled', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'NYK', 'New York Knicks', 'https://cdn.nba.com/logos/nba/1610612752/primary/L/logo.svg', null, 'LAC', 'Los Angeles Clippers', 'https://cdn.nba.com/logos/nba/1610612746/primary/L/logo.svg', null, 'ESPN', null, 76, 'LAC', 'LAC')
+        , ('nba-20260718-phx-gsw', '2026-07-18', '2026-07-18 20:30:00', '2026-07-18 23:00:00', 'America/New_York', 'scheduled', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'GSW', 'Golden State Warriors', 'https://cdn.nba.com/logos/nba/1610612744/primary/L/logo.svg', null, 'PHX', 'Phoenix Suns', 'https://cdn.nba.com/logos/nba/1610612756/primary/L/logo.svg', null, 'ESPN', 'TNT', 84, 'GSW', 'GSW')
+        , ('nba-20260720-chi-hou', '2026-07-20', '2026-07-20 19:30:00', '2026-07-20 22:00:00', 'America/New_York', 'scheduled', null, null, null, 'NBA', 'National Basketball Association', 'https://cdn.nba.com/logos/leagues/logo-nba.svg', 'HOU', 'Houston Rockets', 'https://cdn.nba.com/logos/nba/1610612745/primary/L/logo.svg', null, 'CHI', 'Chicago Bulls', 'https://cdn.nba.com/logos/nba/1610612741/primary/L/logo.svg', null, 'ESPN', null, 62, 'CHI', 'CHI,HOU')
+    )
+
+    select
+      game_id::text
+      , game_date::date
+      , scheduled_start_at::timestamp
+      , scheduled_end_at::timestamp
+      , timezone::text
+      , status::text
+      , live_period::text
+      , live_clock::text
+      , original_scheduled_start_at::timestamp
+      , league_code::text
+      , league_name::text
+      , league_logo_url::text
+      , home_team_code::text
+      , home_team_name::text
+      , home_team_logo_url::text
+      , home_score::integer
+      , away_team_code::text
+      , away_team_name::text
+      , away_team_logo_url::text
+      , away_score::integer
+      , primary_network::text
+      , secondary_network::text
+      , gamepulse_score::integer
+      , gamepulse_focal_team_code::text
+      , case
+          when gamepulse_score::integer >= 70 then 'Hot'
+          when gamepulse_score::integer >= 40 then 'Average'
+          when gamepulse_score::integer is not null then 'Low'
+        end as gamepulse_band
+      , away_team_code || ' vs ' || home_team_code as matchup_label
+      , away_team_code || ',' || home_team_code as team_codes
+      , lower(
+          away_team_code || ' ' || away_team_name || ' '
+          || home_team_code || ' ' || home_team_name || ' '
+          || league_code || ' ' || game_id
+        ) as search_text
+      , supply_team_codes::text
+      , supply_team_codes is not null as has_supply_affiliation
+    from mock_games;;
+}
