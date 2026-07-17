@@ -2,7 +2,7 @@ Model demo_countries {
   type: 'query'
   label: 'Demo Countries'
   description: ''
-  data_source_name: 'demo_bigquery'
+  data_source_name: 'demo_bigquery_parameters'
 
 
   dimension code {
