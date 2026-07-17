@@ -2,13 +2,13 @@ Model shelfoptix_store_scan_sample {
   type: 'table'
   label: 'Shelfoptix store scan sample'
   description: ''
-  data_source_name: 'demodb'
-  dimension project_id_no {
-    label: 'Project id no'
+  data_source_name: 'demo_bigquery'
+  dimension retailer_id {
+    label: 'Retailer id'
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.project_id_no }};;
+    definition: @sql {{ #SOURCE.retailer_id }};;
   }
   dimension store_id_no {
     label: 'Store id no'
@@ -116,30 +116,6 @@ Model shelfoptix_store_scan_sample {
     definition: @sql {{ #SOURCE.stocking_quantity }};;
   }
 
-  import_source: ImportSource {
-    type: 'csv'
-    original_file_name: 'shelfoptix_store_scan_sample_1000.csv'
-    uploaded_at: '2026-07-02 03:42:09'
-    hash: '0aa4407dd2b05dbc2493793c0c98efe01e2d565a2b8c231375d398e20ff0d60e'
-    column_configs: [
-      H.imports.column_config("project_id_no", "project_id_no", "number"),
-      H.imports.column_config("store_id_no", "store_id_no", "number"),
-      H.imports.column_config("store_no", "store_no", "number"),
-      H.imports.column_config("order_control_id_no", "order_control_id_no", "number"),
-      H.imports.column_config("scanned_upc", "scanned_upc", "text"),
-      H.imports.column_config("order_date", "order_date", "datetime"),
-      H.imports.column_config("order_line_item_no", "order_line_item_no", "number"),
-      H.imports.column_config("order_line_type", "order_line_type", "text"),
-      H.imports.column_config("upc_no", "upc_no", "text"),
-      H.imports.column_config("class_id_no", "class_id_no", "number"),
-      H.imports.column_config("class_description", "class_description", "text"),
-      H.imports.column_config("primary_sku_no", "primary_sku_no", "number"),
-      H.imports.column_config("primary_sku_description", "primary_sku_description", "text"),
-      H.imports.column_config("item_sku_no", "item_sku_no", "number"),
-      H.imports.column_config("item_sku_description", "item_sku_description", "text"),
-      H.imports.column_config("stocking_quantity", "stocking_quantity", "number")
-    ]
-  }
   owner: 'dong.ln@holistics.io'
-  table_name: '"demo_shelfoptix"."holistics_shelfoptix_st_70025_202607020342"'
+  table_name: '${schema_name}.store_scan_sample'
 }

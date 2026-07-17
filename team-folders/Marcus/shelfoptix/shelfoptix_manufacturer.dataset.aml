@@ -1,0 +1,81 @@
+// Manufacturer cross-retailer dataset (Part B).
+//
+// A manufacturer (e.g. P&G) sees ONE view across ALL retailers, filtered to its OWN
+// products. Access is by PRODUCT OWNERSHIP: shelfoptix_union_store_scan carries each
+// scan's manufacturer_id (product → manufacturer), and the RLP below pins rows to the
+// `manufacturer_id` in the embed token. No grants table — a manufacturer sees its
+// products wherever they're sold. (If per-retailer consent is ever required, add a
+// grants/consent model and join it here.)
+//
+// Retailers never receive a token for this dataset — it's manufacturer-only.
+// NOTE: create the `manufacturer_id` user attribute in Settings > User Attributes.
+Dataset shelfoptix_manufacturer {
+  label: 'ShelfOptix — Manufacturer Cross-Retailer'
+  description: 'Cross-retailer OSA/OOS for a manufacturer, filtered to its own products across every retailer where they sell (product ownership + RLP).'
+  data_source_name: 'demo_bigquery'
+  models: [
+    shelfoptix_union_store_scan
+  ]
+  relationships: []
+
+  // Row-level permission: a manufacturer sees only scans of products it owns, matched
+  // by the `manufacturer_id` user attribute in the embed token.
+  permission manufacturer_access {
+    field: r(shelfoptix_union_store_scan.manufacturer_id)
+    operator: 'matches_user_attribute'
+    value: 'manufacturer_id'
+  }
+
+  dimension is_oos {
+    label: 'Is OOS'
+    type: 'number'
+    description: '1 when the scanned facing had zero shelf quantity.'
+    definition: @aql case(when: shelfoptix_union_store_scan.stocking_quantity == 0, then: 1, else: 0) ;;
+    model: shelfoptix_union_store_scan
+  }
+
+  metric total_scans {
+    label: 'Total Scans'
+    type: 'number'
+    definition: @aql count(shelfoptix_union_store_scan.order_line_item_no) ;;
+  }
+  metric oos_count {
+    label: 'OOS Count'
+    type: 'number'
+    description: 'Facings scanned with zero shelf quantity (stocking_quantity = 0).'
+    definition: @aql sum(shelfoptix_union_store_scan.is_oos) ;;
+  }
+  metric oos_rate {
+    label: 'OOS Rate %'
+    type: 'number'
+    description: 'Out-of-stock facings ÷ total scanned facings (0–100).'
+    definition: @aql (sum(shelfoptix_union_store_scan.is_oos) * 100.0) / count(shelfoptix_union_store_scan.order_line_item_no) ;;
+  }
+  metric availability_rate {
+    label: 'Availability %'
+    type: 'number'
+    description: 'Share of scanned facings in stock (100 − OOS Rate %).'
+    definition: @aql 100.0 - ((sum(shelfoptix_union_store_scan.is_oos) * 100.0) / count(shelfoptix_union_store_scan.order_line_item_no)) ;;
+  }
+  metric total_units {
+    label: 'Total Units On Shelf'
+    type: 'number'
+    definition: @aql sum(shelfoptix_union_store_scan.stocking_quantity) ;;
+  }
+  metric stores_scanned {
+    label: 'Stores Scanned'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_union_store_scan.store_no) ;;
+  }
+  metric skus_tracked {
+    label: 'SKUs Tracked'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_union_store_scan.primary_sku_no) ;;
+  }
+  metric retailers_covered {
+    label: 'Retailers Covered'
+    type: 'number'
+    description: 'Distinct retailers visible to this manufacturer.'
+    definition: @aql count_distinct(shelfoptix_union_store_scan.retailer_id) ;;
+  }
+}

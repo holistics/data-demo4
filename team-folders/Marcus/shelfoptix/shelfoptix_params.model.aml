@@ -2,7 +2,7 @@ Model shelfoptix_params {
   type: 'query'
   label: 'ShelfOptix Params'
   description: 'Holds dashboard parameters (e.g. the user-set availability target) so metrics can reference them dynamically.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_bigquery'
   query: @sql select 1 as dummy ;;
 
   param target_availability {

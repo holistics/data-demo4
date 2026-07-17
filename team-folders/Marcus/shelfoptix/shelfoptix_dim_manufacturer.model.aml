@@ -1,0 +1,23 @@
+Model shelfoptix_dim_manufacturer {
+  type: 'table'
+  label: 'Shelfoptix dim manufacturer'
+  description: 'Manufacturers (CPG companies). A manufacturer owns many products; a product has exactly one manufacturer.'
+  data_source_name: 'demo_bigquery'
+  dimension manufacturer_id {
+    label: 'Manufacturer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.manufacturer_id }};;
+  }
+  dimension manufacturer_name {
+    label: 'Manufacturer'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.manufacturer_name }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '${schema_name}.dim_manufacturer'
+}

@@ -1,0 +1,95 @@
+// Cross-retailer union for the manufacturer view (Part B).
+// UNION ALL of every retailer dataset's store_scan, joined to its product → manufacturer
+// and retailer dims, so each scan carries manufacturer_id / manufacturer_name / brand and
+// retailer_id / retailer_name. One connection (demo_bigquery) can query all datasets.
+// Row visibility is governed on the shelfoptix_manufacturer dataset via RLP on manufacturer_id.
+Model shelfoptix_union_store_scan {
+  type: 'query'
+  label: 'ShelfOptix Union Store Scan (cross-retailer)'
+  description: 'UNION ALL of all retailer store_scan datasets, tagged with retailer + manufacturer via the product join.'
+  data_source_name: 'demo_bigquery'
+  query: @sql
+    select r.retailer_name, m.manufacturer_id, m.manufacturer_name, pr.brand, pr.sub_category, s.*
+    from `data-demo-502609.shelfoptix_retailer_101.store_scan_sample` s
+    join `data-demo-502609.shelfoptix_retailer_101.dim_product` pr using (primary_sku_no)
+    join `data-demo-502609.shelfoptix_retailer_101.dim_manufacturer` m on pr.manufacturer_id = m.manufacturer_id
+    join `data-demo-502609.shelfoptix_retailer_101.dim_retailer` r on s.retailer_id = r.retailer_id
+    union all
+    select r.retailer_name, m.manufacturer_id, m.manufacturer_name, pr.brand, pr.sub_category, s.*
+    from `data-demo-502609.shelfoptix_retailer_102.store_scan_sample` s
+    join `data-demo-502609.shelfoptix_retailer_102.dim_product` pr using (primary_sku_no)
+    join `data-demo-502609.shelfoptix_retailer_102.dim_manufacturer` m on pr.manufacturer_id = m.manufacturer_id
+    join `data-demo-502609.shelfoptix_retailer_102.dim_retailer` r on s.retailer_id = r.retailer_id
+    union all
+    select r.retailer_name, m.manufacturer_id, m.manufacturer_name, pr.brand, pr.sub_category, s.*
+    from `data-demo-502609.shelfoptix_retailer_103.store_scan_sample` s
+    join `data-demo-502609.shelfoptix_retailer_103.dim_product` pr using (primary_sku_no)
+    join `data-demo-502609.shelfoptix_retailer_103.dim_manufacturer` m on pr.manufacturer_id = m.manufacturer_id
+    join `data-demo-502609.shelfoptix_retailer_103.dim_retailer` r on s.retailer_id = r.retailer_id
+  ;;
+  dimension retailer_id {
+    label: 'Retailer id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.retailer_id }};;
+  }
+  dimension retailer_name {
+    label: 'Retailer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.retailer_name }};;
+  }
+  dimension manufacturer_id {
+    label: 'Manufacturer id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.manufacturer_id }};;
+  }
+  dimension manufacturer_name {
+    label: 'Manufacturer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.manufacturer_name }};;
+  }
+  dimension brand {
+    label: 'Brand'
+    type: 'text'
+    definition: @sql {{ #SOURCE.brand }};;
+  }
+  dimension sub_category {
+    label: 'Sub category'
+    type: 'text'
+    definition: @sql {{ #SOURCE.sub_category }};;
+  }
+  dimension store_no {
+    label: 'Store no'
+    type: 'number'
+    definition: @sql {{ #SOURCE.store_no }};;
+  }
+  dimension primary_sku_no {
+    label: 'Primary sku no'
+    type: 'number'
+    definition: @sql {{ #SOURCE.primary_sku_no }};;
+  }
+  dimension primary_sku_description {
+    label: 'Primary sku description'
+    type: 'text'
+    definition: @sql {{ #SOURCE.primary_sku_description }};;
+  }
+  dimension class_description {
+    label: 'Class description'
+    type: 'text'
+    definition: @sql {{ #SOURCE.class_description }};;
+  }
+  dimension order_date {
+    label: 'Order date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+  dimension order_line_item_no {
+    label: 'Order line item no'
+    type: 'number'
+    definition: @sql {{ #SOURCE.order_line_item_no }};;
+  }
+  dimension stocking_quantity {
+    label: 'Stocking quantity'
+    type: 'number'
+    definition: @sql {{ #SOURCE.stocking_quantity }};;
+  }
+}

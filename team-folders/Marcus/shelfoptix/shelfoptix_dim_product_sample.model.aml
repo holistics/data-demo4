@@ -2,7 +2,7 @@ Model shelfoptix_dim_product_sample {
   type: 'table'
   label: 'Shelfoptix dim product sample'
   description: ''
-  data_source_name: 'demodb'
+  data_source_name: 'demo_bigquery'
   dimension primary_sku_no {
     label: 'Primary sku no'
     description: ''
@@ -38,6 +38,13 @@ Model shelfoptix_dim_product_sample {
     hidden: false
     definition: @sql {{ #SOURCE.brand }};;
   }
+  dimension manufacturer_id {
+    label: 'Manufacturer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.manufacturer_id }};;
+  }
   dimension sub_category {
     label: 'Sub category'
     description: ''
@@ -53,21 +60,6 @@ Model shelfoptix_dim_product_sample {
     definition: @sql {{ #SOURCE.pack_size }};;
   }
 
-  import_source: ImportSource {
-    type: 'csv'
-    original_file_name: 'shelfoptix_dim_product.csv'
-    uploaded_at: '2026-07-02 05:00:39'
-    hash: 'd5dc3d076e5ebed7d20fa745b00c78fa5173f0a38189f11a638822e7f532cd4f'
-    column_configs: [
-      H.imports.column_config("primary_sku_no", "primary_sku_no", "number"),
-      H.imports.column_config("primary_sku_description", "primary_sku_description", "text"),
-      H.imports.column_config("class_id_no", "class_id_no", "number"),
-      H.imports.column_config("class_description", "class_description", "text"),
-      H.imports.column_config("brand", "brand", "text"),
-      H.imports.column_config("sub_category", "sub_category", "text"),
-      H.imports.column_config("pack_size", "pack_size", "text")
-    ]
-  }
   owner: 'dong.ln@holistics.io'
-  table_name: '"demo_shelfoptix"."holistics_shelfoptix_di_4e9bb_202607020500"'
+  table_name: '${schema_name}.dim_product'
 }

@@ -1,0 +1,15 @@
+// Dynamic schema routing for the ShelfOptix Dynamic Data Sources demo.
+//
+// Each retailer's data lives in its own BigQuery dataset inside the
+// `demo_bigquery` connection (project data-demo-502609), named
+// shelfoptix_retailer_<project_id_no>: _101 (Cascade), _102 (MarketFresh), _103 (PureHarvest).
+// The embed token carries a `schema` user attribute that selects the dataset;
+// it falls back to shelfoptix_retailer_101 for non-embedded preview in the Holistics UI.
+//
+// NOTE: create the `schema` user attribute in Settings > User Attributes, or the
+// value passed in the embed token is silently ignored.
+const schema_name = if (H.current_user.schema) {
+  H.current_user.schema
+} else {
+  'shelfoptix_retailer_101'
+}

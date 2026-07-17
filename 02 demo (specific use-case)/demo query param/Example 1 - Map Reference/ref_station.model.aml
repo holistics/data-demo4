@@ -2,7 +2,7 @@ Model ref_station {
   type: 'query'
   label: 'Ref Station'
   description: ''
-  data_source_name: 'demo_bigquery'
+  data_source_name: 'demo_bigquery_parameters'
   dimension ref_station {
     label: 'Ref Station'
     type: 'text'
