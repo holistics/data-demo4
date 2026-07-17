@@ -593,7 +593,7 @@ Dashboard shelfoptix_manufacturer_overview {
       dataset: shelfoptix_osa
       rows: [
         VizFieldFull {
-          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
+          ref: r(shelfoptix_dim_retailer_sample.retailer_name)
           format {
             type: 'text'
           }

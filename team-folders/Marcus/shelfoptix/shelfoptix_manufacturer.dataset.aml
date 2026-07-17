@@ -1,39 +1,31 @@
 // Manufacturer cross-retailer dataset (Part B).
 //
-// A manufacturer (e.g. P&G) sees ONE view across all its assigned retailers,
-// filtered to its own products. Mechanism:
-//   - shelfoptix_union_store_scan unions every retailer dataset (brand + retailer_id).
-//   - shelfoptix_manufacturer_grants is the entitlements table (manufacturer, retailer_id).
-//   - The union joins to grants on manu_retailer_key (brand-retailerId). Because brand
-//     carries the manufacturer, a union row survives only where a grant exists for that
-//     (manufacturer, retailer) pair — i.e. their brand AND their assigned retailers.
-//   - The RLP below pins that to the manufacturer identity in the embed token.
+// A manufacturer (e.g. P&G) sees ONE view across ALL retailers, filtered to its OWN
+// products. Access is by PRODUCT OWNERSHIP: shelfoptix_union_store_scan carries each
+// scan's manufacturer_id (product → manufacturer), and the RLP below pins rows to the
+// `manufacturer_id` in the embed token. No grants table — a manufacturer sees its
+// products wherever they're sold. (If per-retailer consent is ever required, add a
+// grants/consent model and join it here.)
 //
 // Retailers never receive a token for this dataset — it's manufacturer-only.
-// NOTE: create the `manufacturer` user attribute in Settings > User Attributes.
+// NOTE: create the `manufacturer_id` user attribute in Settings > User Attributes.
 Dataset shelfoptix_manufacturer {
   label: 'ShelfOptix — Manufacturer Cross-Retailer'
-  description: 'Cross-retailer OSA/OOS for a manufacturer, filtered to their own products at their assigned retailers (union + grants entitlements + RLP).'
+  description: 'Cross-retailer OSA/OOS for a manufacturer, filtered to its own products across every retailer where they sell (product ownership + RLP).'
   data_source_name: 'demo_bigquery'
   models: [
-    shelfoptix_union_store_scan,
-    shelfoptix_manufacturer_grants
+    shelfoptix_union_store_scan
   ]
-  relationships: [
-    relationship(shelfoptix_union_store_scan.manu_retailer_key > shelfoptix_manufacturer_grants.manu_retailer_key, true)
-  ]
+  relationships: []
 
-  // Row-level permission: a manufacturer sees only rows whose grant manufacturer matches
-  // the `manufacturer` user attribute in the embed token. The union->grants join already
-  // restricts to granted (brand, retailer) pairs, so this yields "their brand, at their
-  // assigned retailers". A token without the attribute sees nothing (no grant matches).
+  // Row-level permission: a manufacturer sees only scans of products it owns, matched
+  // by the `manufacturer_id` user attribute in the embed token.
   permission manufacturer_access {
-    field: r(shelfoptix_manufacturer_grants.manufacturer)
+    field: r(shelfoptix_union_store_scan.manufacturer_id)
     operator: 'matches_user_attribute'
-    value: 'manufacturer'
+    value: 'manufacturer_id'
   }
 
-  // ---- helper row-level flags ----
   dimension is_oos {
     label: 'Is OOS'
     type: 'number'
@@ -42,7 +34,6 @@ Dataset shelfoptix_manufacturer {
     model: shelfoptix_union_store_scan
   }
 
-  // ---- core metrics (mirror the retailer OSA dataset, over the union) ----
   metric total_scans {
     label: 'Total Scans'
     type: 'number'

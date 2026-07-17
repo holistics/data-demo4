@@ -3,12 +3,12 @@ Model shelfoptix_store_scan_sample {
   label: 'Shelfoptix store scan sample'
   description: ''
   data_source_name: 'demo_bigquery'
-  dimension project_id_no {
-    label: 'Project id no'
+  dimension retailer_id {
+    label: 'Retailer id'
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.project_id_no }};;
+    definition: @sql {{ #SOURCE.retailer_id }};;
   }
   dimension store_id_no {
     label: 'Store id no'

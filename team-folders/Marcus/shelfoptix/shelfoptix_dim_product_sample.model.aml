@@ -38,6 +38,13 @@ Model shelfoptix_dim_product_sample {
     hidden: false
     definition: @sql {{ #SOURCE.brand }};;
   }
+  dimension manufacturer_id {
+    label: 'Manufacturer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.manufacturer_id }};;
+  }
   dimension sub_category {
     label: 'Sub category'
     description: ''

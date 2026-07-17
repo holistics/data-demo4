@@ -1,33 +1,31 @@
 // Cross-retailer union for the manufacturer view (Part B).
-// UNION ALL of every retailer dataset's store_scan, tagged with retailer_id +
-// product brand (= manufacturer). One Holistics connection (demo_bigquery) can
-// query all datasets in the project, so the union happens here — no warehouse view.
-// `manu_retailer_key` (brand-retailerId) joins to the grants entitlements table;
-// row visibility is governed on the shelfoptix_manufacturer dataset via RLP.
+// UNION ALL of every retailer dataset's store_scan, joined to its product → manufacturer
+// and retailer dims, so each scan carries manufacturer_id / manufacturer_name / brand and
+// retailer_id / retailer_name. One connection (demo_bigquery) can query all datasets.
+// Row visibility is governed on the shelfoptix_manufacturer dataset via RLP on manufacturer_id.
 Model shelfoptix_union_store_scan {
   type: 'query'
   label: 'ShelfOptix Union Store Scan (cross-retailer)'
-  description: 'UNION ALL of all retailer store_scan datasets, tagged with retailer_id and brand/manufacturer.'
+  description: 'UNION ALL of all retailer store_scan datasets, tagged with retailer + manufacturer via the product join.'
   data_source_name: 'demo_bigquery'
   query: @sql
-    with unioned as (
-      select t.project_id_no as retailer_id, t.tenant_name as retailer_name, pr.brand, pr.sub_category, s.*
-      from `data-demo-502609.shelfoptix_retailer_101.store_scan_sample` s
-      join `data-demo-502609.shelfoptix_retailer_101.dim_product` pr using (primary_sku_no)
-      cross join `data-demo-502609.shelfoptix_retailer_101.dim_tenant` t
-      union all
-      select t.project_id_no, t.tenant_name, pr.brand, pr.sub_category, s.*
-      from `data-demo-502609.shelfoptix_retailer_102.store_scan_sample` s
-      join `data-demo-502609.shelfoptix_retailer_102.dim_product` pr using (primary_sku_no)
-      cross join `data-demo-502609.shelfoptix_retailer_102.dim_tenant` t
-      union all
-      select t.project_id_no, t.tenant_name, pr.brand, pr.sub_category, s.*
-      from `data-demo-502609.shelfoptix_retailer_103.store_scan_sample` s
-      join `data-demo-502609.shelfoptix_retailer_103.dim_product` pr using (primary_sku_no)
-      cross join `data-demo-502609.shelfoptix_retailer_103.dim_tenant` t
-    )
-    select *, concat(brand, '-', cast(retailer_id as string)) as manu_retailer_key
-    from unioned
+    select r.retailer_name, m.manufacturer_id, m.manufacturer_name, pr.brand, pr.sub_category, s.*
+    from `data-demo-502609.shelfoptix_retailer_101.store_scan_sample` s
+    join `data-demo-502609.shelfoptix_retailer_101.dim_product` pr using (primary_sku_no)
+    join `data-demo-502609.shelfoptix_retailer_101.dim_manufacturer` m on pr.manufacturer_id = m.manufacturer_id
+    join `data-demo-502609.shelfoptix_retailer_101.dim_retailer` r on s.retailer_id = r.retailer_id
+    union all
+    select r.retailer_name, m.manufacturer_id, m.manufacturer_name, pr.brand, pr.sub_category, s.*
+    from `data-demo-502609.shelfoptix_retailer_102.store_scan_sample` s
+    join `data-demo-502609.shelfoptix_retailer_102.dim_product` pr using (primary_sku_no)
+    join `data-demo-502609.shelfoptix_retailer_102.dim_manufacturer` m on pr.manufacturer_id = m.manufacturer_id
+    join `data-demo-502609.shelfoptix_retailer_102.dim_retailer` r on s.retailer_id = r.retailer_id
+    union all
+    select r.retailer_name, m.manufacturer_id, m.manufacturer_name, pr.brand, pr.sub_category, s.*
+    from `data-demo-502609.shelfoptix_retailer_103.store_scan_sample` s
+    join `data-demo-502609.shelfoptix_retailer_103.dim_product` pr using (primary_sku_no)
+    join `data-demo-502609.shelfoptix_retailer_103.dim_manufacturer` m on pr.manufacturer_id = m.manufacturer_id
+    join `data-demo-502609.shelfoptix_retailer_103.dim_retailer` r on s.retailer_id = r.retailer_id
   ;;
   dimension retailer_id {
     label: 'Retailer id'
@@ -39,8 +37,18 @@ Model shelfoptix_union_store_scan {
     type: 'text'
     definition: @sql {{ #SOURCE.retailer_name }};;
   }
+  dimension manufacturer_id {
+    label: 'Manufacturer id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.manufacturer_id }};;
+  }
+  dimension manufacturer_name {
+    label: 'Manufacturer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.manufacturer_name }};;
+  }
   dimension brand {
-    label: 'Brand / Manufacturer'
+    label: 'Brand'
     type: 'text'
     definition: @sql {{ #SOURCE.brand }};;
   }
@@ -48,17 +56,6 @@ Model shelfoptix_union_store_scan {
     label: 'Sub category'
     type: 'text'
     definition: @sql {{ #SOURCE.sub_category }};;
-  }
-  dimension manu_retailer_key {
-    label: 'Manufacturer-Retailer key'
-    type: 'text'
-    hidden: true
-    definition: @sql {{ #SOURCE.manu_retailer_key }};;
-  }
-  dimension project_id_no {
-    label: 'Project id no'
-    type: 'number'
-    definition: @sql {{ #SOURCE.project_id_no }};;
   }
   dimension store_no {
     label: 'Store no'
@@ -79,16 +76,6 @@ Model shelfoptix_union_store_scan {
     label: 'Class description'
     type: 'text'
     definition: @sql {{ #SOURCE.class_description }};;
-  }
-  dimension scanned_upc {
-    label: 'Scanned upc'
-    type: 'text'
-    definition: @sql {{ #SOURCE.scanned_upc }};;
-  }
-  dimension upc_no {
-    label: 'Upc no'
-    type: 'text'
-    definition: @sql {{ #SOURCE.upc_no }};;
   }
   dimension order_date {
     label: 'Order date'
