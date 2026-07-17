@@ -1,7 +1,7 @@
 Dataset shelfoptix_osa {
   label: 'ShelfOptix OSA/OOS'
   description: 'On-Shelf Availability / Out-of-Stock semantic layer over ShelfOptix robot/store shelf scans. Defaults (pending customer confirm): tenant = project_id_no, OOS = stocking_quantity 0, OSA = observed availability (share of scanned facings in stock), grain = primary_sku_no.'
-  data_source_name: 'demodb'
+  data_source_name: 'demo_bigquery'
   models: [
     shelfoptix_store_scan_sample,
     shelfoptix_dim_store_sample,
@@ -15,16 +15,10 @@ Dataset shelfoptix_osa {
     relationship(shelfoptix_store_scan_sample.primary_sku_no > shelfoptix_dim_product_sample.primary_sku_no, true)
   ]
 
-  // Row-level security for the embed portal: restrict rows to the tenant passed in the
-  // embed token as the `project_id_no` user attribute. A token that omits it (e.g. the
-  // ShelfOptix corporate/all-tenants user) should send `__ALL__` to bypass this filter.
-  // NOTE: the `project_id_no` user attribute must exist in Holistics (Admin > User
-  // Attributes) or the value passed in the token is silently ignored.
-  permission tenant_access {
-    field: r(shelfoptix_store_scan_sample.project_id_no)
-    operator: 'matches_user_attribute'
-    value: 'project_id_no'
-  }
+  // Retailer isolation for the DDS demo is PHYSICAL: each retailer's data lives in its
+  // own BigQuery dataset (shelfoptix_retailer_101/102/103), selected per embed token via the
+  // `schema` user attribute (see shelfoptix_dynamic_schema.aml). No row-level filter is
+  // needed here. For a within-retailer role RLS variant, add a separate permission.
 
   // ---- helper row-level flags (0/1) so aggregates stay simple & portable ----
   dimension is_oos {

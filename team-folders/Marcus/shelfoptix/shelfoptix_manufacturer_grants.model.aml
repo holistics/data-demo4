@@ -1,0 +1,39 @@
+// Entitlements table for manufacturer cross-retailer access (Part B).
+// Defines which retailers each manufacturer may see. In production this is a
+// governed table maintained by ShelfOptix; here it's inline sample data.
+// The manufacturer's identity arrives in the embed token as the `manufacturer`
+// user attribute; the RLP on shelfoptix_manufacturer pins rows to it.
+Model shelfoptix_manufacturer_grants {
+  type: 'query'
+  label: 'Manufacturer to Retailer Grants'
+  description: 'Which retailers each manufacturer is authorized to see (entitlements table driving the cross-retailer RLP).'
+  data_source_name: 'demo_bigquery'
+  query: @sql
+    select manufacturer, retailer_id, concat(manufacturer, '-', cast(retailer_id as string)) as manu_retailer_key
+    from unnest([
+      struct('Procter & Gamble' as manufacturer, 101 as retailer_id),
+      ('Procter & Gamble', 102),
+      ('Unilever', 101),
+      ('Unilever', 103),
+      ('Nestle', 102),
+      ('PepsiCo', 101),
+      ('PepsiCo', 103)
+    ])
+  ;;
+  dimension manufacturer {
+    label: 'Manufacturer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.manufacturer }};;
+  }
+  dimension retailer_id {
+    label: 'Retailer id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.retailer_id }};;
+  }
+  dimension manu_retailer_key {
+    label: 'Manufacturer-Retailer key'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.manu_retailer_key }};;
+  }
+}
