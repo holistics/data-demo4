@@ -5,14 +5,16 @@ Dataset shelfoptix_osa {
   models: [
     shelfoptix_store_scan_sample,
     shelfoptix_dim_store_sample,
-    shelfoptix_dim_tenant_sample,
+    shelfoptix_dim_retailer_sample,
     shelfoptix_dim_product_sample,
+    shelfoptix_dim_manufacturer,
     shelfoptix_params
   ]
   relationships: [
     relationship(shelfoptix_store_scan_sample.store_no > shelfoptix_dim_store_sample.store_no, true),
-    relationship(shelfoptix_store_scan_sample.project_id_no > shelfoptix_dim_tenant_sample.project_id_no, true),
-    relationship(shelfoptix_store_scan_sample.primary_sku_no > shelfoptix_dim_product_sample.primary_sku_no, true)
+    relationship(shelfoptix_store_scan_sample.retailer_id > shelfoptix_dim_retailer_sample.retailer_id, true),
+    relationship(shelfoptix_store_scan_sample.primary_sku_no > shelfoptix_dim_product_sample.primary_sku_no, true),
+    relationship(shelfoptix_dim_product_sample.manufacturer_id > shelfoptix_dim_manufacturer.manufacturer_id, true)
   ]
 
   // Retailer isolation for the DDS demo is PHYSICAL: each retailer's data lives in its
@@ -89,10 +91,10 @@ Dataset shelfoptix_osa {
     type: 'number'
     definition: @aql count_distinct(shelfoptix_store_scan_sample.primary_sku_no) ;;
   }
-  metric tenants_count {
-    label: 'Tenants'
+  metric retailers_count {
+    label: 'Retailers'
     type: 'number'
-    definition: @aql count_distinct(shelfoptix_store_scan_sample.project_id_no) ;;
+    definition: @aql count_distinct(shelfoptix_store_scan_sample.retailer_id) ;;
   }
   metric upc_mismatch_count {
     label: 'UPC Mismatch Count'

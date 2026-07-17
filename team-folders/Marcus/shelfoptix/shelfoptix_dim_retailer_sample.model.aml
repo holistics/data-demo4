@@ -1,28 +1,21 @@
-Model shelfoptix_dim_tenant_sample {
+Model shelfoptix_dim_retailer_sample {
   type: 'table'
-  label: 'Shelfoptix dim tenant sample'
-  description: ''
+  label: 'Shelfoptix dim retailer sample'
+  description: 'Retailer (the account that owns this dataset). One row per retailer dataset.'
   data_source_name: 'demo_bigquery'
-  dimension project_id_no {
-    label: 'Project id no'
+  dimension retailer_id {
+    label: 'Retailer id'
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.project_id_no }};;
+    definition: @sql {{ #SOURCE.retailer_id }};;
   }
-  dimension tenant_name {
-    label: 'Tenant name'
+  dimension retailer_name {
+    label: 'Retailer'
     description: ''
     type: 'text'
     hidden: false
-    definition: @sql {{ #SOURCE.tenant_name }};;
-  }
-  dimension tenant_type {
-    label: 'Tenant type'
-    description: ''
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.tenant_type }};;
+    definition: @sql {{ #SOURCE.retailer_name }};;
   }
   dimension industry {
     label: 'Industry'
@@ -40,5 +33,5 @@ Model shelfoptix_dim_tenant_sample {
   }
 
   owner: 'dong.ln@holistics.io'
-  table_name: '${schema_name}.dim_tenant'
+  table_name: '${schema_name}.dim_retailer'
 }
