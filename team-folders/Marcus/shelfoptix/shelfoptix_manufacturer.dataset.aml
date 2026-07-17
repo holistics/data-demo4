@@ -1,0 +1,90 @@
+// Manufacturer cross-retailer dataset (Part B).
+//
+// A manufacturer (e.g. P&G) sees ONE view across all its assigned retailers,
+// filtered to its own products. Mechanism:
+//   - shelfoptix_union_store_scan unions every retailer dataset (brand + retailer_id).
+//   - shelfoptix_manufacturer_grants is the entitlements table (manufacturer, retailer_id).
+//   - The union joins to grants on manu_retailer_key (brand-retailerId). Because brand
+//     carries the manufacturer, a union row survives only where a grant exists for that
+//     (manufacturer, retailer) pair — i.e. their brand AND their assigned retailers.
+//   - The RLP below pins that to the manufacturer identity in the embed token.
+//
+// Retailers never receive a token for this dataset — it's manufacturer-only.
+// NOTE: create the `manufacturer` user attribute in Settings > User Attributes.
+Dataset shelfoptix_manufacturer {
+  label: 'ShelfOptix — Manufacturer Cross-Retailer'
+  description: 'Cross-retailer OSA/OOS for a manufacturer, filtered to their own products at their assigned retailers (union + grants entitlements + RLP).'
+  data_source_name: 'demo_bigquery'
+  models: [
+    shelfoptix_union_store_scan,
+    shelfoptix_manufacturer_grants
+  ]
+  relationships: [
+    relationship(shelfoptix_union_store_scan.manu_retailer_key > shelfoptix_manufacturer_grants.manu_retailer_key, true)
+  ]
+
+  // Row-level permission: a manufacturer sees only rows whose grant manufacturer matches
+  // the `manufacturer` user attribute in the embed token. The union->grants join already
+  // restricts to granted (brand, retailer) pairs, so this yields "their brand, at their
+  // assigned retailers". A token without the attribute sees nothing (no grant matches).
+  permission manufacturer_access {
+    field: r(shelfoptix_manufacturer_grants.manufacturer)
+    operator: 'matches_user_attribute'
+    value: 'manufacturer'
+  }
+
+  // ---- helper row-level flags ----
+  dimension is_oos {
+    label: 'Is OOS'
+    type: 'number'
+    description: '1 when the scanned facing had zero shelf quantity.'
+    definition: @aql case(when: shelfoptix_union_store_scan.stocking_quantity == 0, then: 1, else: 0) ;;
+    model: shelfoptix_union_store_scan
+  }
+
+  // ---- core metrics (mirror the retailer OSA dataset, over the union) ----
+  metric total_scans {
+    label: 'Total Scans'
+    type: 'number'
+    definition: @aql count(shelfoptix_union_store_scan.order_line_item_no) ;;
+  }
+  metric oos_count {
+    label: 'OOS Count'
+    type: 'number'
+    description: 'Facings scanned with zero shelf quantity (stocking_quantity = 0).'
+    definition: @aql sum(shelfoptix_union_store_scan.is_oos) ;;
+  }
+  metric oos_rate {
+    label: 'OOS Rate %'
+    type: 'number'
+    description: 'Out-of-stock facings ÷ total scanned facings (0–100).'
+    definition: @aql (sum(shelfoptix_union_store_scan.is_oos) * 100.0) / count(shelfoptix_union_store_scan.order_line_item_no) ;;
+  }
+  metric availability_rate {
+    label: 'Availability %'
+    type: 'number'
+    description: 'Share of scanned facings in stock (100 − OOS Rate %).'
+    definition: @aql 100.0 - ((sum(shelfoptix_union_store_scan.is_oos) * 100.0) / count(shelfoptix_union_store_scan.order_line_item_no)) ;;
+  }
+  metric total_units {
+    label: 'Total Units On Shelf'
+    type: 'number'
+    definition: @aql sum(shelfoptix_union_store_scan.stocking_quantity) ;;
+  }
+  metric stores_scanned {
+    label: 'Stores Scanned'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_union_store_scan.store_no) ;;
+  }
+  metric skus_tracked {
+    label: 'SKUs Tracked'
+    type: 'number'
+    definition: @aql count_distinct(shelfoptix_union_store_scan.primary_sku_no) ;;
+  }
+  metric retailers_covered {
+    label: 'Retailers Covered'
+    type: 'number'
+    description: 'Distinct retailers visible to this manufacturer.'
+    definition: @aql count_distinct(shelfoptix_union_store_scan.retailer_id) ;;
+  }
+}

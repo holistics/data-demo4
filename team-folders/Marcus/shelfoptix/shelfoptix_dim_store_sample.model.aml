@@ -2,7 +2,7 @@ Model shelfoptix_dim_store_sample {
   type: 'table'
   label: 'Shelfoptix dim store sample'
   description: ''
-  data_source_name: 'demodb'
+  data_source_name: 'demo_bigquery'
   dimension store_no {
     label: 'Store no'
     description: ''
@@ -67,23 +67,6 @@ Model shelfoptix_dim_store_sample {
     definition: @sql {{ #SOURCE.store_format }};;
   }
 
-  import_source: ImportSource {
-    type: 'csv'
-    original_file_name: 'shelfoptix_dim_store.csv'
-    uploaded_at: '2026-07-02 05:00:04'
-    hash: '874f56caa6a5ed42bb8a610e46b73ad8b6ec7d1169d9bf3f040dbe03267c9454'
-    column_configs: [
-      H.imports.column_config("store_no", "store_no", "number"),
-      H.imports.column_config("store_id_no", "store_id_no", "number"),
-      H.imports.column_config("project_id_no", "project_id_no", "number"),
-      H.imports.column_config("store_name", "store_name", "text"),
-      H.imports.column_config("retailer_banner", "retailer_banner", "text"),
-      H.imports.column_config("region", "region", "text"),
-      H.imports.column_config("state", "state", "text"),
-      H.imports.column_config("city", "city", "text"),
-      H.imports.column_config("store_format", "store_format", "text")
-    ]
-  }
   owner: 'dong.ln@holistics.io'
-  table_name: '"demo_shelfoptix"."holistics_shelfoptix_di_81ab3_202607020500"'
+  table_name: '${schema_name}.dim_store'
 }

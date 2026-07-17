@@ -1,0 +1,719 @@
+Dashboard shelfoptix_manufacturer_overview {
+  title: 'ShelfOptix — Manufacturer Cross-Retailer OSA/OOS'
+  description: 'A manufacturer view of on-shelf availability across ALL its assigned retailers, filtered to its own products (via the union model + grants entitlements + RLP on the shelfoptix_manufacturer dataset).'
+  block f_date: FilterBlock {
+    label: 'Scan Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_manufacturer
+      field: r(shelfoptix_union_store_scan.order_date)
+    }
+    default {
+      operator: 'matches'
+      value: '2026'
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_retailer: FilterBlock {
+    label: 'Retailer'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_manufacturer
+      field: r(shelfoptix_union_store_scan.retailer_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_manufacturer
+      field: r(shelfoptix_union_store_scan.class_description)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block f_subcat: FilterBlock {
+    label: 'Sub Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_manufacturer
+      field: r(shelfoptix_union_store_scan.sub_category)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    theme: BlockTheme {
+      padding: 6
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_color: '#E3E6EA'
+        border_width: '1px'
+      }
+    }
+  }
+  block kpi_availability: VizBlock {
+    label: 'Availability %'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.availability_rate)
+        label: 'Availability %'
+        format {
+          type: 'number'
+          pattern: '#,##0.0\\%'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_oos_rate: VizBlock {
+    label: 'OOS Rate %'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.oos_rate)
+        label: 'OOS Rate %'
+        format {
+          type: 'number'
+          pattern: '#,##0.0\\%'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_oos_count: VizBlock {
+    label: 'OOS Facings'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.oos_count)
+        label: 'OOS Facings'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_scans: VizBlock {
+    label: 'Total Scans'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.total_scans)
+        label: 'Total Scans'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_retailers: VizBlock {
+    label: 'Retailers'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.retailers_covered)
+        label: 'Retailers'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_stores: VizBlock {
+    label: 'Stores'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.stores_scanned)
+        label: 'Stores'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_skus: VizBlock {
+    label: 'SKUs'
+    viz: MetricKpi {
+      dataset: shelfoptix_manufacturer
+      value: VizFieldFull {
+        ref: r(shelfoptix_manufacturer.skus_tracked)
+        label: 'SKUs'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'center'
+        metric_value {
+          font_size: 24
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block sec_health: TextBlock {
+    content: @md ## ① Availability across your retailers;;
+  }
+  block avail_trend: VizBlock {
+    label: 'Availability % by Week'
+    viz: CombinationChart {
+      dataset: shelfoptix_manufacturer
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_union_store_scan.order_date)
+        transformation: 'datetrunc week'
+        format {
+          type: 'date'
+          pattern: 'LLL dd'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(shelfoptix_manufacturer.availability_rate)
+            label: 'Availability %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0\\%'
+            }
+          }
+          settings {
+            color: '#10b981'
+            line_interpolation: 'smooth'
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        legend_label: 'top'
+      }
+    }
+  }
+  block oos_by_retailer_chart: VizBlock {
+    label: 'OOS Rate % by Retailer'
+    viz: ColumnChart {
+      dataset: shelfoptix_manufacturer
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_union_store_scan.retailer_name)
+        label: 'Retailer'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_manufacturer.oos_rate)
+            label: 'OOS Rate %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0\\%'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+    }
+  }
+  block by_retailer: VizBlock {
+    label: 'Availability by Retailer'
+    viz: DataTable {
+      dataset: shelfoptix_manufacturer
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_union_store_scan.retailer_name)
+          format {
+            type: 'text'
+          }
+          uname: 'rt_retailer'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.stores_scanned)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'rt_stores'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.total_scans)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'rt_scans'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.availability_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0\\%'
+          }
+          uname: 'rt_avail'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.oos_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0\\%'
+          }
+          uname: 'rt_oos'
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'rt_avail'
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'rt_avail'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 90
+              }
+              text_color: '#259B6C'
+              background_color: '#00000000'
+            }
+          },
+          ConditionalFormat {
+            key: 'rt_oos'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 15
+              }
+              text_color: '#BF0E08'
+              background_color: '#00000000'
+            }
+          }
+        ]
+      }
+    }
+  }
+  block sec_where: TextBlock {
+    content: @md ## ② Where are your products going out of stock?;;
+  }
+  block oos_by_category: VizBlock {
+    label: 'OOS Rate % by Category'
+    viz: ColumnChart {
+      dataset: shelfoptix_manufacturer
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_union_store_scan.class_description)
+        label: 'Category'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_manufacturer.oos_rate)
+            label: 'OOS Rate %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0\\%'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+    }
+  }
+  block top_oos_skus: VizBlock {
+    label: 'Top OOS SKUs — your replenishment shortlist'
+    viz: DataTable {
+      dataset: shelfoptix_manufacturer
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_union_store_scan.primary_sku_description)
+          format {
+            type: 'text'
+          }
+          uname: 'sku_name'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_union_store_scan.retailer_name)
+          format {
+            type: 'text'
+          }
+          uname: 'sku_retailer'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_union_store_scan.class_description)
+          format {
+            type: 'text'
+          }
+          uname: 'sku_cat'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.oos_count)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'sku_oos'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.oos_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0\\%'
+          }
+          uname: 'sku_oos_rate'
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'sku_oos'
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'sku_oos_rate'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 15
+              }
+              text_color: '#BF0E08'
+              background_color: '#00000000'
+            }
+          }
+        ]
+      }
+    }
+  }
+  block store_detail: VizBlock {
+    label: 'Store Detail — worst first'
+    viz: DataTable {
+      dataset: shelfoptix_manufacturer
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_union_store_scan.retailer_name)
+          format {
+            type: 'text'
+          }
+          uname: 'sd_retailer'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_union_store_scan.store_no)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'sd_store'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.oos_count)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'sd_oos'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.oos_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0\\%'
+          }
+          uname: 'sd_oos_rate'
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_manufacturer.availability_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0\\%'
+          }
+          uname: 'sd_avail'
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'sd_oos_rate'
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'sd_oos_rate'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 15
+              }
+              text_color: '#BF0E08'
+              background_color: '#00000000'
+            }
+          }
+        ]
+      }
+    }
+  }
+  block v_0umu: VizBlock {
+    label: 'Header copy'
+    viz: MarkdownViz {
+      dataset: shelfoptix_osa
+      rows: [
+        VizFieldFull {
+          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      content: @md <div style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(90deg,#B3141A,#E11B22); padding:16px 24px; border-radius:8px; font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;">
+  <div style="display:flex; align-items:center; gap:16px;">
+    <img src="data:image/png;base64,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" alt="ShelfOptix" style="height:28px; width:auto; vertical-align:middle;">
+    <span style="width:1px; height:26px; background:rgba(255,255,255,0.45);"></span>
+    <span style="color:#ffffff; font-size:15px; font-weight:600;">Actionable Shelf Intelligence at Scale</span>
+  </div>
+  <div style="color:#ffffff; text-align:right; line-height:1.35;">
+    <div style="font-size:15px; font-weight:700;">OSA / OOS Command Center</div>
+    <div style="font-size:11px; opacity:0.85;">On-Shelf Availability &amp; Out-of-Stock</div>
+  </div>
+</div> ;;
+    }
+    settings {
+      hide_label: true
+    }
+    theme: BlockTheme {
+      padding: 1
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_color: 'transparent'
+        border_width: '0px'
+      }
+    }
+  }
+  theme: shelfoptix
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    grid_size: 20
+    auto_expand_vertically: true
+    block f_date {
+      position: pos(20, 100, 240, 80)
+      layer: 1
+    }
+    block f_retailer {
+      position: pos(280, 100, 240, 80)
+      layer: 1
+    }
+    block f_category {
+      position: pos(540, 100, 240, 80)
+      layer: 1
+    }
+    block f_subcat {
+      position: pos(800, 100, 240, 80)
+      layer: 1
+    }
+    block kpi_availability {
+      position: pos(20, 200, 160, 80)
+      layer: 2
+    }
+    block kpi_oos_rate {
+      position: pos(200, 200, 160, 80)
+      layer: 2
+    }
+    block kpi_oos_count {
+      position: pos(380, 200, 160, 80)
+      layer: 2
+    }
+    block kpi_scans {
+      position: pos(560, 200, 180, 80)
+      layer: 2
+    }
+    block kpi_retailers {
+      position: pos(760, 200, 160, 80)
+      layer: 2
+    }
+    block kpi_stores {
+      position: pos(940, 200, 160, 80)
+      layer: 2
+    }
+    block kpi_skus {
+      position: pos(1120, 200, 160, 80)
+      layer: 2
+    }
+    block sec_health {
+      position: pos(20, 300, 1260, 80)
+      layer: 3
+    }
+    block avail_trend {
+      position: pos(20, 400, 820, 300)
+      layer: 4
+    }
+    block oos_by_retailer_chart {
+      position: pos(860, 400, 420, 300)
+      layer: 4
+    }
+    block by_retailer {
+      position: pos(20, 720, 1260, 220)
+      layer: 4
+    }
+    block sec_where {
+      position: pos(20, 960, 1260, 80)
+      layer: 5
+    }
+    block oos_by_category {
+      position: pos(20, 1060, 620, 340)
+      layer: 6
+    }
+    block top_oos_skus {
+      position: pos(660, 1060, 620, 340)
+      layer: 6
+    }
+    block store_detail {
+      position: pos(20, 1420, 1260, 320)
+      layer: 7
+    }
+    block v_0umu {
+      position: pos(20, 20, 1260, 80)
+      layer: 3
+    }
+    mobile {
+      mode: 'auto'
+    }
+    height: 1760
+  }
+}

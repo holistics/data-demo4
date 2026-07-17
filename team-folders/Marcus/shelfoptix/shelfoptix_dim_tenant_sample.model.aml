@@ -2,7 +2,7 @@ Model shelfoptix_dim_tenant_sample {
   type: 'table'
   label: 'Shelfoptix dim tenant sample'
   description: ''
-  data_source_name: 'demodb'
+  data_source_name: 'demo_bigquery'
   dimension project_id_no {
     label: 'Project id no'
     description: ''
@@ -39,19 +39,6 @@ Model shelfoptix_dim_tenant_sample {
     definition: @sql {{ #SOURCE.plan_tier }};;
   }
 
-  import_source: ImportSource {
-    type: 'csv'
-    original_file_name: 'shelfoptix_dim_tenant.csv'
-    uploaded_at: '2026-07-02 04:59:24'
-    hash: '90150884b2b72a6f3b379652fc3cb831aa00ca983e03afd2a5bced8e21c19ce1'
-    column_configs: [
-      H.imports.column_config("project_id_no", "project_id_no", "number"),
-      H.imports.column_config("tenant_name", "tenant_name", "text"),
-      H.imports.column_config("tenant_type", "tenant_type", "text"),
-      H.imports.column_config("industry", "industry", "text"),
-      H.imports.column_config("plan_tier", "plan_tier", "text")
-    ]
-  }
   owner: 'dong.ln@holistics.io'
-  table_name: '"demo_shelfoptix"."holistics_shelfoptix_di_d4053_202607020459"'
+  table_name: '${schema_name}.dim_tenant'
 }
