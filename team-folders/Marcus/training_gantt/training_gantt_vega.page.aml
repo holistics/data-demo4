@@ -1,47 +1,50 @@
 Dashboard training_gantt_vega {
   title: 'Training Timeline (Vega-Lite)'
-  description: 'Gantt via a Vega-Lite custom chart. Data = one row per training segment (Ongoing/Late); the temporal axis handles ticks, month/day, and range automatically — no tick-column model.'
+  description: 'Gantt via a Vega-Lite custom chart on a daily-grain model. The global Time Range filter keeps every training active in the window and clips each bar to it; the axis auto-fits (month view zooms to day view).'
 
   block title: TextBlock {
     content: @md # Training Timeline;;
   }
+
+  block f_range: FilterBlock {
+    label: 'Time Range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: training_gantt
+      field: r(training_gantt_days.active_date)
+    }
+    default {
+      operator: 'matches'
+      value: '2026'
+    }
+  }
+
   block v_gantt: VizBlock {
     label: 'Training Timeline'
     viz: CustomChart {
       dataset: training_gantt
       custom_chart: training_gantt_vgl
       field label: VizFieldFull {
-        ref: r(training_gantt_segments.training_name)
+        ref: r(training_gantt_days.training_name)
         format {
           type: 'text'
         }
       }
-      field seg_start: VizFieldFull {
-        ref: r(training_gantt_segments.seg_start)
+      field active_date: VizFieldFull {
+        ref: r(training_gantt_days.active_date)
         format {
           type: 'date'
-        }
-      }
-      field seg_end: VizFieldFull {
-        ref: r(training_gantt_segments.seg_end)
-        transformation: 'datetrunc month'
-        format {
-          type: 'date'
-          pattern: 'LLL yyyy'
         }
       }
       field status: VizFieldFull {
-        ref: r(training_gantt_segments.status)
+        ref: r(training_gantt_days.status)
         format {
           type: 'text'
         }
       }
-      setting date_format: '%b %Y'
+      setting date_format: 'auto'
       settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
+        row_limit: 10000
       }
     }
   }

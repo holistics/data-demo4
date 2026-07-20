@@ -1,37 +1,25 @@
-// Vega-Lite Gantt custom chart. Replaces the tick-column MarkdownViz approach:
-// the temporal x-axis auto-generates ticks, auto-fits the min/max range, and the
-// "Axis date format" option switches month <-> day. One bar per training segment
-// (Ongoing = blue, Late = red), plus a dashed "today" rule line.
+// Vega-Lite Gantt custom chart, DAILY-GRAIN input (one row per active day).
+// Each bar is rebuilt as min(active_date) -> max(active_date) per training + status,
+// so a GLOBAL DATE FILTER on active_date makes the chart clip bars to the window and
+// the axis auto-fit (month -> day) — while keeping every training active in the window.
+// "Axis format" dropdown switches the label granularity; dashed rule = today.
 CustomChartDef training_gantt_vgl {
   label: 'Training Gantt (timeline)'
-  description: 'Training periods on a real time axis — Ongoing vs Late — with a dashed today line. Auto-scaling range; month/day toggle.'
+  description: 'Training periods on a real time axis — Ongoing vs Late — with a dashed today line. Daily grain so a global date filter zooms/clips natively.'
 
   fields {
-    field label     { label: 'Training'      type: 'dimension' data_type: 'string' }
-    field seg_start { label: 'Segment Start' type: 'dimension' data_type: 'date' }
-    field seg_end   { label: 'Segment End'   type: 'dimension' data_type: 'date' }
-    field status    { label: 'Status'        type: 'dimension' data_type: 'string' }
+    field label       { label: 'Training'    type: 'dimension' data_type: 'string' }
+    field active_date  { label: 'Active Date' type: 'dimension' data_type: 'date' }
+    field status       { label: 'Status'      type: 'dimension' data_type: 'string' }
   }
 
   options {
+    // Default for the on-chart "Axis format" dropdown (viewers can override live).
     option date_format {
       label: 'Axis date format'
       type: 'select'
-      options: ['%b %Y', '%d %b', '%b %d, %Y']
-      default_value: '%b %Y'
-    }
-    // Focus window: zooms the x-axis (clips bars) WITHOUT dropping trainings.
-    // Leave at the full span to see everything; narrow to focus (e.g. 2026-06-01 -> 2026-07-01)
-    // and switch "Axis date format" to '%d %b' for per-day detail.
-    option focus_from {
-      label: 'Focus from (YYYY-MM-DD)'
-      type: 'input'
-      default_value: '2026-01-01'
-    }
-    option focus_to {
-      label: 'Focus to (YYYY-MM-DD)'
-      type: 'input'
-      default_value: '2026-09-01'
+      options: ['auto', '%b %Y', '%d %b', '%b %d, %Y']
+      default_value: 'auto'
     }
   }
 
@@ -39,21 +27,33 @@ CustomChartDef training_gantt_vgl {
     "width": "container",
     "height": {"step": 24},
     "data": {"values": @{values}},
-    "transform": [{"calculate": "toDate(utcFormat(now(), '%Y-%m-%d'))", "as": "today"}],
+    "transform": [
+      {"calculate": "toDate(utcFormat(now(), '%Y-%m-%d'))", "as": "today"},
+      {"joinaggregate": [
+        {"op": "min", "field": @{fields.active_date.name}, "as": "dmin"},
+        {"op": "max", "field": @{fields.active_date.name}, "as": "dmax"}
+      ]}
+    ],
+    "params": [
+      {
+        "name": "axisFmt",
+        "value": @{options.date_format.value},
+        "bind": {"input": "select", "options": ["auto", "%b %Y", "%d %b", "%b %d, %Y"], "labels": ["Auto", "Month", "Day", "Full date"], "name": "Axis format: "}
+      }
+    ],
     "layer": [
       {
-        "mark": {"type": "bar", "cornerRadiusTopRight": 3, "cornerRadiusBottomRight": 3, "tooltip": true, "height": 15, "clip": true},
+        "mark": {"type": "bar", "cornerRadiusTopRight": 3, "cornerRadiusBottomRight": 3, "tooltip": true, "height": 15},
         "encoding": {
           "y": {
             "field": @{fields.label.name}, "type": "nominal", "sort": null,
             "axis": {"title": null, "labelFontSize": 11, "labelLimit": 240, "domain": false, "ticks": false}
           },
           "x": {
-            "field": @{fields.seg_start.name}, "type": "temporal",
-            "scale": {"domain": [@{options.focus_from.value}, @{options.focus_to.value}]},
-            "axis": {"title": null, "format": @{options.date_format.value}, "grid": true, "gridColor": "#eef1f4", "labelFontSize": 11}
+            "field": @{fields.active_date.name}, "aggregate": "min", "type": "temporal",
+            "axis": {"title": null, "labelExpr": "axisFmt == 'auto' ? timeFormat(datum.value, date(datum.value) <= 7 ? '%b %Y' : '%d') : timeFormat(datum.value, axisFmt)", "grid": true, "gridColor": "#eef1f4", "labelFontSize": 11}
           },
-          "x2": {"field": @{fields.seg_end.name}},
+          "x2": {"field": @{fields.active_date.name}, "aggregate": "max"},
           "color": {
             "field": @{fields.status.name}, "type": "nominal",
             "scale": {"domain": ["Ongoing", "Late"], "range": ["#3b82f6", "#ef4444"]},
@@ -62,8 +62,9 @@ CustomChartDef training_gantt_vgl {
         }
       },
       {
+        "transform": [{"filter": "time(datum.today) >= time(toDate(datum.dmin)) && time(datum.today) <= time(toDate(datum.dmax))"}],
         "mark": {"type": "rule", "strokeDash": [3, 3], "color": "#ef4444", "strokeWidth": 1.5},
-        "encoding": {"x": {"field": "today", "type": "temporal"}}
+        "encoding": {"x": {"field": "today", "aggregate": "min", "type": "temporal"}}
       }
     ],
     "config": {"view": {"stroke": null}}

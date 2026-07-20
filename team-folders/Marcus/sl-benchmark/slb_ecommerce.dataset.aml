@@ -1,0 +1,139 @@
+Dataset slb_ecommerce {
+  label: 'SL Benchmark - Ecommerce'
+  description: '''
+Benchmark dataset for the AMQL-vs-other-SL comparison. Reads testdb.ecommerce (via demo_public)
+so all comparison tiers (Tier 0 raw SQL, Tier 1 dbt SL, Tier 2 Cube, Tier 3 AMQL) query identical data.
+
+Governed definitions (the whole point of the benchmark):
+- GMV     = sum(quantity * price), ALL statuses.
+- NMV     = sum(quantity * price * (1 - discount)) EXCLUDING cancelled/refunded. discount is a RATE 0..1.
+- Revenue = NMV * commission (0.5). This is what "revenue" MEANS here; a naive text-to-SQL agent cannot guess it.
+- AOV     = GMV / total_orders.
+'''
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+
+  models: [
+    slb_orders,
+    slb_order_items,
+    slb_products,
+    slb_users,
+    slb_cities,
+    slb_countries,
+    slb_categories,
+    slb_merchants,
+  ]
+
+  relationships: [
+    relationship(slb_order_items.order_id > slb_orders.id, true),
+    relationship(slb_order_items.product_id > slb_products.id, true),
+    relationship(slb_orders.user_id > slb_users.id, true),
+    relationship(slb_users.city_id > slb_cities.id, true),
+    relationship(slb_cities.country_code > slb_countries.code, true),
+    relationship(slb_products.category_id > slb_categories.id, true),
+    relationship(slb_products.merchant_id > slb_merchants.id, true),
+    relationship(slb_merchants.city_id > slb_cities.id, false),
+  ]
+
+  // ── buyer/cohort dimensions (user grain) ──────────────────────────────────
+  dimension total_orders_all_time {
+    model: slb_users
+    label: 'Total Orders (Users)'
+    type: 'number'
+    definition: @aql total_orders | dimensionalize(slb_users.id);;
+  }
+  dimension is_buyer {
+    model: slb_users
+    label: 'Is Buyer'
+    type: 'truefalse'
+    definition: @aql slb_users.total_orders_all_time > 0;;
+  }
+  dimension is_repeated_buyer {
+    model: slb_users
+    label: 'Is Repeated Buyer'
+    type: 'truefalse'
+    definition: @aql slb_users.total_orders_all_time > 1;;
+  }
+  dimension first_order_date {
+    model: slb_users
+    label: 'First Order Date'
+    type: 'date'
+    definition: @aql min(slb_orders.created_at) | dimensionalize(slb_users.id);;
+  }
+
+  // ── governed metrics ──────────────────────────────────────────────────────
+  metric total_orders {
+    label: 'Total Orders'
+    type: 'number'
+    definition: @aql count(slb_orders.id);;
+    description: 'Count of orders, all statuses.'
+  }
+  metric total_users {
+    label: 'Total Users'
+    type: 'number'
+    definition: @aql count(slb_users.id);;
+  }
+  metric gmv {
+    label: 'GMV (Gross Merchandise Value)'
+    type: 'number'
+    definition: @aql slb_order_items | sum(slb_order_items.quantity * slb_products.price);;
+    description: 'Gross value of items ordered before discounts; includes all statuses.'
+  }
+  metric revenue_commission {
+    label: 'Revenue Commission Rate'
+    type: 'number'
+    definition: @aql 0.5;;
+    description: 'Fixed demo commission rate.'
+  }
+  metric nmv {
+    label: 'NMV (Net Merchandise Value)'
+    type: 'number'
+    definition: @aql (slb_order_items | sum(slb_order_items.quantity * slb_products.price * (1 - slb_orders.discount))) | where(slb_orders.status not in ['cancelled', 'refunded']);;
+    description: 'Realized fulfilled value after order-level discounts; excludes cancelled and refunded.'
+  }
+  metric revenue {
+    label: 'Total Revenue'
+    type: 'number'
+    definition: @aql nmv * revenue_commission;;
+    description: 'Platform revenue from fulfilled orders = NMV * commission.'
+  }
+  metric aov {
+    label: 'AOV (Average Order Value)'
+    type: 'number'
+    definition: @aql gmv / total_orders;;
+    description: 'Average gross value per order.'
+  }
+  metric total_delivered_orders {
+    label: 'Total Delivered Orders'
+    type: 'number'
+    definition: @aql total_orders | where(slb_orders.status is 'delivered');;
+  }
+  metric total_cancelled_orders {
+    label: 'Total Cancelled Orders'
+    type: 'number'
+    definition: @aql total_orders | where(slb_orders.status is 'cancelled');;
+  }
+  metric total_refunded_orders {
+    label: 'Total Refunded Orders'
+    type: 'number'
+    definition: @aql total_orders | where(slb_orders.status is 'refunded');;
+  }
+  metric total_buyers {
+    label: 'Total Buyers'
+    type: 'number'
+    definition: @aql count(slb_users.id) | where(slb_users.is_buyer is true);;
+    description: 'Users with at least one order.'
+  }
+  metric total_repeated_buyers {
+    label: 'Total Repeat Buyers'
+    type: 'number'
+    definition: @aql count(slb_users.id) | where(slb_users.is_repeated_buyer is true);;
+    description: 'Users with 2+ orders.'
+  }
+  metric repeat_buyer_rate {
+    label: 'Repeat Buyer Rate'
+    type: 'number'
+    definition: @aql total_repeated_buyers * 1.0 / total_buyers;;
+    description: 'Repeat buyers / buyers.'
+  }
+}

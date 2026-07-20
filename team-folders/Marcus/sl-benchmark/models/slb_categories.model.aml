@@ -1,0 +1,26 @@
+Model slb_categories {
+  type: 'table'
+  label: 'SLB Categories'
+  description: 'Product categories with self-referencing parent_id hierarchy (testdb.ecommerce via demo_public).'
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"ecommerce"."categories"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension name {
+    label: 'Category Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension parent_id {
+    label: 'Parent Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.parent_id }};;
+    description: 'Self-reference to parent category id (NULL for top-level categories).'
+  }
+}
