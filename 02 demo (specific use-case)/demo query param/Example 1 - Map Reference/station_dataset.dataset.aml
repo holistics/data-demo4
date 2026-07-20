@@ -1,7 +1,7 @@
 Dataset station_dataset {
   label: 'Station Dataset'
   description: ''
-  data_source_name: 'demo_bigquery'
+  data_source_name: 'demo_bigquery_parameters'
   models: [
     station_param
   ]

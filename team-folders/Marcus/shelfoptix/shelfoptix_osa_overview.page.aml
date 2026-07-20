@@ -7,7 +7,7 @@ Dashboard shelfoptix_osa_overview {
       dataset: shelfoptix_osa
       rows: [
         VizFieldFull {
-          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
+          ref: r(shelfoptix_dim_retailer_sample.retailer_name)
           format {
             type: 'text'
           }
@@ -74,28 +74,6 @@ Dashboard shelfoptix_osa_overview {
     default {
       operator: 'matches'
       value: '2026'
-    }
-    theme: BlockTheme {
-      padding: 6
-      background {
-        bg_color: '#FFFFFF'
-      }
-      border {
-        border_color: '#E3E6EA'
-        border_width: '1px'
-      }
-    }
-  }
-  block f_tenant: FilterBlock {
-    label: 'Tenant'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: shelfoptix_osa
-      field: r(shelfoptix_dim_tenant_sample.tenant_name)
-    }
-    default {
-      operator: 'is'
-      value: []
     }
     theme: BlockTheme {
       padding: 6
@@ -440,90 +418,6 @@ Dashboard shelfoptix_osa_overview {
       }
     }
   }
-  block avail_by_tenant: VizBlock {
-    label: 'Tenant Availability'
-    viz: DataTable {
-      dataset: shelfoptix_osa
-      fields: [
-        VizFieldFull {
-          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
-          format {
-            type: 'text'
-          }
-          uname: 'ts_tenant'
-        },
-        VizFieldFull {
-          ref: r(shelfoptix_osa.stores_scanned)
-          format {
-            type: 'number'
-            pattern: '#,##0'
-          }
-          uname: 'ts_stores'
-        },
-        VizFieldFull {
-          ref: r(shelfoptix_osa.total_scans)
-          format {
-            type: 'number'
-            pattern: '#,##0'
-          }
-          uname: 'ts_scans'
-        },
-        VizFieldFull {
-          ref: r(shelfoptix_osa.availability_rate)
-          format {
-            type: 'number'
-            pattern: '#,##0.0\\%'
-          }
-          uname: 'ts_avail'
-        },
-        VizFieldFull {
-          ref: r(shelfoptix_osa.avail_gap)
-          format {
-            type: 'number'
-            pattern: '#,##0.0\\%'
-          }
-          uname: 'ts_gap'
-        }
-      ]
-      settings {
-        show_row_number: true
-        sorts: [
-          SortSetting {
-            key: 'ts_avail'
-            direction: 'desc'
-          }
-        ]
-        conditional_formats: [
-          ConditionalFormat {
-            key: 'ts_avail'
-            format: SingleFormat {
-              condition {
-                operator: 'greater_than_equal'
-                value: 90
-              }
-              text_color: '#259B6C'
-              background_color: '#00000000'
-            }
-          },
-          ConditionalFormat {
-            key: 'ts_gap'
-            format: SingleFormat {
-              condition {
-                operator: 'less_than'
-                value: 0
-              }
-              text_color: '#BF0E08'
-              background_color: '#00000000'
-            }
-          }
-        ]
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
   block sec_where: TextBlock {
     content: @md ## ② OOS - Where are we losing availability?;;
   }
@@ -684,13 +578,6 @@ Dashboard shelfoptix_osa_overview {
       dataset: shelfoptix_osa
       fields: [
         VizFieldFull {
-          ref: r(shelfoptix_dim_tenant_sample.tenant_name)
-          format {
-            type: 'text'
-          }
-          uname: 'sd_tenant'
-        },
-        VizFieldFull {
           ref: r(shelfoptix_dim_store_sample.store_name)
           format {
             type: 'text'
@@ -784,20 +671,16 @@ Dashboard shelfoptix_osa_overview {
       position: pos(20, 240, 240, 80)
       layer: 1
     }
-    block f_tenant {
-      position: pos(280, 240, 240, 80)
-      layer: 1
-    }
     block f_category {
-      position: pos(540, 240, 220, 80)
+      position: pos(280, 240, 220, 80)
       layer: 1
     }
     block f_scantype {
-      position: pos(780, 240, 240, 80)
+      position: pos(540, 240, 240, 80)
       layer: 1
     }
     block f_region {
-      position: pos(1040, 240, 240, 80)
+      position: pos(800, 240, 240, 80)
       layer: 1
     }
     block kpi_availability {
@@ -840,37 +723,33 @@ Dashboard shelfoptix_osa_overview {
       position: pos(860, 540, 420, 300)
       layer: 4
     }
-    block avail_by_tenant {
-      position: pos(20, 860, 1260, 200)
-      layer: 4
-    }
     block sec_where {
-      position: pos(20, 1080, 1260, 80)
+      position: pos(20, 860, 1260, 80)
       layer: 5
     }
     block oos_by_category {
-      position: pos(20, 1180, 400, 300)
+      position: pos(20, 960, 400, 300)
       layer: 6
     }
     block oos_by_region {
-      position: pos(440, 1180, 400, 300)
+      position: pos(440, 960, 400, 300)
       layer: 6
     }
     block oos_by_banner {
-      position: pos(860, 1180, 420, 300)
+      position: pos(860, 960, 420, 300)
       layer: 6
     }
     block top_oos_skus {
-      position: pos(20, 1500, 620, 340)
+      position: pos(20, 1280, 620, 340)
       layer: 8
     }
     block store_detail {
-      position: pos(660, 1500, 620, 340)
+      position: pos(660, 1280, 620, 340)
       layer: 8
     }
     mobile {
       mode: 'auto'
     }
-    height: 1860
+    height: 1640
   }
 }

@@ -1,0 +1,37 @@
+Model shelfoptix_dim_retailer_sample {
+  type: 'table'
+  label: 'Shelfoptix dim retailer sample'
+  description: 'Retailer (the account that owns this dataset). One row per retailer dataset.'
+  data_source_name: 'demo_bigquery'
+  dimension retailer_id {
+    label: 'Retailer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.retailer_id }};;
+  }
+  dimension retailer_name {
+    label: 'Retailer'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.retailer_name }};;
+  }
+  dimension industry {
+    label: 'Industry'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.industry }};;
+  }
+  dimension plan_tier {
+    label: 'Plan tier'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.plan_tier }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '${schema_name}.dim_retailer'
+}
