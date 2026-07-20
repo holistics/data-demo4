@@ -1099,11 +1099,74 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_u7e8: VizBlock {
+    label: '''Cohort report of orders count by parent categories over the past 6 quarters
+'''
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      filter {
+        field: r(ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'last 6 quarters'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Order Created Quarter'
+          ref: r(ecommerce_orders.created_at)
+          transformation: 'datetrunc quarter'
+          format {
+            type: 'date'
+            pattern: 'yyyy Qq'
+          }
+          uname: 'datetrunc_quarter_created_at_1'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(ecommerce_users.age_group)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Total Orders'
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        pagination_size: 100
+        empty_cell_as_zero: true
+        show_row_total: true
+        show_column_total: true
+        sorts: [
+          SortSetting {
+            key: 'datetrunc_quarter_created_at_1'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        frozen_columns: 1
+        value_labels_position {
+          placement: 'rows'
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 2820
+    height: 3260
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
@@ -1161,6 +1224,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_lyh4 {
       position: pos(660, 2380, 620, 420)
       layer: 12
+    }
+    block v_u7e8 {
+      position: pos(20, 2820, 620, 420)
+      layer: 13
     }
     mobile {
       mode: 'auto'
