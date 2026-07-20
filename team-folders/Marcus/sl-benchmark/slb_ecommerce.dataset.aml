@@ -40,7 +40,8 @@ Governed definitions (the whole point of the benchmark):
     model: slb_users
     label: 'Total Orders (Users)'
     type: 'number'
-    definition: @aql total_orders | dimensionalize(slb_users.id);;
+    // delivered-only, to match the governed "buyer" definition (Q4 reconcile: 68.3%)
+    definition: @aql total_orders | where(slb_orders.status is 'delivered') | dimensionalize(slb_users.id);;
   }
   dimension is_buyer {
     model: slb_users
