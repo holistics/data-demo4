@@ -1,0 +1,45 @@
+Dataset brainstorm_adoption {
+  label: 'Brainstorm APAC - Adoption'
+  description: 'One row per company snapshot. Latest snapshot is 1 July 2026; monthly trend covers July 2025 to June 2026.'
+  data_source_name: 'brainstorm_apac_runsql'
+  models: [brainstorm_adoption_snapshot, brainstorm_companies]
+  relationships: [relationship(brainstorm_adoption_snapshot.company_id > brainstorm_companies.id, true)]
+  permission company_access {
+    field: r(brainstorm_adoption_snapshot.company_id)
+    operator: 'matches_user_attribute'
+    value: 'company_id'
+  }
+  metric current_headcount {
+    label: 'Current headcount'
+    type: 'number'
+    definition: @aql sum(brainstorm_adoption_snapshot.headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true);;
+  }
+  metric current_app_users {
+    label: 'Current app users'
+    type: 'number'
+    definition: @aql sum(brainstorm_adoption_snapshot.app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true);;
+  }
+  metric latest_adoption {
+    label: 'Latest adoption'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql (sum(brainstorm_adoption_snapshot.app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)) / (sum(brainstorm_adoption_snapshot.headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true));;
+  }
+  metric adoption_rate {
+    label: 'Monthly adoption'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql sum(brainstorm_adoption_snapshot.app_user_hc) / sum(brainstorm_adoption_snapshot.headcount);;
+  }
+  metric adoption_pop {
+    label: 'Adoption PoP'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql ((sum(brainstorm_adoption_snapshot.app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)) / (sum(brainstorm_adoption_snapshot.headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true))) - ((sum(brainstorm_adoption_snapshot.previous_app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)) / (sum(brainstorm_adoption_snapshot.previous_headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)));;
+  }
+  view {
+    group adoption_metrics { metric current_headcount metric current_app_users metric latest_adoption metric adoption_rate metric adoption_pop }
+    model brainstorm_adoption_snapshot {}
+    model brainstorm_companies {}
+  }
+}
