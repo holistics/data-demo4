@@ -1,0 +1,53 @@
+Dataset brainstorm_cases_dataset {
+  label: 'Brainstorm APAC - Cases'
+  description: 'One row per case. Raw case events and sensitive person/detail fields are excluded.'
+  data_source_name: 'brainstorm_apac_runsql'
+  models: [brainstorm_cases, brainstorm_case_lifecycle, brainstorm_companies, brainstorm_case_managers]
+  relationships: [
+    relationship(brainstorm_cases.company_id > brainstorm_companies.id, true),
+    relationship(brainstorm_cases.manager_id > brainstorm_case_managers.id, true),
+    relationship(brainstorm_cases.id - brainstorm_case_lifecycle.case_id, true),
+  ]
+  permission company_access {
+    field: r(brainstorm_cases.company_id)
+    operator: 'matches_user_attribute'
+    value: 'company_id'
+  }
+  metric case_volume {
+    label: 'Case volume'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_cases.id);;
+  }
+  metric actual_cases {
+    label: 'Actual cases'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_cases.classification == 'actual');;
+  }
+  metric duplicate_cases {
+    label: 'Duplicate cases'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_cases.classification == 'duplicate');;
+  }
+  metric closed_cases {
+    label: 'Closed cases'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_case_lifecycle.current_state == 'Closed');;
+  }
+  metric in_progress_cases {
+    label: 'In-progress cases'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_case_lifecycle.current_state == 'In progress');;
+  }
+  metric case_reopenings {
+    label: 'Case reopenings'
+    type: 'number'
+    definition: @aql sum(brainstorm_case_lifecycle.reopen_count);;
+  }
+  view {
+    group case_metrics { metric case_volume metric actual_cases metric duplicate_cases metric closed_cases metric in_progress_cases metric case_reopenings }
+    model brainstorm_cases {}
+    model brainstorm_case_lifecycle {}
+    model brainstorm_companies {}
+    model brainstorm_case_managers {}
+  }
+}
