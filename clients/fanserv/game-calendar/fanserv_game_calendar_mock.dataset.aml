@@ -1,15 +1,51 @@
 Dataset fanserv_game_calendar_mock {
   __engine__: 'aql'
-  label: 'FanServ Game Calendar — Mock'
-  description: 'Temporary dataset for reproducing FanServ’s shared month and day calendar designs while tenant data access is pending.'
+  label: 'FanServ Game Calendar'
+  description: 'CSV-backed POC dataset for the fixed 42-day month board, selected-day cards, persistent game detail, and exact participating-team filtering.'
   data_source_name: 'demodb'
 
   models: [
-    fanserv_mock_games
+    fanserv_mock_games,
+    fanserv_game_team_bridge
   ]
-  relationships: []
+  relationships: [
+    relationship(fanserv_game_team_bridge.game_id > fanserv_mock_games.game_id, true, 'two_way')
+  ]
+
+  metric day_game_order {
+    label: 'Day Game Order'
+    type: 'number'
+    description: 'Filter-aware deterministic game order within each date.'
+    definition: @aql rank(
+      order: min(fanserv_mock_games.deterministic_sort_key),
+      partition: fanserv_mock_games.game_date
+    ) ;;
+  }
+
+  metric day_game_count {
+    label: 'Day Game Count'
+    type: 'number'
+    description: 'Filter-aware number of games on the date partition.'
+    definition: @aql window_sum(
+      countd(fanserv_mock_games.game_id),
+      ..,
+      partition: fanserv_mock_games.game_date
+    ) ;;
+  }
+
+  metric day_game_overflow_count {
+    label: 'Games After First Card'
+    type: 'number'
+    description: 'Filter-aware number of games after the first visible calendar card.'
+    definition: @aql window_sum(
+      countd(fanserv_mock_games.game_id),
+      ..,
+      partition: fanserv_mock_games.game_date
+    ) - 1 ;;
+  }
 
   view {
     model fanserv_mock_games { }
+    model fanserv_game_team_bridge { }
   }
 }

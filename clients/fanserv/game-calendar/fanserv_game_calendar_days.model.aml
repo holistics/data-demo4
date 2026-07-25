@@ -1,0 +1,79 @@
+Model fanserv_calendar_days {
+  type: 'query'
+  label: 'FanServ Game Calendar Days'
+  description: 'Fixed 42-day Monday-start scaffold for the July 2026 Game Calendar POC.'
+  data_source_name: 'demodb'
+
+  dimension calendar_date {
+    label: 'Calendar Date'
+    type: 'date'
+    primary_key: true
+  }
+
+  dimension board_month_start {
+    label: 'Board Month Start'
+    type: 'date'
+  }
+
+  dimension calendar_day_index {
+    label: 'Calendar Day Index'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension calendar_week_index {
+    label: 'Calendar Week Index'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension calendar_weekday_index {
+    label: 'Calendar Weekday Index'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension calendar_day_number {
+    label: 'Day'
+    type: 'number'
+  }
+
+  dimension is_in_board_month {
+    label: 'In July 2026'
+    type: 'truefalse'
+  }
+
+  dimension is_board_today {
+    label: 'POC Today'
+    description: 'Marks 16 July 2026 as today for the fixed POC scenario.'
+    type: 'truefalse'
+  }
+
+  dimension cell_state_class {
+    label: 'Cell State Class'
+    type: 'text'
+    hidden: true
+  }
+
+  query: @sql
+    select
+      calendar_date::date
+      , date '2026-07-01' as board_month_start
+      , (calendar_date::date - date '2026-06-29')::integer as calendar_day_index
+      , floor((calendar_date::date - date '2026-06-29') / 7.0)::integer as calendar_week_index
+      , (extract(isodow from calendar_date)::integer - 1) as calendar_weekday_index
+      , extract(day from calendar_date)::integer as calendar_day_number
+      , date_trunc('month', calendar_date)::date = date '2026-07-01' as is_in_board_month
+      , calendar_date::date = date '2026-07-16' as is_board_today
+      , case
+          when calendar_date::date = date '2026-07-16' then 'is-today'
+          when date_trunc('month', calendar_date)::date <> date '2026-07-01' then 'is-padding'
+          when calendar_date::date < date '2026-07-16' then 'is-past'
+          else 'is-future'
+        end as cell_state_class
+    from generate_series(
+      date '2026-06-29'
+      , date '2026-08-09'
+      , interval '1 day'
+    ) as calendar_date;;
+}

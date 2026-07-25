@@ -1,0 +1,59 @@
+Model fanserv_game_team_bridge {
+  type: 'query'
+  label: 'FanServ Game Teams'
+  description: 'CSV-backed bridge at game-by-participating-team grain so the native Team filter matches either side exactly.'
+  data_source_name: 'demodb'
+
+  dimension game_team_key {
+    label: 'Game Team Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+
+  dimension game_id {
+    label: 'Game ID'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension team_code {
+    label: 'Team UUID'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension team_name {
+    label: 'Team'
+    type: 'text'
+  }
+
+  dimension team_role {
+    label: 'Team Role'
+    type: 'text'
+  }
+
+  query: @sql
+    select
+      games.uuid::text || ':' || teams.uuid::text as game_team_key
+      , games.uuid::text as game_id
+      , teams.uuid::text as team_code
+      , leagues.alias::text || ' · ' || coalesce(
+          nullif(teams.full_name::text, '')
+          , nullif(concat_ws(' ', nullif(teams.market::text, ''), nullif(teams.name::text, '')), '')
+          , teams.alias::text
+        ) as team_name
+      , participant.team_role::text as team_role
+    from "dbt_khai"."holistics_fanserv_games_d2418_202607160936" as games
+    cross join lateral (
+      values
+        (games.home_id, 'home')
+        , (games.away_id, 'away')
+    ) as participant(team_id, team_role)
+    join "dbt_khai"."holistics_fanserv_teams_3d44f_202607160945" as teams
+      on participant.team_id = teams.id
+    join "dbt_khai"."holistics_fanserv_leagu_2a159_202607160936" as leagues
+      on teams.league_id = leagues.id
+    where ((games.scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date
+      between date '2026-06-29' and date '2026-08-09';;
+}
