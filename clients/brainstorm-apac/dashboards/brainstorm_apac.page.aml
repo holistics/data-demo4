@@ -54,7 +54,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Monthly adoption trend — Jul 2025 to Jun 2026'
     viz: LineChart {
       dataset: brainstorm_adoption
-      filter { field: r(brainstorm_adoption_snapshot.snapshot_month) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_adoption_snapshot.snapshot_month) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: VizFieldFull { ref: r(brainstorm_adoption_snapshot.snapshot_month) transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
       y_axis { series { field: VizFieldFull { ref: r(brainstorm_adoption.adoption_rate) format { type: 'number' pattern: '0.0%' } } } }
     }
@@ -73,7 +73,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Cases received by month — Jul 2025 to Jun 2026'
     viz: ColumnChart {
       dataset: brainstorm_cases_dataset
-      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: VizFieldFull { ref: r(brainstorm_cases.created_date) transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
       y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
     }
@@ -82,7 +82,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Actual vs duplicate cases'
     viz: ColumnChart {
       dataset: brainstorm_cases_dataset
-      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: r(brainstorm_cases.classification)
       y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
     }
@@ -91,7 +91,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Cases by channel'
     viz: ColumnChart {
       dataset: brainstorm_cases_dataset
-      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: r(brainstorm_cases.channel)
       y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
     }
@@ -100,7 +100,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Case type and current status'
     viz: ColumnChart {
       dataset: brainstorm_cases_dataset
-      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: r(brainstorm_cases.case_type)
       legend: r(brainstorm_cases.status)
       y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
@@ -110,7 +110,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Closed vs in progress and allegation status'
     viz: DataTable {
       dataset: brainstorm_cases_dataset
-      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       fields: [r(brainstorm_case_lifecycle.current_state), r(brainstorm_cases.allegation_status), r(brainstorm_cases_dataset.case_volume)]
     }
   }
@@ -118,7 +118,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Case manager performance'
     viz: DataTable {
       dataset: brainstorm_cases_dataset
-      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       fields: [r(brainstorm_case_managers.manager), r(brainstorm_cases_dataset.case_volume), r(brainstorm_cases_dataset.closed_cases), r(brainstorm_cases_dataset.in_progress_cases), r(brainstorm_cases_dataset.case_reopenings)]
     }
   }
@@ -128,7 +128,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'SpeakUp submissions over time — Jul 2025 to Jun 2026'
     viz: LineChart {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: VizFieldFull { ref: r(brainstorm_speakup.submitted_date) transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
       y_axis { series { field: r(brainstorm_speakup_dataset.submitted_tickets) } }
     }
@@ -137,7 +137,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Feedback type and anonymous vs identified'
     viz: ColumnChart {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       x_axis: r(brainstorm_speakup.speakup_type)
       legend: r(brainstorm_speakup.identity_type)
       y_axis { series { field: r(brainstorm_speakup_dataset.submitted_tickets) } }
@@ -147,7 +147,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Earliest manager response hours'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       value: r(brainstorm_speakup_dataset.average_first_response_hours)
     }
   }
@@ -155,7 +155,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Current close rate'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       value: VizFieldFull { ref: r(brainstorm_speakup_dataset.current_close_rate) format { type: 'number' pattern: '0.0%' } }
     }
   }
@@ -163,7 +163,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Final close days'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       value: r(brainstorm_speakup_dataset.average_final_close_days)
     }
   }
@@ -171,7 +171,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Reopenings'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       value: r(brainstorm_speakup_dataset.reopenings)
     }
   }
@@ -179,7 +179,7 @@ Dashboard brainstorm_apac_dashboard {
     label: 'SpeakUp manager performance'
     viz: DataTable {
       dataset: brainstorm_speakup_dataset
-      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
       fields: [r(brainstorm_speakup_managers.manager), r(brainstorm_speakup_dataset.submitted_tickets), r(brainstorm_speakup_dataset.average_first_response_hours), r(brainstorm_speakup_dataset.current_close_rate), r(brainstorm_speakup_dataset.average_final_close_days), r(brainstorm_speakup_dataset.reopenings)]
     }
   }
