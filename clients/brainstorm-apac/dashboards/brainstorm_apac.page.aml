@@ -1,0 +1,240 @@
+Dashboard brainstorm_apac_dashboard {
+  title: 'Brainstorm APAC overview'
+  description: 'Reporting period: July 2025 to June 2026. Adoption latest snapshot: 1 July 2026. All times UTC.'
+
+  block company_filter: FilterBlock {
+    label: 'Company'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: brainstorm_adoption
+      field: r(brainstorm_companies.name)
+    }
+    settings { input_type: 'multiple' }
+  }
+  block country_filter: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: brainstorm_adoption
+      field: r(brainstorm_companies.country)
+    }
+    settings { input_type: 'multiple' }
+  }
+
+  block executive_section: TextBlock { content: @md ## Executive adoption;; }
+  block current_hc: VizBlock {
+    label: 'Current headcount'
+    viz: MetricKpi {
+      dataset: brainstorm_adoption
+      value: VizFieldFull { ref: r(brainstorm_adoption.current_headcount) format { type: 'number' pattern: '#,###' } }
+    }
+  }
+  block current_users: VizBlock {
+    label: 'Current app users'
+    viz: MetricKpi {
+      dataset: brainstorm_adoption
+      value: VizFieldFull { ref: r(brainstorm_adoption.current_app_users) format { type: 'number' pattern: '#,###' } }
+    }
+  }
+  block current_adoption: VizBlock {
+    label: 'Latest adoption — 1 Jul 2026'
+    viz: MetricKpi {
+      dataset: brainstorm_adoption
+      value: VizFieldFull { ref: r(brainstorm_adoption.latest_adoption) format { type: 'number' pattern: '0.0%' } }
+    }
+  }
+  block adoption_pop: VizBlock {
+    label: 'Adoption PoP vs Jun 2026'
+    viz: MetricKpi {
+      dataset: brainstorm_adoption
+      value: VizFieldFull { ref: r(brainstorm_adoption.adoption_pop) format { type: 'number' pattern: '0.0%' } }
+    }
+  }
+  block adoption_trend: VizBlock {
+    label: 'Monthly adoption trend — Jul 2025 to Jun 2026'
+    viz: LineChart {
+      dataset: brainstorm_adoption
+      filter { field: r(brainstorm_adoption_snapshot.snapshot_month) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: VizFieldFull { ref: r(brainstorm_adoption_snapshot.snapshot_month) transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
+      y_axis { series { field: VizFieldFull { ref: r(brainstorm_adoption.adoption_rate) format { type: 'number' pattern: '0.0%' } } } }
+    }
+  }
+  block adoption_comparison: VizBlock {
+    label: 'Latest adoption by company and country'
+    viz: DataTable {
+      dataset: brainstorm_adoption
+      filter { field: r(brainstorm_adoption_snapshot.is_latest_snapshot) operator: 'is' value: 'true' }
+      fields: [r(brainstorm_companies.country), r(brainstorm_companies.name), r(brainstorm_adoption.latest_adoption), r(brainstorm_adoption.current_headcount), r(brainstorm_adoption.current_app_users)]
+    }
+  }
+
+  block cases_section: TextBlock { content: @md ## Cases;; }
+  block cases_month: VizBlock {
+    label: 'Cases received by month — Jul 2025 to Jun 2026'
+    viz: ColumnChart {
+      dataset: brainstorm_cases_dataset
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: VizFieldFull { ref: r(brainstorm_cases.created_date) transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
+      y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
+    }
+  }
+  block cases_actual_duplicate: VizBlock {
+    label: 'Actual vs duplicate cases'
+    viz: ColumnChart {
+      dataset: brainstorm_cases_dataset
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: r(brainstorm_cases.classification)
+      y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
+    }
+  }
+  block cases_channel: VizBlock {
+    label: 'Cases by channel'
+    viz: ColumnChart {
+      dataset: brainstorm_cases_dataset
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: r(brainstorm_cases.channel)
+      y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
+    }
+  }
+  block cases_type_status: VizBlock {
+    label: 'Case type and current status'
+    viz: ColumnChart {
+      dataset: brainstorm_cases_dataset
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: r(brainstorm_cases.case_type)
+      legend: r(brainstorm_cases.status)
+      y_axis { series { field: r(brainstorm_cases_dataset.case_volume) } }
+    }
+  }
+  block cases_state_allegation: VizBlock {
+    label: 'Closed vs in progress and allegation status'
+    viz: DataTable {
+      dataset: brainstorm_cases_dataset
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      fields: [r(brainstorm_case_lifecycle.current_state), r(brainstorm_cases.allegation_status), r(brainstorm_cases_dataset.case_volume)]
+    }
+  }
+  block cases_manager: VizBlock {
+    label: 'Case manager performance'
+    viz: DataTable {
+      dataset: brainstorm_cases_dataset
+      filter { field: r(brainstorm_cases.created_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      fields: [r(brainstorm_case_managers.manager), r(brainstorm_cases_dataset.case_volume), r(brainstorm_cases_dataset.closed_cases), r(brainstorm_cases_dataset.in_progress_cases), r(brainstorm_cases_dataset.case_reopenings)]
+    }
+  }
+
+  block speakup_section: TextBlock { content: @md ## SpeakUp;; }
+  block speakup_month: VizBlock {
+    label: 'SpeakUp submissions over time — Jul 2025 to Jun 2026'
+    viz: LineChart {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: VizFieldFull { ref: r(brainstorm_speakup.submitted_date) transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
+      y_axis { series { field: r(brainstorm_speakup_dataset.submitted_tickets) } }
+    }
+  }
+  block speakup_type_identity: VizBlock {
+    label: 'Feedback type and anonymous vs identified'
+    viz: ColumnChart {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      x_axis: r(brainstorm_speakup.speakup_type)
+      legend: r(brainstorm_speakup.identity_type)
+      y_axis { series { field: r(brainstorm_speakup_dataset.submitted_tickets) } }
+    }
+  }
+  block speakup_response: VizBlock {
+    label: 'Earliest manager response hours'
+    viz: MetricKpi {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      value: r(brainstorm_speakup_dataset.average_first_response_hours)
+    }
+  }
+  block speakup_close_rate: VizBlock {
+    label: 'Current close rate'
+    viz: MetricKpi {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      value: VizFieldFull { ref: r(brainstorm_speakup_dataset.current_close_rate) format { type: 'number' pattern: '0.0%' } }
+    }
+  }
+  block speakup_close_time: VizBlock {
+    label: 'Final close days'
+    viz: MetricKpi {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      value: r(brainstorm_speakup_dataset.average_final_close_days)
+    }
+  }
+  block speakup_reopenings: VizBlock {
+    label: 'Reopenings'
+    viz: MetricKpi {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      value: r(brainstorm_speakup_dataset.reopenings)
+    }
+  }
+  block speakup_manager: VizBlock {
+    label: 'SpeakUp manager performance'
+    viz: DataTable {
+      dataset: brainstorm_speakup_dataset
+      filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: '2025-07-01,2026-06-30' }
+      fields: [r(brainstorm_speakup_managers.manager), r(brainstorm_speakup_dataset.submitted_tickets), r(brainstorm_speakup_dataset.average_first_response_hours), r(brainstorm_speakup_dataset.current_close_rate), r(brainstorm_speakup_dataset.average_final_close_days), r(brainstorm_speakup_dataset.reopenings)]
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'Overview'
+    width: 1300
+    height: 3300
+    grid_size: 10
+    auto_expand_vertically: true
+    mobile { mode: 'auto' }
+    block company_filter { position: pos(20, 20, 300, 80) }
+    block country_filter { position: pos(340, 20, 300, 80) }
+    block executive_section { position: pos(20, 120, 1260, 60) }
+    block current_hc { position: pos(20, 190, 300, 120) }
+    block current_users { position: pos(340, 190, 300, 120) }
+    block current_adoption { position: pos(660, 190, 300, 120) }
+    block adoption_pop { position: pos(980, 190, 300, 120) }
+    block adoption_trend { position: pos(20, 330, 760, 320) }
+    block adoption_comparison { position: pos(800, 330, 480, 320) }
+    block cases_section { position: pos(20, 690, 1260, 60) }
+    block cases_month { position: pos(20, 760, 620, 320) }
+    block cases_actual_duplicate { position: pos(660, 760, 620, 320) }
+    block cases_channel { position: pos(20, 1100, 400, 320) }
+    block cases_type_status { position: pos(440, 1100, 400, 320) }
+    block cases_state_allegation { position: pos(860, 1100, 420, 320) }
+    block cases_manager { position: pos(20, 1440, 1260, 320) }
+    block speakup_section { position: pos(20, 1800, 1260, 60) }
+    block speakup_month { position: pos(20, 1870, 620, 320) }
+    block speakup_type_identity { position: pos(660, 1870, 620, 320) }
+    block speakup_response { position: pos(20, 2210, 300, 120) }
+    block speakup_close_rate { position: pos(340, 2210, 300, 120) }
+    block speakup_close_time { position: pos(660, 2210, 300, 120) }
+    block speakup_reopenings { position: pos(980, 2210, 300, 120) }
+    block speakup_manager { position: pos(20, 2350, 1260, 360) }
+    default_zoom: 'fit_to_width'
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'company_filter'
+      to: [
+        CustomMapping { block: ['current_hc', 'current_users', 'current_adoption', 'adoption_pop', 'adoption_trend', 'adoption_comparison'] field: r(brainstorm_companies.name) },
+        CustomMapping { block: ['cases_month', 'cases_actual_duplicate', 'cases_channel', 'cases_type_status', 'cases_state_allegation', 'cases_manager'] field: r(brainstorm_companies.name) },
+        CustomMapping { block: ['speakup_month', 'speakup_type_identity', 'speakup_response', 'speakup_close_rate', 'speakup_close_time', 'speakup_reopenings', 'speakup_manager'] field: r(brainstorm_companies.name) },
+      ]
+    },
+    FilterInteraction {
+      from: 'country_filter'
+      to: [
+        CustomMapping { block: ['current_hc', 'current_users', 'current_adoption', 'adoption_pop', 'adoption_trend', 'adoption_comparison'] field: r(brainstorm_companies.country) },
+        CustomMapping { block: ['cases_month', 'cases_actual_duplicate', 'cases_channel', 'cases_type_status', 'cases_state_allegation', 'cases_manager'] field: r(brainstorm_companies.country) },
+        CustomMapping { block: ['speakup_month', 'speakup_type_identity', 'speakup_response', 'speakup_close_rate', 'speakup_close_time', 'speakup_reopenings', 'speakup_manager'] field: r(brainstorm_companies.country) },
+      ]
+    },
+  ]
+  settings { autorun_on_open: true }
+}

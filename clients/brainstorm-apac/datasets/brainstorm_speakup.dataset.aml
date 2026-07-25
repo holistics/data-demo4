@@ -1,0 +1,56 @@
+Dataset brainstorm_speakup_dataset {
+  label: 'Brainstorm APAC - SpeakUp'
+  description: 'One row per submitted SpeakUp ticket. Raw events and reporter identity are excluded.'
+  data_source_name: 'brainstorm_apac_runsql'
+  models: [brainstorm_speakup, brainstorm_speakup_lifecycle, brainstorm_companies, brainstorm_speakup_managers]
+  relationships: [
+    relationship(brainstorm_speakup.company_id > brainstorm_companies.id, true),
+    relationship(brainstorm_speakup.manager_id > brainstorm_speakup_managers.id, true),
+    relationship(brainstorm_speakup.id - brainstorm_speakup_lifecycle.speakup_id, true),
+  ]
+  permission company_access {
+    field: r(brainstorm_speakup.company_id)
+    operator: 'matches_user_attribute'
+    value: 'company_id'
+  }
+  metric submitted_tickets {
+    label: 'Submitted SpeakUp volume'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_speakup.id);;
+  }
+  metric average_first_response_hours {
+    label: 'First response hours'
+    type: 'number'
+    format: '#,##0.0'
+    definition: @aql average(brainstorm_speakup_lifecycle.first_response_hours);;
+  }
+  metric currently_closed_tickets {
+    label: 'Currently closed tickets'
+    type: 'number'
+    definition: @aql count_distinct(brainstorm_speakup.id) | where(brainstorm_speakup_lifecycle.current_state == 'Closed');;
+  }
+  metric current_close_rate {
+    label: 'Current close rate'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql (count_distinct(brainstorm_speakup.id) | where(brainstorm_speakup_lifecycle.current_state == 'Closed')) / count_distinct(brainstorm_speakup.id);;
+  }
+  metric average_final_close_days {
+    label: 'Final close days'
+    type: 'number'
+    format: '#,##0.0'
+    definition: @aql average(brainstorm_speakup_lifecycle.final_close_days);;
+  }
+  metric reopenings {
+    label: 'Reopenings'
+    type: 'number'
+    definition: @aql sum(brainstorm_speakup_lifecycle.reopen_count);;
+  }
+  view {
+    group speakup_metrics { metric submitted_tickets metric average_first_response_hours metric currently_closed_tickets metric current_close_rate metric average_final_close_days metric reopenings }
+    model brainstorm_speakup {}
+    model brainstorm_speakup_lifecycle {}
+    model brainstorm_companies {}
+    model brainstorm_speakup_managers {}
+  }
+}
