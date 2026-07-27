@@ -21,7 +21,6 @@ Dashboard brainstorm_apac_dashboard {
     settings { input_type: 'multiple' }
   }
 
-  block executive_section: TextBlock { content: @md ## Executive adoption;; }
   block current_hc: VizBlock {
     label: 'Current headcount'
     viz: MetricKpi {
@@ -68,7 +67,6 @@ Dashboard brainstorm_apac_dashboard {
     }
   }
 
-  block cases_section: TextBlock { content: @md ## Cases;; }
   block cases_month: VizBlock {
     label: 'Cases received by month — Jul 2025 to Jun 2026'
     viz: ColumnChart {
@@ -123,7 +121,6 @@ Dashboard brainstorm_apac_dashboard {
     }
   }
 
-  block speakup_section: TextBlock { content: @md ## SpeakUp;; }
   block speakup_month: VizBlock {
     label: 'SpeakUp submissions over time — Jul 2025 to Jun 2026'
     viz: LineChart {
@@ -184,38 +181,59 @@ Dashboard brainstorm_apac_dashboard {
     }
   }
 
-  view: CanvasLayout {
-    label: 'Overview'
-    width: 1300
-    height: 3300
-    grid_size: 10
-    auto_expand_vertically: true
-    mobile { mode: 'auto' }
-    block company_filter { position: pos(20, 20, 300, 80) }
-    block country_filter { position: pos(340, 20, 300, 80) }
-    block executive_section { position: pos(20, 120, 1260, 60) }
-    block current_hc { position: pos(20, 190, 300, 120) }
-    block current_users { position: pos(340, 190, 300, 120) }
-    block current_adoption { position: pos(660, 190, 300, 120) }
-    block adoption_pop { position: pos(980, 190, 300, 120) }
-    block adoption_trend { position: pos(20, 330, 760, 320) }
-    block adoption_comparison { position: pos(800, 330, 480, 320) }
-    block cases_section { position: pos(20, 690, 1260, 60) }
-    block cases_month { position: pos(20, 760, 620, 320) }
-    block cases_actual_duplicate { position: pos(660, 760, 620, 320) }
-    block cases_channel { position: pos(20, 1100, 400, 320) }
-    block cases_type_status { position: pos(440, 1100, 400, 320) }
-    block cases_state_allegation { position: pos(860, 1100, 420, 320) }
-    block cases_manager { position: pos(20, 1440, 1260, 320) }
-    block speakup_section { position: pos(20, 1800, 1260, 60) }
-    block speakup_month { position: pos(20, 1870, 620, 320) }
-    block speakup_type_identity { position: pos(660, 1870, 620, 320) }
-    block speakup_response { position: pos(20, 2210, 300, 120) }
-    block speakup_close_rate { position: pos(340, 2210, 300, 120) }
-    block speakup_close_time { position: pos(660, 2210, 300, 120) }
-    block speakup_reopenings { position: pos(980, 2210, 300, 120) }
-    block speakup_manager { position: pos(20, 2350, 1260, 360) }
-    default_zoom: 'fit_to_width'
+  view: TabLayout {
+    tab executive_adoption: CanvasLayout {
+      label: 'Executive Adoption'
+      width: 1300
+      height: 700
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile { mode: 'auto' }
+      block company_filter { position: pos(20, 20, 300, 80) }
+      block country_filter { position: pos(340, 20, 300, 80) }
+      block current_hc { position: pos(20, 120, 300, 120) }
+      block current_users { position: pos(340, 120, 300, 120) }
+      block current_adoption { position: pos(660, 120, 300, 120) }
+      block adoption_pop { position: pos(980, 120, 300, 120) }
+      block adoption_trend { position: pos(20, 260, 760, 320) }
+      block adoption_comparison { position: pos(800, 260, 480, 320) }
+      default_zoom: 'fit_to_width'
+    }
+    tab cases: CanvasLayout {
+      label: 'Cases'
+      width: 1300
+      height: 1140
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile { mode: 'auto' }
+      block company_filter { position: pos(20, 20, 300, 80) }
+      block country_filter { position: pos(340, 20, 300, 80) }
+      block cases_month { position: pos(20, 120, 620, 320) }
+      block cases_actual_duplicate { position: pos(660, 120, 620, 320) }
+      block cases_channel { position: pos(20, 460, 400, 320) }
+      block cases_type_status { position: pos(440, 460, 400, 320) }
+      block cases_state_allegation { position: pos(860, 460, 420, 320) }
+      block cases_manager { position: pos(20, 800, 1260, 320) }
+      default_zoom: 'fit_to_width'
+    }
+    tab speakup: CanvasLayout {
+      label: 'SpeakUp'
+      width: 1300
+      height: 980
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile { mode: 'auto' }
+      block company_filter { position: pos(20, 20, 300, 80) }
+      block country_filter { position: pos(340, 20, 300, 80) }
+      block speakup_month { position: pos(20, 120, 620, 320) }
+      block speakup_type_identity { position: pos(660, 120, 620, 320) }
+      block speakup_response { position: pos(20, 460, 300, 120) }
+      block speakup_close_rate { position: pos(340, 460, 300, 120) }
+      block speakup_close_time { position: pos(660, 460, 300, 120) }
+      block speakup_reopenings { position: pos(980, 460, 300, 120) }
+      block speakup_manager { position: pos(20, 600, 1260, 360) }
+      default_zoom: 'fit_to_width'
+    }
   }
 
   interactions: [
