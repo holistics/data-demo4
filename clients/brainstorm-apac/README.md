@@ -68,7 +68,7 @@ Validate the local AMQL before testing the data source:
 
 ```sh
 holistics aml validate \
-  clients/brainstorm-apac/models/brainstorm_apac.model.aml \
+  clients/brainstorm-apac/models/*.model.aml \
   clients/brainstorm-apac/datasets/brainstorm_adoption.dataset.aml \
   clients/brainstorm-apac/datasets/brainstorm_cases.dataset.aml \
   clients/brainstorm-apac/datasets/brainstorm_speakup.dataset.aml \

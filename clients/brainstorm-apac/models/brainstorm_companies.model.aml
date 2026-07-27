@@ -1,0 +1,9 @@
+Model brainstorm_companies {
+  type: 'table'
+  label: 'Companies'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."companies"'
+  dimension id { label: 'Company ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
+  dimension name { label: 'Company' type: 'text' definition: @sql {{ #SOURCE.name }};; }
+  dimension country { label: 'Country' type: 'text' definition: @sql {{ #SOURCE.country }};; }
+}

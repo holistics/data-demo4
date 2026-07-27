@@ -1,0 +1,10 @@
+Model brainstorm_case_events {
+  type: 'table'
+  label: 'Case events (internal)'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."case_events"'
+  dimension id { label: 'Event ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
+  dimension case_id { label: 'Case ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.case_id }};; }
+  dimension event_type { label: 'Event type' type: 'text' hidden: true definition: @sql {{ #SOURCE.event_type }};; }
+  dimension created_at { label: 'Event time' type: 'datetime' hidden: true definition: @sql {{ #SOURCE.created_at }};; }
+}

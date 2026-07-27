@@ -1,0 +1,15 @@
+Model brainstorm_speakup {
+  type: 'table'
+  label: 'SpeakUp'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."speakup"'
+  dimension id { label: 'SpeakUp ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; }
+  dimension manager_id { label: 'Manager ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.manager_id }};; }
+  dimension submitted_at { label: 'Submitted at' type: 'datetime' definition: @sql {{ #SOURCE.submitted_at }};; }
+  dimension submitted_date { label: 'Submitted date' type: 'date' definition: @sql {{ #SOURCE.submitted_at }}::date;; }
+  dimension status { label: 'Current status' type: 'text' definition: @sql {{ #SOURCE.status }};; }
+  dimension anonymous { label: 'Anonymous' type: 'truefalse' definition: @sql {{ #SOURCE.anonymous }};; }
+  dimension identity_type { label: 'Identity type' type: 'text' definition: @sql case when {{ #SOURCE.anonymous }} then 'Anonymous' else 'Identified' end;; }
+  dimension speakup_type { label: 'Feedback type' type: 'text' definition: @sql {{ #SOURCE.speakup_type }};; }
+}
