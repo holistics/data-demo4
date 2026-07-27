@@ -36,7 +36,7 @@ Dashboard brainstorm_apac_dashboard {
     }
   }
   block current_adoption: VizBlock {
-    label: 'Latest adoption — 1 Jul 2026'
+    label: 'Latest adoption - 1 Jul 2026'
     viz: MetricKpi {
       dataset: brainstorm_adoption
       value: VizFieldFull { ref: r(brainstorm_adoption.latest_adoption) format { type: 'number' pattern: '0.0%' } }
@@ -50,7 +50,7 @@ Dashboard brainstorm_apac_dashboard {
     }
   }
   block adoption_trend: VizBlock {
-    label: 'Monthly adoption trend — Jul 2025 to Jun 2026'
+    label: 'Monthly adoption trend - Jul 2025 to Jun 2026'
     viz: LineChart {
       dataset: brainstorm_adoption
       filter { field: r(brainstorm_adoption_snapshot.snapshot_month) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
@@ -68,7 +68,7 @@ Dashboard brainstorm_apac_dashboard {
   }
 
   block cases_month: VizBlock {
-    label: 'Cases received by month — Jul 2025 to Jun 2026'
+    label: 'Cases received by month - Jul 2025 to Jun 2026'
     viz: ColumnChart {
       dataset: brainstorm_cases_dataset
       filter { field: r(brainstorm_cases.created_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
@@ -122,7 +122,7 @@ Dashboard brainstorm_apac_dashboard {
   }
 
   block speakup_month: VizBlock {
-    label: 'SpeakUp submissions over time — Jul 2025 to Jun 2026'
+    label: 'SpeakUp submissions over time - Jul 2025 to Jun 2026'
     viz: LineChart {
       dataset: brainstorm_speakup_dataset
       filter { field: r(brainstorm_speakup.submitted_date) operator: 'between' value: ['2025-07-01', '2026-06-30'] }
