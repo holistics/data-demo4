@@ -27,12 +27,12 @@ Model brainstorm_speakup_lifecycle {
       and {{ #e.created_at }} <= timestamp '2026-07-01 00:00:00'
     where {{ #s.submitted_at }} < timestamp '2026-07-01 00:00:00'
     group by {{ #s.id }}, {{ #s.submitted_at }};;
-  dimension speakup_id { label: 'SpeakUp ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.speakup_id }};; }
-  dimension first_manager_response_at { label: 'First manager response' type: 'datetime' definition: @sql {{ #SOURCE.first_manager_response_at }};; }
-  dimension first_response_hours { label: 'First response hours' type: 'number' definition: @sql {{ #SOURCE.first_response_hours }};; }
-  dimension reopen_count { label: 'Reopenings' type: 'number' definition: @sql {{ #SOURCE.reopen_count }};; }
-  dimension final_closed_at { label: 'Final close' type: 'datetime' definition: @sql {{ #SOURCE.final_closed_at }};; }
-  dimension final_close_days { label: 'Final close days' type: 'number' definition: @sql {{ #SOURCE.final_close_days }};; }
-  dimension lifecycle_days { label: 'Lifecycle days' type: 'number' definition: @sql {{ #SOURCE.lifecycle_days }};; }
-  dimension current_state { label: 'Lifecycle state' type: 'text' definition: @sql case when {{ #SOURCE.final_closed_at }} is null then 'In progress' else 'Closed' end;; }
+  dimension speakup_id { label: 'SpeakUp ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.speakup_id }};; description: 'SpeakUp ticket represented by this one-row lifecycle summary. Use to join lifecycle measures to SpeakUp tickets.' }
+  dimension first_manager_response_at { label: 'First manager response' type: 'datetime' definition: @sql {{ #SOURCE.first_manager_response_at }};; description: 'UTC time of the first manager response after submission and on or before 1 July 2026. Blank means no qualifying response.' }
+  dimension first_response_hours { label: 'First response hours' type: 'number' definition: @sql {{ #SOURCE.first_response_hours }};; description: 'Elapsed hours from ticket submission to the first manager response. Use to assess response speed; excludes tickets without a response.' }
+  dimension reopen_count { label: 'Reopenings' type: 'number' definition: @sql {{ #SOURCE.reopen_count }};; description: 'Number of reopen events recorded for the ticket on or before 1 July 2026. Sum to measure repeated handling.' }
+  dimension final_closed_at { label: 'Final close' type: 'datetime' definition: @sql {{ #SOURCE.final_closed_at }};; description: 'UTC time of the last valid close not followed by a reopen before 1 July 2026. Blank means the ticket remained open at the cutoff.' }
+  dimension final_close_days { label: 'Final close days' type: 'number' definition: @sql {{ #SOURCE.final_close_days }};; description: 'Elapsed days from submission to final close. Use for closure-time analysis; excludes tickets not finally closed by the cutoff.' }
+  dimension lifecycle_days { label: 'Lifecycle days' type: 'number' definition: @sql {{ #SOURCE.lifecycle_days }};; description: 'Elapsed days from submission to final close, or to 1 July 2026 when still open. Use for total lifecycle duration analysis.' }
+  dimension current_state { label: 'Lifecycle state' type: 'text' definition: @sql case when {{ #SOURCE.final_closed_at }} is null then 'In progress' else 'Closed' end;; description: 'Cutoff-aware SpeakUp state as at 1 July 2026. Use Closed versus In progress for consistent status reporting.' }
 }

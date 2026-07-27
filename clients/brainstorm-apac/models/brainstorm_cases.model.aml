@@ -3,15 +3,15 @@ Model brainstorm_cases {
   label: 'Cases'
   data_source_name: 'brainstorm_apac_runsql'
   table_name: '"public"."cases"'
-  dimension id { label: 'Case ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
-  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; }
-  dimension manager_id { label: 'Manager ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.manager_id }};; }
-  dimension created_at { label: 'Created at' type: 'datetime' definition: @sql {{ #SOURCE.created_at }};; }
-  dimension created_date { label: 'Created date' type: 'date' definition: @sql {{ #SOURCE.created_at }}::date;; }
-  dimension status { label: 'Current status' type: 'text' definition: @sql {{ #SOURCE.status }};; }
-  dimension channel { label: 'Channel' type: 'text' definition: @sql {{ #SOURCE.channel }};; }
-  dimension case_type { label: 'Case type' type: 'text' definition: @sql {{ #SOURCE.case_type_code }};; }
-  dimension classification { label: 'Classification' type: 'text' definition: @sql {{ #SOURCE.classification }};; }
-  dimension allegation_status { label: 'Allegation status' type: 'text' definition: @sql {{ #SOURCE.allegation_status }};; }
-  dimension target_closure_date { label: 'Target closure date' type: 'date' definition: @sql {{ #SOURCE.target_closure_date }}::date;; }
+  dimension id { label: 'Case ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; description: 'Unique case identifier. Use for distinct case counts and record-level joins; do not display as a business label.' }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; description: 'Company that owns the case. Use for joins and tenant access rules; use Company for display.' }
+  dimension manager_id { label: 'Manager ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.manager_id }};; description: 'Case manager assigned to the case. Use for joins; use Case manager to group or display results.' }
+  dimension created_at { label: 'Created at' type: 'datetime' definition: @sql {{ #SOURCE.created_at }};; description: 'UTC date and time when the case was created. Use for precise sequencing and time-of-day analysis.' }
+  dimension created_date { label: 'Created date' type: 'date' definition: @sql {{ #SOURCE.created_at }}::date;; description: 'Calendar date when the case was created. Use for date filters and daily, monthly or yearly case trends.' }
+  dimension status { label: 'Current status' type: 'text' definition: @sql {{ #SOURCE.status }};; description: 'Source-system status currently stored on the case. Use for operational status breakdowns; use Lifecycle state for cutoff-aware open versus closed analysis.' }
+  dimension channel { label: 'Channel' type: 'text' definition: @sql {{ #SOURCE.channel }};; description: 'Intake channel through which the case was submitted. Use to compare case volume by submission route.' }
+  dimension case_type { label: 'Case type' type: 'text' definition: @sql {{ #SOURCE.case_type_code }};; description: 'Business category assigned to the case. Use to filter or compare case volume and outcomes by issue type.' }
+  dimension classification { label: 'Classification' type: 'text' definition: @sql {{ #SOURCE.classification }};; description: 'Case validity classification. Use actual to analyse genuine cases and duplicate to identify repeated submissions.' }
+  dimension allegation_status { label: 'Allegation status' type: 'text' definition: @sql {{ #SOURCE.allegation_status }};; description: 'Current assessment status of the allegation attached to the case. Use for allegation outcome breakdowns.' }
+  dimension target_closure_date { label: 'Target closure date' type: 'date' definition: @sql {{ #SOURCE.target_closure_date }}::date;; description: 'Planned date by which the case should be closed. Compare with Final close or the reporting cutoff to assess timeliness.' }
 }

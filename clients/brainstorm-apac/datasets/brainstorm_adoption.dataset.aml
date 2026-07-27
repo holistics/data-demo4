@@ -13,29 +13,34 @@ Dataset brainstorm_adoption {
     label: 'Current headcount'
     type: 'number'
     definition: @aql sum(brainstorm_adoption_snapshot.headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true);;
+    description: 'Total employee headcount in the fixed latest snapshot dated 1 July 2026. Use for current workforce size and as the denominator context for adoption.'
   }
   metric current_app_users {
     label: 'Current app users'
     type: 'number'
     definition: @aql sum(brainstorm_adoption_snapshot.app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true);;
+    description: 'Total employees counted as app users in the fixed latest snapshot dated 1 July 2026. Use for current active user volume.'
   }
   metric latest_adoption {
     label: 'Latest adoption'
     type: 'number'
     format: '0.0%'
     definition: @aql (sum(brainstorm_adoption_snapshot.app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)) / (sum(brainstorm_adoption_snapshot.headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true));;
+    description: 'Current app users divided by current headcount in the 1 July 2026 snapshot. Use for the latest adoption percentage across selected companies.'
   }
   metric adoption_rate {
     label: 'Monthly adoption'
     type: 'number'
     format: '0.0%'
     definition: @aql sum(brainstorm_adoption_snapshot.app_user_hc) / sum(brainstorm_adoption_snapshot.headcount);;
+    description: 'App users divided by headcount for the selected snapshot period. Use with Snapshot month for monthly adoption trends; do not sum percentages.'
   }
   metric adoption_pop {
     label: 'Adoption PoP'
     type: 'number'
     format: '0.0%'
     definition: @aql ((sum(brainstorm_adoption_snapshot.app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)) / (sum(brainstorm_adoption_snapshot.headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true))) - ((sum(brainstorm_adoption_snapshot.previous_app_user_hc) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)) / (sum(brainstorm_adoption_snapshot.previous_headcount) | where(brainstorm_adoption_snapshot.is_latest_snapshot == true)));;
+    description: 'Latest adoption on 1 July 2026 minus adoption in the preceding snapshot month. Positive values mean adoption increased; interpret as percentage-point change.'
   }
   view {
     group adoption_metrics { metric current_headcount metric current_app_users metric latest_adoption metric adoption_rate metric adoption_pop }
