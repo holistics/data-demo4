@@ -24,16 +24,26 @@ Dashboard brainstorm_apac_dashboard {
       input_type: 'multiple'
     }
   }
-
   block current_hc: VizBlock {
     label: 'Current headcount'
     viz: MetricKpi {
       dataset: brainstorm_adoption
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       value: VizFieldFull {
         ref: r(brainstorm_adoption.current_headcount)
         format {
           type: 'number'
           pattern: '#,###'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
@@ -45,6 +55,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Current app users'
     viz: MetricKpi {
       dataset: brainstorm_adoption
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       value: VizFieldFull {
         ref: r(brainstorm_adoption.current_app_users)
         format {
@@ -61,6 +76,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Latest adoption - 1 Jul 2026'
     viz: MetricKpi {
       dataset: brainstorm_adoption
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       value: VizFieldFull {
         ref: r(brainstorm_adoption.latest_adoption)
         format {
@@ -77,6 +97,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Adoption PoP vs Jun 2026'
     viz: MetricKpi {
       dataset: brainstorm_adoption
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       value: VizFieldFull {
         ref: r(brainstorm_adoption.adoption_pop)
         format {
@@ -322,6 +347,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Earliest manager response hours'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       filter {
         field: r(brainstorm_speakup.submitted_date)
         operator: 'between'
@@ -340,6 +370,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Current close rate'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       filter {
         field: r(brainstorm_speakup.submitted_date)
         operator: 'between'
@@ -364,6 +399,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Final close days'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       filter {
         field: r(brainstorm_speakup.submitted_date)
         operator: 'between'
@@ -382,6 +422,11 @@ Dashboard brainstorm_apac_dashboard {
     label: 'Reopenings'
     viz: MetricKpi {
       dataset: brainstorm_speakup_dataset
+      theme {
+        metric_kpi {
+          alignment: 'center'
+        }
+      }
       filter {
         field: r(brainstorm_speakup.submitted_date)
         operator: 'between'
