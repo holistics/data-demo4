@@ -17,34 +17,40 @@ Dataset brainstorm_speakup_dataset {
     label: 'Submitted SpeakUp volume'
     type: 'number'
     definition: @aql count_distinct(brainstorm_speakup.id);;
+    description: 'Distinct number of submitted SpeakUp tickets after all selected filters. Use as the standard submission count and break it down by company, date, type, identity or manager.'
   }
   metric average_first_response_hours {
     label: 'First response hours'
     type: 'number'
     format: '#,##0.0'
     definition: @aql average(brainstorm_speakup_lifecycle.first_response_hours);;
+    description: 'Average elapsed hours from submission to the first manager response for tickets with a qualifying response by 1 July 2026. Lower values indicate faster response.'
   }
   metric currently_closed_tickets {
     label: 'Currently closed tickets'
     type: 'number'
     definition: @aql count_distinct(brainstorm_speakup.id) | where(brainstorm_speakup_lifecycle.current_state == 'Closed');;
+    description: 'Distinct SpeakUp tickets finally closed as at 1 July 2026, with no later reopen before the cutoff. Use for cutoff-consistent closure volume.'
   }
   metric current_close_rate {
     label: 'Current close rate'
     type: 'number'
     format: '0.0%'
     definition: @aql (count_distinct(brainstorm_speakup.id) | where(brainstorm_speakup_lifecycle.current_state == 'Closed')) / count_distinct(brainstorm_speakup.id);;
+    description: 'Share of selected SpeakUp tickets that were finally closed as at 1 July 2026. Divide closed tickets by submitted tickets; do not sum percentages.'
   }
   metric average_final_close_days {
     label: 'Final close days'
     type: 'number'
     format: '#,##0.0'
     definition: @aql average(brainstorm_speakup_lifecycle.final_close_days);;
+    description: 'Average elapsed days from submission to final close for tickets finally closed by 1 July 2026. Excludes tickets still in progress at the cutoff.'
   }
   metric reopenings {
     label: 'Reopenings'
     type: 'number'
     definition: @aql sum(brainstorm_speakup_lifecycle.reopen_count);;
+    description: 'Total reopen events across selected SpeakUp tickets on or before 1 July 2026. One ticket can contribute more than one reopening, so this is an event count.'
   }
   view {
     group speakup_metrics { metric submitted_tickets metric average_first_response_hours metric currently_closed_tickets metric current_close_rate metric average_final_close_days metric reopenings }

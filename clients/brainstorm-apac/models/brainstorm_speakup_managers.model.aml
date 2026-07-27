@@ -3,9 +3,9 @@ Model brainstorm_speakup_managers {
   label: 'SpeakUp managers'
   data_source_name: 'brainstorm_apac_runsql'
   table_name: '"public"."speakup_managers"'
-  dimension id { label: 'Manager ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
-  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; }
-  dimension manager { label: 'SpeakUp manager' type: 'text' definition: @sql {{ #SOURCE.synthetic_manager_code }};; }
-  dimension role { label: 'Role' type: 'text' definition: @sql {{ #SOURCE.role_code }};; }
-  dimension status { label: 'Manager status' type: 'text' definition: @sql {{ #SOURCE.status }};; }
+  dimension id { label: 'Manager ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; description: 'Unique SpeakUp manager identifier. Use for joins to SpeakUp tickets; use SpeakUp manager for display.' }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; description: 'Company that the SpeakUp manager belongs to. Use for joins and tenant access checks.' }
+  dimension manager { label: 'SpeakUp manager' type: 'text' definition: @sql {{ #SOURCE.synthetic_manager_code }};; description: 'Synthetic, non-personal manager code. Use to group or compare SpeakUp workload and response performance by manager.' }
+  dimension role { label: 'Role' type: 'text' definition: @sql {{ #SOURCE.role_code }};; description: 'SpeakUp manager role code. Use to filter or compare performance by operational role.' }
+  dimension status { label: 'Manager status' type: 'text' definition: @sql {{ #SOURCE.status }};; description: 'Current account or employment status of the SpeakUp manager. Use to distinguish active and inactive managers.' }
 }

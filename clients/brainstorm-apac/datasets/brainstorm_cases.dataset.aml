@@ -17,31 +17,37 @@ Dataset brainstorm_cases_dataset {
     label: 'Case volume'
     type: 'number'
     definition: @aql count_distinct(brainstorm_cases.id);;
+    description: 'Distinct number of cases after all selected filters. Use as the standard case count and break it down by company, date, channel, type, manager or status.'
   }
   metric actual_cases {
     label: 'Actual cases'
     type: 'number'
     definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_cases.classification == 'actual');;
+    description: 'Distinct cases classified as actual rather than duplicate. Use to measure genuine case demand after selected filters.'
   }
   metric duplicate_cases {
     label: 'Duplicate cases'
     type: 'number'
     definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_cases.classification == 'duplicate');;
+    description: 'Distinct cases classified as duplicate. Use to monitor repeated submissions and compare with Actual cases.'
   }
   metric closed_cases {
     label: 'Closed cases'
     type: 'number'
     definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_case_lifecycle.current_state == 'Closed');;
+    description: 'Distinct cases finally closed as at 1 July 2026, with no later reopen before the cutoff. Use for cutoff-consistent closure reporting.'
   }
   metric in_progress_cases {
     label: 'In-progress cases'
     type: 'number'
     definition: @aql count_distinct(brainstorm_cases.id) | where(brainstorm_case_lifecycle.current_state == 'In progress');;
+    description: 'Distinct cases not finally closed as at 1 July 2026. Use for the open workload at the reporting cutoff.'
   }
   metric case_reopenings {
     label: 'Case reopenings'
     type: 'number'
     definition: @aql sum(brainstorm_case_lifecycle.reopen_count);;
+    description: 'Total reopen events across selected cases on or before 1 July 2026. One case can contribute more than one reopening, so this is an event count rather than a case count.'
   }
   view {
     group case_metrics { metric case_volume metric actual_cases metric duplicate_cases metric closed_cases metric in_progress_cases metric case_reopenings }

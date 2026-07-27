@@ -24,9 +24,9 @@ Model brainstorm_case_lifecycle {
       and {{ #e.created_at }} <= timestamp '2026-07-01 00:00:00'
     where {{ #c.created_at }} < timestamp '2026-07-01 00:00:00'
     group by {{ #c.id }}, {{ #c.created_at }};;
-  dimension case_id { label: 'Case ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.case_id }};; }
-  dimension reopen_count { label: 'Reopenings' type: 'number' definition: @sql {{ #SOURCE.reopen_count }};; }
-  dimension final_closed_at { label: 'Final close' type: 'datetime' definition: @sql {{ #SOURCE.final_closed_at }};; }
-  dimension lifecycle_days { label: 'Lifecycle days' type: 'number' definition: @sql {{ #SOURCE.lifecycle_days }};; }
-  dimension current_state { label: 'Lifecycle state' type: 'text' definition: @sql case when {{ #SOURCE.final_closed_at }} is null then 'In progress' else 'Closed' end;; }
+  dimension case_id { label: 'Case ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.case_id }};; description: 'Case represented by this one-row lifecycle summary. Use to join lifecycle measures to Cases.' }
+  dimension reopen_count { label: 'Reopenings' type: 'number' definition: @sql {{ #SOURCE.reopen_count }};; description: 'Number of reopen events recorded for the case on or before 1 July 2026. Sum to measure repeated case work.' }
+  dimension final_closed_at { label: 'Final close' type: 'datetime' definition: @sql {{ #SOURCE.final_closed_at }};; description: 'UTC time of the last valid close not followed by a reopen before 1 July 2026. Blank means the case remained open at the cutoff.' }
+  dimension lifecycle_days { label: 'Lifecycle days' type: 'number' definition: @sql {{ #SOURCE.lifecycle_days }};; description: 'Elapsed days from case creation to final close, or to 1 July 2026 when still open. Use for duration analysis.' }
+  dimension current_state { label: 'Lifecycle state' type: 'text' definition: @sql case when {{ #SOURCE.final_closed_at }} is null then 'In progress' else 'Closed' end;; description: 'Cutoff-aware case state as at 1 July 2026. Use Closed versus In progress for consistent status reporting.' }
 }

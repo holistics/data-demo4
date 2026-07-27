@@ -3,8 +3,8 @@ Model brainstorm_case_events {
   label: 'Case events (internal)'
   data_source_name: 'brainstorm_apac_runsql'
   table_name: '"public"."case_events"'
-  dimension id { label: 'Event ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
-  dimension case_id { label: 'Case ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.case_id }};; }
-  dimension event_type { label: 'Event type' type: 'text' hidden: true definition: @sql {{ #SOURCE.event_type }};; }
-  dimension created_at { label: 'Event time' type: 'datetime' hidden: true definition: @sql {{ #SOURCE.created_at }};; }
+  dimension id { label: 'Event ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; description: 'Unique case event identifier. Use only for event-level joins or deduplication.' }
+  dimension case_id { label: 'Case ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.case_id }};; description: 'Case affected by the event. Use to join event history to its parent case.' }
+  dimension event_type { label: 'Event type' type: 'text' hidden: true definition: @sql {{ #SOURCE.event_type }};; description: 'Lifecycle action recorded for the case, such as close or reopen. Use in lifecycle calculations rather than direct reporting.' }
+  dimension created_at { label: 'Event time' type: 'datetime' hidden: true definition: @sql {{ #SOURCE.created_at }};; description: 'UTC date and time when the case event occurred. Use to order lifecycle actions and apply the reporting cutoff.' }
 }

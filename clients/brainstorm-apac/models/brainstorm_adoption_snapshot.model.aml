@@ -16,15 +16,15 @@ Model brainstorm_adoption_snapshot {
       , lag({{ #s.app_user_hc }}::numeric / nullif({{ #s.headcount }}, 0)) over (partition by {{ #s.company_id }} order by {{ #s.snapshot_month }}) as previous_adoption_rate
       , {{ #s.snapshot_month }} = date '2026-07-01' as is_latest_snapshot
     from {{ #brainstorm_company_snapshots as s }};;
-  dimension snapshot_key { label: 'Snapshot key' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.snapshot_key }};; }
-  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; }
-  dimension snapshot_month { label: 'Snapshot month' type: 'date' definition: @sql {{ #SOURCE.snapshot_month }};; }
-  dimension headcount { label: 'Headcount' type: 'number' definition: @sql {{ #SOURCE.headcount }};; }
-  dimension app_user_hc { label: 'App users' type: 'number' definition: @sql {{ #SOURCE.app_user_hc }};; }
-  dimension adoption_rate { label: 'Adoption rate' type: 'number' definition: @sql {{ #SOURCE.adoption_rate }};; }
-  dimension previous_headcount { label: 'Previous headcount' type: 'number' hidden: true definition: @sql {{ #SOURCE.previous_headcount }};; }
-  dimension previous_app_user_hc { label: 'Previous app users' type: 'number' hidden: true definition: @sql {{ #SOURCE.previous_app_user_hc }};; }
-  dimension previous_adoption_rate { label: 'Previous adoption rate' type: 'number' hidden: true definition: @sql {{ #SOURCE.previous_adoption_rate }};; }
-  dimension adoption_pop { label: 'Adoption PoP' type: 'number' definition: @sql {{ #SOURCE.adoption_rate }} - {{ #SOURCE.previous_adoption_rate }};; }
-  dimension is_latest_snapshot { label: 'Latest snapshot' type: 'truefalse' hidden: true definition: @sql {{ #SOURCE.is_latest_snapshot }};; }
+  dimension snapshot_key { label: 'Snapshot key' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.snapshot_key }};; description: 'Unique company-month snapshot key. Use only for record-level joins or deduplication.' }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; description: 'Company that owns the adoption snapshot. Use for joins and tenant access rules; use Company for display.' }
+  dimension snapshot_month { label: 'Snapshot month' type: 'date' definition: @sql {{ #SOURCE.snapshot_month }};; description: 'Month represented by the adoption snapshot. Use as the time axis or to filter monthly adoption trends.' }
+  dimension headcount { label: 'Headcount' type: 'number' definition: @sql {{ #SOURCE.headcount }};; description: 'Total company employee headcount in the snapshot month. Aggregate with sum across companies.' }
+  dimension app_user_hc { label: 'App users' type: 'number' definition: @sql {{ #SOURCE.app_user_hc }};; description: 'Employees counted as app users in the snapshot month. Aggregate with sum and divide by Headcount for adoption.' }
+  dimension adoption_rate { label: 'Adoption rate' type: 'number' definition: @sql {{ #SOURCE.adoption_rate }};; description: 'App users divided by headcount for one company-month snapshot. Use for row-level inspection; use Monthly adoption for aggregated reporting.' }
+  dimension previous_headcount { label: 'Previous headcount' type: 'number' hidden: true definition: @sql {{ #SOURCE.previous_headcount }};; description: 'Headcount from the immediately preceding snapshot month for the same company. Use in period-over-period calculations.' }
+  dimension previous_app_user_hc { label: 'Previous app users' type: 'number' hidden: true definition: @sql {{ #SOURCE.previous_app_user_hc }};; description: 'App-user count from the immediately preceding snapshot month for the same company. Use in period-over-period calculations.' }
+  dimension previous_adoption_rate { label: 'Previous adoption rate' type: 'number' hidden: true definition: @sql {{ #SOURCE.previous_adoption_rate }};; description: 'Adoption rate from the immediately preceding snapshot month for the same company. Use to calculate adoption change.' }
+  dimension adoption_pop { label: 'Adoption PoP' type: 'number' definition: @sql {{ #SOURCE.adoption_rate }} - {{ #SOURCE.previous_adoption_rate }};; description: 'Current snapshot adoption rate minus the previous month rate. Positive values mean adoption increased; interpret as percentage-point change.' }
+  dimension is_latest_snapshot { label: 'Latest snapshot' type: 'truefalse' hidden: true definition: @sql {{ #SOURCE.is_latest_snapshot }};; description: 'True only for the fixed latest snapshot dated 1 July 2026. Use to filter current headcount, users and adoption metrics.' }
 }
