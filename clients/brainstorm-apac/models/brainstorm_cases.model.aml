@@ -1,0 +1,17 @@
+Model brainstorm_cases {
+  type: 'table'
+  label: 'Cases'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."cases"'
+  dimension id { label: 'Case ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; }
+  dimension manager_id { label: 'Manager ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.manager_id }};; }
+  dimension created_at { label: 'Created at' type: 'datetime' definition: @sql {{ #SOURCE.created_at }};; }
+  dimension created_date { label: 'Created date' type: 'date' definition: @sql {{ #SOURCE.created_at }}::date;; }
+  dimension status { label: 'Current status' type: 'text' definition: @sql {{ #SOURCE.status }};; }
+  dimension channel { label: 'Channel' type: 'text' definition: @sql {{ #SOURCE.channel }};; }
+  dimension case_type { label: 'Case type' type: 'text' definition: @sql {{ #SOURCE.case_type_code }};; }
+  dimension classification { label: 'Classification' type: 'text' definition: @sql {{ #SOURCE.classification }};; }
+  dimension allegation_status { label: 'Allegation status' type: 'text' definition: @sql {{ #SOURCE.allegation_status }};; }
+  dimension target_closure_date { label: 'Target closure date' type: 'date' definition: @sql {{ #SOURCE.target_closure_date }}::date;; }
+}

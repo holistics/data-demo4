@@ -1,0 +1,11 @@
+Model brainstorm_case_managers {
+  type: 'table'
+  label: 'Case managers'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."case_managers"'
+  dimension id { label: 'Manager ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; }
+  dimension manager { label: 'Case manager' type: 'text' definition: @sql {{ #SOURCE.synthetic_manager_code }};; }
+  dimension role { label: 'Role' type: 'text' definition: @sql {{ #SOURCE.role_code }};; }
+  dimension status { label: 'Manager status' type: 'text' definition: @sql {{ #SOURCE.status }};; }
+}

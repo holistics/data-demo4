@@ -1,0 +1,32 @@
+Model brainstorm_case_lifecycle {
+  type: 'query'
+  label: 'Case lifecycle'
+  data_source_name: 'brainstorm_apac_runsql'
+  models: [brainstorm_cases, brainstorm_case_events]
+  query: @sql
+    select
+      {{ #c.id }} as case_id
+      , count(*) filter (where {{ #e.event_type }} = 'reopen' and {{ #e.created_at }} <= timestamp '2026-07-01 00:00:00') as reopen_count
+      , max({{ #e.created_at }}) filter (
+          where {{ #e.event_type }} = 'close'
+            and {{ #e.created_at }} <= timestamp '2026-07-01 00:00:00'
+            and not exists (
+              select 1 from {{ #brainstorm_case_events as r }}
+              where {{ #r.case_id }} = {{ #c.id }}
+                and {{ #r.event_type }} = 'reopen'
+                and {{ #r.created_at }} > {{ #e.created_at }}
+                and {{ #r.created_at }} <= timestamp '2026-07-01 00:00:00'
+            )
+        ) as final_closed_at
+      , extract(epoch from (coalesce(max({{ #e.created_at }}) filter (where {{ #e.event_type }} = 'close' and {{ #e.created_at }} <= timestamp '2026-07-01 00:00:00' and not exists (select 1 from {{ #brainstorm_case_events as r2 }} where {{ #r2.case_id }} = {{ #c.id }} and {{ #r2.event_type }} = 'reopen' and {{ #r2.created_at }} > {{ #e.created_at }} and {{ #r2.created_at }} <= timestamp '2026-07-01 00:00:00')), timestamp '2026-07-01 00:00:00') - {{ #c.created_at }})) / 86400.0 as lifecycle_days
+    from {{ #brainstorm_cases as c }}
+    left join {{ #brainstorm_case_events as e }} on {{ #e.case_id }} = {{ #c.id }}
+      and {{ #e.created_at }} <= timestamp '2026-07-01 00:00:00'
+    where {{ #c.created_at }} < timestamp '2026-07-01 00:00:00'
+    group by {{ #c.id }}, {{ #c.created_at }};;
+  dimension case_id { label: 'Case ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.case_id }};; }
+  dimension reopen_count { label: 'Reopenings' type: 'number' definition: @sql {{ #SOURCE.reopen_count }};; }
+  dimension final_closed_at { label: 'Final close' type: 'datetime' definition: @sql {{ #SOURCE.final_closed_at }};; }
+  dimension lifecycle_days { label: 'Lifecycle days' type: 'number' definition: @sql {{ #SOURCE.lifecycle_days }};; }
+  dimension current_state { label: 'Lifecycle state' type: 'text' definition: @sql case when {{ #SOURCE.final_closed_at }} is null then 'In progress' else 'Closed' end;; }
+}
