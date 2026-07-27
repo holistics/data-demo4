@@ -11,7 +11,7 @@ The analytical cutoff is 1 July 2026 at 00:00 UTC. The reporting period is July 
 - `models/` contains private source models and one-row-per-parent lifecycle models
 - `datasets/` contains 3 fanout-safe datasets
 - `dashboards/` contains the 3-section dashboard
-- `brainstorm_apac_embed_portal.embed.aml` exposes the dashboard through an Embed Portal
+- `embeds/` contains the Embed Portal that exposes the dashboard
 
 ## Seed manifest
 
@@ -68,12 +68,12 @@ Validate the local AMQL before testing the data source:
 
 ```sh
 holistics aml validate \
-  clients/brainstorm-apac/models/brainstorm_apac.model.aml \
+  clients/brainstorm-apac/models/*.model.aml \
   clients/brainstorm-apac/datasets/brainstorm_adoption.dataset.aml \
   clients/brainstorm-apac/datasets/brainstorm_cases.dataset.aml \
   clients/brainstorm-apac/datasets/brainstorm_speakup.dataset.aml \
   clients/brainstorm-apac/dashboards/brainstorm_apac.page.aml \
-  clients/brainstorm-apac/brainstorm_apac_embed_portal.embed.aml \
+  clients/brainstorm-apac/embeds/brainstorm_apac_embed_portal.embed.aml \
   -u company_id:number
 ```
 
