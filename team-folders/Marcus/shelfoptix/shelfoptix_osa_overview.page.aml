@@ -569,6 +569,16 @@ Dashboard shelfoptix_osa_overview {
             }
           }
         ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'sku_name'
+            width: 249
+          }
+        ]
       }
     }
   }
@@ -646,6 +656,16 @@ Dashboard shelfoptix_osa_overview {
               text_color: '#259B6C'
               background_color: '#00000000'
             }
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'sd_store'
+            width: 232
           }
         ]
       }
@@ -764,11 +784,11 @@ Dashboard shelfoptix_osa_overview {
       layer: 6
     }
     block top_oos_skus {
-      position: pos(20, 1280, 620, 340)
+      position: pos(20, 1280, 1260, 340)
       layer: 8
     }
     block store_detail {
-      position: pos(660, 1280, 620, 340)
+      position: pos(20, 1640, 1260, 340)
       layer: 8
     }
     block f_shelfoptix_dim_retailer_sample_retailer_id {
@@ -782,7 +802,7 @@ Dashboard shelfoptix_osa_overview {
     mobile {
       mode: 'auto'
     }
-    height: 1640
+    height: 1980
   }
   interactions: [
     FilterInteraction {
