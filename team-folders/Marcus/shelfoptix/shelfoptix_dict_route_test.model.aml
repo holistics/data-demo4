@@ -1,0 +1,39 @@
+// WORKABLE PATTERN: if/else const returns the column NAME as a string (same deferred
+// mechanism as schema_name), then interpolate ${routed_col}. This routes each retailer
+// to a DIFFERENT column at query time — the dictionary-lookup form crashes because it
+// resolves eagerly and can't take a runtime H.current_user value.
+const routed_col = if (H.current_user.schema == 'shelfoptix_retailer_101') {
+  'stocking_quantity'
+} else if (H.current_user.schema == 'shelfoptix_retailer_102') {
+  'item_sku_no'
+} else {
+  'class_id_no'
+}
+
+Model shelfoptix_dict_route_test {
+  type: 'query'
+  label: 'Shelfoptix dict route test'
+  description: 'Experiment baseline.'
+  data_source_name: 'demo_bigquery'
+
+  dimension store_no {
+    label: 'Store no'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_no }};;
+  }
+  dimension routed_value {
+    label: 'Routed value'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.routed_value }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  query: @sql
+    SELECT
+      store_no,
+      ${routed_col} AS routed_value
+    FROM ${schema_name}.store_scan_sample;;
+  models: []
+}
