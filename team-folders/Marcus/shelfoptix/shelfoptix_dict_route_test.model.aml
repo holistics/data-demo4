@@ -1,19 +1,28 @@
-// WORKABLE PATTERN: if/else const returns the column NAME as a string (same deferred
-// mechanism as schema_name), then interpolate ${routed_col}. This routes each retailer
-// to a DIFFERENT column at query time — the dictionary-lookup form crashes because it
-// resolves eagerly and can't take a runtime H.current_user value.
-const routed_col = if (H.current_user.schema == 'shelfoptix_retailer_101') {
-  'stocking_quantity'
-} else if (H.current_user.schema == 'shelfoptix_retailer_102') {
-  'item_sku_no'
+// Per-retailer COLUMN mapping — the "datasets aren't identical" case.
+//
+// Business field = on-hand quantity. Retailers 101/102/103 name that column
+// `stocking_quantity`; the new retailer 104 names it `stock_qty`. One model serves all
+// four by mapping the column NAME per retailer, then aliasing back to a common name.
+//
+// Mechanism = the same deferred string-interpolation used by `schema_name` for datasets:
+// an if/else const returns the column name, and ${routed_col} is substituted at query
+// time. NOTE: an AML dictionary { key: value } does NOT work here — dict("key") resolves
+// eagerly at compile time and crashes on a runtime H.current_user key, so if/else it is.
+//
+// Earlier baseline of this experiment routed 101/102/else to stocking_quantity /
+// item_sku_no / class_id_no under a generic `routed_value` dimension. That proved the
+// mechanism but mixed unrelated fields, so it has been superseded by the real
+// on-hand-quantity case below.
+const routed_col = if (H.current_user.schema == 'shelfoptix_retailer_104') {
+  'stock_qty'
 } else {
-  'class_id_no'
+  'stocking_quantity'
 }
 
 Model shelfoptix_dict_route_test {
   type: 'query'
   label: 'Shelfoptix dict route test'
-  description: 'Experiment baseline.'
+  description: 'Per-retailer column mapping: routes each retailer to its on-hand-quantity column even when the name differs (104 = stock_qty, others = stocking_quantity).'
   data_source_name: 'demo_bigquery'
 
   dimension store_no {
@@ -22,18 +31,18 @@ Model shelfoptix_dict_route_test {
     hidden: false
     definition: @sql {{ #SOURCE.store_no }};;
   }
-  dimension routed_value {
-    label: 'Routed value'
+  dimension stocking_quantity {
+    label: 'Stocking quantity'
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.routed_value }};;
+    definition: @sql {{ #SOURCE.stocking_quantity }};;
   }
 
   owner: 'dong.ln@holistics.io'
   query: @sql
     SELECT
       store_no,
-      ${routed_col} AS routed_value
+      ${routed_col} AS stocking_quantity
     FROM ${schema_name}.store_scan_sample;;
   models: []
 }
