@@ -1,0 +1,72 @@
+Dashboard training_gantt_vega {
+  title: 'Training Timeline (Vega-Lite)'
+  description: 'Gantt via a Vega-Lite custom chart on a daily-grain model. The global Time Range filter keeps every training active in the window and clips each bar to it; the axis auto-fits (month view zooms to day view).'
+
+  block title: TextBlock {
+    content: @md # Training Timeline;;
+  }
+
+  block f_range: FilterBlock {
+    label: 'Time Range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: training_gantt
+      field: r(training_gantt_days.active_date)
+    }
+    default {
+      operator: 'matches'
+      value: '2026'
+    }
+  }
+
+  block v_gantt: VizBlock {
+    label: 'Training Timeline'
+    viz: CustomChart {
+      dataset: training_gantt
+      custom_chart: training_gantt_vgl
+      field label: VizFieldFull {
+        ref: r(training_gantt_days.training_name)
+        format {
+          type: 'text'
+        }
+      }
+      field active_date: VizFieldFull {
+        ref: r(training_gantt_days.active_date)
+        format {
+          type: 'date'
+        }
+      }
+      field status: VizFieldFull {
+        ref: r(training_gantt_days.status)
+        format {
+          type: 'text'
+        }
+      }
+      setting date_format: 'auto'
+      settings {
+        row_limit: 10000
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1340
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(40, 20, 900, 60)
+    }
+    block f_range {
+      position: pos(960, 24, 340, 60)
+      layer: 1
+    }
+    block v_gantt {
+      position: pos(40, 100, 1260, 440)
+    }
+    mobile {
+      mode: 'auto'
+    }
+    height: 560
+  }
+}

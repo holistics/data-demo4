@@ -1,0 +1,25 @@
+Model slb_countries {
+  type: 'table'
+  label: 'SLB Countries'
+  description: 'Countries (testdb.ecommerce via demo_public).'
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"ecommerce"."countries"'
+
+  dimension code {
+    label: 'Country Code'
+    type: 'text'
+    primary_key: true
+    definition: @sql {{ #SOURCE.code }};;
+  }
+  dimension name {
+    label: 'Country Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension continent_name {
+    label: 'Continent Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.continent_name }};;
+  }
+}
