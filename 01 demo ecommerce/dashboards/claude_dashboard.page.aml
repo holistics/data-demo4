@@ -17,16 +17,12 @@ A unified ecommerce analytics workspace — 10 reports spanning retention, lifet
   block f1: FilterBlock {
     label: 'Date Range'
     type: 'date'
-    default {
-      operator: 'matches'
-      value: '18 months ago till now'
-    }
   }
   block f2: FilterBlock {
     label: 'Time Granularity'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('claude_granularity', 'period')
     }
     default {
@@ -41,115 +37,79 @@ A unified ecommerce analytics workspace — 10 reports spanning retention, lifet
     label: 'Acquisition Cohort'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_users', 'cohort_month')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f4: FilterBlock {
     label: 'Country'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_countries', 'name')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f5: FilterBlock {
     label: 'City'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_cities', 'name')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f6: FilterBlock {
     label: 'Gender'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_users', 'gender')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f7: FilterBlock {
     label: 'Age Group'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_users', 'age_group')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f8: FilterBlock {
     label: 'Parent Category'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('map_categories', 'parent_category')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f9: FilterBlock {
     label: 'Merchant'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_merchants', 'name')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f10: FilterBlock {
     label: 'Order Status'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_orders', 'status')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f11: FilterBlock {
     label: 'Promo Applied'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_orders', 'promo_applied')
-    }
-    default {
-      operator: 'is'
-      value: []
     }
   }
   block f12: FilterBlock {
     label: 'Customer Type'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_users', 'customer_type')
     }
     default {
@@ -161,7 +121,7 @@ A unified ecommerce analytics workspace — 10 reports spanning retention, lifet
     label: 'Delivery-Attempts Band'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_orders', 'delivery_band')
     }
     default {
@@ -173,7 +133,7 @@ A unified ecommerce analytics workspace — 10 reports spanning retention, lifet
     label: 'Price Band'
     type: 'field'
     source: FieldFilterSource {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       field: ref('ecommerce_products', 'price_band')
     }
     default {
@@ -192,7 +152,7 @@ Share of each signup cohort that places an order in each subsequent month — a 
   block r1: VizBlock {
     label: 'Cohort Retention Matrix'
     viz: RetentionHeatmap {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       cohort: VizFieldFull {
         label: 'Acquisition Cohort'
         ref: ref('ecommerce_users', 'cohort_month')
@@ -242,7 +202,7 @@ Cumulative gross profit per acquired customer, plotted over months-since-first-o
   block r2: VizBlock {
     label: 'CLV by Acquisition Cohort'
     viz: LineChart {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
         label: 'Months Since Signup'
         ref: ref('ecommerce_orders', 'month_number')
@@ -292,7 +252,7 @@ Every customer scored on Recency, Frequency, and Monetary value and mapped to a 
   block r3: VizBlock {
     label: 'RFM Customer Segmentation'
     viz: DataTable {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       fields: [
         VizFieldFull {
           ref: ref('ecommerce_users', 'full_name')
@@ -355,7 +315,7 @@ Products ranked by basket reach — how many distinct orders contain each produc
   block r4: VizBlock {
     label: 'Product Affinity'
     viz: DataTable {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       calculation orders_with_product {
         label: 'Orders Containing Product'
         formula: @aql count_distinct(ecommerce_orders.id);;
@@ -424,7 +384,7 @@ GMV decomposed by customer type over time, showing how much revenue comes from n
   block r5: VizBlock {
     label: 'Revenue Bridge'
     viz: ColumnChart {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
         label: 'Period'
         ref: ref('ecommerce_orders', 'order_period')
@@ -474,7 +434,7 @@ Ranked scorecard per merchant: GMV, gross margin, order volume, fulfillment qual
   block r6: VizBlock {
     label: 'Merchant Scorecard'
     viz: PivotTable {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       rows: [
         VizFieldFull {
           ref: ref('ecommerce_merchants', 'name')
@@ -550,7 +510,7 @@ Walks from GMV → discounts → COGS → gross profit across the parent-categor
   block r7: VizBlock {
     label: 'Category Profitability'
     viz: ColumnChart {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
         ref: ref('map_categories', 'parent_category')
         format {
@@ -616,7 +576,7 @@ Compares stacked-promo vs single-promo orders on AOV, margin, order volume, and 
   block r8: VizBlock {
     label: 'Promo Effectiveness'
     viz: PivotTable {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       rows: [
         VizFieldFull {
           ref: ref('ecommerce_orders', 'promo_applied')
@@ -677,7 +637,7 @@ Distribution of delivery attempts crossed with order status — separating logis
   block r9: VizBlock {
     label: 'Fulfillment & Delivery'
     viz: ColumnChart {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
         ref: ref('ecommerce_orders', 'delivery_band')
         format {
@@ -725,7 +685,7 @@ Sales and buyer penetration by continent → country, crossed with gender and ag
   block r10: VizBlock {
     label: 'Geographic & Demographic Mix'
     viz: PivotTable {
-      dataset: Claude_dataset
+      dataset: demo_ecommerce_version_2
       rows: [
         VizFieldFull {
           ref: ref('ecommerce_countries', 'continent_name')

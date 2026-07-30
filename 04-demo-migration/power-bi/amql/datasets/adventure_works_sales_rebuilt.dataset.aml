@@ -1,7 +1,7 @@
 // AdventureWorks Sales dataset rebuilt on the working non-prefixed model family
-Dataset adventure_works_sales {
+Dataset adventure_works_sales_rebuilt {
   __engine__: 'aql'
-  label: 'AdventureWorks Sales'
+  label: 'AdventureWorks Sales Rebuilt'
   description: '''Migrated from Power BI AdventureWorksSales semantic model. Rebuilt on the working non-prefixed model family.'''
   data_source_name: 'md_adventure_works_sales'
 
