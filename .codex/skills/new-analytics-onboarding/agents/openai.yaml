@@ -1,0 +1,4 @@
+interface:
+  display_name: "New Analytics Onboarding"
+  short_description: "Run Holistics AI context onboarding"
+  default_prompt: "Use $new-analytics-onboarding to onboard this Holistics customer context."
