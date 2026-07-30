@@ -114,6 +114,9 @@ Dashboard dabble_au_trading_performance_command_center {
   block audit_intro: TextBlock {
     content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#EEE9FA;"><strong>Audit detail</strong> - the original wide tables are retained for export, underlying-data checks, and metric-definition conversations.</div>;;
   }
+  block metric_sheet_intro: TextBlock {
+    content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#EEE9FA;"><strong>Executive metrics sheet</strong> - monthly leadership scorecard for trading scale, profitability, customer economics, risk exposure, Rocket incentives, and racing/sport/copy mix.</div>;;
+  }
 
   block kpi_actives: VizBlock {
     label: 'Actives'
@@ -269,6 +272,407 @@ Dashboard dabble_au_trading_performance_command_center {
     }
     settings {
       hide_label: true
+    }
+  }
+
+  block executive_metric_sheet: VizBlock {
+    label: 'Executive Metrics Sheet'
+    viz: MetricSheet {
+      dataset: dabble_trading
+      theme {
+        table {
+          general {
+            bg_color: '#FFFFFFFF'
+            hover_color: '#EEE9FA'
+            font_size: 13
+            font_color: '#21099B'
+            border_color: '#DDD8EA'
+            grid_color: '#DDD8EA'
+            borders {
+              outer: true
+              vertical: true
+              header: true
+            }
+          }
+          header {
+            bg_color: '#21099B'
+            font_size: 13
+            font_weight: 'semibold'
+            font_color: '#FFFFFFFF'
+          }
+          sub_header {
+            bg_color: '#EEE9FA'
+            font_size: 13
+            font_weight: 'bold'
+            font_color: '#180666'
+          }
+        }
+      }
+      date_field: VizFieldFull {
+        ref: r(dabble_fact_bet.reporting_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      rows: [
+        MetricHeading {
+          label: 'Trading scale'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.actives)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.bets)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.combined_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.combined_stake_yoy_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricHeading {
+          label: 'Profitability'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.gross_win)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_win)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_revenue_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_revenue_yoy_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricHeading {
+          label: 'Customer economics'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.avg_bet_size)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.avg_stake_per_active)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricHeading {
+          label: 'Risk and incentives'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.restricted_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.restricted_stake_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.bonus_cash_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.bonus_cash_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.rocket_boost)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricHeading {
+          label: 'Racing, sport and copy mix'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.racing_combined_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.racing_gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.sport_combined_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.sport_gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.copy_combined_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.copy_rocket_boost)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.copy_gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        }
+      ]
+      settings {
+        max_column: 12
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
     }
   }
 
@@ -907,6 +1311,26 @@ Dashboard dabble_au_trading_performance_command_center {
   }
 
   view: TabLayout {
+    tab executive_metrics_sheet: CanvasLayout {
+      label: 'Executive Metrics Sheet'
+      width: 1300
+      height: 1280
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block reporting_date_filter {
+        position: pos(20, 20, 300, 80)
+      }
+      block metric_sheet_intro {
+        position: pos(340, 20, 940, 80)
+      }
+      block executive_metric_sheet {
+        position: pos(20, 130, 1260, 1100)
+      }
+      default_zoom: 'fit_to_width'
+    }
     tab executive_pulse: CanvasLayout {
       label: 'Executive Pulse'
       width: 1300
@@ -1116,6 +1540,7 @@ Dashboard dabble_au_trading_performance_command_center {
             'kpi_gross_win_pct',
             'kpi_net_revenue',
             'kpi_rocket_boost',
+            'executive_metric_sheet',
             'weekly_trading_pulse',
             'yoy_scorecard',
             'channel_mix_donut',
@@ -1158,6 +1583,7 @@ Dashboard dabble_au_trading_performance_command_center {
             'kpi_gross_win_pct',
             'kpi_net_revenue',
             'kpi_rocket_boost',
+            'executive_metric_sheet',
             'weekly_trading_pulse',
             'yoy_scorecard',
             'channel_mix_donut',
@@ -1199,6 +1625,7 @@ Dashboard dabble_au_trading_performance_command_center {
             'kpi_gross_win_pct',
             'kpi_net_revenue',
             'kpi_rocket_boost',
+            'executive_metric_sheet',
             'weekly_trading_pulse',
             'yoy_scorecard',
             'channel_mix_donut',
