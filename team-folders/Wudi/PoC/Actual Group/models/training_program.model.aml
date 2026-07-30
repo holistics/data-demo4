@@ -2,7 +2,7 @@ Model ag_training_program {
   type: 'table'
   label: 'Training Program'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension training_program_id {
     label: 'Training Program Id'
     type: 'number'

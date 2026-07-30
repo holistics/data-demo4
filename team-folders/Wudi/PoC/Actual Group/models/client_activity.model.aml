@@ -2,7 +2,7 @@ Model ag_client_activity {
   type: 'table'
   label: 'Client Activity'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension client_activity_id {
     label: 'Client Activity Id'
     type: 'number'

@@ -2,7 +2,7 @@ Model ag_invoice_line {
   type: 'table'
   label: 'Invoice Line'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension invoice_line_id {
     label: 'Invoice Line Id'
     type: 'number'

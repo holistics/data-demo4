@@ -2,7 +2,7 @@ Model ag_offer {
   type: 'table'
   label: 'Offer'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension offer_id {
     label: 'Offer Id'
     type: 'number'

@@ -3,7 +3,7 @@
 Model ag_margin_bridge {
   type: 'query'
   label: 'Margin Bridge'
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   query: @sql
     select step, ord, base, delta from (
       select '1. Revenue'::text as step, 1 as ord, 0::numeric as base,

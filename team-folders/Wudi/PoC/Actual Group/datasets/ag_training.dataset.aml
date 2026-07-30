@@ -7,7 +7,7 @@ Dataset ag_training {
   __engine__: 'aql'
   label: '[AG] Training & Skills'
   description: 'Training enrolment, completion, cost and downstream placement outcomes for candidates.'
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
 
   models: [
     ag_candidate_training,

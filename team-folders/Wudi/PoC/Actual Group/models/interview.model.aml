@@ -2,7 +2,7 @@ Model ag_interview {
   type: 'table'
   label: 'Interview'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension interview_id {
     label: 'Interview Id'
     type: 'number'
