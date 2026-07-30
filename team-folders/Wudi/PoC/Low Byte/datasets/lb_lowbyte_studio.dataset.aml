@@ -145,6 +145,23 @@ Dataset lb_lowbyte_studio {
       ) ;;
   }
 
+  dimension periods_since_install {
+    label: 'Periods Since Install'
+    description: 'Calendar periods elapsed between the install period and the activity period. Granularity switches with the Cohort Granularity control in lockstep with Install Cohort (Month / Week / Quarter), so period 0 is always the install period itself. Uncapped: the axis shows exactly the periods present in the data.'
+    type: 'number'
+    model: lb_fact_player_activity_daily
+    // Both sides of every date_diff must be DATE-typed. Using the datetime
+    // `first_activity_at` here silently timezone-converts one side only
+    // (AT TIME ZONE 'America/Los_Angeles') and shifts the diagonal by one period.
+    definition: @aql case(
+        when: 'Week' in lb_cohort_params.cohort_grain
+        , then: date_diff('week', lb_fact_install.install_week, lb_dim_date.week_start_date)
+        , when: 'Quarter' in lb_cohort_params.cohort_grain
+        , then: date_diff('quarter', lb_fact_install.install_quarter, lb_dim_date.quarter_start_date)
+        , else: date_diff('month', lb_fact_install.install_month, lb_dim_date.month_start_date)
+      ) ;;
+  }
+
   // ---------- Volume / audience ----------
   metric installs {
     label: 'Installs'

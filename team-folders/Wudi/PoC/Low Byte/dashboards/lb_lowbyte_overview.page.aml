@@ -1703,11 +1703,11 @@ Dashboard lb_lowbyte_overview {
     type: 'field'
     source: FieldFilterSource {
       dataset: lb_lowbyte_studio
-      field: ref('lb_fact_install', 'installed_at')
+      field: r(lb_fact_install.installed_at)
     }
     default {
       operator: 'matches'
-      value: 'last 1 year'
+      value: 'last 12 months until today'
     }
   }
   block k64: VizBlock {
@@ -1826,12 +1826,18 @@ Dashboard lb_lowbyte_overview {
     }
   }
   block cp69: VizBlock {
-    label: 'Cohort Retention % — Install Cohort × Weeks Since Install'
+    label: 'Cohort Retention % — Install Cohort × Periods Since Install'
     viz: PivotTable {
       dataset: lb_lowbyte_studio
       calculation retention_pct {
         label: 'Retention %'
-        formula: @aql safe_divide(active_players, installs | of_all(lb_fact_player_activity_daily.weeks_since_install_capped, keep_filters: true)) ;;
+        // Cohort base counts net-new players only (is_reinstall = false). The same
+        // filter must apply to numerator and denominator, or reinstall players'
+        // activity would be divided by a base that excludes them.
+        formula: @aql safe_divide(
+          active_players | where(lb_fact_install.is_reinstall is false),
+          installs | where(lb_fact_install.is_reinstall is false) | of_all(lb_fact_player_activity_daily.periods_since_install, keep_filters: true)
+        ) ;;
         calc_type: 'measure'
         data_type: 'number'
       }
@@ -1854,7 +1860,7 @@ Dashboard lb_lowbyte_overview {
       ]
       columns: [
         VizFieldFull {
-          ref: r(lb_fact_player_activity_daily.weeks_since_install_capped)
+          ref: r(lb_lowbyte_studio, lb_fact_player_activity_daily.periods_since_install)
           format {
             type: 'number'
           }
@@ -1898,7 +1904,7 @@ Dashboard lb_lowbyte_overview {
         column_styles: [
           ColumnStyle {
             key: 'custom_retention_pct'
-            width: 102
+            width: 260
           },
           ColumnStyle {
             key: 'lb_dim_acquisition_source_channel_group'
@@ -2223,33 +2229,35 @@ Dashboard lb_lowbyte_overview {
         position: pos(20, 20, 1160, 104)
         layer: 1
       }
-      block flt_cohort_grain {
-        position: pos(20, 144, 373, 56)
-        layer: 2
-      }
-      block flt_cohort_date {
-        position: pos(413, 144, 373, 56)
-        layer: 3
-      }
       block k64 {
-        position: pos(20, 220, 224, 120)
+        position: pos(20, 144, 224, 120)
         layer: 4
       }
       block k65 {
-        position: pos(248, 220, 224, 120)
+        position: pos(248, 144, 224, 120)
         layer: 5
       }
       block k66 {
-        position: pos(476, 220, 224, 120)
+        position: pos(476, 144, 224, 120)
         layer: 6
       }
       block k67 {
-        position: pos(704, 220, 224, 120)
+        position: pos(704, 144, 224, 120)
         layer: 7
       }
       block k68 {
-        position: pos(932, 220, 224, 120)
+        position: pos(932, 144, 224, 120)
         layer: 8
+      }
+      // Scoped to the cohort matrix below, not the page — kept adjacent to cp69
+      // and below the KPI row so they don't read as global filters.
+      block flt_cohort_grain {
+        position: pos(20, 284, 373, 56)
+        layer: 2
+      }
+      block flt_cohort_date {
+        position: pos(413, 284, 373, 56)
+        layer: 3
       }
       block cp69 {
         position: pos(20, 358, 1160, 460)
@@ -2436,7 +2444,6 @@ Dashboard lb_lowbyte_overview {
       }
     }
   }
-
   interactions: [
     FilterInteraction {
       from: 'flt_cohort_date'
