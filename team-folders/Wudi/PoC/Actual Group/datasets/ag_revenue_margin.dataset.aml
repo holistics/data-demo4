@@ -8,7 +8,7 @@ Dataset ag_revenue_margin {
   __engine__: 'aql'
   label: '[AG] Revenue & Margin'
   description: 'Revenue, cost, gross margin and productivity metrics for the Actual Group staffing PoC.'
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
 
   models: [
     ag_invoice,
