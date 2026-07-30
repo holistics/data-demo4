@@ -1,0 +1,1262 @@
+Dashboard dabble_au_trading_performance_command_center {
+  title: 'Dabble AU Trading Performance Command Center'
+  description: 'Alternative executive-to-operator dashboard design for the Dabble AU trading prototype. Preserves the same synthetic semantic layer while presenting KPI pulse, performance drivers, customer risk, and audit detail as a guided analysis flow.'
+  theme: dabble_light
+
+  block reporting_date_filter: FilterBlock {
+    label: 'Reporting Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_fact_bet.reporting_date)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 2 years to today'
+    }
+  }
+  block fixture_start_filter: FilterBlock {
+    label: 'Fixture Start'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_dim_fixture.advertised_start)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 2 years to today'
+    }
+  }
+  block sport_filter: FilterBlock {
+    label: 'Sport'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_dim_sport.sport_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block competition_filter: FilterBlock {
+    label: 'Competition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_dim_competition.competition_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block fixture_filter: FilterBlock {
+    label: 'Fixture'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_dim_fixture.fixture_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block date_drill: DateDrillBlock {
+    label: 'Date Drill'
+  }
+  block period_comparison: PopBlock {
+    label: 'Compare'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'year'
+    }
+  }
+
+  block command_center_intro: TextBlock {
+    content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#EEE9FA;"><strong>After concept</strong> - trading leadership gets a fast pulse first, then guided driver analysis, risk/customer investigation, and audit-grade detail. All values and aliases remain synthetic demo data.</div>;;
+  }
+  block drivers_intro: TextBlock {
+    content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#EEE9FA;"><strong>Driver lens</strong> - move from sport mix to competition, fixture, market group, and risk concentration. Filter or drill the visuals before opening row-level detail.</div>;;
+  }
+  block risk_intro: TextBlock {
+    content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#EEE9FA;"><strong>Risk and customer lens</strong> - compare turnover, profitability, Rocket economics, and restricted stake exposure before reviewing customer tables.</div>;;
+  }
+  block audit_intro: TextBlock {
+    content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#EEE9FA;"><strong>Audit detail</strong> - the original wide tables are retained for export, underlying-data checks, and metric-definition conversations.</div>;;
+  }
+
+  block kpi_actives: VizBlock {
+    label: 'Actives'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        ref: r(dabble_trading.actives)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_bets: VizBlock {
+    label: 'Bets'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        ref: r(dabble_trading.bets)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_stake: VizBlock {
+    label: 'Combined Stake'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        ref: r(dabble_trading.combined_stake)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_gross_win_pct: VizBlock {
+    label: 'Gross Win %'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        ref: r(dabble_trading.gross_win_pct)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_net_revenue: VizBlock {
+    label: 'Trading Net Revenue'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        ref: r(dabble_trading.trading_net_revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_rocket_boost: VizBlock {
+    label: 'Rocket Boost'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        ref: r(dabble_trading.rocket_boost)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block weekly_trading_pulse: VizBlock {
+    label: 'Weekly Stake and Margin Pulse'
+    viz: CombinationChart {
+      dataset: dabble_trading
+      x_axis: VizFieldFull {
+        ref: r(dabble_fact_bet.reporting_date)
+        transformation: 'datetrunc week'
+        format {
+          type: 'date'
+          pattern: 'dd LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Combined Stake'
+            ref: r(dabble_trading.combined_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#8A5DFF'
+          }
+        }
+      }
+      y_axis {
+        settings {
+          alignment: 'right'
+          axis_min: 0
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Win %'
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#28AC26'
+            line_interpolation: 'smooth'
+          }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: false
+        show_data_points: true
+        legend_label: 'right'
+        row_limit: 5000
+      }
+    }
+  }
+  block yoy_scorecard: VizBlock {
+    label: 'Reusable YoY Scorecard'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        r(dabble_trading.combined_stake),
+        r(dabble_trading.combined_stake_prior_year),
+        r(dabble_trading.combined_stake_yoy_pct),
+        r(dabble_trading.trading_net_revenue),
+        r(dabble_trading.trading_net_revenue_prior_year),
+        r(dabble_trading.trading_net_revenue_yoy_pct)
+      ]
+      settings {
+        wrap_header_text: true
+      }
+    }
+  }
+  block channel_mix_donut: VizBlock {
+    label: 'Stake Mix: Racing vs Sport'
+    viz: PieChart {
+      dataset: dabble_trading
+      legend: VizFieldFull {
+        ref: r(dabble_dim_sport.is_racing)
+        label: 'Racing Flag'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(dabble_trading.combined_stake)
+          label: 'Combined Stake'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        row_limit: 5000
+      }
+    }
+  }
+  block sports_profitability_scatter: VizBlock {
+    label: 'Sport Profitability Map'
+    viz: ScatterChart {
+      dataset: dabble_trading
+      x_col: VizFieldFull {
+        ref: r(dabble_trading.combined_stake)
+        label: 'Combined Stake'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      y_col: VizFieldFull {
+        ref: r(dabble_trading.gross_win_pct)
+        label: 'Gross Win %'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      label_col: VizFieldFull {
+        ref: r(dabble_dim_sport.sport_name)
+        label: 'Sport'
+        format {
+          type: 'text'
+        }
+      }
+      settings {
+        row_limit: 25
+      }
+    }
+  }
+  block top_sports_stake: VizBlock {
+    label: 'Top Sports by Stake'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_dim_sport.sport_name)
+      y_axis {
+        series {
+          field: r(dabble_trading.combined_stake)
+          settings {
+            color: '#8A5DFF'
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+  block top_sports_margin: VizBlock {
+    label: 'Top Sports by Margin'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_dim_sport.sport_name)
+      y_axis {
+        series {
+          field: r(dabble_trading.gross_win_pct)
+          settings {
+            color: '#28AC26'
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+  block category_summary: VizBlock {
+    label: 'Racing, Sport and Copy Summary'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        r(dabble_trading.racing_actives),
+        r(dabble_trading.racing_combined_stake),
+        r(dabble_trading.racing_gross_win_pct),
+        r(dabble_trading.sport_actives),
+        r(dabble_trading.sport_combined_stake),
+        r(dabble_trading.sport_gross_win_pct),
+        r(dabble_trading.copy_actives),
+        r(dabble_trading.copy_combined_stake),
+        r(dabble_trading.copy_rocket_boost),
+        r(dabble_trading.copy_gross_win_pct)
+      ]
+      settings {
+        wrap_header_text: true
+      }
+    }
+  }
+
+  block sport_driver_matrix: VizBlock {
+    label: 'Sport Driver Matrix'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.avg_bet_size) uname: 'avg_bet_size' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 1
+        row_limit: 5000
+        sorts: [
+          SortSetting {
+            key: 'combined_stake'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block competition_leaderboard: VizBlock {
+    label: 'Competition Leaderboard'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 2
+        row_limit: 50
+        sorts: [
+          SortSetting {
+            key: 'combined_stake'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block fixture_leaderboard: VizBlock {
+    label: 'Fixture Leaderboard'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
+        VizFieldFull { ref: r(dabble_dim_fixture.fixture_name) uname: 'fixture' },
+        VizFieldFull { ref: r(dabble_dim_fixture.advertised_start) uname: 'advertised_start' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 3
+        row_limit: 50
+        sorts: [
+          SortSetting {
+            key: 'combined_stake'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block risk_stake: VizBlock {
+    label: 'Stake by Risk Factor Bracket'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_fact_bet.risk_factor_bracket)
+      y_axis {
+        series {
+          field: r(dabble_trading.combined_stake)
+          settings {
+            color: '#E58A00'
+          }
+        }
+      }
+    }
+  }
+  block risk_margin: VizBlock {
+    label: 'Gross Win % by Risk Factor Bracket'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_fact_bet.risk_factor_bracket)
+      y_axis {
+        series {
+          field: r(dabble_trading.gross_win_pct)
+          settings {
+            color: '#D9363E'
+          }
+        }
+      }
+    }
+  }
+  block market_group_stake: VizBlock {
+    label: 'Market Group Stake'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_dim_market.market_group)
+      y_axis {
+        series {
+          field: r(dabble_trading.combined_stake)
+          settings {
+            color: '#3478D4'
+          }
+        }
+      }
+      settings {
+        row_limit: 15
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+
+  block rocket_category_performance: VizBlock {
+    label: 'Rocket Category Performance'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_fact_bet.rocket_category) uname: 'rocket_category' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.rocket_boost) uname: 'rocket_boost' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 1
+        row_limit: 100
+        sorts: [
+          SortSetting {
+            key: 'combined_stake'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block rocket_boost_by_category: VizBlock {
+    label: 'Rocket Boost by Category'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_fact_bet.rocket_category)
+      y_axis {
+        series {
+          field: r(dabble_trading.rocket_boost)
+          settings {
+            color: '#73F8D4'
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+  block restricted_stake_by_bet_type: VizBlock {
+    label: 'Restricted Stake by Bet Type'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_fact_bet.bet_type)
+      y_axis {
+        series {
+          field: r(dabble_trading.restricted_stake)
+          settings {
+            color: '#FE8885'
+          }
+        }
+      }
+    }
+  }
+  block customer_profitability_scatter: VizBlock {
+    label: 'Customer Profitability Map'
+    viz: ScatterChart {
+      dataset: dabble_trading
+      x_col: VizFieldFull {
+        ref: r(dabble_trading.combined_stake)
+        label: 'Combined Stake'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      y_col: VizFieldFull {
+        ref: r(dabble_trading.trading_net_revenue)
+        label: 'Trading Net Revenue'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      label_col: VizFieldFull {
+        ref: r(dabble_dim_user.display_alias)
+        label: 'Alias'
+        format {
+          type: 'text'
+        }
+      }
+      settings {
+        row_limit: 100
+      }
+    }
+  }
+  block customers_turnover: VizBlock {
+    label: 'Top Highest Turnover Customers'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_user.source_user_id) uname: 'source_user_id' },
+        VizFieldFull { ref: r(dabble_dim_user.display_alias) uname: 'display_alias' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'turnover' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 2
+        row_limit: 10
+        sorts: [
+          SortSetting {
+            key: 'turnover'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block customers_profitable: VizBlock {
+    label: 'Top Most Profitable Customers'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        r(dabble_dim_user.source_user_id),
+        r(dabble_dim_user.display_alias),
+        r(dabble_trading.bets),
+        r(dabble_trading.combined_stake),
+        VizFieldFull {
+          ref: r(dabble_trading.trading_net_revenue)
+          uname: 'profit'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        row_limit: 10
+        sorts: [
+          SortSetting {
+            key: 'profit'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block customers_least_profitable: VizBlock {
+    label: 'Top Least Profitable Customers'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        r(dabble_dim_user.source_user_id),
+        r(dabble_dim_user.display_alias),
+        r(dabble_trading.bets),
+        r(dabble_trading.combined_stake),
+        VizFieldFull {
+          ref: r(dabble_trading.trading_net_revenue)
+          uname: 'profit'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        row_limit: 10
+        sorts: [
+          SortSetting {
+            key: 'profit'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  block audit_sport_matrix: VizBlock {
+    label: 'Sport Overview Matrix'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.avg_bet_size) uname: 'avg_bet_size' },
+        VizFieldFull { ref: r(dabble_trading.avg_stake_per_active) uname: 'avg_stake_per_active' },
+        VizFieldFull { ref: r(dabble_trading.cash_stake) uname: 'cash_stake' },
+        VizFieldFull { ref: r(dabble_trading.bonus_cash_stake) uname: 'bonus_cash_stake' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.restricted_stake) uname: 'restricted_stake' },
+        VizFieldFull { ref: r(dabble_trading.restricted_stake_pct) uname: 'restricted_stake_pct' },
+        VizFieldFull { ref: r(dabble_trading.cash_payout) uname: 'cash_payout' },
+        VizFieldFull { ref: r(dabble_trading.bonus_cash_payout) uname: 'bonus_cash_payout' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
+        VizFieldFull { ref: r(dabble_trading.rocket_boost) uname: 'rocket_boost' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_win) uname: 'trading_net_win' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 1
+        row_limit: 5000
+      }
+    }
+  }
+  block audit_competition_overview: VizBlock {
+    label: 'Competition Overview'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 2
+        row_limit: 5000
+      }
+    }
+  }
+  block audit_fixture_overview: VizBlock {
+    label: 'Fixture Overview'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
+        VizFieldFull { ref: r(dabble_dim_fixture.fixture_name) uname: 'fixture' },
+        VizFieldFull { ref: r(dabble_dim_fixture.advertised_start) uname: 'advertised_start' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 3
+        row_limit: 5000
+      }
+    }
+  }
+  block audit_market_group_overview: VizBlock {
+    label: 'Market Group Overview'
+    viz: DataTable {
+      dataset: dabble_trading
+      fields: [
+        VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
+        VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
+        VizFieldFull { ref: r(dabble_dim_market.market_group) uname: 'market_group' },
+        VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
+        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
+        VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
+        VizFieldFull { ref: r(dabble_trading.weighted_dividend) uname: 'weighted_dividend' },
+        VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
+        VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
+        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 3
+        row_limit: 5000
+      }
+    }
+  }
+  block audit_margin_by_bet_legs: VizBlock {
+    label: 'Margin by Bet Leg Count'
+    viz: PivotTable {
+      dataset: dabble_trading
+      rows: [
+        r(dabble_fact_bet.leg_count)
+      ]
+      columns: [
+        r(dabble_fact_bet.bet_type)
+      ]
+      values: [
+        r(dabble_trading.actives),
+        r(dabble_trading.bets),
+        r(dabble_trading.combined_stake),
+        r(dabble_trading.gross_win),
+        r(dabble_trading.gross_win_pct)
+      ]
+      settings {
+        wrap_header_text: true
+        show_column_total: true
+        row_limit: 500
+      }
+    }
+  }
+  block audit_about: TextBlock {
+    content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#FFFFFF;"><h2 style="color:#21099B;margin:0 0 8px 0;">Prototype note</h2><p style="margin:0;">This alternative dashboard uses deterministic synthetic data and contains no direct customer PII. Source user IDs and aliases are generated. Financial measures are allocated to bet legs so sport and event totals remain additive. Restricted stake, weighted dividend, Rocket categories, active users, Australian settled reporting date and period comparisons are demo assumptions pending Dabble confirmation.</p></div>;;
+  }
+
+  view: TabLayout {
+    tab executive_pulse: CanvasLayout {
+      label: 'Executive Pulse'
+      width: 1300
+      height: 1820
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block reporting_date_filter {
+        position: pos(20, 20, 280, 80)
+      }
+      block date_drill {
+        position: pos(320, 20, 200, 80)
+      }
+      block period_comparison {
+        position: pos(540, 20, 200, 80)
+      }
+      block command_center_intro {
+        position: pos(760, 20, 520, 80)
+      }
+      block kpi_actives {
+        position: pos(20, 120, 200, 150)
+      }
+      block kpi_bets {
+        position: pos(232, 120, 200, 150)
+      }
+      block kpi_stake {
+        position: pos(444, 120, 200, 150)
+      }
+      block kpi_gross_win_pct {
+        position: pos(656, 120, 200, 150)
+      }
+      block kpi_net_revenue {
+        position: pos(868, 120, 200, 150)
+      }
+      block kpi_rocket_boost {
+        position: pos(1080, 120, 200, 150)
+      }
+      block weekly_trading_pulse {
+        position: pos(20, 300, 820, 430)
+      }
+      block channel_mix_donut {
+        position: pos(860, 300, 420, 430)
+      }
+      block yoy_scorecard {
+        position: pos(20, 760, 1260, 220)
+      }
+      block sports_profitability_scatter {
+        position: pos(20, 1010, 620, 360)
+      }
+      block category_summary {
+        position: pos(660, 1010, 620, 360)
+      }
+      block top_sports_stake {
+        position: pos(20, 1400, 620, 360)
+      }
+      block top_sports_margin {
+        position: pos(660, 1400, 620, 360)
+      }
+      default_zoom: 'fit_to_width'
+    }
+    tab sport_competition_drivers: CanvasLayout {
+      label: 'Sport & Competition Drivers'
+      width: 1300
+      height: 2140
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block fixture_start_filter {
+        position: pos(20, 20, 300, 80)
+      }
+      block sport_filter {
+        position: pos(340, 20, 300, 80)
+      }
+      block competition_filter {
+        position: pos(660, 20, 300, 80)
+      }
+      block fixture_filter {
+        position: pos(980, 20, 300, 80)
+      }
+      block drivers_intro {
+        position: pos(20, 120, 1260, 90)
+      }
+      block sport_driver_matrix {
+        position: pos(20, 240, 1260, 390)
+      }
+      block risk_stake {
+        position: pos(20, 660, 410, 360)
+      }
+      block risk_margin {
+        position: pos(450, 660, 410, 360)
+      }
+      block market_group_stake {
+        position: pos(880, 660, 400, 360)
+      }
+      block competition_leaderboard {
+        position: pos(20, 1050, 1260, 450)
+      }
+      block fixture_leaderboard {
+        position: pos(20, 1530, 1260, 560)
+      }
+      default_zoom: 'fit_to_width'
+    }
+    tab customer_rocket_risk: CanvasLayout {
+      label: 'Customer, Rocket & Risk'
+      width: 1300
+      height: 2140
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block reporting_date_filter {
+        position: pos(20, 20, 300, 80)
+      }
+      block sport_filter {
+        position: pos(340, 20, 300, 80)
+      }
+      block competition_filter {
+        position: pos(660, 20, 300, 80)
+      }
+      block risk_intro {
+        position: pos(980, 20, 300, 80)
+      }
+      block rocket_category_performance {
+        position: pos(20, 130, 760, 360)
+      }
+      block rocket_boost_by_category {
+        position: pos(800, 130, 480, 360)
+      }
+      block customer_profitability_scatter {
+        position: pos(20, 520, 620, 420)
+      }
+      block restricted_stake_by_bet_type {
+        position: pos(660, 520, 620, 420)
+      }
+      block customers_turnover {
+        position: pos(20, 970, 1260, 340)
+      }
+      block customers_profitable {
+        position: pos(20, 1340, 620, 360)
+      }
+      block customers_least_profitable {
+        position: pos(660, 1340, 620, 360)
+      }
+      default_zoom: 'fit_to_width'
+    }
+    tab explore_audit_detail: CanvasLayout {
+      label: 'Explore & Audit Detail'
+      width: 1300
+      height: 2710
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block reporting_date_filter {
+        position: pos(20, 20, 300, 80)
+      }
+      block fixture_start_filter {
+        position: pos(340, 20, 300, 80)
+      }
+      block sport_filter {
+        position: pos(660, 20, 300, 80)
+      }
+      block competition_filter {
+        position: pos(980, 20, 300, 80)
+      }
+      block audit_intro {
+        position: pos(20, 120, 1260, 90)
+      }
+      block audit_sport_matrix {
+        position: pos(20, 240, 1260, 470)
+      }
+      block audit_competition_overview {
+        position: pos(20, 740, 1260, 430)
+      }
+      block audit_fixture_overview {
+        position: pos(20, 1200, 1260, 470)
+      }
+      block audit_market_group_overview {
+        position: pos(20, 1700, 1260, 470)
+      }
+      block audit_margin_by_bet_legs {
+        position: pos(20, 2200, 1260, 280)
+      }
+      block audit_about {
+        position: pos(20, 2510, 1260, 160)
+      }
+      default_zoom: 'fit_to_width'
+    }
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'sport_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'competition_filter',
+            'fixture_filter',
+            'kpi_actives',
+            'kpi_bets',
+            'kpi_stake',
+            'kpi_gross_win_pct',
+            'kpi_net_revenue',
+            'kpi_rocket_boost',
+            'weekly_trading_pulse',
+            'yoy_scorecard',
+            'channel_mix_donut',
+            'sports_profitability_scatter',
+            'top_sports_stake',
+            'top_sports_margin',
+            'category_summary',
+            'sport_driver_matrix',
+            'competition_leaderboard',
+            'fixture_leaderboard',
+            'risk_stake',
+            'risk_margin',
+            'market_group_stake',
+            'rocket_category_performance',
+            'rocket_boost_by_category',
+            'restricted_stake_by_bet_type',
+            'customer_profitability_scatter',
+            'customers_turnover',
+            'customers_profitable',
+            'customers_least_profitable',
+            'audit_sport_matrix',
+            'audit_competition_overview',
+            'audit_fixture_overview',
+            'audit_market_group_overview',
+            'audit_margin_by_bet_legs'
+          ]
+          field: r(dabble_dim_sport.sport_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'competition_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'fixture_filter',
+            'kpi_actives',
+            'kpi_bets',
+            'kpi_stake',
+            'kpi_gross_win_pct',
+            'kpi_net_revenue',
+            'kpi_rocket_boost',
+            'weekly_trading_pulse',
+            'yoy_scorecard',
+            'channel_mix_donut',
+            'sports_profitability_scatter',
+            'top_sports_stake',
+            'top_sports_margin',
+            'category_summary',
+            'sport_driver_matrix',
+            'competition_leaderboard',
+            'fixture_leaderboard',
+            'risk_stake',
+            'risk_margin',
+            'market_group_stake',
+            'rocket_category_performance',
+            'rocket_boost_by_category',
+            'restricted_stake_by_bet_type',
+            'customer_profitability_scatter',
+            'customers_turnover',
+            'customers_profitable',
+            'customers_least_profitable',
+            'audit_sport_matrix',
+            'audit_competition_overview',
+            'audit_fixture_overview',
+            'audit_market_group_overview',
+            'audit_margin_by_bet_legs'
+          ]
+          field: r(dabble_dim_competition.competition_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'fixture_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'kpi_actives',
+            'kpi_bets',
+            'kpi_stake',
+            'kpi_gross_win_pct',
+            'kpi_net_revenue',
+            'kpi_rocket_boost',
+            'weekly_trading_pulse',
+            'yoy_scorecard',
+            'channel_mix_donut',
+            'sports_profitability_scatter',
+            'top_sports_stake',
+            'top_sports_margin',
+            'category_summary',
+            'sport_driver_matrix',
+            'competition_leaderboard',
+            'fixture_leaderboard',
+            'risk_stake',
+            'risk_margin',
+            'market_group_stake',
+            'rocket_category_performance',
+            'rocket_boost_by_category',
+            'restricted_stake_by_bet_type',
+            'customer_profitability_scatter',
+            'customers_turnover',
+            'customers_profitable',
+            'customers_least_profitable',
+            'audit_sport_matrix',
+            'audit_competition_overview',
+            'audit_fixture_overview',
+            'audit_market_group_overview',
+            'audit_margin_by_bet_legs'
+          ]
+          field: r(dabble_dim_fixture.fixture_name)
+        }
+      ]
+    },
+    DateDrillInteraction {
+      from: 'date_drill'
+      to: [
+        CustomMapping {
+          block: 'weekly_trading_pulse'
+          field: r(dabble_fact_bet.reporting_date)
+        }
+      ]
+    },
+    PopInteraction {
+      from: 'period_comparison'
+      to: [
+        CustomMapping {
+          block: [
+            'weekly_trading_pulse',
+            'kpi_actives',
+            'kpi_bets',
+            'kpi_stake',
+            'kpi_gross_win_pct',
+            'kpi_net_revenue',
+            'kpi_rocket_boost'
+          ]
+          field: r(dabble_fact_bet.reporting_date)
+        }
+      ]
+    }
+  ]
+  settings {
+    autorun_on_open: true
+  }
+}
