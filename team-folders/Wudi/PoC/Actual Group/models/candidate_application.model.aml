@@ -2,7 +2,7 @@ Model ag_candidate_application {
   type: 'table'
   label: 'Candidate Application'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension application_id {
     label: 'Application Id'
     type: 'number'

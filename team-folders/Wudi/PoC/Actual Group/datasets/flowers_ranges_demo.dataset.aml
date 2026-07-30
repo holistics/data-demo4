@@ -1,0 +1,11 @@
+Dataset flowers_ranges_demo {
+  label: 'Flowers Relative Ranges (Demo)'
+  description: 'Backs the relative-range h-drill demo. Buttons and KPI card both read this; clicking a range button cross-filters range_label to select its precomputed row.'
+  data_source_name: 'demodb'
+  owner: 'chukwudi@holistics.io'
+  models: [
+    flowers_ranges,
+  ]
+  relationships: [
+  ]
+}

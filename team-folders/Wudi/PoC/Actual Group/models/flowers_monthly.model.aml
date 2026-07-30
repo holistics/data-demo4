@@ -1,0 +1,245 @@
+Model flowers_monthly {
+  type: 'query'
+  label: 'Flowers Monthly (Precomputed)'
+  description: 'One row per reference month with the full monthly scorecard precomputed in SQL: base values, prior-month (LAG 1), prior-year (LAG 12), and all derived %/MoM/YoY/arrow columns. A month spine keeps LAG offsets true even if a month has no orders. Restricted to the card months (Mar-Jun 2026) at the end, but comparisons are computed over the full series first. Cross-filter on ref_month selects which month-row the report shows.'
+  data_source_name: 'demodb'
+  owner: 'chukwudi@holistics.io'
+
+  dimension ref_month {
+    label: 'Reference Month'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.ref_month }};;
+  }
+  dimension sort_order {
+    label: 'Sort Order'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.sort_order }};;
+  }
+  dimension v_ref_month {
+    label: 'v_ref_month'
+    type: 'date'
+    definition: @sql {{ #SOURCE.ref_month }};;
+  }
+
+  dimension fr_new_outlets { label: 'fr_new_outlets' type: 'number' definition: @sql {{ #SOURCE.fr_new_outlets }};; }
+  dimension fr_active      { label: 'fr_active'      type: 'number' definition: @sql {{ #SOURCE.fr_active }};; }
+
+  dimension v_placed    { label: 'v_placed'    type: 'number' definition: @sql {{ #SOURCE.v_placed }};; }
+  dimension v_cancelled { label: 'v_cancelled' type: 'number' definition: @sql {{ #SOURCE.v_cancelled }};; }
+  dimension v_delivered { label: 'v_delivered' type: 'number' definition: @sql {{ #SOURCE.v_delivered }};; }
+  dimension v_pct_delivered { label: 'v_pct_delivered' type: 'number' definition: @sql {{ #SOURCE.v_pct_delivered }};; }
+  dimension v_avgcheck  { label: 'v_avgcheck'  type: 'number' definition: @sql {{ #SOURCE.v_avgcheck }};; }
+  dimension v_profit    { label: 'v_profit'    type: 'number' definition: @sql {{ #SOURCE.v_profit }};; }
+  dimension v_refunds_qty { label: 'v_refunds_qty' type: 'number' definition: @sql {{ #SOURCE.v_refunds_qty }};; }
+  dimension v_refunds_pct { label: 'v_refunds_pct' type: 'number' definition: @sql {{ #SOURCE.v_refunds_pct }};; }
+
+  dimension v_placed_on    { label: 'v_placed_on'    type: 'number' definition: @sql {{ #SOURCE.v_placed_on }};; }
+  dimension v_cancelled_on { label: 'v_cancelled_on' type: 'number' definition: @sql {{ #SOURCE.v_cancelled_on }};; }
+  dimension v_delivered_on { label: 'v_delivered_on' type: 'number' definition: @sql {{ #SOURCE.v_delivered_on }};; }
+  dimension v_share_on     { label: 'v_share_on'     type: 'number' definition: @sql {{ #SOURCE.v_share_on }};; }
+  dimension v_avgcheck_on  { label: 'v_avgcheck_on'  type: 'number' definition: @sql {{ #SOURCE.v_avgcheck_on }};; }
+  dimension v_profit_on    { label: 'v_profit_on'    type: 'number' definition: @sql {{ #SOURCE.v_profit_on }};; }
+
+  dimension v_placed_off    { label: 'v_placed_off'    type: 'number' definition: @sql {{ #SOURCE.v_placed_off }};; }
+  dimension v_cancelled_off { label: 'v_cancelled_off' type: 'number' definition: @sql {{ #SOURCE.v_cancelled_off }};; }
+  dimension v_delivered_off { label: 'v_delivered_off' type: 'number' definition: @sql {{ #SOURCE.v_delivered_off }};; }
+  dimension v_share_off     { label: 'v_share_off'     type: 'number' definition: @sql {{ #SOURCE.v_share_off }};; }
+  dimension v_avgcheck_off  { label: 'v_avgcheck_off'  type: 'number' definition: @sql {{ #SOURCE.v_avgcheck_off }};; }
+  dimension v_profit_off    { label: 'v_profit_off'    type: 'number' definition: @sql {{ #SOURCE.v_profit_off }};; }
+
+  dimension v_placed_ly    { label: 'v_placed_ly'    type: 'number' definition: @sql {{ #SOURCE.v_placed_ly }};; }
+  dimension v_cancelled_ly { label: 'v_cancelled_ly' type: 'number' definition: @sql {{ #SOURCE.v_cancelled_ly }};; }
+  dimension v_delivered_ly { label: 'v_delivered_ly' type: 'number' definition: @sql {{ #SOURCE.v_delivered_ly }};; }
+  dimension v_pct_delivered_ly { label: 'v_pct_delivered_ly' type: 'number' definition: @sql {{ #SOURCE.v_pct_delivered_ly }};; }
+  dimension v_avgcheck_ly  { label: 'v_avgcheck_ly'  type: 'number' definition: @sql {{ #SOURCE.v_avgcheck_ly }};; }
+  dimension v_profit_ly    { label: 'v_profit_ly'    type: 'number' definition: @sql {{ #SOURCE.v_profit_ly }};; }
+  dimension v_refunds_qty_ly { label: 'v_refunds_qty_ly' type: 'number' definition: @sql {{ #SOURCE.v_refunds_qty_ly }};; }
+  dimension v_refunds_pct_ly { label: 'v_refunds_pct_ly' type: 'number' definition: @sql {{ #SOURCE.v_refunds_pct_ly }};; }
+
+  dimension v_units_per_outlet  { label: 'v_units_per_outlet'  type: 'number' definition: @sql {{ #SOURCE.v_units_per_outlet }};; }
+  dimension v_active_growth_yoy { label: 'v_active_growth_yoy' type: 'number' definition: @sql {{ #SOURCE.v_active_growth_yoy }};; }
+  dimension v_placed_mom    { label: 'v_placed_mom'    type: 'number' definition: @sql {{ #SOURCE.v_placed_mom }};; }
+  dimension v_placed_yoy    { label: 'v_placed_yoy'    type: 'number' definition: @sql {{ #SOURCE.v_placed_yoy }};; }
+  dimension v_cancelled_yoy { label: 'v_cancelled_yoy' type: 'number' definition: @sql {{ #SOURCE.v_cancelled_yoy }};; }
+  dimension v_delivered_mom { label: 'v_delivered_mom' type: 'number' definition: @sql {{ #SOURCE.v_delivered_mom }};; }
+  dimension v_delivered_yoy { label: 'v_delivered_yoy' type: 'number' definition: @sql {{ #SOURCE.v_delivered_yoy }};; }
+  dimension v_avgcheck_mom  { label: 'v_avgcheck_mom'  type: 'number' definition: @sql {{ #SOURCE.v_avgcheck_mom }};; }
+  dimension v_avgcheck_yoy  { label: 'v_avgcheck_yoy'  type: 'number' definition: @sql {{ #SOURCE.v_avgcheck_yoy }};; }
+  dimension v_orders_mom    { label: 'v_orders_mom'    type: 'number' definition: @sql {{ #SOURCE.v_orders_mom }};; }
+
+  dimension a_profit_mom     { label: 'a_profit_mom'     type: 'text' definition: @sql {{ #SOURCE.a_profit_mom }};; }
+  dimension a_profit_mom_cls { label: 'a_profit_mom_cls' type: 'text' definition: @sql {{ #SOURCE.a_profit_mom_cls }};; }
+  dimension a_profit_yoy     { label: 'a_profit_yoy'     type: 'text' definition: @sql {{ #SOURCE.a_profit_yoy }};; }
+  dimension a_profit_yoy_cls { label: 'a_profit_yoy_cls' type: 'text' definition: @sql {{ #SOURCE.a_profit_yoy_cls }};; }
+  dimension a_refunds_qty_yoy     { label: 'a_refunds_qty_yoy'     type: 'text' definition: @sql {{ #SOURCE.a_refunds_qty_yoy }};; }
+  dimension a_refunds_qty_yoy_cls { label: 'a_refunds_qty_yoy_cls' type: 'text' definition: @sql {{ #SOURCE.a_refunds_qty_yoy_cls }};; }
+  dimension a_refunds_pct_mom     { label: 'a_refunds_pct_mom'     type: 'text' definition: @sql {{ #SOURCE.a_refunds_pct_mom }};; }
+  dimension a_refunds_pct_mom_cls { label: 'a_refunds_pct_mom_cls' type: 'text' definition: @sql {{ #SOURCE.a_refunds_pct_mom_cls }};; }
+  dimension a_refunds_pct_yoy     { label: 'a_refunds_pct_yoy'     type: 'text' definition: @sql {{ #SOURCE.a_refunds_pct_yoy }};; }
+  dimension a_refunds_pct_yoy_cls { label: 'a_refunds_pct_yoy_cls' type: 'text' definition: @sql {{ #SOURCE.a_refunds_pct_yoy_cls }};; }
+  dimension a_units     { label: 'a_units'     type: 'text' definition: @sql {{ #SOURCE.a_units }};; }
+  dimension a_units_cls { label: 'a_units_cls' type: 'text' definition: @sql {{ #SOURCE.a_units_cls }};; }
+  dimension a_cr     { label: 'a_cr'     type: 'text' definition: @sql {{ #SOURCE.a_cr }};; }
+  dimension a_cr_cls { label: 'a_cr_cls' type: 'text' definition: @sql {{ #SOURCE.a_cr_cls }};; }
+
+  query: @sql
+    WITH spine AS (
+      SELECT generate_series(
+        date_trunc('month', (SELECT min(created_at) FROM ecommerce.orders)),
+        date_trunc('month', (SELECT max(created_at) FROM ecommerce.orders)),
+        interval '1 month'
+      )::date AS ref_month
+    ),
+    ord AS (
+      SELECT
+        date_trunc('month', o.created_at)::date AS m,
+        count(*)                                                            AS placed,
+        count(*) FILTER (WHERE u.gender = 'f')                              AS placed_on,
+        count(*) FILTER (WHERE o.status = 'cancelled')                      AS cancelled,
+        count(*) FILTER (WHERE o.status = 'cancelled' AND u.gender = 'f')   AS cancelled_on,
+        count(*) FILTER (WHERE o.status = 'delivered')                      AS delivered,
+        count(*) FILTER (WHERE o.status = 'delivered' AND u.gender = 'f')   AS delivered_on,
+        count(*) FILTER (WHERE o.status = 'refunded')                       AS refunds
+      FROM ecommerce.orders o
+      JOIN ecommerce.users u ON o.user_id = u.id
+      GROUP BY 1
+    ),
+    itm AS (
+      SELECT
+        date_trunc('month', o.created_at)::date AS m,
+        sum(oi.quantity * p.price)               FILTER (WHERE o.status = 'delivered')                            AS dval,
+        sum(oi.quantity * p.price)               FILTER (WHERE o.status = 'delivered' AND u.gender = 'f')         AS dval_on,
+        sum(oi.quantity * round(p.price * 0.3))  FILTER (WHERE o.status = 'delivered')                            AS dcost,
+        sum(oi.quantity * round(p.price * 0.3))  FILTER (WHERE o.status = 'delivered' AND u.gender = 'f')         AS dcost_on,
+        sum(oi.quantity)                                                                                          AS units,
+        count(DISTINCT p.merchant_id)                                                                             AS active
+      FROM ecommerce.order_items oi
+      JOIN ecommerce.orders o   ON oi.order_id = o.id
+      JOIN ecommerce.products p ON oi.product_id = p.id
+      JOIN ecommerce.users u    ON o.user_id = u.id
+      GROUP BY 1
+    ),
+    base AS (
+      SELECT
+        s.ref_month,
+        COALESCE(ord.placed, 0)       AS placed,
+        COALESCE(ord.placed_on, 0)    AS placed_on,
+        COALESCE(ord.cancelled, 0)    AS cancelled,
+        COALESCE(ord.cancelled_on, 0) AS cancelled_on,
+        COALESCE(ord.delivered, 0)    AS delivered,
+        COALESCE(ord.delivered_on, 0) AS delivered_on,
+        COALESCE(ord.refunds, 0)      AS refunds,
+        COALESCE(itm.dval, 0)         AS dval,
+        COALESCE(itm.dval_on, 0)      AS dval_on,
+        COALESCE(itm.dcost, 0)        AS dcost,
+        COALESCE(itm.dcost_on, 0)     AS dcost_on,
+        COALESCE(itm.units, 0)        AS units,
+        COALESCE(itm.active, 0)       AS active
+      FROM spine s
+      LEFT JOIN ord ON ord.m = s.ref_month
+      LEFT JOIN itm ON itm.m = s.ref_month
+    ),
+    lagged AS (
+      SELECT
+        b.*,
+        LAG(placed, 1)     OVER w AS placed_p,
+        LAG(delivered, 1)  OVER w AS delivered_p,
+        LAG(dval, 1)       OVER w AS dval_p,
+        LAG(dcost, 1)      OVER w AS dcost_p,
+        LAG(refunds, 1)    OVER w AS refunds_p,
+        LAG(units, 1)      OVER w AS units_p,
+        LAG(active, 1)     OVER w AS active_p,
+        LAG(placed, 12)    OVER w AS placed_ly,
+        LAG(cancelled, 12) OVER w AS cancelled_ly,
+        LAG(delivered, 12) OVER w AS delivered_ly,
+        LAG(dval, 12)      OVER w AS dval_ly,
+        LAG(dcost, 12)     OVER w AS dcost_ly,
+        LAG(refunds, 12)   OVER w AS refunds_ly,
+        LAG(active, 12)    OVER w AS active_ly
+      FROM base b
+      WINDOW w AS (ORDER BY b.ref_month)
+    ),
+    calc AS (
+      SELECT
+        l.*,
+        delivered::numeric  / NULLIF(placed, 0)        AS pct_delivered,
+        delivered_p::numeric / NULLIF(placed_p, 0)     AS cr_prev,
+        dval::numeric       / NULLIF(delivered, 0)     AS avgcheck,
+        dval_p::numeric     / NULLIF(delivered_p, 0)   AS avgcheck_prev,
+        dval_ly::numeric    / NULLIF(delivered_ly, 0)  AS avgcheck_ly,
+        (dval - dcost)::numeric    / NULLIF(dval, 0)   AS profit,
+        (dval_p - dcost_p)::numeric   / NULLIF(dval_p, 0)  AS profit_prev,
+        (dval_ly - dcost_ly)::numeric / NULLIF(dval_ly, 0) AS profit_ly,
+        refunds::numeric    / NULLIF(placed, 0)        AS refunds_pct,
+        refunds_p::numeric  / NULLIF(placed_p, 0)      AS refunds_pct_prev,
+        refunds_ly::numeric / NULLIF(placed_ly, 0)     AS refunds_pct_ly,
+        units::numeric   / NULLIF(active, 0)           AS upo,
+        units_p::numeric / NULLIF(active_p, 0)         AS upo_prev
+      FROM lagged l
+    )
+    SELECT
+      ref_month,
+      to_char(ref_month, 'YYYYMM')::int              AS sort_order,
+      0                                              AS fr_new_outlets,
+      active                                         AS fr_active,
+      placed                                         AS v_placed,
+      cancelled                                      AS v_cancelled,
+      delivered                                      AS v_delivered,
+      pct_delivered                                  AS v_pct_delivered,
+      avgcheck                                       AS v_avgcheck,
+      profit                                         AS v_profit,
+      refunds                                        AS v_refunds_qty,
+      refunds_pct                                    AS v_refunds_pct,
+      placed_on                                      AS v_placed_on,
+      cancelled_on                                   AS v_cancelled_on,
+      delivered_on                                   AS v_delivered_on,
+      placed_on::numeric / NULLIF(placed, 0)         AS v_share_on,
+      dval_on::numeric / NULLIF(delivered_on, 0)     AS v_avgcheck_on,
+      (dval_on - dcost_on)::numeric / NULLIF(dval_on, 0) AS v_profit_on,
+      (placed - placed_on)                           AS v_placed_off,
+      (cancelled - cancelled_on)                     AS v_cancelled_off,
+      (delivered - delivered_on)                     AS v_delivered_off,
+      (placed - placed_on)::numeric / NULLIF(placed, 0)  AS v_share_off,
+      (dval - dval_on)::numeric / NULLIF(delivered - delivered_on, 0) AS v_avgcheck_off,
+      ((dval - dval_on) - (dcost - dcost_on))::numeric / NULLIF(dval - dval_on, 0) AS v_profit_off,
+      placed_ly                                      AS v_placed_ly,
+      cancelled_ly                                   AS v_cancelled_ly,
+      delivered_ly                                   AS v_delivered_ly,
+      delivered_ly::numeric / NULLIF(placed_ly, 0)   AS v_pct_delivered_ly,
+      avgcheck_ly                                    AS v_avgcheck_ly,
+      profit_ly                                      AS v_profit_ly,
+      refunds_ly                                     AS v_refunds_qty_ly,
+      refunds_pct_ly                                 AS v_refunds_pct_ly,
+      upo                                            AS v_units_per_outlet,
+      (active - active_ly)::numeric / NULLIF(active_ly, 0) AS v_active_growth_yoy,
+      (placed - placed_p)::numeric / NULLIF(placed_p, 0)   AS v_placed_mom,
+      (placed - placed_ly)::numeric / NULLIF(placed_ly, 0) AS v_placed_yoy,
+      (cancelled - cancelled_ly)::numeric / NULLIF(cancelled_ly, 0) AS v_cancelled_yoy,
+      (delivered - delivered_p)::numeric / NULLIF(delivered_p, 0)   AS v_delivered_mom,
+      (delivered - delivered_ly)::numeric / NULLIF(delivered_ly, 0) AS v_delivered_yoy,
+      (avgcheck - avgcheck_prev) / NULLIF(avgcheck_prev, 0)         AS v_avgcheck_mom,
+      (avgcheck - avgcheck_ly) / NULLIF(avgcheck_ly, 0)             AS v_avgcheck_yoy,
+      (placed - placed_p)::numeric / NULLIF(placed_p, 0)           AS v_orders_mom,
+      CASE WHEN profit >= profit_prev THEN '↑' ELSE '↓' END        AS a_profit_mom,
+      CASE WHEN profit >= profit_prev THEN 'rep-upg' ELSE 'rep-red' END AS a_profit_mom_cls,
+      CASE WHEN profit >= profit_ly THEN '↑' ELSE '↓' END          AS a_profit_yoy,
+      CASE WHEN profit >= profit_ly THEN 'rep-upg' ELSE 'rep-red' END   AS a_profit_yoy_cls,
+      CASE WHEN refunds >= refunds_ly THEN '↑' ELSE '↓' END        AS a_refunds_qty_yoy,
+      CASE WHEN refunds >= refunds_ly THEN 'rep-red' ELSE 'rep-upg' END AS a_refunds_qty_yoy_cls,
+      CASE WHEN refunds_pct >= refunds_pct_prev THEN '↑' ELSE '↓' END   AS a_refunds_pct_mom,
+      CASE WHEN refunds_pct >= refunds_pct_prev THEN 'rep-red' ELSE 'rep-upg' END AS a_refunds_pct_mom_cls,
+      CASE WHEN refunds_pct >= refunds_pct_ly THEN '↑' ELSE '↓' END     AS a_refunds_pct_yoy,
+      CASE WHEN refunds_pct >= refunds_pct_ly THEN 'rep-red' ELSE 'rep-upg' END AS a_refunds_pct_yoy_cls,
+      CASE WHEN upo >= upo_prev THEN '↑' ELSE '↓' END              AS a_units,
+      CASE WHEN upo >= upo_prev THEN 'rep-upg' ELSE 'rep-red' END   AS a_units_cls,
+      CASE WHEN pct_delivered >= cr_prev THEN '↑' ELSE '↓' END     AS a_cr,
+      CASE WHEN pct_delivered >= cr_prev THEN 'rep-upg' ELSE 'rep-red' END AS a_cr_cls
+    FROM calc
+    WHERE ref_month IN (DATE '2026-03-01', DATE '2026-04-01', DATE '2026-05-01', DATE '2026-06-01')
+    ORDER BY ref_month
+  ;;
+  models: [
+  ]
+}

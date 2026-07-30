@@ -7,7 +7,7 @@ Dataset ag_staffing_assignments {
   __engine__: 'aql'
   label: '[AG] Staffing & Assignments'
   description: 'Assignment volume and quality (completion, no-show, early termination), hours, and worker activity.'
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
 
   models: [
     ag_assignment,

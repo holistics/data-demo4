@@ -2,7 +2,7 @@ Model ag_client_contract {
   type: 'table'
   label: 'Client Contract'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension client_contract_id {
     label: 'Client Contract Id'
     type: 'number'

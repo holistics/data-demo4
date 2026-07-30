@@ -2,7 +2,7 @@ Model ag_target_plan {
   type: 'table'
   label: 'Target Plan'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension target_plan_id {
     label: 'Target Plan Id'
     type: 'number'

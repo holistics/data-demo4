@@ -1,0 +1,77 @@
+Model flowers_ranges {
+  type: 'query'
+  label: 'Flowers Relative Ranges (Precomputed)'
+  description: 'One row per named RELATIVE date range (Year to Date, Last 30 Days, Last Quarter, Last 12 Months), each computed against the database current_date in SQL. Proves that h-drill buttons CAN drive dynamic/relative ranges: the button passes a static range label, cross-filters to that precomputed row, and the numbers re-evaluate every run because the boundaries use current_date. No page reload.'
+  data_source_name: 'demodb'
+  owner: 'chukwudi@holistics.io'
+
+  dimension range_label { label: 'Range' type: 'text' hidden: false definition: @sql {{ #SOURCE.range_label }};; }
+  dimension sort_order  { label: 'Sort Order' type: 'number' hidden: true definition: @sql {{ #SOURCE.sort_order }};; }
+  dimension range_from  { label: 'From' type: 'date' definition: @sql {{ #SOURCE.range_from }};; }
+  dimension range_to    { label: 'To'   type: 'date' definition: @sql {{ #SOURCE.range_to }};; }
+
+  dimension placed          { label: 'Orders Placed'    type: 'number' definition: @sql {{ #SOURCE.placed }};; }
+  dimension delivered       { label: 'Delivered'        type: 'number' definition: @sql {{ #SOURCE.delivered }};; }
+  dimension delivery_rate   { label: 'Delivery Rate'    type: 'number' definition: @sql {{ #SOURCE.delivery_rate }};; }
+  dimension revenue         { label: 'Revenue'          type: 'number' definition: @sql {{ #SOURCE.revenue }};; }
+  dimension avg_check       { label: 'Avg Check'        type: 'number' definition: @sql {{ #SOURCE.avg_check }};; }
+  dimension active_merchants { label: 'Active Merchants' type: 'number' definition: @sql {{ #SOURCE.active_merchants }};; }
+
+  query: @sql
+    WITH ranges AS (
+      SELECT 'Year to Date'::text AS range_label, 1 AS sort_order,
+             date_trunc('year', current_date)::date              AS dt_from,
+             (current_date + 1)::date                            AS dt_to
+      UNION ALL
+      SELECT 'Last 30 Days', 2,
+             (current_date - interval '30 days')::date,
+             (current_date + 1)::date
+      UNION ALL
+      SELECT 'Last Quarter', 3,
+             (date_trunc('quarter', current_date) - interval '3 months')::date,
+             date_trunc('quarter', current_date)::date
+      UNION ALL
+      SELECT 'Last 12 Months', 4,
+             (current_date - interval '12 months')::date,
+             (current_date + 1)::date
+    ),
+    ord AS (
+      SELECT
+        r.range_label,
+        count(*)                                       AS placed,
+        count(*) FILTER (WHERE o.status = 'delivered') AS delivered
+      FROM ranges r
+      JOIN ecommerce.orders o
+        ON o.created_at >= r.dt_from AND o.created_at < r.dt_to
+      GROUP BY r.range_label
+    ),
+    itm AS (
+      SELECT
+        r.range_label,
+        sum(oi.quantity * p.price) FILTER (WHERE o.status = 'delivered') AS dval,
+        count(DISTINCT p.merchant_id)                                    AS active
+      FROM ranges r
+      JOIN ecommerce.orders o       ON o.created_at >= r.dt_from AND o.created_at < r.dt_to
+      JOIN ecommerce.order_items oi ON oi.order_id = o.id
+      JOIN ecommerce.products p     ON oi.product_id = p.id
+      GROUP BY r.range_label
+    )
+    SELECT
+      r.range_label,
+      r.sort_order,
+      r.dt_from            AS range_from,
+      (r.dt_to - 1)        AS range_to,
+      COALESCE(ord.placed, 0)                                AS placed,
+      COALESCE(ord.delivered, 0)                             AS delivered,
+      ord.delivered::numeric / NULLIF(ord.placed, 0)         AS delivery_rate,
+      COALESCE(itm.dval, 0)                                  AS revenue,
+      itm.dval::numeric / NULLIF(ord.delivered, 0)           AS avg_check,
+      COALESCE(itm.active, 0)                                AS active_merchants
+    FROM ranges r
+    LEFT JOIN ord ON ord.range_label = r.range_label
+    LEFT JOIN itm ON itm.range_label = r.range_label
+    ORDER BY r.sort_order
+  ;;
+  models: [
+  ]
+}

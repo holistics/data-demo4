@@ -2,7 +2,7 @@ Model ag_skill {
   type: 'table'
   label: 'Skill'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension skill_id {
     label: 'Skill Id'
     type: 'number'

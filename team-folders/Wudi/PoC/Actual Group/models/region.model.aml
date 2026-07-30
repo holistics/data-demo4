@@ -2,7 +2,7 @@ Model ag_region {
   type: 'table'
   label: 'Region'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension region_id {
     label: 'Region Id'
     type: 'number'

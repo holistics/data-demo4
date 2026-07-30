@@ -8,7 +8,7 @@ Dataset ag_recruitment_funnel {
   __engine__: 'aql'
   label: '[AG] Recruitment Funnel'
   description: 'Application-to-placement funnel, conversion rates, recruiter productivity, and source-channel quality.'
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
 
   models: [
     ag_candidate,
