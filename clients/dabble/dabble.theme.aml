@@ -1,0 +1,225 @@
+const dabble_canvas = "#FCFCFE"
+const dabble_card = "#FFFFFF"
+const dabble_surface_subtle = "#F4F4F5"
+const dabble_surface_selected = "#EEE9FA"
+const dabble_text_strong = "#180666"
+const dabble_text_muted = "#4D4566"
+const dabble_border_subtle = "#DDD8EA"
+const dabble_brand_primary = "#5C3BC4"
+const dabble_brand_action = "#5C3BC4"
+const dabble_positive_fill = "#E4F7EA"
+const dabble_positive_text = "#176B35"
+const dabble_negative_fill = "#FDE8E7"
+const dabble_negative_text = "#A61B1B"
+const dabble_font = "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+
+ColorPalette dabble_categorical_palette {
+  title: "Dabble categorical"
+  categorical {
+    colors: [
+      "#8A5DFF",
+      "#73F8D4",
+      "#FE8885",
+      "#4D23A4",
+      "#3478D4",
+      "#E58A00",
+      "#D94FA3",
+      "#28AC26"
+    ]
+  }
+}
+
+ColorPalette dabble_purple_sequential_palette {
+  title: "Dabble purple sequential"
+  categorical {
+    colors: [
+      "#EEE9FA",
+      "#D8CCF3",
+      "#B8A4E7",
+      "#8B6ED8",
+      "#5C3BC4",
+      "#21099B"
+    ]
+  }
+}
+
+ColorPalette dabble_performance_diverging_palette {
+  title: "Dabble performance diverging"
+  categorical {
+    colors: [
+      "#A61B1B",
+      "#FE8885",
+      "#F4F4F5",
+      "#73F8D4",
+      "#176B35"
+    ]
+  }
+}
+
+BlockTheme dabble_page_chrome {
+  background {
+    bg_color: "transparent"
+  }
+  border {
+    border_width: 0
+    border_radius: 0
+    border_style: "none"
+  }
+  padding: 0
+  shadow: "none"
+}
+
+PageTheme dabble_light {
+  title: "Dabble Light"
+
+  color {
+    data: dabble_categorical_palette
+  }
+
+  background {
+    bg_color: dabble_canvas
+  }
+
+  canvas {
+    background {
+      bg_color: dabble_canvas
+    }
+    border {
+      border_width: 1
+      border_radius: 6
+      border_color: dabble_border_subtle
+      border_style: "solid"
+    }
+    shadow: "sm"
+    opacity: 1
+  }
+
+  block {
+    label {
+      font_family: dabble_font
+      font_size: 14
+      font_color: dabble_text_strong
+      font_weight: "semibold"
+    }
+    text {
+      font_family: dabble_font
+      font_size: 13
+      font_color: dabble_text_muted
+      font_weight: "normal"
+    }
+    background {
+      bg_color: dabble_card
+    }
+    border {
+      border_width: 1
+      border_radius: 6
+      border_color: dabble_border_subtle
+      border_style: "solid"
+    }
+    padding: 12
+    shadow: "none"
+    opacity: 1
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: dabble_card
+        hover_color: dabble_surface_selected
+        banding_color: dabble_surface_subtle
+        cell_padding: 8
+        font_color: dabble_text_strong
+        font_family: dabble_font
+        font_size: 13
+        border_color: dabble_border_subtle
+        border_width: 1
+        grid_color: dabble_border_subtle
+      }
+      header {
+        bg_color: dabble_brand_primary
+        font_color: "#FFFFFF"
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: dabble_surface_selected
+        font_color: dabble_text_strong
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: dabble_text_muted
+        font_size: 11
+        font_weight: "medium"
+      }
+      sparkline {
+        line {
+          color: dabble_brand_action
+          width: 2
+        }
+        column {
+          color: dabble_brand_action
+          width: 4
+        }
+      }
+    }
+
+    metric_kpi {
+      alignment: "center"
+      label {
+        font_family: dabble_font
+        font_size: 12
+        font_color: dabble_text_muted
+        font_weight: "semibold"
+      }
+      value {
+        font_family: dabble_font
+        font_size: 32
+        font_color: dabble_text_strong
+        font_weight: "bold"
+      }
+      trend {
+        positive {
+          text {
+            font_color: dabble_positive_text
+            font_weight: "bold"
+          }
+          background {
+            bg_color: dabble_positive_fill
+          }
+        }
+        negative {
+          text {
+            font_color: dabble_negative_text
+            font_weight: "bold"
+          }
+          background {
+            bg_color: dabble_negative_fill
+          }
+        }
+        neutral {
+          text {
+            font_color: dabble_text_muted
+            font_weight: "semibold"
+          }
+          background {
+            bg_color: dabble_surface_subtle
+          }
+        }
+      }
+      progress {
+        text {
+          font_color: dabble_text_muted
+          font_size: 12
+        }
+        indicator {
+          bg_color: dabble_brand_action
+        }
+        track {
+          bg_color: dabble_border_subtle
+        }
+      }
+    }
+
+  }
+}
