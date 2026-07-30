@@ -10,7 +10,10 @@ Dashboard lb_lowbyte_overview {
       dataset: lb_lowbyte_studio
       field: ref('lb_dim_date', 'full_date')
     }
-    default { operator: 'matches' value: '$H_NIL$' }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
   }
   block flt_game: FilterBlock {
     label: 'Game'
@@ -19,7 +22,10 @@ Dashboard lb_lowbyte_overview {
       dataset: lb_lowbyte_studio
       field: ref('lb_dim_game', 'game_name')
     }
-    default { operator: 'matches' value: '$H_NIL$' }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
   }
   block flt_platform: FilterBlock {
     label: 'Platform'
@@ -28,7 +34,10 @@ Dashboard lb_lowbyte_overview {
       dataset: lb_lowbyte_studio
       field: ref('lb_dim_platform', 'platform_name')
     }
-    default { operator: 'matches' value: '$H_NIL$' }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
   }
   block h1: TextBlock {
     content: @md <div style="height:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(97deg,#E63329 0%,#C42A22 100%);border-radius:12px;padding:12px 22px;"><div><div style="color:#FFFFFF;font-size:26px;font-weight:700;font-family:Poppins,sans-serif;">Executive Overview</div><div style="color:#FFE3E0;font-size:14px;margin-top:4px;">Studio-wide KPIs across acquisition, engagement, retention & monetization — Lowbyte Studio</div></div><div style="background:#FFFFFF;border-radius:8px;padding:8px 14px;display:flex;align-items:center;flex:none;"><img src="data:image/png;base64,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" alt="Lowbyte Studio" style="height:36px;display:block;" /></div></div>;;
@@ -40,12 +49,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'installs'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -56,12 +72,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'active_players'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -72,12 +95,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'total_revenue'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -88,12 +118,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'roas'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -104,12 +141,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'ltv_to_date'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -120,12 +164,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd1_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -136,12 +187,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd7_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -152,12 +210,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd30_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -168,12 +233,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'arppu'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -184,12 +256,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'payer_rate'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -197,30 +276,44 @@ Dashboard lb_lowbyte_overview {
     label: 'Revenue Trend — IAP vs Ad (monthly)'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
       y_axis {
-      settings { show_stack_total: true stack_series_by: 'value' }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.iap_revenue)
-          format { type: 'number' pattern: 'inherited' }
+        settings {
+          show_stack_total: true
+          stack_series_by: 'value'
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ad_revenue)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.iap_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ad_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -228,23 +321,31 @@ Dashboard lb_lowbyte_overview {
     label: 'Installs by Month'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.installs)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.installs)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -252,23 +353,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Total Revenue by Game'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_game.game_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.total_revenue)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_game.game_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.total_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -282,12 +394,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'installs'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -298,12 +417,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'paid_installs'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -314,12 +440,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'ua_spend'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -330,12 +463,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'cpi'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -346,12 +486,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'roas'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -359,23 +506,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Installs by Acquisition Source'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.installs)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.installs)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -383,23 +541,34 @@ Dashboard lb_lowbyte_overview {
     label: 'CPI by Acquisition Source'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.cpi)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.cpi)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -407,23 +576,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Installs by Country (Top 15)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_country.country_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.installs)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_country.country_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.installs)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 15
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 15
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -431,23 +611,34 @@ Dashboard lb_lowbyte_overview {
     label: 'UA Spend by Source'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ua_spend)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ua_spend)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -455,23 +646,31 @@ Dashboard lb_lowbyte_overview {
     label: 'Installs by Month'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.installs)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.installs)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -485,12 +684,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'active_players'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -501,12 +707,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'new_players'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -517,12 +730,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'sessions'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -533,12 +753,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'sessions_per_active'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -549,12 +776,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'playtime_hours'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -565,12 +799,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd1_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -581,12 +822,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd7_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -597,12 +845,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd30_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -610,23 +865,31 @@ Dashboard lb_lowbyte_overview {
     label: 'Monthly Active Players'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.active_players)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.active_players)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -634,34 +897,47 @@ Dashboard lb_lowbyte_overview {
     label: 'Retention by Game (D1 / D7 / D30)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_game.game_name)
-      format { type: 'text' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_game.game_name)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d1_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d1_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d7_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d7_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d30_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d30_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -669,23 +945,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Sessions by Platform'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_platform.platform_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.sessions)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_platform.platform_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.sessions)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -693,23 +980,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Active Players by Country (Top 15)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_country.country_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.active_players)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_country.country_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.active_players)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 15
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 15
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -717,23 +1015,31 @@ Dashboard lb_lowbyte_overview {
     label: 'New Players by Month'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.new_players)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.new_players)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -747,12 +1053,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'total_revenue'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -763,12 +1076,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'iap_revenue'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -779,12 +1099,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'ad_revenue'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -795,12 +1122,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'arppu'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -811,12 +1145,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'payer_rate'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -824,30 +1165,44 @@ Dashboard lb_lowbyte_overview {
     label: 'Revenue by Month — IAP vs Ad'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
       y_axis {
-      settings { show_stack_total: true stack_series_by: 'value' }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.iap_revenue)
-          format { type: 'number' pattern: 'inherited' }
+        settings {
+          show_stack_total: true
+          stack_series_by: 'value'
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ad_revenue)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.iap_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ad_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -855,23 +1210,34 @@ Dashboard lb_lowbyte_overview {
     label: 'IAP Revenue by Game'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_game.game_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.iap_revenue)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_game.game_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.iap_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -879,23 +1245,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Ad Revenue by Network'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_ad_network.network_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ad_revenue)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_ad_network.network_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ad_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -903,23 +1280,34 @@ Dashboard lb_lowbyte_overview {
     label: 'IAP Revenue by Product Type'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_iap_product.product_type)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.iap_revenue)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_iap_product.product_type)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.iap_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -927,23 +1315,34 @@ Dashboard lb_lowbyte_overview {
     label: 'Total Revenue by Country (Top 15)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_country.country_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.total_revenue)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_country.country_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.total_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 15
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 15
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -957,12 +1356,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'ua_spend'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -973,12 +1379,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'paid_installs'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -989,12 +1402,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'cpi'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1005,12 +1425,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'roas'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1021,12 +1448,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'attributed_revenue'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1034,23 +1468,34 @@ Dashboard lb_lowbyte_overview {
     label: 'ROAS by Acquisition Source (attributed)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.roas_channel)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.roas_channel)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1058,23 +1503,34 @@ Dashboard lb_lowbyte_overview {
     label: 'LTV per Install by Source (attributed)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ltv_channel)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ltv_channel)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1082,29 +1538,43 @@ Dashboard lb_lowbyte_overview {
     label: 'Attributed Revenue vs UA Spend by Source'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.attributed_revenue)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.attributed_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ua_spend)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ua_spend)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1112,23 +1582,34 @@ Dashboard lb_lowbyte_overview {
     label: 'CPI by Acquisition Source'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.cpi)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.cpi)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1136,23 +1617,34 @@ Dashboard lb_lowbyte_overview {
     label: 'ROAS by Game (attributed)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_game.game_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.roas_channel)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_game.game_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.roas_channel)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1160,23 +1652,31 @@ Dashboard lb_lowbyte_overview {
     label: 'UA Spend by Month'
     viz: LineChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_date.full_date)
-      transformation: 'datetrunc month'
-      format { type: 'date' pattern: 'LLL yyyy' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.ua_spend)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_date.full_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.ua_spend)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1194,7 +1694,9 @@ Dashboard lb_lowbyte_overview {
       operator: 'is'
       value: 'Month'
     }
-    settings { input_type: 'single' }
+    settings {
+      input_type: 'single'
+    }
   }
   block flt_cohort_date: FilterBlock {
     label: 'Install Date (Cohort)'
@@ -1215,12 +1717,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'installs'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1231,12 +1740,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'active_players'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1247,12 +1763,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd1_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1263,12 +1786,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd7_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1279,12 +1809,19 @@ Dashboard lb_lowbyte_overview {
       value: VizFieldFull {
         label: ' '
         ref: 'd30_retention'
-        format { type: 'number' pattern: 'inherited' }
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
       }
       settings {
         display_mode: 'single'
-        metric_value { font_size: 26 }
-        aggregate_awareness { enabled: true }
+        metric_value {
+          font_size: 26
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1301,31 +1838,40 @@ Dashboard lb_lowbyte_overview {
       rows: [
         VizFieldFull {
           ref: r(lb_dim_acquisition_source.channel_group)
-          format { type: 'text' }
+          format {
+            type: 'text'
+          }
+          uname: 'lb_dim_acquisition_source_channel_group'
         },
         VizFieldFull {
-          ref: ref('lb_fact_install', 'cohort_period')
-          format { type: 'date' pattern: 'yyyy-MM-dd' }
-        },
+          ref: r(lb_lowbyte_studio, lb_fact_install.cohort_period)
+          format {
+            type: 'date'
+            pattern: 'yyyy-MM-dd'
+          }
+          uname: 'lb_fact_install_cohort_period'
+        }
       ]
       columns: [
         VizFieldFull {
           ref: r(lb_fact_player_activity_daily.weeks_since_install_capped)
-          format { type: 'number' }
-        },
+          format {
+            type: 'number'
+          }
+        }
       ]
       values: [
         VizFieldFull {
-          label: 'Retention %'
+          label: 'Ret%'
           ref: 'retention_pct'
+          format {
+            type: 'number'
+            pattern: '#,###%'
+          }
           uname: 'custom_retention_pct'
-          format { type: 'number' pattern: '#,###%' }
-        },
+        }
       ]
       settings {
-        show_row_total: false
-        show_column_total: false
-        empty_cell_as_zero: false
         conditional_formats: [
           ConditionalFormat {
             key: 'custom_retention_pct'
@@ -1345,7 +1891,24 @@ Dashboard lb_lowbyte_overview {
             }
           }
         ]
-        aggregate_awareness { enabled: true }
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'custom_retention_pct'
+            width: 102
+          },
+          ColumnStyle {
+            key: 'lb_dim_acquisition_source_channel_group'
+            width: 178
+          },
+          ColumnStyle {
+            key: 'lb_fact_install_cohort_period'
+            width: 177
+          }
+        ]
       }
     }
   }
@@ -1353,34 +1916,47 @@ Dashboard lb_lowbyte_overview {
     label: 'Retention by Game (D1 / D7 / D30)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_game.game_name)
-      format { type: 'text' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_game.game_name)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d1_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d1_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d7_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d7_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d30_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d30_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1388,34 +1964,47 @@ Dashboard lb_lowbyte_overview {
     label: 'Retention by Acquisition Source (D1 / D7 / D30)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_acquisition_source.source_name)
-      format { type: 'text' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_acquisition_source.source_name)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d1_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d1_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d7_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d7_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d30_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d30_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1423,23 +2012,34 @@ Dashboard lb_lowbyte_overview {
     label: 'D1 Retention by Country (Top 15)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_country.country_name)
-      format { type: 'text' }
-    }
-      y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d1_retention)
-          format { type: 'number' pattern: 'inherited' }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_country.country_name)
+        format {
+          type: 'text'
         }
       }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d1_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
       }
       settings {
-      row_limit: 15
-      x_axis_show_null_datetime: false
-      sort { field_index: 0 direction: 'desc' type: 'series' }
-      aggregate_awareness { enabled: true }
+        row_limit: 15
+        x_axis_show_null_datetime: false
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
@@ -1447,38 +2047,50 @@ Dashboard lb_lowbyte_overview {
     label: 'Retention by Platform (D1 / D7 / D30)'
     viz: ColumnChart {
       dataset: lb_lowbyte_studio
-    x_axis: VizFieldFull {
-      ref: r(lb_dim_platform.platform_name)
-      format { type: 'text' }
-    }
+      x_axis: VizFieldFull {
+        ref: r(lb_dim_platform.platform_name)
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d1_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d1_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d7_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d7_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
-      series {
-        field: VizFieldFull {
-          ref: r(lb_lowbyte_studio.d30_retention)
-          format { type: 'number' pattern: 'inherited' }
+        series {
+          field: VizFieldFull {
+            ref: r(lb_lowbyte_studio.d30_retention)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
         }
-      }
       }
       settings {
-      row_limit: 5000
-      x_axis_show_null_datetime: false
-      aggregate_awareness { enabled: true }
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+        }
       }
     }
   }
-
   view: TabLayout {
     label: 'Lowbyte Studio'
     tab over_view: CanvasLayout {
@@ -1601,6 +2213,63 @@ Dashboard lb_lowbyte_overview {
       block v25 {
         position: pos(20, 1002, 1160, 360)
         layer: 11
+      }
+    }
+    tab cohorts: CanvasLayout {
+      label: 'Cohorts'
+      height: 1578
+      grid_size: 20
+      block h63 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block flt_cohort_grain {
+        position: pos(20, 144, 373, 56)
+        layer: 2
+      }
+      block flt_cohort_date {
+        position: pos(413, 144, 373, 56)
+        layer: 3
+      }
+      block k64 {
+        position: pos(20, 220, 224, 120)
+        layer: 4
+      }
+      block k65 {
+        position: pos(248, 220, 224, 120)
+        layer: 5
+      }
+      block k66 {
+        position: pos(476, 220, 224, 120)
+        layer: 6
+      }
+      block k67 {
+        position: pos(704, 220, 224, 120)
+        layer: 7
+      }
+      block k68 {
+        position: pos(932, 220, 224, 120)
+        layer: 8
+      }
+      block cp69 {
+        position: pos(20, 358, 1160, 460)
+        layer: 9
+      }
+      block v70 {
+        position: pos(20, 838, 570, 340)
+        layer: 10
+      }
+      block v71 {
+        position: pos(610, 838, 570, 340)
+        layer: 11
+      }
+      block v72 {
+        position: pos(20, 1198, 570, 340)
+        layer: 12
+      }
+      block v73 {
+        position: pos(610, 1198, 570, 340)
+        layer: 13
       }
     }
     tab engagement_retention: CanvasLayout {
@@ -1766,63 +2435,6 @@ Dashboard lb_lowbyte_overview {
         layer: 12
       }
     }
-    tab cohorts: CanvasLayout {
-      label: 'Cohorts'
-      height: 1578
-      grid_size: 20
-      block h63 {
-        position: pos(20, 20, 1160, 104)
-        layer: 1
-      }
-      block flt_cohort_grain {
-        position: pos(20, 144, 373, 56)
-        layer: 2
-      }
-      block flt_cohort_date {
-        position: pos(413, 144, 373, 56)
-        layer: 3
-      }
-      block k64 {
-        position: pos(20, 220, 224, 120)
-        layer: 4
-      }
-      block k65 {
-        position: pos(248, 220, 224, 120)
-        layer: 5
-      }
-      block k66 {
-        position: pos(476, 220, 224, 120)
-        layer: 6
-      }
-      block k67 {
-        position: pos(704, 220, 224, 120)
-        layer: 7
-      }
-      block k68 {
-        position: pos(932, 220, 224, 120)
-        layer: 8
-      }
-      block cp69 {
-        position: pos(20, 358, 1160, 460)
-        layer: 9
-      }
-      block v70 {
-        position: pos(20, 838, 570, 340)
-        layer: 10
-      }
-      block v71 {
-        position: pos(610, 838, 570, 340)
-        layer: 11
-      }
-      block v72 {
-        position: pos(20, 1198, 570, 340)
-        layer: 12
-      }
-      block v73 {
-        position: pos(610, 1198, 570, 340)
-        layer: 13
-      }
-    }
   }
 
   interactions: [
@@ -1830,7 +2442,74 @@ Dashboard lb_lowbyte_overview {
       from: 'flt_cohort_date'
       to: [
         CustomMapping {
-          block: ['k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8', 'k9', 'k10', 'k11', 'v12', 'v13', 'v14', 'k16', 'k17', 'k18', 'k19', 'k20', 'v21', 'v22', 'v23', 'v24', 'v25', 'k27', 'k28', 'k29', 'k30', 'k31', 'k32', 'k33', 'k34', 'v35', 'v36', 'v37', 'v38', 'v39', 'k41', 'k42', 'k43', 'k44', 'k45', 'v46', 'v47', 'v48', 'v49', 'v50', 'k52', 'k53', 'k54', 'k55', 'k56', 'v57', 'v58', 'v59', 'v60', 'v61', 'v62', 'k64', 'k65', 'k66', 'k67', 'k68', 'v70', 'v71', 'v72', 'v73']
+          block: [
+            'k2',
+            'k3',
+            'k4',
+            'k5',
+            'k6',
+            'k7',
+            'k8',
+            'k9',
+            'k10',
+            'k11',
+            'v12',
+            'v13',
+            'v14',
+            'k16',
+            'k17',
+            'k18',
+            'k19',
+            'k20',
+            'v21',
+            'v22',
+            'v23',
+            'v24',
+            'v25',
+            'k27',
+            'k28',
+            'k29',
+            'k30',
+            'k31',
+            'k32',
+            'k33',
+            'k34',
+            'v35',
+            'v36',
+            'v37',
+            'v38',
+            'v39',
+            'k41',
+            'k42',
+            'k43',
+            'k44',
+            'k45',
+            'v46',
+            'v47',
+            'v48',
+            'v49',
+            'v50',
+            'k52',
+            'k53',
+            'k54',
+            'k55',
+            'k56',
+            'v57',
+            'v58',
+            'v59',
+            'v60',
+            'v61',
+            'v62',
+            'k64',
+            'k65',
+            'k66',
+            'k67',
+            'k68',
+            'v70',
+            'v71',
+            'v72',
+            'v73'
+          ]
           disabled: true
         }
       ]
