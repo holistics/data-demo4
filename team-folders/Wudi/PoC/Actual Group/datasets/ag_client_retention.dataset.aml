@@ -8,7 +8,7 @@ Dataset ag_client_retention {
   __engine__: 'aql'
   label: '[AG] Client & Retention'
   description: 'Client demand, fill rate, revenue, activity and retention/churn-risk metrics for account management.'
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
 
   models: [
     ag_client,

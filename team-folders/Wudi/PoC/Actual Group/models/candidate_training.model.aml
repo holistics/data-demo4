@@ -2,7 +2,7 @@ Model ag_candidate_training {
   type: 'table'
   label: 'Candidate Training'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension candidate_training_id {
     label: 'Candidate Training Id'
     type: 'number'

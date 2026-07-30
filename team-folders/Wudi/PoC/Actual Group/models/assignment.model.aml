@@ -2,7 +2,7 @@ Model ag_assignment {
   type: 'table'
   label: 'Assignment'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension assignment_id {
     label: 'Assignment Id'
     type: 'number'

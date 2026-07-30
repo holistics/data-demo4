@@ -2,7 +2,7 @@ Model ag_source_channel {
   type: 'table'
   label: 'Source Channel'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension source_channel_id {
     label: 'Source Channel Id'
     type: 'number'

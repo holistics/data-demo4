@@ -2,7 +2,7 @@ Model ag_exchange_rate {
   type: 'table'
   label: 'Exchange Rate'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demo_prospect_poc'
   dimension exchange_rate_id {
     label: 'Exchange Rate Id'
     type: 'number'
