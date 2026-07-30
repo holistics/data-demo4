@@ -1,0 +1,131 @@
+Model dabble_fact_bet_leg {
+  type: 'table'
+  label: 'Bet Legs'
+  data_source_name: 'dabble_neon'
+  table_name: '"dabble_demo"."fact_bet_leg"'
+
+  dimension bet_leg_id {
+    label: 'Bet Leg ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.bet_leg_id }};;
+  }
+  dimension source_bet_leg_id {
+    label: 'Source Bet Leg ID'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.source_bet_leg_id }};;
+  }
+  dimension bet_id {
+    label: 'Bet ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.bet_id }};;
+  }
+  dimension leg_number {
+    label: 'Leg Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.leg_number }};;
+  }
+  dimension market_id {
+    label: 'Market ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.market_id }};;
+  }
+  dimension selection_name {
+    label: 'Selection'
+    type: 'text'
+    definition: @sql {{ #SOURCE.selection_name }};;
+  }
+  dimension result {
+    label: 'Result'
+    type: 'text'
+    definition: @sql {{ #SOURCE.result }};;
+  }
+  dimension dividend {
+    label: 'Dividend'
+    type: 'number'
+    definition: @sql {{ #SOURCE.dividend }};;
+    description: 'Synthetic leg dividend.'
+  }
+  dimension cash_stake {
+    label: 'Cash Stake'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cash_stake }};;
+  }
+  dimension bonus_stake {
+    label: 'Bonus Stake'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.bonus_stake }};;
+  }
+  dimension combined_stake {
+    label: 'Combined Stake'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.combined_stake }};;
+  }
+  dimension restricted_stake {
+    label: 'Restricted Stake'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.restricted_stake }};;
+  }
+  dimension cash_payout {
+    label: 'Cash Payout'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cash_payout }};;
+  }
+  dimension bonus_payout {
+    label: 'Bonus Payout'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.bonus_payout }};;
+  }
+  dimension combined_payout {
+    label: 'Combined Payout'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.combined_payout }};;
+  }
+  dimension rocket_boost {
+    label: 'Rocket Boost'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.rocket_boost }};;
+  }
+  dimension brg {
+    label: 'BRG'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.brg }};;
+  }
+  dimension gross_win {
+    label: 'Gross Win'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.gross_win }};;
+  }
+  dimension trading_net_win {
+    label: 'Trading Net Win'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.trading_net_win }};;
+  }
+  dimension cogs {
+    label: 'COGS'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cogs }};;
+  }
+  dimension trading_net_revenue {
+    label: 'Trading Net Revenue'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.trading_net_revenue }};;
+  }
+}
