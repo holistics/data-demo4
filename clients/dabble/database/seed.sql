@@ -74,7 +74,7 @@ create temporary table seed_bet on commit drop as
 select n as bet_id
   , 1 + ((n * 1543) % 3000) as user_id
   , case when n % 20 < 9 then 'Single' when n % 20 < 14 then 'Multi' when n % 20 < 17 then 'SGM' when n % 20 < 19 then 'Each Way' else 'Dabble Div' end as bet_type
-<<<<<<< local:clients/dabble/database/seed.sql
+  -- Keep the common demo distribution while covering every leg count shown in the supplied report.
   , case
       when n % 20 < 9 then 1
       when n % 20 < 14 and (n / 20) % 50 = 0 then 6 + ((n / 1000) % 20)
@@ -83,9 +83,6 @@ select n as bet_id
       when n % 20 < 19 then 2
       else 3 + (n % 2)
     end::smallint as leg_count
-=======
-  , case when n % 20 < 9 then 1 when n % 20 < 14 then 2 + (n % 3) when n % 20 < 17 then 2 + (n % 2) when n % 20 < 19 then 2 else 3 + (n % 2) end::smallint as leg_count
->>>>>>> cloud:clients/dabble/database/seed.sql
   , (timestamp '2024-01-01 00:00:00' + ((n * 701) % 938) * interval '1 day' + ((n * 43) % 86400) * interval '1 second') at time zone 'Australia/Sydney' as placed_at
   , case when n % 10 = 0 then 'Copied Rocket Bet' when n % 10 = 1 then 'Non Copied Rocket Bet' else 'Not Rocket' end as rocket_category
 from generate_series(1, 90000) as g(n);

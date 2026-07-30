@@ -153,15 +153,7 @@ Use a consistent 6px radius for canvases, cards, controls, tables, and status co
 - Tables: 32–36px rows, deep-purple header with white 12px semibold text, pale-purple subheaders, subtle zebra rows, and pale-purple hover/selection. Keep grid lines quiet but visible.
 - Filters: compact 32–36px controls with white fill, subtle border, strong violet labels, and a visible `focus` ring. Stack at narrow widths.
 - KPI blocks: strong violet values, short labels, and semantic trend chips using pale fills plus dark accessible text and explicit signs/labels.
-<<<<<<< local:clients/dabble/design.md
 - Charts: inherit `dabble_categorical_palette` by default. Single-series charts in this dashboard explicitly use `chart-categorical-1` (`#8A5DFF`) as a deterministic fallback because current Studio palette inheritance rendered the project default. Reserve sequential and diverging palettes for ordered intensity and performance comparisons respectively; legends and direct labels remain mandatory where categories could be ambiguous.
-=======
-<<<<<<< local:clients/dabble/design.md
-- Charts: inherit `dabble_categorical_palette` by default. Single-series charts in this dashboard explicitly use `chart-categorical-1` (`#8A5DFF`) as a deterministic fallback because current Studio palette inheritance rendered the project default. Reserve sequential and diverging palettes for ordered intensity and performance comparisons respectively; legends and direct labels remain mandatory where categories could be ambiguous.
-=======
-- Charts: inherit `dabble_categorical_palette` by default. Reserve sequential and diverging palettes for ordered intensity and performance comparisons respectively; legends and direct labels remain mandatory where categories could be ambiguous.
->>>>>>> cloud:clients/dabble/design.md
->>>>>>> cloud:clients/dabble/design.md
 - Callouts: use `surface-selected` with a `brand-action` left rule and strong violet text. Keep callout copy unchanged and concise.
 
 ## Do's and Don'ts

@@ -141,10 +141,6 @@ Dashboard dabble_au_trading_kpi_prototype {
     viz: DataTable {
       dataset: dabble_trading
       fields: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_fact_bet.rocket_category) uname: 'rocket_category' },
         VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
         VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
@@ -152,49 +148,12 @@ Dashboard dabble_au_trading_kpi_prototype {
         VizFieldFull { ref: r(dabble_trading.rocket_boost) uname: 'rocket_boost' },
         VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
         VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        VizFieldFull {
-          ref: r(dabble_fact_bet.rocket_category)
-          uname: 'rocket_category'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.actives)
-          uname: 'actives'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bets)
-          uname: 'bets'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.combined_stake)
-          uname: 'combined_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.rocket_boost)
-          uname: 'rocket_boost'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win)
-          uname: 'gross_win'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win_pct)
-          uname: 'gross_win_pct'
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       ]
       settings {
         wrap_header_text: true
         frozen_columns: 1
         column_width {
           manual_widths: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
             ColumnWidth { key: 'rocket_category' width: 150 },
             ColumnWidth { key: 'actives' width: 90 },
             ColumnWidth { key: 'bets' width: 90 },
@@ -202,39 +161,6 @@ Dashboard dabble_au_trading_kpi_prototype {
             ColumnWidth { key: 'rocket_boost' width: 130 },
             ColumnWidth { key: 'gross_win' width: 130 },
             ColumnWidth { key: 'gross_win_pct' width: 120 }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-            ColumnWidth {
-              key: 'rocket_category'
-              width: 150
-            },
-            ColumnWidth {
-              key: 'actives'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'bets'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'combined_stake'
-              width: 140
-            },
-            ColumnWidth {
-              key: 'rocket_boost'
-              width: 130
-            },
-            ColumnWidth {
-              key: 'gross_win'
-              width: 130
-            },
-            ColumnWidth {
-              key: 'gross_win_pct'
-              width: 120
-            }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
           ]
         }
       }
@@ -282,18 +208,9 @@ Dashboard dabble_au_trading_kpi_prototype {
       y_axis {
         series {
           field: r(dabble_trading.gross_win)
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
           settings {
             color: '#8A5DFF'
           }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-          settings {
-            color: '#8A5DFF'
-          }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         }
       }
       settings {
@@ -314,18 +231,9 @@ Dashboard dabble_au_trading_kpi_prototype {
       y_axis {
         series {
           field: r(dabble_trading.gross_win_pct)
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
           settings {
             color: '#8A5DFF'
           }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-          settings {
-            color: '#8A5DFF'
-          }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         }
       }
       settings {
@@ -353,18 +261,9 @@ Dashboard dabble_au_trading_kpi_prototype {
       y_axis {
         series {
           field: r(dabble_trading.actives)
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
           settings {
             color: '#8A5DFF'
           }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-          settings {
-            color: '#8A5DFF'
-          }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         }
       }
     }
@@ -384,18 +283,9 @@ Dashboard dabble_au_trading_kpi_prototype {
       y_axis {
         series {
           field: r(dabble_trading.combined_stake)
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
           settings {
             color: '#8A5DFF'
           }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-          settings {
-            color: '#8A5DFF'
-          }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         }
       }
     }
@@ -406,86 +296,25 @@ Dashboard dabble_au_trading_kpi_prototype {
     viz: DataTable {
       dataset: dabble_trading
       fields: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_dim_user.source_user_id) uname: 'source_user_id' },
         VizFieldFull { ref: r(dabble_dim_user.display_alias) uname: 'display_alias' },
         VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-        VizFieldFull { ref: r(dabble_dim_user.source_user_id) uname: 'source_user_id' },
-        VizFieldFull { ref: r(dabble_dim_user.display_alias) uname: 'display_alias' },
-        VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
-=======
-        VizFieldFull {
-          ref: r(dabble_dim_user.source_user_id)
-          uname: 'source_user_id'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_user.display_alias)
-          uname: 'display_alias'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bets)
-          uname: 'bets'
-        },
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull {
           ref: r(dabble_trading.combined_stake)
           uname: 'turnover'
         },
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-        VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
-=======
-        VizFieldFull {
-          ref: r(dabble_trading.trading_net_revenue)
-          uname: 'trading_net_revenue'
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       ]
       settings {
         wrap_header_text: true
         frozen_columns: 2
         column_width {
           manual_widths: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
             ColumnWidth { key: 'source_user_id' width: 170 },
             ColumnWidth { key: 'display_alias' width: 190 },
             ColumnWidth { key: 'bets' width: 90 },
             ColumnWidth { key: 'turnover' width: 145 },
             ColumnWidth { key: 'trading_net_revenue' width: 150 }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-            ColumnWidth {
-              key: 'source_user_id'
-              width: 170
-            },
-            ColumnWidth {
-              key: 'display_alias'
-              width: 190
-            },
-            ColumnWidth {
-              key: 'bets'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'turnover'
-              width: 145
-            },
-            ColumnWidth {
-              key: 'trading_net_revenue'
-              width: 150
-            }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
           ]
         }
         row_limit: 10
@@ -559,18 +388,9 @@ Dashboard dabble_au_trading_kpi_prototype {
       y_axis {
         series {
           field: r(dabble_trading.combined_stake)
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
           settings {
             color: '#8A5DFF'
           }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-          settings {
-            color: '#8A5DFF'
-          }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         }
       }
     }
@@ -635,10 +455,6 @@ Dashboard dabble_au_trading_kpi_prototype {
     viz: DataTable {
       dataset: dabble_trading
       fields: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
         VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
         VizFieldFull { ref: r(dabble_trading.bets) uname: 'bets' },
@@ -655,85 +471,12 @@ Dashboard dabble_au_trading_kpi_prototype {
         VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
         VizFieldFull { ref: r(dabble_trading.rocket_boost) uname: 'rocket_boost' },
         VizFieldFull { ref: r(dabble_trading.trading_net_win) uname: 'trading_net_win' }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        VizFieldFull {
-          ref: r(dabble_dim_sport.sport_name)
-          uname: 'sport'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.actives)
-          uname: 'actives'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bets)
-          uname: 'bets'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.avg_bet_size)
-          uname: 'avg_bet_size'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.avg_stake_per_active)
-          uname: 'avg_stake_per_active'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.cash_stake)
-          uname: 'cash_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bonus_cash_stake)
-          uname: 'bonus_cash_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.combined_stake)
-          uname: 'combined_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.restricted_stake)
-          uname: 'restricted_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.restricted_stake_pct)
-          uname: 'restricted_stake_pct'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.cash_payout)
-          uname: 'cash_payout'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bonus_cash_payout)
-          uname: 'bonus_cash_payout'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win)
-          uname: 'gross_win'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win_pct)
-          uname: 'gross_win_pct'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.rocket_boost)
-          uname: 'rocket_boost'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.trading_net_win)
-          uname: 'trading_net_win'
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       ]
       settings {
         wrap_header_text: true
         frozen_columns: 1
         column_width {
           manual_widths: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
             ColumnWidth { key: 'sport' width: 260 },
             ColumnWidth { key: 'actives' width: 90 },
             ColumnWidth { key: 'bets' width: 90 },
@@ -750,75 +493,6 @@ Dashboard dabble_au_trading_kpi_prototype {
             ColumnWidth { key: 'gross_win_pct' width: 120 },
             ColumnWidth { key: 'rocket_boost' width: 120 },
             ColumnWidth { key: 'trading_net_win' width: 145 }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-            ColumnWidth {
-              key: 'sport'
-              width: 160
-            },
-            ColumnWidth {
-              key: 'actives'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'bets'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'avg_bet_size'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'avg_stake_per_active'
-              width: 150
-            },
-            ColumnWidth {
-              key: 'cash_stake'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'bonus_cash_stake'
-              width: 145
-            },
-            ColumnWidth {
-              key: 'combined_stake'
-              width: 140
-            },
-            ColumnWidth {
-              key: 'restricted_stake'
-              width: 140
-            },
-            ColumnWidth {
-              key: 'restricted_stake_pct'
-              width: 130
-            },
-            ColumnWidth {
-              key: 'cash_payout'
-              width: 125
-            },
-            ColumnWidth {
-              key: 'bonus_cash_payout'
-              width: 160
-            },
-            ColumnWidth {
-              key: 'gross_win'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'gross_win_pct'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'rocket_boost'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'trading_net_win'
-              width: 145
-            }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
           ]
         }
         row_limit: 5000
@@ -830,10 +504,6 @@ Dashboard dabble_au_trading_kpi_prototype {
     viz: DataTable {
       dataset: dabble_trading
       fields: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
         VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
         VizFieldFull { ref: r(dabble_trading.actives) uname: 'actives' },
@@ -842,51 +512,10 @@ Dashboard dabble_au_trading_kpi_prototype {
         VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
         VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
         VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        VizFieldFull {
-          ref: r(dabble_dim_sport.sport_name)
-          uname: 'sport'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_competition.competition_name)
-          uname: 'competition'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.actives)
-          uname: 'actives'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bets)
-          uname: 'bets'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.combined_stake)
-          uname: 'combined_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win)
-          uname: 'gross_win'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win_pct)
-          uname: 'gross_win_pct'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.trading_net_revenue)
-          uname: 'trading_net_revenue'
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       ]
       settings {
         wrap_header_text: true
         frozen_columns: 2
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         column_width { manual_widths: [
           ColumnWidth { key: 'sport' width: 150 },
           ColumnWidth { key: 'competition' width: 360 },
@@ -897,47 +526,6 @@ Dashboard dabble_au_trading_kpi_prototype {
           ColumnWidth { key: 'gross_win_pct' width: 120 },
           ColumnWidth { key: 'trading_net_revenue' width: 150 }
         ] }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        column_width {
-          manual_widths: [
-            ColumnWidth {
-              key: 'sport'
-              width: 150
-            },
-            ColumnWidth {
-              key: 'competition'
-              width: 240
-            },
-            ColumnWidth {
-              key: 'actives'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'bets'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'combined_stake'
-              width: 140
-            },
-            ColumnWidth {
-              key: 'gross_win'
-              width: 130
-            },
-            ColumnWidth {
-              key: 'gross_win_pct'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'trading_net_revenue'
-              width: 150
-            }
-          ]
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         row_limit: 5000
       }
     }
@@ -947,10 +535,6 @@ Dashboard dabble_au_trading_kpi_prototype {
     viz: DataTable {
       dataset: dabble_trading
       fields: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
         VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
         VizFieldFull { ref: r(dabble_dim_fixture.fixture_name) uname: 'fixture' },
@@ -960,55 +544,10 @@ Dashboard dabble_au_trading_kpi_prototype {
         VizFieldFull { ref: r(dabble_trading.combined_stake) uname: 'combined_stake' },
         VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
         VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        VizFieldFull {
-          ref: r(dabble_dim_sport.sport_name)
-          uname: 'sport'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_competition.competition_name)
-          uname: 'competition'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_fixture.fixture_name)
-          uname: 'fixture'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_fixture.advertised_start)
-          uname: 'advertised_start'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.actives)
-          uname: 'actives'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bets)
-          uname: 'bets'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.combined_stake)
-          uname: 'combined_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win)
-          uname: 'gross_win'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win_pct)
-          uname: 'gross_win_pct'
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       ]
       settings {
         wrap_header_text: true
         frozen_columns: 3
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         column_width { manual_widths: [
           ColumnWidth { key: 'sport' width: 150 },
           ColumnWidth { key: 'competition' width: 220 },
@@ -1020,51 +559,6 @@ Dashboard dabble_au_trading_kpi_prototype {
           ColumnWidth { key: 'gross_win' width: 130 },
           ColumnWidth { key: 'gross_win_pct' width: 120 }
         ] }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        column_width {
-          manual_widths: [
-            ColumnWidth {
-              key: 'sport'
-              width: 150
-            },
-            ColumnWidth {
-              key: 'competition'
-              width: 220
-            },
-            ColumnWidth {
-              key: 'fixture'
-              width: 300
-            },
-            ColumnWidth {
-              key: 'advertised_start'
-              width: 170
-            },
-            ColumnWidth {
-              key: 'actives'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'bets'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'combined_stake'
-              width: 140
-            },
-            ColumnWidth {
-              key: 'gross_win'
-              width: 130
-            },
-            ColumnWidth {
-              key: 'gross_win_pct'
-              width: 120
-            }
-          ]
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         row_limit: 5000
       }
     }
@@ -1077,18 +571,9 @@ Dashboard dabble_au_trading_kpi_prototype {
       y_axis {
         series {
           field: r(dabble_trading.combined_stake)
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
           settings {
             color: '#8A5DFF'
           }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-          settings {
-            color: '#8A5DFF'
-          }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         }
       }
     }
@@ -1098,10 +583,6 @@ Dashboard dabble_au_trading_kpi_prototype {
     viz: DataTable {
       dataset: dabble_trading
       fields: [
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         VizFieldFull { ref: r(dabble_dim_sport.sport_name) uname: 'sport' },
         VizFieldFull { ref: r(dabble_dim_competition.competition_name) uname: 'competition' },
         VizFieldFull { ref: r(dabble_dim_market.market_group) uname: 'market_group' },
@@ -1112,59 +593,10 @@ Dashboard dabble_au_trading_kpi_prototype {
         VizFieldFull { ref: r(dabble_trading.gross_win) uname: 'gross_win' },
         VizFieldFull { ref: r(dabble_trading.gross_win_pct) uname: 'gross_win_pct' },
         VizFieldFull { ref: r(dabble_trading.trading_net_revenue) uname: 'trading_net_revenue' }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        VizFieldFull {
-          ref: r(dabble_dim_sport.sport_name)
-          uname: 'sport'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_competition.competition_name)
-          uname: 'competition'
-        },
-        VizFieldFull {
-          ref: r(dabble_dim_market.market_group)
-          uname: 'market_group'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.actives)
-          uname: 'actives'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.bets)
-          uname: 'bets'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.combined_stake)
-          uname: 'combined_stake'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.weighted_dividend)
-          uname: 'weighted_dividend'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win)
-          uname: 'gross_win'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.gross_win_pct)
-          uname: 'gross_win_pct'
-        },
-        VizFieldFull {
-          ref: r(dabble_trading.trading_net_revenue)
-          uname: 'trading_net_revenue'
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       ]
       settings {
         wrap_header_text: true
         frozen_columns: 3
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         column_width { manual_widths: [
           ColumnWidth { key: 'sport' width: 150 },
           ColumnWidth { key: 'competition' width: 220 },
@@ -1177,55 +609,6 @@ Dashboard dabble_au_trading_kpi_prototype {
           ColumnWidth { key: 'gross_win_pct' width: 120 },
           ColumnWidth { key: 'trading_net_revenue' width: 150 }
         ] }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-=======
-=======
-        column_width {
-          manual_widths: [
-            ColumnWidth {
-              key: 'sport'
-              width: 150
-            },
-            ColumnWidth {
-              key: 'competition'
-              width: 220
-            },
-            ColumnWidth {
-              key: 'market_group'
-              width: 200
-            },
-            ColumnWidth {
-              key: 'actives'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'bets'
-              width: 90
-            },
-            ColumnWidth {
-              key: 'combined_stake'
-              width: 140
-            },
-            ColumnWidth {
-              key: 'weighted_dividend'
-              width: 150
-            },
-            ColumnWidth {
-              key: 'gross_win'
-              width: 130
-            },
-            ColumnWidth {
-              key: 'gross_win_pct'
-              width: 120
-            },
-            ColumnWidth {
-              key: 'trading_net_revenue'
-              width: 150
-            }
-          ]
-        }
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
         row_limit: 5000
       }
     }
@@ -1235,15 +618,7 @@ Dashboard dabble_au_trading_kpi_prototype {
     tab au_kpi_overview: CanvasLayout {
       label: 'AU - KPI Overview'
       width: 1300
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
       height: 3950
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-      height: 3950
-=======
-      height: 3790
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       grid_size: 10
       auto_expand_vertically: true
       mobile {
@@ -1310,15 +685,7 @@ Dashboard dabble_au_trading_kpi_prototype {
         position: pos(20, 3290, 1260, 340)
       }
       block about_sample {
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
         position: pos(20, 3650, 1260, 280)
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-        position: pos(20, 3650, 1260, 280)
-=======
-        position: pos(20, 3650, 1260, 130)
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
       }
       default_zoom: 'fit_to_width'
     }
@@ -1363,31 +730,8 @@ Dashboard dabble_au_trading_kpi_prototype {
       }
       default_zoom: 'fit_to_width'
     }
-    tab tab_bxt2: CanvasLayout {
-      label: 'Untitled'
-      width: 1300
-      height: 800
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-    }
   }
-  settings {
-    autorun_on_open: true
-  }
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
-  settings {
-    autorun_on_open: true
-  }
-=======
-<<<<<<< local:clients/dabble/dashboards/dabble_au_trading.page.aml
   settings {
     autorun_on_open: true
   }
 }
-=======
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
-}
->>>>>>> cloud:clients/dabble/dashboards/dabble_au_trading.page.aml
