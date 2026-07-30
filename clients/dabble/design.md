@@ -3,7 +3,7 @@ version: alpha
 name: Dabble Holistics
 description: Production light theme for Dabble's compact AU trading dashboards in Holistics.
 colors:
-  primary: "#21099B"
+  primary: "#5C3BC4"
   canvas: "#FCFCFE"
   card: "#FFFFFF"
   surface-subtle: "#F4F4F5"
