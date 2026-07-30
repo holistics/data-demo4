@@ -5,7 +5,7 @@ const dabble_surface_selected = "#EEE9FA"
 const dabble_text_strong = "#180666"
 const dabble_text_muted = "#4D4566"
 const dabble_border_subtle = "#DDD8EA"
-const dabble_brand_primary = "#21099B"
+const dabble_brand_primary = "#5C3BC4"
 const dabble_brand_action = "#5C3BC4"
 const dabble_positive_fill = "#E4F7EA"
 const dabble_positive_text = "#176B35"
@@ -54,6 +54,19 @@ ColorPalette dabble_performance_diverging_palette {
       "#176B35"
     ]
   }
+}
+
+BlockTheme dabble_page_chrome {
+  background {
+    bg_color: "transparent"
+  }
+  border {
+    border_width: 0
+    border_radius: 0
+    border_style: "none"
+  }
+  padding: 0
+  shadow: "none"
 }
 
 PageTheme dabble_light {
@@ -207,5 +220,6 @@ PageTheme dabble_light {
         }
       }
     }
+
   }
 }
