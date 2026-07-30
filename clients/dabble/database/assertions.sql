@@ -97,12 +97,10 @@ begin
 
   if (select count(distinct home_state) from dabble_demo.dim_user) <> 8
     or (select count(distinct bet_type) from dabble_demo.fact_bet) <> 5
-<<<<<<< local:clients/dabble/database/assertions.sql
+    -- The supplied margin table displays leg counts from 1 through 25.
     or (select min(leg_count) from dabble_demo.fact_bet) <> 1
     or (select max(leg_count) from dabble_demo.fact_bet) <> 25
     or (select count(distinct leg_count) from dabble_demo.fact_bet) <> 25
-=======
->>>>>>> cloud:clients/dabble/database/assertions.sql
     or (select count(distinct risk_rating) from dabble_demo.dim_user) <> 4
     or (select count(distinct rocket_category) from dabble_demo.fact_bet) <> 3
     or not exists (select 1 from dabble_demo.dim_user where risk_factor = -1)
