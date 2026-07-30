@@ -149,10 +149,10 @@ Share of each signup cohort that places an order in each subsequent month — a 
         }
       }
       cohort_value: VizFieldFull {
-        ref: 'cohort_active_users'
+        ref: 'retention'
         format {
           type: 'number'
-          pattern: '#,###0'
+          pattern: '#,###0.0%'
         }
       }
       settings {
@@ -175,6 +175,15 @@ Cumulative gross profit per acquired customer, plotted over months-since-first-o
     label: 'CLV by Acquisition Cohort'
     viz: LineChart {
       dataset: demo_ecommerce_version_2
+      calculation ltv_per_customer {
+        label: 'Cumulative Gross Profit per Customer'
+        formula: @aql running_total(
+          (ecommerce_order_items | sum(ecommerce_order_items.quantity * (ecommerce_products.price - ecommerce_products.cost))),
+          ecommerce_orders.month_number
+        ) / ecommerce_orders.cohort_size;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       x_axis: VizFieldFull {
         label: 'Months Since Signup'
         ref: ref('ecommerce_orders', 'month_number')
@@ -225,6 +234,33 @@ Every customer scored on Recency, Frequency, and Monetary value and mapped to a 
     label: 'RFM Customer Segmentation'
     viz: DataTable {
       dataset: demo_ecommerce_version_2
+      calculation rfm_segment {
+        label: 'RFM Segment'
+        formula: @aql case(
+          when: count(ecommerce_orders.id) >= 3
+            and date_diff('day', max(ecommerce_orders.created_at), @now) <= 90
+          , then: '1. Champions'
+          , when: count(ecommerce_orders.id) >= 3
+          , then: '2. Loyal (Lapsing)'
+          , when: count(ecommerce_orders.id) >= 1
+            and date_diff('day', max(ecommerce_orders.created_at), @now) <= 90
+          , then: '3. Promising'
+          , when: count(ecommerce_orders.id) >= 1
+            and date_diff('day', max(ecommerce_orders.created_at), @now) <= 180
+          , then: '4. At Risk'
+          , when: count(ecommerce_orders.id) >= 1
+          , then: '5. Hibernating'
+          , else: '6. Never Purchased'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation recency_days {
+        label: 'Recency (Days Since Last Order)'
+        formula: @aql date_diff('day', max(ecommerce_orders.created_at), @now);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       fields: [
         VizFieldFull {
           ref: ref('ecommerce_users', 'full_name')
@@ -233,19 +269,20 @@ Every customer scored on Recency, Frequency, and Monetary value and mapped to a 
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'rfm_segment')
+          ref: 'rfm_segment'
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'customer_type')
+          label: 'Repeat Buyer'
+          ref: ref('ecommerce_users', 'is_repeated_buyer')
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'recency_days')
+          ref: 'recency_days'
           format {
             type: 'number'
             pattern: '#,###0'
@@ -259,7 +296,8 @@ Every customer scored on Recency, Frequency, and Monetary value and mapped to a 
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'monetary_value')
+          label: 'Monetary Value (GMV)'
+          ref: 'gmv'
           format {
             type: 'number'
             pattern: 'inherited'
@@ -359,13 +397,16 @@ GMV decomposed by customer type over time, showing how much revenue comes from n
       dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
         label: 'Period'
-        ref: ref('ecommerce_orders', 'order_period')
+        ref: ref('ecommerce_orders', 'created_at')
+        transformation: 'datetrunc month'
         format {
           type: 'date'
+          pattern: 'yyyy-MM'
         }
       }
       legend: VizFieldFull {
-        ref: ref('ecommerce_users', 'customer_type')
+        label: 'Repeat Buyer'
+        ref: ref('ecommerce_users', 'is_repeated_buyer')
         format {
           type: 'text'
         }
@@ -407,6 +448,18 @@ Ranked scorecard per merchant: GMV, gross margin, order volume, fulfillment qual
     label: 'Merchant Scorecard'
     viz: PivotTable {
       dataset: demo_ecommerce_version_2
+      calculation gross_margin_pct {
+        label: 'Gross Margin %'
+        formula: @aql (ecommerce_order_items | sum(ecommerce_order_items.quantity * (ecommerce_products.price - ecommerce_products.cost))) / gmv;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation team_size {
+        label: 'Team Size'
+        formula: @aql count(ecommerce_employees.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       rows: [
         VizFieldFull {
           ref: ref('ecommerce_merchants', 'name')
@@ -427,7 +480,7 @@ Ranked scorecard per merchant: GMV, gross margin, order volume, fulfillment qual
           ref: 'gross_margin_pct'
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###0.0%'
           }
         },
         VizFieldFull {
@@ -438,14 +491,15 @@ Ranked scorecard per merchant: GMV, gross margin, order volume, fulfillment qual
           }
         },
         VizFieldFull {
-          ref: 'delivery_success_rate'
+          label: 'Delivery Success Rate'
+          ref: 'order_fulfillment_rate'
           format {
             type: 'number'
             pattern: 'inherited'
           }
         },
         VizFieldFull {
-          ref: 'total_products'
+          ref: ref('ecommerce_products', 'total_products')
           format {
             type: 'number'
             pattern: 'inherited'
@@ -483,6 +537,24 @@ Walks from GMV → discounts → COGS → gross profit across the parent-categor
     label: 'Category Profitability'
     viz: ColumnChart {
       dataset: demo_ecommerce_version_2
+      calculation discount_amount {
+        label: 'Discounts'
+        formula: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price * ecommerce_orders.discount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation cogs {
+        label: 'COGS'
+        formula: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.cost);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gross_profit {
+        label: 'Gross Profit'
+        formula: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * (ecommerce_products.price - ecommerce_products.cost));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       x_axis: VizFieldFull {
         ref: ref('map_categories', 'parent_category')
         format {
@@ -549,9 +621,30 @@ Compares stacked-promo vs single-promo orders on AOV, margin, order volume, and 
     label: 'Promo Effectiveness'
     viz: PivotTable {
       dataset: demo_ecommerce_version_2
+      calculation promo_intensity {
+        label: 'Promo Intensity'
+        formula: @aql case(
+          when: find(ecommerce_orders.applied_promo_codes, ',') > 0, then: 'Stacked promos'
+          , else: 'Single promo'
+        );;
+        calc_type: 'dimension'
+        data_type: 'text'
+      }
+      calculation gross_margin_pct {
+        label: 'Gross Margin %'
+        formula: @aql (ecommerce_order_items | sum(ecommerce_order_items.quantity * (ecommerce_products.price - ecommerce_products.cost))) / gmv;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation repeat_purchase_rate {
+        label: 'Repeat Purchase Rate'
+        formula: @aql total_repeated_buyers / total_buyers;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       rows: [
         VizFieldFull {
-          ref: ref('ecommerce_orders', 'promo_applied')
+          ref: 'promo_intensity'
           format {
             type: 'text'
           }
@@ -576,14 +669,14 @@ Compares stacked-promo vs single-promo orders on AOV, margin, order volume, and 
           ref: 'gross_margin_pct'
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###0.0%'
           }
         },
         VizFieldFull {
           ref: 'repeat_purchase_rate'
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###0.0%'
           }
         }
       ]
@@ -610,8 +703,19 @@ Distribution of delivery attempts crossed with order status — separating logis
     label: 'Fulfillment & Delivery'
     viz: ColumnChart {
       dataset: demo_ecommerce_version_2
+      calculation delivery_band {
+        label: 'Delivery Attempts'
+        formula: @aql case(
+          when: ecommerce_orders.delivery_attempts <= 1, then: '1 attempt'
+          , when: ecommerce_orders.delivery_attempts == 2, then: '2 attempts'
+          , when: ecommerce_orders.delivery_attempts == 3, then: '3 attempts'
+          , else: '4+ attempts'
+        );;
+        calc_type: 'dimension'
+        data_type: 'text'
+      }
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_orders', 'delivery_band')
+        ref: 'delivery_band'
         format {
           type: 'text'
         }
