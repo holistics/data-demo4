@@ -25,7 +25,14 @@ Model dabble_dim_sport {
   dimension is_racing {
     label: 'Is Racing'
     type: 'truefalse'
+    hidden: true
     definition: @sql {{ #SOURCE.is_racing }};;
-    description: 'Demo classification used to separate racing and sport summaries.'
+    description: 'Demo classification used to separate racing and sport summaries. Hidden from reporting because the raw boolean renders as true/false; use Sport Category instead.'
+  }
+  dimension sport_category {
+    label: 'Sport Category'
+    type: 'text'
+    definition: @sql case when {{ #SOURCE.is_racing }} then 'Racing' else 'Sport' end;;
+    description: 'Reporting-friendly label for the racing/sport split. Use this wherever the split is shown to a user.'
   }
 }
