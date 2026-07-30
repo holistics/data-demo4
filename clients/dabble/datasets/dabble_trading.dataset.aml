@@ -167,6 +167,27 @@ Dataset dabble_trading {
     definition: @aql safe_divide(sum(dabble_fact_bet_leg, dabble_fact_bet_leg.dividend * dabble_fact_bet_leg.combined_stake), combined_stake);;
     description: 'Combined-Stake-weighted mean leg dividend. This aggregation is a demo assumption until Dabble confirms production dividend semantics.'
   }
+  metric expected_gross_win {
+    label: 'Expected Gross Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg, dabble_fact_bet_leg.combined_stake * dabble_fact_bet_leg.expected_margin_rate);;
+    description: 'Gross Win the priced book should have returned: allocated leg stake multiplied by the theoretical margin implied by that leg dividend. Additive across all exposed dimensions.'
+  }
+  metric expected_gross_win_pct {
+    label: 'Expected Gross Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(expected_gross_win, combined_stake);;
+    description: 'Stake-weighted theoretical margin for the selected context - the margin the book was priced to hold. Compare against Gross Win % to separate pricing from result variance.'
+  }
+  metric margin_variance_pct {
+    label: 'Margin Variance (pts)'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql gross_win_pct - expected_gross_win_pct;;
+    description: 'Realised Gross Win % less Expected Gross Win %, in percentage points. Positive means the book ran better than priced; negative means worse. Recalculate at each grouping; do not sum.'
+  }
 
   metric racing_actives {
     label: 'Racing Actives #'
@@ -324,6 +345,9 @@ Dataset dabble_trading {
       metric trading_net_revenue
       metric trading_net_revenue_pct
       metric weighted_dividend
+      metric expected_gross_win
+      metric expected_gross_win_pct
+      metric margin_variance_pct
     }
     group prototype_summary_metrics {
       metric racing_actives
