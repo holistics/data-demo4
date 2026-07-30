@@ -1,0 +1,114 @@
+// =====================================================================
+// Lowbyte Studio — dashboard theme (lowbytestudio.com)
+// Dark "console/neon" aesthetic for a mobile-game analytics studio.
+// Apply from a dashboard with:  theme: lowbyte
+// =====================================================================
+
+// Brand / surface colors
+const lb_bg        = "#0A0E1A"   // page background (near-black navy)
+const lb_canvas    = "#0E1424"   // canvas
+const lb_card      = "#141D33"   // block/card surface
+const lb_border    = "#26324F"   // hairline borders
+const lb_text      = "#E8EEFF"   // primary text
+const lb_muted     = "#93A0C7"   // secondary text
+const lb_header_bg = "#1B2748"   // table header
+
+// Neon categorical palette
+const lb_blue      = "#4C6FFF"
+const lb_cyan      = "#22D3EE"
+const lb_violet    = "#A78BFA"
+const lb_magenta   = "#F472D0"
+const lb_lime      = "#A3E635"
+const lb_amber     = "#F5B301"
+const lb_coral     = "#FB7185"
+const lb_teal      = "#34D399"
+
+ColorPalette lowbyte_palette {
+  title: "Lowbyte Neon"
+  categorical {
+    colors: [
+      lb_blue,
+      lb_cyan,
+      lb_violet,
+      lb_lime,
+      lb_magenta,
+      lb_amber,
+      lb_teal,
+      lb_coral
+    ]
+  }
+}
+
+PageTheme lowbyte {
+  title: 'Lowbyte Studio'
+
+  color {
+    data: lowbyte_palette
+  }
+
+  background {
+    bg_color: lb_bg
+  }
+
+  canvas {
+    background {
+      bg_color: lb_canvas
+    }
+    border {
+      border_radius: 14
+      border_color: lb_border
+    }
+  }
+
+  block {
+    background {
+      bg_color: lb_card
+    }
+    label {
+      font_family: "Space Grotesk"
+      font_color: lb_text
+      font_weight: 'bold'
+      font_size: 15
+    }
+    text {
+      font_family: "Inter"
+      font_color: lb_muted
+      font_size: 13
+    }
+    border {
+      border_width: 1
+      border_radius: 12
+      border_color: lb_border
+      border_style: 'solid'
+    }
+    padding: 16
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: lb_card
+        hover_color: lb_header_bg
+        banding_color: "#111A2E"
+        font_color: lb_text
+        font_size: 13
+        font_family: "Inter"
+        border_color: lb_border
+        grid_color: lb_border
+        cell_padding: 8
+      }
+      header {
+        bg_color: lb_header_bg
+        font_color: lb_text
+        font_weight: 'bold'
+      }
+      sub_title {
+        font_color: lb_muted
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap');
+  ;;
+}

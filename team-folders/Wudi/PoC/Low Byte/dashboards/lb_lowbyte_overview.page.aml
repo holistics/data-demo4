@@ -1,0 +1,1841 @@
+Dashboard lb_lowbyte_overview {
+  title: 'Lowbyte Studio — Game Analytics'
+  description: 'Unified UA, engagement, retention, monetization & marketing dashboard for Lowbyte Studio.'
+  owner: 'chukwudi@holistics.io'
+
+  block flt_date: FilterBlock {
+    label: 'Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: ref('lb_dim_date', 'full_date')
+    }
+    default { operator: 'matches' value: '$H_NIL$' }
+  }
+  block flt_game: FilterBlock {
+    label: 'Game'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: ref('lb_dim_game', 'game_name')
+    }
+    default { operator: 'matches' value: '$H_NIL$' }
+  }
+  block flt_platform: FilterBlock {
+    label: 'Platform'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: ref('lb_dim_platform', 'platform_name')
+    }
+    default { operator: 'matches' value: '$H_NIL$' }
+  }
+  block h1: TextBlock {
+    content: @md <div style="height:100%;box-sizing:border-box;background:linear-gradient(97deg,#101B3A 0%,#1B2748 60%,#22305C 100%);border:1px solid #26324F;border-radius:12px;padding:12px 22px;"><div style="color:#E8EEFF;font-size:26px;font-weight:700;font-family:Space Grotesk,sans-serif;">Executive Overview</div><div style="color:#93A0C7;font-size:14px;margin-top:4px;">Studio-wide KPIs across acquisition, engagement, retention & monetization — Lowbyte Studio</div></div>;;
+  }
+  block k2: VizBlock {
+    label: 'Installs'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'installs'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k3: VizBlock {
+    label: 'Active Players'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'active_players'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k4: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'total_revenue'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k5: VizBlock {
+    label: 'ROAS'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'roas'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k6: VizBlock {
+    label: 'LTV (to date)'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'ltv_to_date'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k7: VizBlock {
+    label: 'D1 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd1_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k8: VizBlock {
+    label: 'D7 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd7_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k9: VizBlock {
+    label: 'D30 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd30_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k10: VizBlock {
+    label: 'ARPPU'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'arppu'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k11: VizBlock {
+    label: 'Payer Rate'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'payer_rate'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v12: VizBlock {
+    label: 'Revenue Trend — IAP vs Ad (monthly)'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      settings { show_stack_total: true stack_series_by: 'value' }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.iap_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ad_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v13: VizBlock {
+    label: 'Installs by Month'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.installs)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v14: VizBlock {
+    label: 'Total Revenue by Game'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_game.game_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.total_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block h15: TextBlock {
+    content: @md <div style="height:100%;box-sizing:border-box;background:linear-gradient(97deg,#101B3A 0%,#1B2748 60%,#22305C 100%);border:1px solid #26324F;border-radius:12px;padding:12px 22px;"><div style="color:#E8EEFF;font-size:26px;font-weight:700;font-family:Space Grotesk,sans-serif;">User Acquisition</div><div style="color:#93A0C7;font-size:14px;margin-top:4px;">Where installs come from and what they cost</div></div>;;
+  }
+  block k16: VizBlock {
+    label: 'Installs'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'installs'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k17: VizBlock {
+    label: 'Paid Installs'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'paid_installs'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k18: VizBlock {
+    label: 'UA Spend'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'ua_spend'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k19: VizBlock {
+    label: 'CPI'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'cpi'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k20: VizBlock {
+    label: 'ROAS'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'roas'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v21: VizBlock {
+    label: 'Installs by Acquisition Source'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.installs)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v22: VizBlock {
+    label: 'CPI by Acquisition Source'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.cpi)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v23: VizBlock {
+    label: 'Installs by Country (Top 15)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_country.country_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.installs)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 15
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v24: VizBlock {
+    label: 'UA Spend by Source'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ua_spend)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v25: VizBlock {
+    label: 'Installs by Month'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.installs)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block h26: TextBlock {
+    content: @md <div style="height:100%;box-sizing:border-box;background:linear-gradient(97deg,#101B3A 0%,#1B2748 60%,#22305C 100%);border:1px solid #26324F;border-radius:12px;padding:12px 22px;"><div style="color:#E8EEFF;font-size:26px;font-weight:700;font-family:Space Grotesk,sans-serif;">Engagement & Retention</div><div style="color:#93A0C7;font-size:14px;margin-top:4px;">How players play and how well they stick</div></div>;;
+  }
+  block k27: VizBlock {
+    label: 'Active Players'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'active_players'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k28: VizBlock {
+    label: 'New Players'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'new_players'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k29: VizBlock {
+    label: 'Sessions'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'sessions'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k30: VizBlock {
+    label: 'Sessions / Active'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'sessions_per_active'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k31: VizBlock {
+    label: 'Playtime (hrs)'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'playtime_hours'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k32: VizBlock {
+    label: 'D1 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd1_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k33: VizBlock {
+    label: 'D7 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd7_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k34: VizBlock {
+    label: 'D30 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd30_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v35: VizBlock {
+    label: 'Monthly Active Players'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.active_players)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v36: VizBlock {
+    label: 'Retention by Game (D1 / D7 / D30)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_game.game_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d1_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d7_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d30_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v37: VizBlock {
+    label: 'Sessions by Platform'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_platform.platform_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.sessions)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v38: VizBlock {
+    label: 'Active Players by Country (Top 15)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_country.country_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.active_players)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 15
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v39: VizBlock {
+    label: 'New Players by Month'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.new_players)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block h40: TextBlock {
+    content: @md <div style="height:100%;box-sizing:border-box;background:linear-gradient(97deg,#101B3A 0%,#1B2748 60%,#22305C 100%);border:1px solid #26324F;border-radius:12px;padding:12px 22px;"><div style="color:#E8EEFF;font-size:26px;font-weight:700;font-family:Space Grotesk,sans-serif;">Monetization</div><div style="color:#93A0C7;font-size:14px;margin-top:4px;">IAP and ad revenue in one place</div></div>;;
+  }
+  block k41: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'total_revenue'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k42: VizBlock {
+    label: 'IAP Revenue'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'iap_revenue'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k43: VizBlock {
+    label: 'Ad Revenue'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'ad_revenue'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k44: VizBlock {
+    label: 'ARPPU'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'arppu'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k45: VizBlock {
+    label: 'Payer Rate'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'payer_rate'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v46: VizBlock {
+    label: 'Revenue by Month — IAP vs Ad'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      settings { show_stack_total: true stack_series_by: 'value' }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.iap_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ad_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v47: VizBlock {
+    label: 'IAP Revenue by Game'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_game.game_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.iap_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v48: VizBlock {
+    label: 'Ad Revenue by Network'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_ad_network.network_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ad_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v49: VizBlock {
+    label: 'IAP Revenue by Product Type'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_iap_product.product_type)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.iap_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v50: VizBlock {
+    label: 'Total Revenue by Country (Top 15)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_country.country_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.total_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 15
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block h51: TextBlock {
+    content: @md <div style="height:100%;box-sizing:border-box;background:linear-gradient(97deg,#101B3A 0%,#1B2748 60%,#22305C 100%);border:1px solid #26324F;border-radius:12px;padding:12px 22px;"><div style="color:#E8EEFF;font-size:26px;font-weight:700;font-family:Space Grotesk,sans-serif;">Marketing & ROAS</div><div style="color:#93A0C7;font-size:14px;margin-top:4px;">Spend efficiency and cohort-attributed return by channel and title</div></div>;;
+  }
+  block k52: VizBlock {
+    label: 'UA Spend'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'ua_spend'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k53: VizBlock {
+    label: 'Paid Installs'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'paid_installs'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k54: VizBlock {
+    label: 'CPI'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'cpi'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k55: VizBlock {
+    label: 'ROAS (blended)'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'roas'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k56: VizBlock {
+    label: 'Attributed Revenue'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'attributed_revenue'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v57: VizBlock {
+    label: 'ROAS by Acquisition Source (attributed)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.roas_channel)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v58: VizBlock {
+    label: 'LTV per Install by Source (attributed)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ltv_channel)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v59: VizBlock {
+    label: 'Attributed Revenue vs UA Spend by Source'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.attributed_revenue)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ua_spend)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v60: VizBlock {
+    label: 'CPI by Acquisition Source'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.cpi)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v61: VizBlock {
+    label: 'ROAS by Game (attributed)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_game.game_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.roas_channel)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v62: VizBlock {
+    label: 'UA Spend by Month'
+    viz: LineChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_date.full_date)
+      transformation: 'datetrunc month'
+      format { type: 'date' pattern: 'LLL yyyy' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.ua_spend)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block h63: TextBlock {
+    content: @md <div style="height:100%;box-sizing:border-box;background:linear-gradient(97deg,#101B3A 0%,#1B2748 60%,#22305C 100%);border:1px solid #26324F;border-radius:12px;padding:12px 22px;"><div style="color:#E8EEFF;font-size:26px;font-weight:700;font-family:Space Grotesk,sans-serif;">Cohorts</div><div style="color:#93A0C7;font-size:14px;margin-top:4px;">Install-cohort retention (defaults to last 1 year) — switch granularity with the control; no date-drill needed</div></div>;;
+  }
+  block flt_cohort_grain: FilterBlock {
+    label: 'Cohort Granularity'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: r(lb_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings { input_type: 'single' }
+  }
+  block flt_cohort_date: FilterBlock {
+    label: 'Install Date (Cohort)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: ref('lb_fact_install', 'installed_at')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 1 year'
+    }
+  }
+  block k64: VizBlock {
+    label: 'Installs'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'installs'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k65: VizBlock {
+    label: 'Active Players'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'active_players'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k66: VizBlock {
+    label: 'D1 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd1_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k67: VizBlock {
+    label: 'D7 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd7_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block k68: VizBlock {
+    label: 'D30 Retention'
+    viz: MetricKpi {
+      dataset: lb_lowbyte_studio
+      value: VizFieldFull {
+        label: ' '
+        ref: 'd30_retention'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        metric_value { font_size: 26 }
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block cp69: VizBlock {
+    label: 'Cohort Retention % — Install Cohort × Weeks Since Install'
+    viz: PivotTable {
+      dataset: lb_lowbyte_studio
+      calculation retention_pct {
+        label: 'Retention %'
+        formula: @aql safe_divide(active_players, installs | of_all(lb_fact_player_activity_daily.weeks_since_install_capped, keep_filters: true)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      rows: [
+        VizFieldFull {
+          ref: r(lb_dim_acquisition_source.channel_group)
+          format { type: 'text' }
+        },
+        VizFieldFull {
+          ref: ref('lb_fact_install', 'cohort_period')
+          format { type: 'date' pattern: 'yyyy-MM-dd' }
+        },
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(lb_fact_player_activity_daily.weeks_since_install_capped)
+          format { type: 'number' }
+        },
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Retention %'
+          ref: 'retention_pct'
+          uname: 'custom_retention_pct'
+          format { type: 'number' pattern: '#,###%' }
+        },
+      ]
+      settings {
+        show_row_total: false
+        show_column_total: false
+        empty_cell_as_zero: false
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'custom_retention_pct'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#0E2036'
+              }
+              mid {
+                value: 0.4
+                color: '#1D6FB8'
+              }
+              max {
+                value: 1
+                color: '#22D3EE'
+              }
+            }
+          }
+        ]
+        aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v70: VizBlock {
+    label: 'Retention by Game (D1 / D7 / D30)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_game.game_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d1_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d7_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d30_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v71: VizBlock {
+    label: 'Retention by Acquisition Source (D1 / D7 / D30)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_acquisition_source.source_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d1_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d7_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d30_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v72: VizBlock {
+    label: 'D1 Retention by Country (Top 15)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_country.country_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d1_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 15
+      x_axis_show_null_datetime: false
+      sort { field_index: 0 direction: 'desc' type: 'series' }
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+  block v73: VizBlock {
+    label: 'Retention by Platform (D1 / D7 / D30)'
+    viz: ColumnChart {
+      dataset: lb_lowbyte_studio
+    x_axis: VizFieldFull {
+      ref: r(lb_dim_platform.platform_name)
+      format { type: 'text' }
+    }
+      y_axis {
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d1_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d7_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(lb_lowbyte_studio.d30_retention)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      }
+      }
+      settings {
+      row_limit: 5000
+      x_axis_show_null_datetime: false
+      aggregate_awareness { enabled: true }
+      }
+    }
+  }
+
+  view: TabLayout {
+    label: 'Lowbyte Studio'
+    tab over_view: CanvasLayout {
+      label: 'Executive Overview'
+      height: 1256
+      grid_size: 20
+      block h1 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block flt_date {
+        position: pos(20, 144, 373, 56)
+        layer: 2
+      }
+      block flt_game {
+        position: pos(413, 144, 373, 56)
+        layer: 3
+      }
+      block flt_platform {
+        position: pos(806, 144, 373, 56)
+        layer: 4
+      }
+      block k2 {
+        position: pos(20, 220, 224, 120)
+        layer: 5
+      }
+      block k3 {
+        position: pos(248, 220, 224, 120)
+        layer: 6
+      }
+      block k4 {
+        position: pos(476, 220, 224, 120)
+        layer: 7
+      }
+      block k5 {
+        position: pos(704, 220, 224, 120)
+        layer: 8
+      }
+      block k6 {
+        position: pos(932, 220, 224, 120)
+        layer: 9
+      }
+      block k7 {
+        position: pos(20, 358, 224, 120)
+        layer: 10
+      }
+      block k8 {
+        position: pos(248, 358, 224, 120)
+        layer: 11
+      }
+      block k9 {
+        position: pos(476, 358, 224, 120)
+        layer: 12
+      }
+      block k10 {
+        position: pos(704, 358, 224, 120)
+        layer: 13
+      }
+      block k11 {
+        position: pos(932, 358, 224, 120)
+        layer: 14
+      }
+      block v12 {
+        position: pos(20, 496, 1160, 360)
+        layer: 15
+      }
+      block v13 {
+        position: pos(20, 876, 570, 340)
+        layer: 16
+      }
+      block v14 {
+        position: pos(610, 876, 570, 340)
+        layer: 17
+      }
+    }
+    tab user_acquisition: CanvasLayout {
+      label: 'User Acquisition'
+      height: 1402
+      grid_size: 20
+      block h15 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block k16 {
+        position: pos(20, 144, 224, 120)
+        layer: 2
+      }
+      block k17 {
+        position: pos(248, 144, 224, 120)
+        layer: 3
+      }
+      block k18 {
+        position: pos(476, 144, 224, 120)
+        layer: 4
+      }
+      block k19 {
+        position: pos(704, 144, 224, 120)
+        layer: 5
+      }
+      block k20 {
+        position: pos(932, 144, 224, 120)
+        layer: 6
+      }
+      block v21 {
+        position: pos(20, 282, 570, 340)
+        layer: 7
+      }
+      block v22 {
+        position: pos(610, 282, 570, 340)
+        layer: 8
+      }
+      block v23 {
+        position: pos(20, 642, 570, 340)
+        layer: 9
+      }
+      block v24 {
+        position: pos(610, 642, 570, 340)
+        layer: 10
+      }
+      block v25 {
+        position: pos(20, 1002, 1160, 360)
+        layer: 11
+      }
+    }
+    tab engagement_retention: CanvasLayout {
+      label: 'Engagement & Retention'
+      height: 1540
+      grid_size: 20
+      block h26 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block k27 {
+        position: pos(20, 144, 224, 120)
+        layer: 2
+      }
+      block k28 {
+        position: pos(248, 144, 224, 120)
+        layer: 3
+      }
+      block k29 {
+        position: pos(476, 144, 224, 120)
+        layer: 4
+      }
+      block k30 {
+        position: pos(704, 144, 224, 120)
+        layer: 5
+      }
+      block k31 {
+        position: pos(932, 144, 224, 120)
+        layer: 6
+      }
+      block k32 {
+        position: pos(20, 282, 224, 120)
+        layer: 7
+      }
+      block k33 {
+        position: pos(248, 282, 224, 120)
+        layer: 8
+      }
+      block k34 {
+        position: pos(476, 282, 224, 120)
+        layer: 9
+      }
+      block v35 {
+        position: pos(20, 420, 1160, 360)
+        layer: 10
+      }
+      block v36 {
+        position: pos(20, 800, 570, 340)
+        layer: 11
+      }
+      block v37 {
+        position: pos(610, 800, 570, 340)
+        layer: 12
+      }
+      block v38 {
+        position: pos(20, 1160, 570, 340)
+        layer: 13
+      }
+      block v39 {
+        position: pos(610, 1160, 570, 340)
+        layer: 14
+      }
+    }
+    tab monetization: CanvasLayout {
+      label: 'Monetization'
+      height: 1402
+      grid_size: 20
+      block h40 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block k41 {
+        position: pos(20, 144, 224, 120)
+        layer: 2
+      }
+      block k42 {
+        position: pos(248, 144, 224, 120)
+        layer: 3
+      }
+      block k43 {
+        position: pos(476, 144, 224, 120)
+        layer: 4
+      }
+      block k44 {
+        position: pos(704, 144, 224, 120)
+        layer: 5
+      }
+      block k45 {
+        position: pos(932, 144, 224, 120)
+        layer: 6
+      }
+      block v46 {
+        position: pos(20, 282, 1160, 360)
+        layer: 7
+      }
+      block v47 {
+        position: pos(20, 662, 570, 340)
+        layer: 8
+      }
+      block v48 {
+        position: pos(610, 662, 570, 340)
+        layer: 9
+      }
+      block v49 {
+        position: pos(20, 1022, 570, 340)
+        layer: 10
+      }
+      block v50 {
+        position: pos(610, 1022, 570, 340)
+        layer: 11
+      }
+    }
+    tab marketing_roas: CanvasLayout {
+      label: 'Marketing & ROAS'
+      height: 1762
+      grid_size: 20
+      block h51 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block k52 {
+        position: pos(20, 144, 224, 120)
+        layer: 2
+      }
+      block k53 {
+        position: pos(248, 144, 224, 120)
+        layer: 3
+      }
+      block k54 {
+        position: pos(476, 144, 224, 120)
+        layer: 4
+      }
+      block k55 {
+        position: pos(704, 144, 224, 120)
+        layer: 5
+      }
+      block k56 {
+        position: pos(932, 144, 224, 120)
+        layer: 6
+      }
+      block v57 {
+        position: pos(20, 282, 570, 340)
+        layer: 7
+      }
+      block v58 {
+        position: pos(610, 282, 570, 340)
+        layer: 8
+      }
+      block v59 {
+        position: pos(20, 642, 570, 340)
+        layer: 9
+      }
+      block v60 {
+        position: pos(610, 642, 570, 340)
+        layer: 10
+      }
+      block v61 {
+        position: pos(20, 1002, 570, 340)
+        layer: 11
+      }
+      block v62 {
+        position: pos(20, 1362, 1160, 360)
+        layer: 12
+      }
+    }
+    tab cohorts: CanvasLayout {
+      label: 'Cohorts'
+      height: 1578
+      grid_size: 20
+      block h63 {
+        position: pos(20, 20, 1160, 104)
+        layer: 1
+      }
+      block flt_cohort_grain {
+        position: pos(20, 144, 373, 56)
+        layer: 2
+      }
+      block flt_cohort_date {
+        position: pos(413, 144, 373, 56)
+        layer: 3
+      }
+      block k64 {
+        position: pos(20, 220, 224, 120)
+        layer: 4
+      }
+      block k65 {
+        position: pos(248, 220, 224, 120)
+        layer: 5
+      }
+      block k66 {
+        position: pos(476, 220, 224, 120)
+        layer: 6
+      }
+      block k67 {
+        position: pos(704, 220, 224, 120)
+        layer: 7
+      }
+      block k68 {
+        position: pos(932, 220, 224, 120)
+        layer: 8
+      }
+      block cp69 {
+        position: pos(20, 358, 1160, 460)
+        layer: 9
+      }
+      block v70 {
+        position: pos(20, 838, 570, 340)
+        layer: 10
+      }
+      block v71 {
+        position: pos(610, 838, 570, 340)
+        layer: 11
+      }
+      block v72 {
+        position: pos(20, 1198, 570, 340)
+        layer: 12
+      }
+      block v73 {
+        position: pos(610, 1198, 570, 340)
+        layer: 13
+      }
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'flt_cohort_date'
+      to: [
+        CustomMapping {
+          block: ['k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8', 'k9', 'k10', 'k11', 'v12', 'v13', 'v14', 'k16', 'k17', 'k18', 'k19', 'k20', 'v21', 'v22', 'v23', 'v24', 'v25', 'k27', 'k28', 'k29', 'k30', 'k31', 'k32', 'k33', 'k34', 'v35', 'v36', 'v37', 'v38', 'v39', 'k41', 'k42', 'k43', 'k44', 'k45', 'v46', 'v47', 'v48', 'v49', 'v50', 'k52', 'k53', 'k54', 'k55', 'k56', 'v57', 'v58', 'v59', 'v60', 'v61', 'v62', 'k64', 'k65', 'k66', 'k67', 'k68', 'v70', 'v71', 'v72', 'v73']
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  theme: lowbyte
+}
