@@ -1,0 +1,60 @@
+Dataset balance_sheet {
+  label: 'Balance Sheet'
+  description: 'Balance sheet financial data including credit/debit amounts at line level.'
+  data_source_name: 'demo_dbt_test'
+  owner: 'dong.ln@holistics.io'
+  models: [
+    iceye_fact_balance_sheet,
+    iceye_dim_accounts,
+    iceye_dim_departments,
+    iceye_dim_exchange_rates,
+    iceye_department_hierarchy_map,
+    iceye_account_hierarchy_map,
+  ]
+
+  relationships: [
+    relationship(iceye_fact_balance_sheet.department_number > iceye_dim_departments.department_number, true),
+    relationship(iceye_fact_balance_sheet.account_number > iceye_dim_accounts.acct_number, true),
+    relationship(iceye_department_hierarchy_map.department_number > iceye_dim_departments.department_number, true),
+    relationship(iceye_account_hierarchy_map.account_number > iceye_dim_accounts.acct_number, true),
+  ]
+
+  metric total_net_amount_eur {
+    label: 'Total Net Amount EUR'
+    type: 'number'
+    description: 'Sum of line-level Net Amount EUR (credit − debit).'
+    definition: @aql iceye_fact_balance_sheet.net_amount_eur_agg;;
+    format: '[€]#,###0.00'
+  }
+  metric total_credit_eur {
+    label: 'Total Credit EUR'
+    type: 'number'
+    definition: @aql sum(iceye_fact_balance_sheet.accounting_line_credit_amount_eur);;
+    format: '[€]#,###0.00'
+  }
+  metric total_debit_eur {
+    label: 'Total Debit EUR'
+    type: 'number'
+    definition: @aql sum(iceye_fact_balance_sheet.accounting_line_debit_amount_eur);;
+    format: '[€]#,###0.00'
+  }
+  // Balance-sheet totals by category (assets are debit-normal, so shown as debit − credit = -net)
+  metric total_assets_eur {
+    label: 'Total Assets (EUR)'
+    type: 'number'
+    definition: @aql (iceye_fact_balance_sheet.net_amount_eur_agg | where(iceye_fact_balance_sheet.account_type in ['Bank', 'AcctRec', 'Inventory', 'FixedAsset', 'OthAsset'])) * -1;;
+    format: '[€]#,###0.00'
+  }
+  metric total_liabilities_eur {
+    label: 'Total Liabilities (EUR)'
+    type: 'number'
+    definition: @aql iceye_fact_balance_sheet.net_amount_eur_agg | where(iceye_fact_balance_sheet.account_type in ['AcctPay', 'OthCurrLiab', 'LongTermLiab']);;
+    format: '[€]#,###0.00'
+  }
+  metric total_equity_eur {
+    label: 'Total Equity (EUR)'
+    type: 'number'
+    definition: @aql iceye_fact_balance_sheet.net_amount_eur_agg | where(iceye_fact_balance_sheet.account_type is 'Equity');;
+    format: '[€]#,###0.00'
+  }
+}
