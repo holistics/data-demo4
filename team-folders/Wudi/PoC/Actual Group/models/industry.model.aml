@@ -2,7 +2,7 @@ Model ag_industry {
   type: 'table'
   label: 'Industry'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension industry_id {
     label: 'Industry Id'
     type: 'number'

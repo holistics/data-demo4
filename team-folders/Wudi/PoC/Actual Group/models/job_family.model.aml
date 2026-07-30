@@ -2,7 +2,7 @@ Model ag_job_family {
   type: 'table'
   label: 'Job Family'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension job_family_id {
     label: 'Job Family Id'
     type: 'number'

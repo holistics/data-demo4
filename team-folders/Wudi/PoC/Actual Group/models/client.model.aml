@@ -2,7 +2,7 @@ Model ag_client {
   type: 'table'
   label: 'Client'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension client_id {
     label: 'Client Id'
     type: 'number'

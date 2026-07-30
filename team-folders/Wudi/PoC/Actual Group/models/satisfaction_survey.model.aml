@@ -2,7 +2,7 @@ Model ag_satisfaction_survey {
   type: 'table'
   label: 'Satisfaction Survey'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension survey_id {
     label: 'Survey Id'
     type: 'number'

@@ -2,7 +2,7 @@ Model ag_candidate_status_history {
   type: 'table'
   label: 'Candidate Status History'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension candidate_status_history_id {
     label: 'Candidate Status History Id'
     type: 'number'

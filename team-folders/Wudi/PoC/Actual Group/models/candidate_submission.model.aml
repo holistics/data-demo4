@@ -2,7 +2,7 @@ Model ag_candidate_submission {
   type: 'table'
   label: 'Candidate Submission'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension submission_id {
     label: 'Submission Id'
     type: 'number'

@@ -2,7 +2,7 @@ Model ag_data_quality_event {
   type: 'table'
   label: 'Data Quality Event'
   description: ''
-  data_source_name: 'demo_actual_group_poc'
+  data_source_name: 'demodb'
   dimension data_quality_event_id {
     label: 'Data Quality Event Id'
     type: 'number'
