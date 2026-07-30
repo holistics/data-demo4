@@ -50,6 +50,19 @@ Model dabble_fact_bet_leg {
     definition: @sql {{ #SOURCE.dividend }};;
     description: 'Synthetic leg dividend.'
   }
+  dimension expected_margin_rate {
+    label: 'Expected Margin Rate'
+    type: 'number'
+    hidden: true
+    definition: @sql
+    1 - 1 / (case
+      when {{ #SOURCE.dividend }} < 2.00 then 1.07
+      when {{ #SOURCE.dividend }} < 5.00 then 1.10
+      when {{ #SOURCE.dividend }} < 10.00 then 1.16
+      else 1.22
+    end)::numeric;;
+    description: 'Theoretical margin priced into the leg, derived as 1 - 1/overround. Overround is banded by dividend because longer prices carry a wider book. The band values are a documented demo assumption pending Dabble confirmation of its actual pricing overrounds.'
+  }
   dimension cash_stake {
     label: 'Cash Stake'
     type: 'number'
