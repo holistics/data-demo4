@@ -1,0 +1,64 @@
+Model lb_dim_acquisition_source {
+  type: 'table'
+  label: 'Dim Acquisition Source'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_acquisition_source"'
+
+  dimension acquisition_source_key {
+    label: 'Acquisition Source Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.acquisition_source_key }};;
+  }
+  dimension source_code {
+    label: 'Source Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_code }};;
+  }
+  dimension source_name {
+    label: 'Source Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_name }};;
+  }
+  dimension channel_group {
+    label: 'Channel Group'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.channel_group }};;
+  }
+  dimension source_type {
+    label: 'Source Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_type }};;
+  }
+  dimension is_paid {
+    label: 'Is Paid'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_paid }};;
+  }
+  dimension is_organic {
+    label: 'Is Organic'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_organic }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

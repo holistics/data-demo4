@@ -1,0 +1,365 @@
+Dataset lb_lowbyte_studio {
+  label: 'Lowbyte Studio'
+  description: 'Lowbyte Studio mobile-game analytics — all 27 models of the lowbyte_studio schema with FK relationships (diamond paths deactivated).'
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+
+  models: [
+    lb_source_system,
+    lb_etl_batch,
+    lb_dim_date,
+    lb_dim_platform,
+    lb_dim_country,
+    lb_dim_game,
+    lb_dim_app,
+    lb_dim_app_version,
+    lb_dim_device,
+    lb_dim_acquisition_source,
+    lb_dim_campaign,
+    lb_dim_event,
+    lb_dim_iap_product,
+    lb_dim_ad_network,
+    lb_dim_ad_placement,
+    lb_dim_player,
+    lb_bridge_player_identity,
+    lb_fact_install,
+    lb_fact_session,
+    lb_fact_game_event,
+    lb_fact_player_activity_daily,
+    lb_fact_iap_transaction,
+    lb_fact_ad_revenue_daily,
+    lb_fact_player_revenue_daily,
+    lb_fact_marketing_spend_daily,
+    lb_fact_store_listing_daily,
+    lb_fact_app_quality_daily,
+    lb_cohort_params,
+  ]
+  relationships: [
+    relationship(lb_etl_batch.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_dim_app.game_key > lb_dim_game.game_key, true),
+    relationship(lb_dim_app.platform_key > lb_dim_platform.platform_key, true),
+    relationship(lb_dim_app_version.app_key > lb_dim_app.app_key, true),
+    relationship(lb_dim_device.platform_key > lb_dim_platform.platform_key, true),
+    relationship(lb_dim_campaign.app_key > lb_dim_app.app_key, true),
+    relationship(lb_dim_campaign.acquisition_source_key > lb_dim_acquisition_source.acquisition_source_key, true),
+    relationship(lb_dim_event.app_key > lb_dim_app.app_key, true),
+    relationship(lb_dim_iap_product.app_key > lb_dim_app.app_key, true),
+    relationship(lb_dim_ad_placement.app_key > lb_dim_app.app_key, true),
+    relationship(lb_dim_player.first_country_key > lb_dim_country.country_key, true),
+    relationship(lb_bridge_player_identity.player_key > lb_dim_player.player_key, true),
+    relationship(lb_bridge_player_identity.app_key > lb_dim_app.app_key, true),
+    relationship(lb_bridge_player_identity.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_install.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_install.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_install.install_date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_install.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_install.device_key > lb_dim_device.device_key, true),
+    relationship(lb_fact_install.app_version_key > lb_dim_app_version.app_version_key, true),
+    relationship(lb_fact_install.acquisition_source_key > lb_dim_acquisition_source.acquisition_source_key, true),
+    relationship(lb_fact_install.campaign_key > lb_dim_campaign.campaign_key, true),
+    relationship(lb_fact_install.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_install.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_session.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_session.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_session.install_key > lb_fact_install.install_key, true),
+    relationship(lb_fact_session.session_date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_session.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_session.device_key > lb_dim_device.device_key, true),
+    relationship(lb_fact_session.app_version_key > lb_dim_app_version.app_version_key, true),
+    relationship(lb_fact_session.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_session.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_game_event.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_game_event.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_game_event.install_key > lb_fact_install.install_key, true),
+    relationship(lb_fact_game_event.session_key > lb_fact_session.session_key, true),
+    relationship(lb_fact_game_event.event_key > lb_dim_event.event_key, true),
+    relationship(lb_fact_game_event.event_date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_game_event.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_game_event.device_key > lb_dim_device.device_key, true),
+    relationship(lb_fact_game_event.app_version_key > lb_dim_app_version.app_version_key, true),
+    relationship(lb_fact_game_event.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_game_event.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_player_activity_daily.date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_player_activity_daily.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_player_activity_daily.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_player_activity_daily.cohort_install_key > lb_fact_install.install_key, true),
+    relationship(lb_fact_player_activity_daily.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_player_activity_daily.device_key > lb_dim_device.device_key, true),
+    relationship(lb_fact_player_activity_daily.app_version_key > lb_dim_app_version.app_version_key, true),
+    relationship(lb_fact_player_activity_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_iap_transaction.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_iap_transaction.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_iap_transaction.cohort_install_key > lb_fact_install.install_key, true),
+    relationship(lb_fact_iap_transaction.transaction_date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_iap_transaction.iap_product_key > lb_dim_iap_product.iap_product_key, true),
+    relationship(lb_fact_iap_transaction.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_iap_transaction.app_version_key > lb_dim_app_version.app_version_key, true),
+    relationship(lb_fact_iap_transaction.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_iap_transaction.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_ad_revenue_daily.date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_ad_revenue_daily.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_ad_revenue_daily.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_ad_revenue_daily.ad_network_key > lb_dim_ad_network.ad_network_key, true),
+    relationship(lb_fact_ad_revenue_daily.ad_placement_key > lb_dim_ad_placement.ad_placement_key, true),
+    relationship(lb_fact_ad_revenue_daily.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_ad_revenue_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_player_revenue_daily.date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_player_revenue_daily.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_player_revenue_daily.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_player_revenue_daily.cohort_install_key > lb_fact_install.install_key, true),
+    relationship(lb_fact_player_revenue_daily.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_player_revenue_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_marketing_spend_daily.date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_marketing_spend_daily.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_marketing_spend_daily.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_marketing_spend_daily.acquisition_source_key > lb_dim_acquisition_source.acquisition_source_key, true),
+    relationship(lb_fact_marketing_spend_daily.campaign_key > lb_dim_campaign.campaign_key, true),
+    relationship(lb_fact_marketing_spend_daily.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_marketing_spend_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_store_listing_daily.date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_store_listing_daily.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_store_listing_daily.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_store_listing_daily.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_store_listing_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_app_quality_daily.date_key > lb_dim_date.date_key, true),
+    relationship(lb_fact_app_quality_daily.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_app_quality_daily.app_version_key > lb_dim_app_version.app_version_key, true),
+    relationship(lb_fact_app_quality_daily.country_key > lb_dim_country.country_key, true),
+    relationship(lb_fact_app_quality_daily.device_key > lb_dim_device.device_key, true),
+    relationship(lb_fact_app_quality_daily.source_system_key > lb_source_system.source_system_key, true),
+    relationship(lb_fact_app_quality_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+  ]
+
+  // ---------- Dynamic cohort granularity (driven by lb_cohort_params.cohort_grain) ----------
+  dimension cohort_period {
+    label: 'Install Cohort'
+    description: 'Install cohort bucket; granularity switches with the Cohort Granularity control (Month / Week / Quarter).'
+    type: 'date'
+    model: lb_fact_install
+    definition: @aql case(
+        when: 'Week' in lb_cohort_params.cohort_grain
+        , then: lb_fact_install.install_week
+        , when: 'Quarter' in lb_cohort_params.cohort_grain
+        , then: lb_fact_install.install_quarter
+        , else: lb_fact_install.install_month
+      ) ;;
+  }
+
+  // ---------- Volume / audience ----------
+  metric installs {
+    label: 'Installs'
+    type: 'number'
+    definition: @aql count(lb_fact_install.install_key) ;;
+    format: '#,###0'
+    description: 'Total attributed app installs.'
+  }
+  metric active_players {
+    label: 'Active Players'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_player_activity_daily.player_key) ;;
+    format: '#,###0'
+    description: 'Distinct active players. By day = DAU, by month = MAU.'
+  }
+  metric new_players {
+    label: 'New Players'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_player_activity_daily.player_key) | where(lb_fact_player_activity_daily.is_new_player == true) ;;
+    format: '#,###0'
+    description: 'Players on their install day.'
+  }
+  metric sessions {
+    label: 'Sessions'
+    type: 'number'
+    definition: @aql sum(lb_fact_player_activity_daily.session_count) ;;
+    format: '#,###0'
+    description: 'Total gameplay sessions.'
+  }
+  metric sessions_per_active {
+    label: 'Sessions / Active Player'
+    type: 'number'
+    definition: @aql sessions / active_players ;;
+    format: '#,###0.00'
+    description: 'Average sessions per active player.'
+  }
+  metric playtime_hours {
+    label: 'Playtime (hours)'
+    type: 'number'
+    definition: @aql sum(lb_fact_player_activity_daily.playtime_seconds) / 3600.0 ;;
+    format: '#,###0'
+    description: 'Total playtime in hours.'
+  }
+
+  // ---------- Retention ----------
+  metric cohort_base {
+    label: 'Cohort Base (D0)'
+    type: 'number'
+    hidden: true
+    definition: @aql count_distinct(lb_fact_player_activity_daily.player_key) | where(lb_fact_player_activity_daily.days_since_install == 0) ;;
+    format: '#,###0'
+  }
+  metric retained_d1 {
+    label: 'Retained D1'
+    type: 'number'
+    hidden: true
+    definition: @aql count_distinct(lb_fact_player_activity_daily.player_key) | where(lb_fact_player_activity_daily.days_since_install == 1) ;;
+    format: '#,###0'
+  }
+  metric retained_d7 {
+    label: 'Retained D7'
+    type: 'number'
+    hidden: true
+    definition: @aql count_distinct(lb_fact_player_activity_daily.player_key) | where(lb_fact_player_activity_daily.days_since_install == 7) ;;
+    format: '#,###0'
+  }
+  metric retained_d30 {
+    label: 'Retained D30'
+    type: 'number'
+    hidden: true
+    definition: @aql count_distinct(lb_fact_player_activity_daily.player_key) | where(lb_fact_player_activity_daily.days_since_install == 30) ;;
+    format: '#,###0'
+  }
+  metric d1_retention {
+    label: 'D1 Retention'
+    type: 'number'
+    definition: @aql retained_d1 / cohort_base ;;
+    format: '#,###0.0%'
+    description: 'Share of the install cohort active 1 day after install.'
+  }
+  metric d7_retention {
+    label: 'D7 Retention'
+    type: 'number'
+    definition: @aql retained_d7 / cohort_base ;;
+    format: '#,###0.0%'
+    description: 'Share of the install cohort active 7 days after install.'
+  }
+  metric d30_retention {
+    label: 'D30 Retention'
+    type: 'number'
+    definition: @aql retained_d30 / cohort_base ;;
+    format: '#,###0.0%'
+    description: 'Share of the install cohort active 30 days after install.'
+  }
+
+  // ---------- Monetization ----------
+  metric iap_revenue {
+    label: 'IAP Revenue'
+    type: 'number'
+    definition: @aql sum(lb_fact_iap_transaction.net_revenue_reporting) ;;
+    format: '[\$\$]#,###0'
+    description: 'Net in-app-purchase revenue (USD), net of refunds.'
+  }
+  metric ad_revenue {
+    label: 'Ad Revenue'
+    type: 'number'
+    definition: @aql sum(lb_fact_ad_revenue_daily.revenue_reporting) ;;
+    format: '[\$\$]#,###0'
+    description: 'Ad-mediation revenue (USD).'
+  }
+  metric total_revenue {
+    label: 'Total Revenue'
+    type: 'number'
+    definition: @aql iap_revenue + ad_revenue ;;
+    format: '[\$\$]#,###0'
+    description: 'IAP net + ad revenue (USD).'
+  }
+  metric payers {
+    label: 'Payers'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_iap_transaction.player_key) | where(lb_fact_iap_transaction.is_refund == false) ;;
+    format: '#,###0'
+    description: 'Distinct players with a non-refunded purchase.'
+  }
+  metric payer_rate {
+    label: 'Payer Rate'
+    type: 'number'
+    definition: @aql payers / installs ;;
+    format: '#,###0.00%'
+    description: 'Share of installs that ever paid.'
+  }
+  metric arppu {
+    label: 'ARPPU'
+    type: 'number'
+    definition: @aql iap_revenue / payers ;;
+    format: '[\$\$]#,###0.00'
+    description: 'Average IAP revenue per paying user.'
+  }
+  metric arpdau {
+    label: 'ARPDAU'
+    type: 'number'
+    definition: @aql total_revenue / active_players ;;
+    format: '[\$\$]#,###0.000'
+    description: 'Average revenue per daily active user (use on a daily grain).'
+  }
+  metric ltv_to_date {
+    label: 'LTV (to date)'
+    type: 'number'
+    definition: @aql total_revenue / installs ;;
+    format: '[\$\$]#,###0.00'
+    description: 'Blended lifetime-to-date revenue per install.'
+  }
+
+  // ---------- Marketing / UA ----------
+  metric ua_spend {
+    label: 'UA Spend'
+    type: 'number'
+    definition: @aql sum(lb_fact_marketing_spend_daily.spend_reporting) ;;
+    format: '[\$\$]#,###0'
+    description: 'Paid user-acquisition spend (USD).'
+  }
+  metric paid_installs {
+    label: 'Paid Installs'
+    type: 'number'
+    definition: @aql sum(lb_fact_marketing_spend_daily.reported_installs) ;;
+    format: '#,###0'
+    description: 'Installs reported by ad platforms.'
+  }
+  metric cpi {
+    label: 'CPI'
+    type: 'number'
+    definition: @aql ua_spend / paid_installs ;;
+    format: '[\$\$]#,###0.00'
+    description: 'Cost per install (spend / reported installs).'
+  }
+  metric roas {
+    label: 'ROAS'
+    type: 'number'
+    definition: @aql total_revenue / ua_spend ;;
+    format: '#,###0.00'
+    description: 'Blended return on ad spend (total revenue / UA spend).'
+  }
+
+  // ---------- Attribution (cohort-linked: revenue -> install cohort -> source/campaign) ----------
+  metric attributed_revenue {
+    label: 'Attributed Revenue'
+    type: 'number'
+    definition: @aql sum(lb_fact_player_revenue_daily.total_revenue_reporting) ;;
+    format: '[\$\$]#,###0'
+    description: 'Player-level revenue (IAP net + ad) attributable to the install cohort — links to acquisition source/campaign/country.'
+  }
+  metric attributed_iap {
+    label: 'Attributed IAP Revenue'
+    type: 'number'
+    definition: @aql sum(lb_fact_player_revenue_daily.iap_net_revenue_reporting) ;;
+    format: '[\$\$]#,###0'
+  }
+  metric attributed_ad {
+    label: 'Attributed Ad Revenue'
+    type: 'number'
+    definition: @aql sum(lb_fact_player_revenue_daily.ad_revenue_reporting) ;;
+    format: '[\$\$]#,###0'
+  }
+  metric roas_channel {
+    label: 'ROAS (by channel)'
+    type: 'number'
+    definition: @aql attributed_revenue / ua_spend ;;
+    format: '#,###0.00'
+    description: 'Cohort-attributed return on ad spend — valid to break down by acquisition source / campaign / country.'
+  }
+  metric ltv_channel {
+    label: 'LTV per Install (by channel)'
+    type: 'number'
+    definition: @aql attributed_revenue / installs ;;
+    format: '[\$\$]#,###0.00'
+    description: 'Cohort-attributed lifetime-to-date revenue per install.'
+  }
+}

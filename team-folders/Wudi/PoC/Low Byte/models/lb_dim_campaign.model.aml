@@ -1,0 +1,166 @@
+Model lb_dim_campaign {
+  type: 'table'
+  label: 'Dim Campaign'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_campaign"'
+
+  dimension campaign_key {
+    label: 'Campaign Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.campaign_key }};;
+  }
+  dimension campaign_natural_key {
+    label: 'Campaign Natural Key'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.campaign_natural_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension acquisition_source_key {
+    label: 'Acquisition Source Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.acquisition_source_key }};;
+  }
+  dimension source_account_id {
+    label: 'Source Account Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_account_id }};;
+  }
+  dimension source_account_name {
+    label: 'Source Account Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_account_name }};;
+  }
+  dimension campaign_id {
+    label: 'Campaign Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.campaign_id }};;
+  }
+  dimension campaign_name {
+    label: 'Campaign Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.campaign_name }};;
+  }
+  dimension campaign_objective {
+    label: 'Campaign Objective'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.campaign_objective }};;
+  }
+  dimension ad_group_id {
+    label: 'Ad Group Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_group_id }};;
+  }
+  dimension ad_group_name {
+    label: 'Ad Group Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_group_name }};;
+  }
+  dimension ad_id {
+    label: 'Ad Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_id }};;
+  }
+  dimension ad_name {
+    label: 'Ad Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_name }};;
+  }
+  dimension creative_id {
+    label: 'Creative Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.creative_id }};;
+  }
+  dimension creative_name {
+    label: 'Creative Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.creative_name }};;
+  }
+  dimension creative_type {
+    label: 'Creative Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.creative_type }};;
+  }
+  dimension optimization_goal {
+    label: 'Optimization Goal'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.optimization_goal }};;
+  }
+  dimension bid_strategy {
+    label: 'Bid Strategy'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.bid_strategy }};;
+  }
+  dimension campaign_status {
+    label: 'Campaign Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.campaign_status }};;
+  }
+  dimension source_currency_code {
+    label: 'Source Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_currency_code }};;
+  }
+  dimension valid_from {
+    label: 'Valid From'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.valid_from }};;
+  }
+  dimension valid_to {
+    label: 'Valid To'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.valid_to }};;
+  }
+  dimension is_current {
+    label: 'Is Current'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_current }};;
+  }
+  dimension source_attributes {
+    label: 'Source Attributes'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_attributes }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}
