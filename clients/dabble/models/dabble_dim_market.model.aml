@@ -1,0 +1,37 @@
+Model dabble_dim_market {
+  type: 'table'
+  label: 'Markets'
+  data_source_name: 'dabble_neon'
+  table_name: '"dabble_demo"."dim_market"'
+
+  dimension market_id {
+    label: 'Market ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.market_id }};;
+  }
+  dimension source_market_id {
+    label: 'Source Market ID'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.source_market_id }};;
+  }
+  dimension fixture_id {
+    label: 'Fixture ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.fixture_id }};;
+  }
+  dimension market_name {
+    label: 'Market'
+    type: 'text'
+    definition: @sql {{ #SOURCE.market_name }};;
+  }
+  dimension market_group {
+    label: 'Market Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.market_group }};;
+    description: 'Source-style grouping used by the Sport Overview report.'
+  }
+}
