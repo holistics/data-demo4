@@ -2,27 +2,10 @@ Dashboard dabble_au_trading_performance_command_center {
   title: 'Dabble AU Trading Performance'
   description: 'Trading performance for the Australian book: turnover and margin pulse, realised margin against the priced book, sport and competition drivers, and customer risk exposure.'
   theme: dabble_light
-
-  block header_executive_pulse: block_dabble_page_header(
-    'Executive Pulse',
-    'Turnover and margin against last year, at a glance',
-    'AU Book'
-  )
-  block header_monthly_scorecard: block_dabble_page_header(
-    'Monthly Trading Scorecard',
-    'Month-by-month scale, profitability, customer economics and risk',
-    'AU Book'
-  )
-  block header_sport_drivers: block_dabble_page_header(
-    'Sport & Competition Drivers',
-    'Where realised margin diverges from the priced book',
-    'AU Book'
-  )
-  block header_customer_risk: block_dabble_page_header(
-    'Customer, Rocket & Risk',
-    'Risk brackets, Rocket incentives and customer profitability',
-    'AU Book'
-  )
+  block header_executive_pulse: block_dabble_page_header('Executive Pulse', 'Turnover and margin against last year, at a glance', 'AU Book')
+  block header_monthly_scorecard: block_dabble_page_header('Monthly Trading Scorecard', 'Month-by-month scale, profitability, customer economics and risk', 'AU Book')
+  block header_sport_drivers: block_dabble_page_header('Sport & Competition Drivers', 'Where realised margin diverges from the priced book', 'AU Book')
+  block header_customer_risk: block_dabble_page_header('Customer, Rocket & Risk', 'Risk brackets, Rocket incentives and customer profitability', 'AU Book')
   block reporting_date_filter: FilterBlock {
     label: 'Settled Date (financials)'
     type: 'field'
@@ -121,7 +104,6 @@ Dashboard dabble_au_trading_performance_command_center {
       granularity: 'year'
     }
   }
-
   block kpi_actives: VizBlock {
     label: 'Actives'
     viz: MetricKpi {
@@ -281,7 +263,6 @@ Dashboard dabble_au_trading_performance_command_center {
       hide_label: true
     }
   }
-
   block stake_margin_trend: VizBlock {
     label: 'Stake & Margin Trend'
     viz: CombinationChart {
@@ -414,15 +395,11 @@ Dashboard dabble_au_trading_performance_command_center {
       }
     }
   }
-
   block key_competition_cards: VizBlock {
     label: 'Key Competitions - click a card to filter the scorecard (double-click to clear)'
     viz: CustomChart {
       dataset: dabble_trading
       custom_chart: dabble_competition_cards
-      // The three named competitions in the AU book. Everything else in
-      // dim_competition is generic filler, so pinning the card row here keeps
-      // the shortcut meaningful without a hard-coded list inside the chart def.
       filter {
         field: r(dabble_dim_competition.competition_name)
         operator: 'is'
@@ -928,7 +905,6 @@ Dashboard dabble_au_trading_performance_command_center {
   block data_notes: TextBlock {
     content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#FFFFFF;"><h2 style="color:#21099B;margin:0 0 8px 0;">Metric definitions and assumptions</h2><p style="margin:0;">This dashboard runs on deterministic synthetic data and contains no direct customer PII - source user IDs and aliases are generated. Financial measures are allocated to bet legs so sport and event totals stay additive. Prior-year comparison in this table is fixed at one year and does not follow the Compare control. Restricted stake, weighted dividend, expected margin overrounds, Rocket categories, active users and the Australian settled reporting date are documented assumptions pending Dabble confirmation.</p></div>;;
   }
-
   block margin_vs_expected: VizBlock {
     label: 'Realised vs Priced Margin'
     viz: CombinationChart {
@@ -1391,7 +1367,6 @@ Dashboard dabble_au_trading_performance_command_center {
       }
     }
   }
-
   block risk_performance: VizBlock {
     label: 'Turnover and Margin by Risk Factor Bracket'
     viz: CombinationChart {
@@ -1912,12 +1887,11 @@ Dashboard dabble_au_trading_performance_command_center {
       }
     }
   }
-
   view: TabLayout {
     tab executive_pulse: CanvasLayout {
       label: 'Executive Pulse'
       width: 1300
-      height: 820
+      height: 770
       grid_size: 10
       auto_expand_vertically: true
       mobile {
@@ -1927,40 +1901,40 @@ Dashboard dabble_au_trading_performance_command_center {
         position: pos(0, 0, 1300, 110)
       }
       block reporting_date_filter {
-        position: pos(20, 130, 300, 70)
+        position: pos(20, 130, 300, 80)
       }
       block date_drill {
-        position: pos(340, 130, 190, 70)
+        position: pos(340, 130, 190, 80)
       }
       block period_comparison {
-        position: pos(550, 130, 190, 70)
+        position: pos(550, 130, 200, 80)
       }
       block sport_filter {
-        position: pos(760, 130, 300, 70)
+        position: pos(770, 130, 300, 80)
       }
       block kpi_actives {
-        position: pos(20, 220, 200, 140)
+        position: pos(20, 230, 200, 100)
       }
       block kpi_bets {
-        position: pos(232, 220, 200, 140)
+        position: pos(230, 230, 200, 100)
       }
       block kpi_stake {
-        position: pos(444, 220, 200, 140)
+        position: pos(440, 230, 200, 100)
       }
       block kpi_gross_win_pct {
-        position: pos(656, 220, 200, 140)
+        position: pos(660, 230, 200, 100)
       }
       block kpi_net_revenue {
-        position: pos(868, 220, 200, 140)
+        position: pos(870, 230, 200, 100)
       }
       block kpi_rocket_boost {
-        position: pos(1080, 220, 200, 140)
+        position: pos(1080, 230, 200, 100)
       }
       block stake_margin_trend {
-        position: pos(20, 380, 840, 400)
+        position: pos(20, 350, 840, 400)
       }
       block channel_mix_donut {
-        position: pos(880, 380, 400, 400)
+        position: pos(880, 350, 400, 400)
       }
       default_zoom: 'fit_to_width'
     }
