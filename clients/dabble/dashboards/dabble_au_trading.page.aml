@@ -2,7 +2,6 @@ Dashboard dabble_au_trading_kpi_prototype {
   title: 'Dabble AU Trading KPI Prototype'
   description: 'Privacy-safe synthetic prototype reproducing the supplied AU Trading KPI and Sport Overview report structure. Financials use allocated bet-leg grain; metric semantics are demo assumptions pending Dabble confirmation.'
   theme: dabble_light
-
   block reporting_date_filter: FilterBlock {
     label: 'Reporting Date'
     type: 'field'
@@ -63,7 +62,6 @@ Dashboard dabble_au_trading_kpi_prototype {
       value: []
     }
   }
-
   block hero_header_with_logo: TextBlock {
     content: @md <header aria-label="Dabble AU trading dashboard" style="position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:24px;height:100%;box-sizing:border-box;overflow:hidden;padding:24px 32px;background:#5C3BC4;border:1px solid #180666;border-radius:6px;color:#FFFFFF;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;">
   <div>
@@ -82,14 +80,12 @@ Dashboard dabble_au_trading_kpi_prototype {
 </footer>;;
     theme: dabble_page_chrome
   }
-
   block overview_disclaimer: TextBlock {
     content: @md <div style="border-left:6px solid #5C3BC4;padding:10px 16px;background:#EEE9FA;"><strong>Conversation prototype</strong> — all values and customer aliases are synthetic. Metric definitions are assumptions to confirm with Dabble.</div>;;
   }
   block sport_disclaimer: TextBlock {
     content: @md <div style="border-left:6px solid #5C3BC4;padding:10px 16px;background:#EEE9FA;"><strong>Sport Overview</strong> — allocated bet-leg financials make sport, fixture and market totals additive. Risk and dividend semantics are demo assumptions.</div>;;
   }
-
   block metric_catalog: TextBlock {
     content: @md <style>
   .dabble-metric-catalog {
@@ -370,7 +366,6 @@ Dashboard dabble_au_trading_kpi_prototype {
 </table>
 </section>;;
   }
-
   block trading_summary: VizBlock {
     label: 'Trading Summary'
     viz: DataTable {
@@ -435,7 +430,6 @@ Dashboard dabble_au_trading_kpi_prototype {
       }
     }
   }
-
   block rocket_metrics: VizBlock {
     label: 'Rocket Metrics'
     viz: DataTable {
@@ -940,7 +934,6 @@ Dashboard dabble_au_trading_kpi_prototype {
   block about_sample: TextBlock {
     content: @md <div style="border-left:6px solid #5C3BC4;padding:12px 18px;background:#FFFFFF;"><h2 style="color:#21099B;">About this sample</h2><p>This prototype uses deterministic synthetic data and contains no direct customer PII. Source user IDs and aliases are generated. Financial measures are allocated to bet legs so sport and event totals remain additive. Restricted stake, weighted dividend, Rocket categories, active users, Australian settled reporting date and period comparisons are explicitly demo assumptions pending Dabble confirmation.</p></div>;;
   }
-
   block sport_matrix: VizBlock {
     label: 'Sport Overview Matrix'
     viz: DataTable {
@@ -1368,7 +1361,6 @@ Dashboard dabble_au_trading_kpi_prototype {
       }
     }
   }
-
   view: TabLayout {
     tab au_kpi_overview: CanvasLayout {
       label: 'AU - KPI Overview'
@@ -1500,19 +1492,18 @@ Dashboard dabble_au_trading_kpi_prototype {
     tab metric_catalog: CanvasLayout {
       label: 'Metric Catalog'
       width: 1300
-      height: 2460
+      height: 1780
       grid_size: 10
       auto_expand_vertically: true
       mobile {
         mode: 'auto'
       }
       block metric_catalog {
-        position: pos(20, 20, 1260, 2420)
+        position: pos(0, 0, 1300, 1770)
       }
       default_zoom: 1
     }
   }
-
   settings {
     autorun_on_open: true
   }
