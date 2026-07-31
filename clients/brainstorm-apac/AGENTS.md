@@ -30,3 +30,4 @@ holistics aml validate \
 - Run `git diff --check`.
 - Treat AML validation as syntax and semantic validation, not runtime acceptance. For changed model or dataset logic, execute a real cloud query or visualization before completion.
 - Every new or changed field and metric needs a plain-language description covering meaning, grain or units, intended use and any cutoff or aggregation caveat.
+- Ask the operator whether the change should be reflected in tenant-wide `settings/ai/context.aml` — see `clients/AGENTS.md`. Brainstorm APAC has no routing block there yet, so new models, datasets, metric definitions or vocabulary are invisible to Holistics AI until one is added. Never edit `context.aml` without the operator's go-ahead.
