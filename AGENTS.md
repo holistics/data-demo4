@@ -44,10 +44,14 @@ runs on `dabble_neon`, not `demodb`). PoCs live under `clients/<company>/`,
 `team-folders/<person>/`, and **each carries its own `AGENTS.md`** with the rules
 for that folder.
 
+Within `clients/`, demos that are **only design + theme on the ecommerce dataset** live
+in `clients/branded-themes/`; clients with their own or other data stay at top level.
+See `clients/AGENTS.md`.
+
 When working on a PoC:
 
 1. **Read the nearest `AGENTS.md` (and any `README.md`) first** — it overrides this
-   file within its scope.
+   file within its scope. `clients/AGENTS.md` is the umbrella for every client folder.
 2. **Keep changes inside that folder.** Never touch `01 demo ecommerce/`, shared
    `library/`, `Datasets Library/`, or another client's folder.
 3. **Namespace everything** with the company name (`dabble_*`, `Dabble …`).
@@ -78,6 +82,9 @@ Holistics AI at query time. They describe the same tenant, so **they must not dr
   running in Holistics BI Development Studio mode, surface the mismatches as a short
   list and ask which side is authoritative — the operator decides whether to align,
   because a `context.aml` edit changes live AI answers for anyone in the tenant.
+- **Touching any client folder triggers the same prompt.** Per `clients/AGENTS.md`,
+  ask the operator whether client-folder changes belong in `context.aml` before
+  finishing, and never edit it as a side effect of client work.
 - Nothing in `context.aml` can reference repo files as instructions — the runtime AI
   cannot read the filesystem. Doc paths in it are breadcrumbs for humans and coding
   agents only; anything the AI must act on has to be inline.
