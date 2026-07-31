@@ -1,28 +1,39 @@
-# Dabble Dashboard Agent Instructions
+# Dabble dashboards
 
-You are a high-performing Big 4 / McKinsey-caliber consultant and expert data analyst with analytics engineering skill sets and business intelligence leadership experience.
+**Inherit first:** read `clients/dabble/AGENTS.md` before anything in this file. It
+carries the persona, the three audiences, the QuickSight frustrations the PoC answers,
+the stack, the turnover / gross win / margin vocabulary, the measurement
+non-negotiables, and the `settings/ai/context.aml` prompt rule. Everything below is
+additional, dashboard-specific context only.
 
-You are servicing Dabble Australia, a social betting company. Your work in this directory should focus on building dashboards and analytics that make sense for Dabble's executives, senior leadership, business users, and BI analysts.
+## Scope of this folder
 
-Use the following audience context as a primary design constraint:
+- `dabble_au_trading.page.aml` and `dabble_au_trading_after.page.aml` — the AU trading
+  performance dashboards. `..._after.page.aml` is the reworked version; check
+  `../docs/dabble_au_trading_after_audit.md` before changing either.
+- `dabble_competition_cards.chart.aml`, `dabble_sport_quadrant.chart.aml` — reusable
+  charts consumed by those pages. Changing one affects every page that references it.
+- All blocks read the `dabble_trading` dataset. Push new metric logic into the dataset
+  or metric definitions, not into per-widget expressions, so the semantic layer stays
+  the single source of truth — that is the point of the PoC.
 
-> "Three main audiences. Executives and senior leadership who consume curated dashboards and want consistent, trusted KPIs across our three markets (AU, UK, US). A small cohort of business users (~20-40 people across Strategy, Trading, Marketing and Finance) who need to answer their own questions without depending on the BI team. And our BI analysts (team of 5) who build and maintain the reporting layer and need flexible querying and fast iteration."
+## Design and layout
 
-Dabble currently uses AWS QuickSight for BI. The main frustrations with the current setup are:
+- Apply `dabble.theme.aml`; take colours from `../design.md` tokens rather than
+  hardcoding hex values.
+- Read `../docs/dabble_dashboard_context.md` for which tab owns which question, and
+  preserve that information architecture unless the user changes scope.
+- Executive-facing pages: clarity and fast decision-making over density. Label every
+  number with its date lens, and never show a margin without the turnover behind it.
+- Give every dashboard filter an explicit default, and size text and KPI blocks so
+  nothing is cramped or truncated.
 
-- Lack of a proper semantic layer.
-- Poor version control.
-- An extract-based SPICE model that creates stale data and maintenance overhead.
-- Limited chart flexibility.
-- Difficulty with cohort analysis.
-- A self-service experience that is not viable for non-technical users.
-- No meaningful path toward AI-assisted analytics, which is a growing priority.
+## Acceptance
 
-When building dashboards and analytics for Dabble:
-
-- Prioritize consistent, trusted KPIs across AU, UK, and US markets.
-- Design executive-facing dashboards for clarity, confidence, and fast decision-making.
-- Support self-service workflows for Strategy, Trading, Marketing, and Finance users without requiring BI team intervention.
-- Keep the reporting layer flexible and maintainable for BI analysts.
-- Prefer semantic clarity, reusable metrics, version-controlled AMQL, and query patterns that support fast iteration.
-- Treat cohort analysis, chart flexibility, and AI-assisted analytics readiness as important product requirements.
+- After edits, inspect the dashboard in Demo4 Development, then verify Reporting.
+  Completion means every block renders, filters propagate, and there are no loading or
+  query errors.
+- Renaming a dashboard, page or block label is the highest-risk edit here: the
+  tenant-wide AI context now routes by the underlying `dabble_*` model set, but labels
+  still shape what users ask and what the semantic layer exposes. Flag any rename to the
+  operator per `clients/dabble/AGENTS.md`.
