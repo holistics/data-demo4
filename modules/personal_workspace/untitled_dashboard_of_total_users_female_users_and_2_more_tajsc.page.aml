@@ -1162,6 +1162,134 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
+  block v_11pq: VizBlock {
+    label: 'Combined Stake, Gross Win % and 2 more by Week Reporting Date'
+    viz: CombinationChart {
+      dataset: dabble_trading
+      filter {
+        field: r(dabble_fact_bet.reporting_date)
+        operator: 'matches'
+        value: 'last 13 weeks - 26 jul'
+      }
+      filter {
+        field: r(dabble_dim_fixture.advertised_start)
+        operator: 'matches'
+        value: 'last 12 months - today'
+      }
+      filter {
+        field: r(dabble_dim_sport.sport_name)
+        operator: 'is'
+        value: '$H_NIL$'
+      }
+      filter {
+        field: r(dabble_dim_competition.competition_name)
+        operator: 'is'
+        value: '$H_NIL$'
+      }
+      filter {
+        field: r(dabble_dim_fixture.fixture_name)
+        operator: 'is'
+        value: '$H_NIL$'
+      }
+      x_axis: VizFieldFull {
+        ref: r(dabble_fact_bet.reporting_date)
+        transformation: 'datetrunc week'
+        format {
+          type: 'date'
+          pattern: 'dd LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Combined Stake'
+            ref: r(dabble_trading.combined_stake)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00,"K"'
+            }
+          }
+          settings {
+            color: '#8A5DFF'
+          }
+        }
+      }
+      y_axis {
+        settings {
+          alignment: 'right'
+          axis_min: 0.15
+          axis_max: 0.35
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Win %'
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#28AC26'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Win % (4-period avg)'
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+            analytic: MovingCalculationField {
+              type: 'avg'
+              order: 'row'
+              range {
+                previous: 3
+                next: 0
+              }
+              null_if_not_enough_values: true
+            }
+          }
+          settings {
+            color: '#180666'
+            line_style: 'dashed'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Average Gross Win %'
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+            analytic: ReferenceLine {
+              type: 'avg'
+            }
+          }
+          settings {
+            color: '#8B8B8B'
+            line_style: 'dotted'
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   interactions: []
   view: CanvasLayout {
     label: 'View 1'
@@ -1228,6 +1356,10 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
     block v_u7e8 {
       position: pos(20, 2820, 620, 420)
       layer: 13
+    }
+    block v_11pq {
+      position: pos(660, 2820, 620, 420)
+      layer: 14
     }
     mobile {
       mode: 'auto'
