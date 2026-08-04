@@ -21,12 +21,18 @@ Model slb_orders {
   dimension created_at {
     label: 'Created At'
     type: 'datetime'
+    // Hidden: period filters on a datetime get shifted by the org reporting timezone
+    // (compiles to a -08:00 boundary), which pulls boundary orders across the year line
+    // and makes calendar-period totals differ from the raw-SQL/dbt/Cube tiers by ~0.08%.
+    // Filter on created_date (a timezone-neutral date) instead. Kept for min()/timestamp use.
+    hidden: true
     definition: @sql {{ #SOURCE.created_at }};;
   }
   dimension created_date {
     label: 'Created Date'
     type: 'date'
     definition: @sql {{ #SOURCE.created_at }}::date;;
+    description: 'Order creation date. Use for period (year/month/day) filters - timezone-neutral, matches the raw-SQL / dbt / Cube tiers exactly.'
   }
   dimension user_id {
     label: 'User Id'
