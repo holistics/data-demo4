@@ -1,0 +1,145 @@
+// =====================================================================
+// Seed Company — Fiscal Year Demo dataset
+//
+// Oct-Sep fiscal year driven by a single YEAR NUMBER parameter.
+// No date dimension table, no SQL columns, no derived fiscal dimension,
+// and no case() mapping table. AQL resolves the year number straight
+// into the fiscal window.
+//
+// Built on the shared ecommerce models (read-only reference, nothing in
+// `01 demo ecommerce/` is modified). `ecommerce_orders.created_at`
+// stands in for Seed's close date — swap that one reference to port.
+//
+// ---------------------------------------------------------------------
+// How the year number becomes a date window
+// ---------------------------------------------------------------------
+// Fiscal year N runs 1 Oct (N-1) to 30 Sep (N). Build both boundaries by
+// pasting the year onto a fixed month-day and casting to a date:
+//
+//     >= cast(concat(cast(N - 1, 'text'), '-10-01'), 'date')
+//     <  cast(concat(cast(N,     'text'), '-10-01'), 'date')
+//
+// Upper bound is "< 1 Oct of year N" rather than "<= 30 Sep", which
+// avoids any end-of-day / timestamp truncation question entirely.
+//
+// This works for ANY year with no AML change at all.
+//
+// ---------------------------------------------------------------------
+// Why the expression is repeated per metric
+// ---------------------------------------------------------------------
+// It would be nicer to bind the window once and reuse it. AQL cannot, in
+// a row-level filter. Four routes were tried against this instance:
+//
+//   1. matches <computed string>          -> rejected at parse
+//   2. reference a number metric          -> "must be grouped or aggregated"
+//   3. reference a param-model dimension  -> same aggregate-context error
+//   4. reference date-typed metrics       -> works with ONE in the where,
+//                                            fails with two
+//
+// So each metric inlines both boundaries. Two lines, and the only thing
+// that varies between metrics is the base metric being filtered.
+//
+// ---------------------------------------------------------------------
+// Where the default year lives
+// ---------------------------------------------------------------------
+// Not here. The dashboard filter's `default` sets it, so a year is
+// written down in exactly one place per dashboard. An earlier version
+// carried a coalesce(param, <fiscal year containing today>) fallback so
+// a blank filter meant "current FY"; it made each metric ~14 lines with
+// the same block repeated four times, and was dropped as not worth it.
+// If zero annual edits ever becomes a hard requirement, that fallback or
+// a derived fiscal_year dimension is the price.
+//
+// ---------------------------------------------------------------------
+// Known boundary nuance
+// ---------------------------------------------------------------------
+// `cast(...)` bounds are evaluated without the timezone conversion that
+// `matches @(a to b)` applies, so the two differ slightly on rows sitting
+// within the tenant's UTC offset of a boundary. On this demo data that is
+// 6,996,534 (cast) vs 6,990,976 (matches) for FY26. Confirm with Seed
+// which timezone their fiscal boundaries are defined in before porting.
+// =====================================================================
+Dataset seed_fiscal_year {
+  label: 'Seed Company - Fiscal Year Demo'
+  description: '''
+Oct-Sep fiscal year driven by a single year-number parameter.
+
+- `Fiscal Year` parameter - a plain year number. 2026 = Oct 2025 to Sep 2026.
+- `GMV (Selected FY)` / `Orders (Selected FY)` respond to it.
+
+AQL builds the Oct-Sep window from the number, so any year works without
+an AML change. Filtering only: there is no fiscal year dimension to group
+or drill by.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+    ecommerce_users,
+    ecommerce_cities,
+    ecommerce_countries,
+    seed_fy_param,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+    relationship(ecommerce_orders.user_id > ecommerce_users.id, true),
+    relationship(ecommerce_users.city_id > ecommerce_cities.id, true),
+    relationship(ecommerce_cities.country_code > ecommerce_countries.code, true),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════
+  // BASE METRICS
+  // ═══════════════════════════════════════════════════════════════════
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross value of items ordered, before discount, all statuses.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  metric total_orders {
+    label: 'Total Orders'
+    type: 'number'
+    description: 'Count of orders, all statuses.'
+    definition: @aql count(ecommerce_orders.id) ;;
+    format: '#,###0'
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PARAM-DRIVEN METRICS
+  //
+  // One expression each. No case(), no per-year branches.
+  // ═══════════════════════════════════════════════════════════════════
+
+  metric gmv_fy {
+    label: 'GMV (Selected FY)'
+    type: 'number'
+    description: 'GMV for the fiscal year selected in the Fiscal Year parameter.'
+    definition: @aql
+      gmv | where(
+        ecommerce_orders.created_at >= cast(concat(cast((seed_fy_param.fy_year | first()) - 1, 'text'), '-10-01'), 'date')
+        and ecommerce_orders.created_at < cast(concat(cast((seed_fy_param.fy_year | first()), 'text'), '-10-01'), 'date')
+      )
+    ;;
+    format: '#,###0'
+  }
+
+  metric orders_fy {
+    label: 'Orders (Selected FY)'
+    type: 'number'
+    description: 'Order count for the fiscal year selected in the Fiscal Year parameter.'
+    definition: @aql
+      total_orders | where(
+        ecommerce_orders.created_at >= cast(concat(cast((seed_fy_param.fy_year | first()) - 1, 'text'), '-10-01'), 'date')
+        and ecommerce_orders.created_at < cast(concat(cast((seed_fy_param.fy_year | first()), 'text'), '-10-01'), 'date')
+      )
+    ;;
+    format: '#,###0'
+  }
+}

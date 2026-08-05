@@ -1,0 +1,235 @@
+// =====================================================================
+// Seed Company — Fiscal Year Parameter Demo
+//
+// Answers the Oct-Sep fiscal year question from the onboarding call:
+// "we need that to be something that we can just apply, like current
+// fiscal year, and the cards would know the timeframe".
+//
+// A single year-number parameter. No fiscal dimension, no date dimension
+// table, no SQL, no case() mapping. AQL builds the Oct-Sep window from
+// the number and applies it straight to the order date column.
+//
+// What to check:
+//  1. Filter defaults to 2026 — cards show Oct 2025 - Sep 2026.
+//  2. Pick 2025 — every card moves to Oct 2024 - Sep 2025.
+//  3. Pick 2024 — moves again. No card names a date anywhere.
+//  4. The month trend re-scopes to the selected fiscal year's Oct-Sep window.
+// =====================================================================
+Dashboard seed_fiscal_year_demo {
+  title: 'Seed Company - Fiscal Year (Oct-Sep) Demo'
+  description: 'Fiscal year driven by a single year-number parameter. Pick a year, AQL builds the Oct-Sep window.'
+
+  block f_fy: FilterBlock {
+    label: 'Fiscal Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_fiscal_year
+      field: r(seed_fy_param.fy_year)
+    }
+    // The only place a year is written down. Bump on 1 October.
+    default {
+      operator: 'is'
+      value: 2026
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block t_intro: TextBlock {
+    content: @md
+### Fiscal year: 1 Oct to 30 Sep, named by the ending year
+
+Pick a **year number**. 2026 means 1 Oct 2025 to 30 Sep 2026. AQL builds the
+Oct-Sep window from that number and applies it straight to the order date, so
+any year works without an AML change. No fiscal dimension was added to the model
+to make this work.
+    ;;
+  }
+
+  block kpi_gmv: VizBlock {
+    label: 'GMV (Selected FY)'
+    viz: MetricKpi {
+      dataset: seed_fiscal_year
+      value: VizFieldFull {
+        ref: r(seed_fiscal_year.gmv_fy)
+        label: 'GMV (Selected FY)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders (Selected FY)'
+    viz: MetricKpi {
+      dataset: seed_fiscal_year
+      value: VizFieldFull {
+        ref: r(seed_fiscal_year.orders_fy)
+        label: 'Orders (Selected FY)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block v_trend: VizBlock {
+    label: 'GMV by Month within Selected FY'
+    viz: ColumnChart {
+      dataset: seed_fiscal_year
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        label: 'Month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_fiscal_year.gmv_fy)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  block v_detail: VizBlock {
+    label: 'Monthly Detail (Selected FY)'
+    viz: DataTable {
+      dataset: seed_fiscal_year
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_orders.created_at)
+          transformation: 'datetrunc month'
+          label: 'Month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(seed_fiscal_year.gmv_fy)
+          label: 'GMV'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          ref: r(seed_fiscal_year.orders_fy)
+          label: 'Orders'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      settings {
+        row_limit: 500
+        show_row_number: false
+      }
+    }
+  }
+
+  block v_country: VizBlock {
+    label: 'Top Countries (Selected FY)'
+    viz: BarChart {
+      dataset: seed_fiscal_year
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_countries.name)
+        label: 'Country'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_fiscal_year.gmv_fy)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 1
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1400
+    height: 1160
+    grid_size: 20
+    block t_intro {
+      position: pos(0, 0, 1000, 130)
+    }
+    block f_fy {
+      position: pos(1020, 0, 380, 140)
+    }
+    block kpi_gmv {
+      position: pos(0, 150, 490, 120)
+    }
+    block kpi_orders {
+      position: pos(510, 150, 490, 120)
+    }
+    block v_trend {
+      position: pos(0, 290, 1400, 360)
+    }
+    block v_country {
+      position: pos(0, 670, 690, 360)
+    }
+    block v_detail {
+      position: pos(710, 670, 690, 360)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

@@ -1,0 +1,33 @@
+// =====================================================================
+// Seed Company — fiscal year selector param
+//
+// Seed Company's fiscal year runs 1 Oct to 30 Sep, named by the ENDING
+// calendar year: 2026 means 1 Oct 2025 -> 30 Sep 2026.
+//
+// The param is a plain YEAR NUMBER. AQL builds the date window from it,
+// so nothing here is a mapping table and no metric changes when a new
+// year arrives.
+//
+// The dashboard filter sets which year is the default. See
+// `seed_fiscal_year_demo.page.aml` — that default is the one place a
+// year is written down, and the only thing to touch on 1 October.
+// =====================================================================
+Model seed_fy_param {
+  type: 'query'
+  label: 'Seed FY Param'
+  description: 'Fiscal year selector for Seed Company dashboards (FY runs Oct 1 - Sep 30, named by ending year).'
+  data_source_name: 'demodb'
+
+  query: @sql select 1 as dummy;;
+  models: []
+
+  param fy_year {
+    label: 'Fiscal Year'
+    type: 'number'
+    description: 'Fiscal year, named by the ending calendar year. 2026 = Oct 2025 to Sep 2026.'
+    // allowed_values intentionally omitted: a `number` param with numeric
+    // allowed_values makes the dataset fail to load server-side (HTTP 500 on
+    // every query, including unrelated metrics), while `holistics aml validate`
+    // still passes locally. Free numeric entry instead.
+  }
+}
