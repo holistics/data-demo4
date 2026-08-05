@@ -42,6 +42,6 @@ Model dim_bike {
     label: 'Active Bikes'
     type: 'number'
     description: 'Bikes not retired.'
-    definition: @aql count(dim_bike.bike_id) | where(is_null(dim_bike.retired_at)) ;;
+    definition: @aql count(dim_bike.bike_id) | where(dim_bike.retired_at is null) ;;
   }
 }

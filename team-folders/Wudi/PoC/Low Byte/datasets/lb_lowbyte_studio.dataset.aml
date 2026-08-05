@@ -32,6 +32,7 @@ Dataset lb_lowbyte_studio {
     lb_fact_marketing_spend_daily,
     lb_fact_store_listing_daily,
     lb_fact_app_quality_daily,
+    lb_fact_level_funnel,
     lb_cohort_params,
   ]
   relationships: [
@@ -128,6 +129,9 @@ Dataset lb_lowbyte_studio {
     relationship(lb_fact_app_quality_daily.device_key > lb_dim_device.device_key, true),
     relationship(lb_fact_app_quality_daily.source_system_key > lb_source_system.source_system_key, true),
     relationship(lb_fact_app_quality_daily.etl_batch_id > lb_etl_batch.etl_batch_id, true),
+    relationship(lb_fact_level_funnel.player_key > lb_dim_player.player_key, true),
+    relationship(lb_fact_level_funnel.app_key > lb_dim_app.app_key, true),
+    relationship(lb_fact_level_funnel.reached_date_key > lb_dim_date.date_key, true),
   ]
 
   // ---------- Dynamic cohort granularity (driven by lb_cohort_params.cohort_grain) ----------
@@ -204,6 +208,85 @@ Dataset lb_lowbyte_studio {
     definition: @aql sum(lb_fact_player_activity_daily.playtime_seconds) / 3600.0 ;;
     format: '#,###0'
     description: 'Total playtime in hours.'
+  }
+
+  // ---------- Level progression ----------
+  metric players_reached_level {
+    label: 'Players Reaching Level'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) ;;
+    format: '#,###0'
+    description: 'Unique players from the level-1 starter cohort who reached this level milestone or beyond (based on level_start events). Cumulative, so it only ever decreases as the funnel deepens. Break down by Funnel Step.'
+  }
+
+  // One metric per funnel step — the ConversionFunnel viz takes each step as a
+  // separate value field, so these cannot be collapsed into a single measure.
+  metric reached_level_01 {
+    label: 'Level 1'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 1) ;;
+    format: '#,###0'
+    description: 'Level-1 starter cohort — the funnel entry point.'
+  }
+  metric reached_level_02 {
+    label: 'Level 2'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 2) ;;
+    format: '#,###0'
+  }
+  metric reached_level_03 {
+    label: 'Level 3'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 3) ;;
+    format: '#,###0'
+  }
+  metric reached_level_04 {
+    label: 'Level 4'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 4) ;;
+    format: '#,###0'
+  }
+  metric reached_level_05 {
+    label: 'Level 5'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 5) ;;
+    format: '#,###0'
+  }
+  metric reached_level_10 {
+    label: 'Level 10'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 10) ;;
+    format: '#,###0'
+  }
+  metric reached_level_20 {
+    label: 'Level 20'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 20) ;;
+    format: '#,###0'
+  }
+  metric reached_level_30 {
+    label: 'Level 30'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 30) ;;
+    format: '#,###0'
+  }
+  metric reached_level_40 {
+    label: 'Level 40'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 40) ;;
+    format: '#,###0'
+  }
+  metric reached_level_50 {
+    label: 'Level 50'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 50) ;;
+    format: '#,###0'
+  }
+  metric reached_level_60 {
+    label: 'Level 60'
+    type: 'number'
+    definition: @aql count_distinct(lb_fact_level_funnel.player_key) | where(lb_fact_level_funnel.step_level == 60) ;;
+    format: '#,###0'
   }
 
   // ---------- Retention ----------

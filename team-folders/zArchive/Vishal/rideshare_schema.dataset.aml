@@ -30,7 +30,13 @@ Dataset rideshare_schema {
     model: drivers_agg
     label: 'Top Drivers'
     type: 'text'
-    definition: @aql select(drivers_agg.realname| where(drivers_agg.driver_rank <= 10)) ;;
+    // `select()` expects a Table; this is a row-level text dimension, so the rank
+    // restriction belongs in a conditional. Names the driver when they rank top-10,
+    // NULL otherwise.
+    definition: @aql case(
+      when: drivers_agg.driver_rank <= 10,
+      then: drivers_agg.realname
+    ) ;;
   }
 
   metric active_drivers {
