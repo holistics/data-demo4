@@ -1,0 +1,11 @@
+Model brainstorm_company_snapshots {
+  type: 'table'
+  label: 'Company snapshots'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."company_snapshots"'
+  dimension snapshot_key { label: 'Snapshot key' type: 'text' primary_key: true hidden: true definition: @sql concat({{ #SOURCE.company_id }}, '-', {{ #SOURCE.snapshot_month }}::text);; description: 'Unique company-month snapshot key. Use only for record-level joins or deduplication.' }
+  dimension company_id { label: 'Company ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.company_id }};; description: 'Company that owns the monthly snapshot. Use for joins and tenant access rules; use Company for display.' }
+  dimension snapshot_month { label: 'Snapshot month' type: 'date' definition: @sql {{ #SOURCE.snapshot_month }}::date;; description: 'Month represented by the snapshot. Use as the time axis or to filter adoption and workforce trends.' }
+  dimension headcount { label: 'Headcount' type: 'number' definition: @sql {{ #SOURCE.headcount }};; description: 'Total company employee headcount recorded for the snapshot month. Aggregate with sum across companies.' }
+  dimension app_user_hc { label: 'App users' type: 'number' definition: @sql {{ #SOURCE.app_user_hc }};; description: 'Employees counted as app users in the snapshot month. Aggregate with sum and compare with Headcount to calculate adoption.' }
+}

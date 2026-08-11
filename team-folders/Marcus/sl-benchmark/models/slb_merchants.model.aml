@@ -1,0 +1,26 @@
+Model slb_merchants {
+  type: 'table'
+  label: 'SLB Merchants'
+  description: 'Merchants supplying products (testdb.ecommerce via demo_public).'
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"ecommerce"."merchants"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension name {
+    label: 'Merchant Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension city_id {
+    label: 'City Id'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.city_id }};;
+  }
+}

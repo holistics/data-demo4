@@ -569,6 +569,16 @@ Dashboard shelfoptix_osa_overview {
             }
           }
         ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'sku_name'
+            width: 249
+          }
+        ]
       }
     }
   }
@@ -648,7 +658,41 @@ Dashboard shelfoptix_osa_overview {
             }
           }
         ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'sd_store'
+            width: 232
+          }
+        ]
       }
+    }
+  }
+  block f_shelfoptix_dim_retailer_sample_retailer_id: FilterBlock {
+    label: 'Retailer id'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_dim_retailer_sample.retailer_id)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_retailer_id_copy: FilterBlock {
+    label: 'Manufacturer id'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: shelfoptix_osa
+      field: r(shelfoptix_dim_manufacturer.manufacturer_id)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
     }
   }
   theme: shelfoptix
@@ -740,16 +784,118 @@ Dashboard shelfoptix_osa_overview {
       layer: 6
     }
     block top_oos_skus {
-      position: pos(20, 1280, 620, 340)
+      position: pos(20, 1280, 1260, 340)
       layer: 8
     }
     block store_detail {
-      position: pos(660, 1280, 620, 340)
+      position: pos(20, 1640, 1260, 340)
       layer: 8
+    }
+    block f_shelfoptix_dim_retailer_sample_retailer_id {
+      position: pos(1320, 20, 300, 80)
+      layer: 4
+    }
+    block f_retailer_id_copy {
+      position: pos(1320, 120, 300, 80)
+      layer: 4
     }
     mobile {
       mode: 'auto'
     }
-    height: 1640
+    height: 1980
   }
+  interactions: [
+    FilterInteraction {
+      from: 'f_target'
+      to: [
+        CustomMapping {
+          block: [
+            'f_shelfoptix_dim_retailer_sample_retailer_id',
+            'f_retailer_id_copy'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_date'
+      to: [
+        CustomMapping {
+          block: [
+            'f_shelfoptix_dim_retailer_sample_retailer_id',
+            'f_retailer_id_copy'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_category'
+      to: [
+        CustomMapping {
+          block: [
+            'f_shelfoptix_dim_retailer_sample_retailer_id',
+            'f_retailer_id_copy'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_scantype'
+      to: [
+        CustomMapping {
+          block: [
+            'f_shelfoptix_dim_retailer_sample_retailer_id',
+            'f_retailer_id_copy'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_region'
+      to: [
+        CustomMapping {
+          block: [
+            'f_shelfoptix_dim_retailer_sample_retailer_id',
+            'f_retailer_id_copy'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_shelfoptix_dim_retailer_sample_retailer_id'
+      to: [
+        CustomMapping {
+          block: [
+            'f_target',
+            'f_date',
+            'f_category',
+            'f_scantype',
+            'f_region',
+            'f_retailer_id_copy'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_retailer_id_copy'
+      to: [
+        CustomMapping {
+          block: [
+            'f_target',
+            'f_date',
+            'f_category',
+            'f_scantype',
+            'f_region',
+            'f_shelfoptix_dim_retailer_sample_retailer_id'
+          ]
+          disabled: true
+        }
+      ]
+    }
+  ]
 }

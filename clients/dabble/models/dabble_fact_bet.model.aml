@@ -1,0 +1,93 @@
+Model dabble_fact_bet {
+  type: 'table'
+  label: 'Bets'
+  data_source_name: 'dabble_neon'
+  table_name: '"dabble_demo"."fact_bet"'
+
+  dimension bet_id {
+    label: 'Bet ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.bet_id }};;
+    description: 'Synthetic bet key used for distinct bet counts.'
+  }
+  dimension source_bet_id {
+    label: 'Source Bet ID'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.source_bet_id }};;
+  }
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+  dimension bet_type {
+    label: 'Bet Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bet_type }};;
+  }
+  dimension leg_count {
+    label: 'Bet Legs'
+    type: 'number'
+    definition: @sql {{ #SOURCE.leg_count }}::integer;;
+    description: 'Number of legs in each bet. The deterministic demo seed covers every value from 1 through 25.'
+  }
+  dimension rocket_category {
+    label: 'Rocket Category'
+    type: 'text'
+    definition: @sql {{ #SOURCE.rocket_category }};;
+    description: 'Demo Rocket and copied-bet classification pending Dabble confirmation.'
+  }
+  dimension placed_at {
+    label: 'Placed At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.placed_at }};;
+  }
+  dimension settled_at {
+    label: 'Settled At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.settled_at }};;
+  }
+  dimension reporting_date {
+    label: 'Reporting Date'
+    type: 'date'
+    definition: @sql ({{ #SOURCE.settled_at }} at time zone 'Australia/Sydney')::date;;
+    description: 'Demo assumption: Australian calendar date derived from settled_at.'
+  }
+  dimension placed_risk_rating {
+    label: 'Placed Risk Rating'
+    type: 'text'
+    definition: @sql {{ #SOURCE.placed_risk_rating }};;
+  }
+  dimension placed_risk_factor {
+    label: 'Placed Risk Factor'
+    type: 'number'
+    definition: @sql {{ #SOURCE.placed_risk_factor }};;
+  }
+  dimension risk_factor_bracket {
+    label: 'Risk Factor Bracket'
+    type: 'text'
+    definition: @sql
+    case
+      when {{ #SOURCE.placed_risk_factor }} is null then 'Unassigned'
+      when {{ #SOURCE.placed_risk_factor }} < 0 then '-1 (unrated)'
+      when {{ #SOURCE.placed_risk_factor }} < 0.31 then '00.01 - 00.30'
+      when {{ #SOURCE.placed_risk_factor }} < 0.50 then '00.31 - 00.49'
+      when {{ #SOURCE.placed_risk_factor }} <= 0.80 then '00.50 - 00.80'
+      when {{ #SOURCE.placed_risk_factor }} < 0.90 then '00.81 - 00.89'
+      when {{ #SOURCE.placed_risk_factor }} = 0.90 then '00.90'
+      when {{ #SOURCE.placed_risk_factor }} < 1.00 then '00.91 - 00.99'
+      when {{ #SOURCE.placed_risk_factor }} = 1.00 then '01.00'
+      when {{ #SOURCE.placed_risk_factor }} <= 1.05 then '01.01 - 01.05'
+      when {{ #SOURCE.placed_risk_factor }} <= 1.10 then '01.06 - 01.10'
+      when {{ #SOURCE.placed_risk_factor }} <= 1.11 then '01.11'
+      when {{ #SOURCE.placed_risk_factor }} < 5.00 then '01.12 - 04.99'
+      when {{ #SOURCE.placed_risk_factor }} < 10.00 then '05.00 - 09.99'
+      else '10.00+'
+    end;;
+    description: 'Contiguous bands over the full risk-factor range, so no stake falls into an unclassified bucket. Numeric bounds are zero-padded to two digits so the text dimension sorts in ascending risk order. Demo bands reproduce the supplied Sport Overview thresholds; production thresholds require Dabble confirmation.'
+  }
+}
