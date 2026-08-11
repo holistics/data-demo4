@@ -2646,13 +2646,7 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="#05264c" opacity="0.4"/><ellipse cx="16" cy="17" fill="#05264c" opacity="0.4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="#05264c"/><ellipse cx="9.001" cy="17.001" fill="#05264c" rx="7" ry="4"/></svg>;;
   }
   block t_m0xo: block_ha_card()
-  block t_3mrm: block_ha_info_icon_only(
-    'Explore user signups over time',
-    " <h4>Drill Down for Deeper Insights</h4>   <p>     Right-click any bar to drill into dimensions such as <strong>Gender</strong>, <strong>Age Group</strong>,      <strong>Country</strong>, and more. This helps you identify which segments contributed most to user growth     during a specific period.   </p>    <h4>Cross Filter</h4>   <p>     Click any bar to view the filtered demographic details on the right. This allows you to instantly compare      trends and understand how different segments interact within your data.   </p>    <h4>View Underlying Data</h4>   <p>Whether you're on the main chart or in a drilled-down view:</p>   <ul>     <li>       Click <strong>View Underlying Data</strong> to see the exact list of users who signed up.     </li>     <li>       Filter or export this raw data to investigate anomalies, evaluate campaign performance,        or follow up with specific user cohorts.     </li>   </ul>",
-    'Pro tip • Last updated: Oct 2025',
-    'right',
-    'info'
-  )
+  block t_3mrm: block_ha_info_icon_only('Explore user signups over time', " <h4>Drill Down for Deeper Insights</h4>   <p>     Right-click any bar to drill into dimensions such as <strong>Gender</strong>, <strong>Age Group</strong>,      <strong>Country</strong>, and more. This helps you identify which segments contributed most to user growth     during a specific period.   </p>    <h4>Cross Filter</h4>   <p>     Click any bar to view the filtered demographic details on the right. This allows you to instantly compare      trends and understand how different segments interact within your data.   </p>    <h4>View Underlying Data</h4>   <p>Whether you're on the main chart or in a drilled-down view:</p>   <ul>     <li>       Click <strong>View Underlying Data</strong> to see the exact list of users who signed up.     </li>     <li>       Filter or export this raw data to investigate anomalies, evaluate campaign performance,        or follow up with specific user cohorts.     </li>   </ul>", 'Pro tip • Last updated: Oct 2025', 'right', 'info')
   view: TabLayout {
     label: 'View 1'
     tab tab_5dpo: CanvasLayout {
@@ -3046,14 +3040,14 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
         layer: 15
       }
       block t_m0xo {
-        position: pos(300, 500, 660, 480)
+        position: pos(300, 500, 500, 480)
       }
       block t_pyqe {
         position: pos(320, 520, 40, 40)
         layer: 1
       }
       block v_41e2 {
-        position: pos(320, 520, 620, 440)
+        position: pos(320, 520, 460, 440)
         layer: 1
       }
       block v_4uad {
