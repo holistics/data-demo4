@@ -466,7 +466,7 @@ Dataset healthcare_overview {
     label: 'Readmission Count'
     type: 'number'
     description: 'Count of readmissions - alternative calculation using count_if. Useful for grouping by dimensions like department.'
-    definition: @aql count_if(admissions.is_readmission == true) ;;
+    definition: @aql count_if(admissions.is_readmission == 1) ;;
   }
 
   metric first_admission_rate {
@@ -631,8 +631,8 @@ Dataset healthcare_overview {
     label: 'ED Visits (7-Day Avg)'
     type: 'number'
     description: '7-day rolling average of daily ED visits. Smooths daily variation to reveal underlying trends and seasonality.'
-    definition: @aql total_ed_visits 
-      | trailing_period(ed_visits.arrival_time, interval(7 days)) / 7 ;;
+    definition: @aql (total_ed_visits
+      | trailing_period(ed_visits.arrival_time, interval(7 days))) / 7 ;;
   }
   metric net_transfer {
     label: "Net Transfer"

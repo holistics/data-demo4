@@ -194,6 +194,51 @@ end;;
     aggregation_type: "custom"
   }
 
+  // Action-target URL builders for the '[Feature] Product Actions' dashboard, which
+  // binds its GoToUrl VizActions to these. Every one was referenced but had never
+  // been defined, so all five actions on that dashboard were broken. Same
+  // `concat(url, field)` style as ecommerce_cities.map_search.
+  dimension linkedin_search {
+    label: 'LinkedIn Search'
+    type: 'text'
+    description: 'Search URL for this user on LinkedIn. Action target for the Product Actions demo.'
+    definition: @aql concat(
+      'https://www.linkedin.com/search/results/all/?keywords=', ecommerce_users.full_name
+    );;
+  }
+  dimension ig {
+    label: 'Instagram Search'
+    type: 'text'
+    description: 'Search URL for this user on Instagram. Action target for the Product Actions demo.'
+    definition: @aql concat(
+      'https://www.instagram.com/explore/search/keyword/?q=', ecommerce_users.full_name
+    );;
+  }
+  dimension fb {
+    label: 'Facebook Search'
+    type: 'text'
+    description: 'Search URL for this user on Facebook. Action target for the Product Actions demo.'
+    definition: @aql concat(
+      'https://www.facebook.com/search/top?q=', ecommerce_users.full_name
+    );;
+  }
+  dimension x {
+    label: 'X Search'
+    type: 'text'
+    description: 'Search URL for this user on X. Action target for the Product Actions demo.'
+    definition: @aql concat(
+      'https://x.com/search?q=', ecommerce_users.full_name
+    );;
+  }
+  dimension write_recommendation {
+    label: 'Write Recommendation'
+    type: 'text'
+    description: 'Opens a search for travel recommendations for this customer. Action target for the Product Actions demo.'
+    definition: @aql concat(
+      'https://www.google.com/search?q=travel+recommendations+for+', ecommerce_users.full_name
+    );;
+  }
+
   measure date_datum_2 {
     label: "Date Datum 2"
     type: "date"

@@ -2097,6 +2097,124 @@ Dashboard lb_lowbyte_overview {
       }
     }
   }
+  // Engagement-tab-local filters. Deliberately separate blocks from the
+  // dashboard-level flt_platform / flt_date so their state is independent and
+  // they only appear on (and drive) the Engagement & Retention tab.
+  block flt_eng_platform: FilterBlock {
+    label: 'Platform (Android / iOS)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: r(lb_dim_platform.platform_name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block flt_eng_start_month: FilterBlock {
+    label: 'Month Started (Level 1 Cohort)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: lb_lowbyte_studio
+      field: r(lb_fact_level_funnel.started_month)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block v74: VizBlock {
+    label: 'Level Progression Funnel — Unique Players Starting at Level 1'
+    description: 'Distinct players who started at level 1, tracked through each level milestone. Each step counts players who reached that level or beyond, so the percentages are true step-to-step conversion rates.'
+    viz: ConversionFunnel {
+      dataset: lb_lowbyte_studio
+      values: [
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_01)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_02)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_03)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_04)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_05)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_10)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_20)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_30)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_40)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_50)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(lb_lowbyte_studio.reached_level_60)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        aggregate_awareness {
+          enabled: true
+        }
+      }
+    }
+  }
   view: TabLayout {
     label: 'Lowbyte Studio'
     tab over_view: CanvasLayout {
@@ -2282,63 +2400,75 @@ Dashboard lb_lowbyte_overview {
     }
     tab engagement_retention: CanvasLayout {
       label: 'Engagement & Retention'
-      height: 1540
+      height: 2056
       grid_size: 20
       block h26 {
         position: pos(20, 20, 1160, 104)
         layer: 1
       }
-      block k27 {
-        position: pos(20, 144, 224, 120)
+      block flt_eng_platform {
+        position: pos(20, 144, 570, 56)
         layer: 2
       }
-      block k28 {
-        position: pos(248, 144, 224, 120)
+      block flt_eng_start_month {
+        position: pos(610, 144, 570, 56)
         layer: 3
       }
-      block k29 {
-        position: pos(476, 144, 224, 120)
+      block k27 {
+        position: pos(20, 220, 224, 120)
         layer: 4
       }
-      block k30 {
-        position: pos(704, 144, 224, 120)
+      block k28 {
+        position: pos(248, 220, 224, 120)
         layer: 5
       }
-      block k31 {
-        position: pos(932, 144, 224, 120)
+      block k29 {
+        position: pos(476, 220, 224, 120)
         layer: 6
       }
-      block k32 {
-        position: pos(20, 282, 224, 120)
+      block k30 {
+        position: pos(704, 220, 224, 120)
         layer: 7
       }
-      block k33 {
-        position: pos(248, 282, 224, 120)
+      block k31 {
+        position: pos(932, 220, 224, 120)
         layer: 8
       }
-      block k34 {
-        position: pos(476, 282, 224, 120)
+      block k32 {
+        position: pos(20, 358, 224, 120)
         layer: 9
       }
-      block v35 {
-        position: pos(20, 420, 1160, 360)
+      block k33 {
+        position: pos(248, 358, 224, 120)
         layer: 10
       }
-      block v36 {
-        position: pos(20, 800, 570, 340)
+      block k34 {
+        position: pos(476, 358, 224, 120)
         layer: 11
       }
-      block v37 {
-        position: pos(610, 800, 570, 340)
+      block v35 {
+        position: pos(20, 496, 1160, 360)
         layer: 12
       }
-      block v38 {
-        position: pos(20, 1160, 570, 340)
+      block v36 {
+        position: pos(20, 876, 570, 340)
         layer: 13
       }
-      block v39 {
-        position: pos(610, 1160, 570, 340)
+      block v37 {
+        position: pos(610, 876, 570, 340)
         layer: 14
+      }
+      block v38 {
+        position: pos(20, 1236, 570, 340)
+        layer: 15
+      }
+      block v39 {
+        position: pos(610, 1236, 570, 340)
+        layer: 16
+      }
+      block v74 {
+        position: pos(20, 1596, 1160, 440)
+        layer: 17
       }
     }
     tab monetization: CanvasLayout {

@@ -137,4 +137,16 @@ Governed definitions (the whole point of the benchmark):
     definition: @aql total_repeated_buyers * 1.0 / total_buyers;;
     description: 'Repeat buyers / buyers.'
   }
+  metric refunded_gmv {
+    label: 'Refunded GMV'
+    type: 'number'
+    definition: @aql gmv | where(slb_orders.status is 'refunded');;
+    description: 'Gross value of refunded items (GMV restricted to refunded orders).'
+  }
+  metric refund_rate {
+    label: 'Refund Rate'
+    type: 'number'
+    definition: @aql refunded_gmv / gmv;;
+    description: 'Share of GMV that was refunded = refunded_gmv / gmv. Composes at any grain (e.g. by category), which lets a query filter categories by this measure inline.'
+  }
 }
