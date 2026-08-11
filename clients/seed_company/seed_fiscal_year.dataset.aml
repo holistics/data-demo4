@@ -1,75 +1,54 @@
 // =====================================================================
 // Seed Company — Fiscal Year Demo dataset
 //
-// Oct-Sep fiscal year driven by a single YEAR NUMBER parameter.
-// No date dimension table, no SQL columns, no derived fiscal dimension,
-// and no case() mapping table. AQL resolves the year number straight
-// into the fiscal window.
+// Oct-Sep fiscal year, done the plain way: the date dimension carries
+// fiscal columns, and everything else is ordinary filtering and
+// grouping on a real field.
+//
+// The fiscal logic lives in exactly one place, `seed_dim_dates`. No
+// parameter, no case() mapping, no per-metric date arithmetic. Metrics
+// here are just metrics.
 //
 // Built on the shared ecommerce models (read-only reference, nothing in
-// `01 demo ecommerce/` is modified). `ecommerce_orders.created_at`
-// stands in for Seed's close date — swap that one reference to port.
+// `01 demo ecommerce/` is modified). `ecommerce_orders.created_date`
+// stands in for Seed's close date — repoint the relationship below to
+// port this to their tenant.
 //
 // ---------------------------------------------------------------------
-// How the year number becomes a date window
+// Why this shape and not the earlier ones
 // ---------------------------------------------------------------------
-// Fiscal year N runs 1 Oct (N-1) to 30 Sep (N). Build both boundaries by
-// pasting the year onto a fixed month-day and casting to a date:
+// Two earlier attempts pushed the fiscal logic into the metrics: a
+// case() mapping each FY to a literal range, then a year-number
+// parameter resolved into date bounds. Both worked, both were clunky,
+// and both were filter-only — you could not put fiscal year on a chart
+// axis or let the AI group by it, because there was no field to group.
 //
-//     >= cast(concat(cast(N - 1, 'text'), '-10-01'), 'date')
-//     <  cast(concat(cast(N,     'text'), '-10-01'), 'date')
-//
-// Upper bound is "< 1 Oct of year N" rather than "<= 30 Sep", which
-// avoids any end-of-day / timestamp truncation question entirely.
-//
-// This works for ANY year with no AML change at all.
-//
-// ---------------------------------------------------------------------
-// Why the expression is repeated per metric
-// ---------------------------------------------------------------------
-// It would be nicer to bind the window once and reuse it. AQL cannot, in
-// a row-level filter. Four routes were tried against this instance:
-//
-//   1. matches <computed string>          -> rejected at parse
-//   2. reference a number metric          -> "must be grouped or aggregated"
-//   3. reference a param-model dimension  -> same aggregate-context error
-//   4. reference date-typed metrics       -> works with ONE in the where,
-//                                            fails with two
-//
-// So each metric inlines both boundaries. Two lines, and the only thing
-// that varies between metrics is the base metric being filtered.
+// A column on the date dimension gives all of that for free, and it is
+// also what Chukwudi already told the customer on the call: "we're just
+// going to route it through the date dimension model, which means it
+// can adapt to any field it needs to adapt".
 //
 // ---------------------------------------------------------------------
-// Where the default year lives
+// Multiple date fields
 // ---------------------------------------------------------------------
-// Not here. The dashboard filter's `default` sets it, so a year is
-// written down in exactly one place per dashboard. An earlier version
-// carried a coalesce(param, <fiscal year containing today>) fallback so
-// a blank filter meant "current FY"; it made each metric ~14 lines with
-// the same block repeated four times, and was dropped as not worth it.
-// If zero annual edits ever becomes a hard requirement, that fallback or
-// a derived fiscal_year dimension is the price.
-//
-// ---------------------------------------------------------------------
-// Known boundary nuance
-// ---------------------------------------------------------------------
-// `cast(...)` bounds are evaluated without the timezone conversion that
-// `matches @(a to b)` applies, so the two differ slightly on rows sitting
-// within the tenant's UTC offset of a boundary. On this demo data that is
-// 6,996,534 (cast) vs 6,990,976 (matches) for FY26. Confirm with Seed
-// which timezone their fiscal boundaries are defined in before porting.
+// Lori noted the relevant date differs per dataset (forecast uses close
+// date). Only ONE relationship to the date dimension can be active. For
+// a second date role, either add an inactive relationship and reach it
+// with `with_relationships()`, or extend `seed_dim_dates` again into a
+// separate role model with its own active relationship.
 // =====================================================================
 Dataset seed_fiscal_year {
   label: 'Seed Company - Fiscal Year Demo'
   description: '''
-Oct-Sep fiscal year driven by a single year-number parameter.
+Oct-Sep fiscal year carried as columns on the date dimension.
 
-- `Fiscal Year` parameter - a plain year number. 2026 = Oct 2025 to Sep 2026.
-- `GMV (Selected FY)` / `Orders (Selected FY)` respond to it.
+- `Fiscal Year` - 2026 means 1 Oct 2025 to 30 Sep 2026. Filter it, group by it, drill it.
+- `Fiscal Year Label` - 'FY26' for display.
+- `Fiscal Quarter` - Q1 = Oct-Dec.
+- `Fiscal Year Offset` - 0 = current fiscal year, -1 = prior. Resolves against today.
 
-AQL builds the Oct-Sep window from the number, so any year works without
-an AML change. Filtering only: there is no fiscal year dimension to group
-or drill by.
+Filter a card to `Fiscal Year Offset = 0` and it is permanently "current
+fiscal year" with no date written down anywhere.
 '''
   data_source_name: 'demodb'
 
@@ -80,7 +59,7 @@ or drill by.
     ecommerce_users,
     ecommerce_cities,
     ecommerce_countries,
-    seed_fy_param,
+    seed_dim_dates,
   ]
 
   relationships: [
@@ -89,10 +68,13 @@ or drill by.
     relationship(ecommerce_orders.user_id > ecommerce_users.id, true),
     relationship(ecommerce_users.city_id > ecommerce_cities.id, true),
     relationship(ecommerce_cities.country_code > ecommerce_countries.code, true),
+
+    // Seed's close date equivalent. Repoint this one line to port.
+    relationship(ecommerce_orders.created_date > seed_dim_dates.date_key, true),
   ]
 
   // ═══════════════════════════════════════════════════════════════════
-  // BASE METRICS
+  // METRICS — no fiscal logic needed, the date dimension handles it
   // ═══════════════════════════════════════════════════════════════════
 
   metric gmv {
@@ -111,35 +93,21 @@ or drill by.
     format: '#,###0'
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // PARAM-DRIVEN METRICS
-  //
-  // One expression each. No case(), no per-year branches.
-  // ═══════════════════════════════════════════════════════════════════
-
-  metric gmv_fy {
-    label: 'GMV (Selected FY)'
+  // The only fiscal-aware metrics needed: cards that must always show
+  // the live year regardless of what the dashboard filter is set to.
+  metric gmv_current_fy {
+    label: 'GMV (Current FY)'
     type: 'number'
-    description: 'GMV for the fiscal year selected in the Fiscal Year parameter.'
-    definition: @aql
-      gmv | where(
-        ecommerce_orders.created_at >= cast(concat(cast((seed_fy_param.fy_year | first()) - 1, 'text'), '-10-01'), 'date')
-        and ecommerce_orders.created_at < cast(concat(cast((seed_fy_param.fy_year | first()), 'text'), '-10-01'), 'date')
-      )
-    ;;
+    description: 'GMV for the fiscal year containing today. Never needs editing.'
+    definition: @aql gmv | where(seed_dim_dates.fiscal_year_offset == 0) ;;
     format: '#,###0'
   }
 
-  metric orders_fy {
-    label: 'Orders (Selected FY)'
+  metric gmv_prior_fy {
+    label: 'GMV (Prior FY)'
     type: 'number'
-    description: 'Order count for the fiscal year selected in the Fiscal Year parameter.'
-    definition: @aql
-      total_orders | where(
-        ecommerce_orders.created_at >= cast(concat(cast((seed_fy_param.fy_year | first()) - 1, 'text'), '-10-01'), 'date')
-        and ecommerce_orders.created_at < cast(concat(cast((seed_fy_param.fy_year | first()), 'text'), '-10-01'), 'date')
-      )
-    ;;
+    description: 'GMV for the fiscal year before the one containing today.'
+    definition: @aql gmv | where(seed_dim_dates.fiscal_year_offset == -1) ;;
     format: '#,###0'
   }
 }

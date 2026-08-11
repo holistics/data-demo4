@@ -2,15 +2,16 @@
 
 Seed Company is a US non-profit (tsco.org) in onboarding, running a PoC on
 Holistics. Warehouse is **unconfirmed**: Lori said Snowflake on the onboarding
-call, Chukwudi saw Redshift on the instance. Confirm before building anything
-that depends on SQL dialect.
+call, Chukwudi saw Redshift on the instance. The fiscal year work below is
+warehouse-agnostic on purpose, but confirm before building anything that
+depends on SQL dialect.
 
 ## Data source
 
 Seed's own data is **not** in this tenant. Everything here runs on the shared
 ecommerce demo data (`demodb`) as a stand-in, so these are proofs of concept for
 mechanics and design, not real Seed numbers. Nothing under `01 demo ecommerce/`
-is modified; the models are referenced read-only.
+is modified; `dim_dates` is extended, not edited.
 
 ## Files
 
@@ -18,94 +19,93 @@ is modified; the models are referenced read-only.
 |---|---|
 | `seed_company_demo_dashboard.page.aml` | Brand theme showcase on `demo_ecommerce_version_2` |
 | `themes/`, `blocks/` | Seed brand theme, header and footer |
-| `seed_fy_param.model.aml` | Fiscal year param, a plain year number |
-| `seed_fiscal_year.dataset.aml` | Param-driven fiscal year metrics |
+| `seed_dim_dates.model.aml` | `dim_dates` extended with fiscal year columns |
+| `seed_fiscal_year.dataset.aml` | Dataset wiring orders to the fiscal calendar |
 | `seed_fiscal_year_demo.page.aml` | Walkthrough dashboard |
 
-## Fiscal year (the open PoC question)
+## Fiscal year
 
 Seed's fiscal year runs **1 Oct to 30 Sep, named by the ending calendar year**:
 2026 = 1 Oct 2025 to 30 Sep 2026. On the onboarding call Lori asked for a
 reusable "current fiscal year" that cards resolve automatically, because they do
-not want visualizations that name specific years. Their reporting sits on one
-wide table with no date dimension, and the relevant date field differs per
-dataset (the forecast model uses close date).
+not want visualizations that name specific years.
 
-**Two constraints came from the operator, both deliberate:**
+**Fiscal year is a column on the date dimension.** That is the whole design.
+Filter it, group by it, put it on an axis, let the AI use it. No parameter, no
+`case()` mapping table, no per-metric date arithmetic.
 
-1. **No derived fiscal dimensions.** An earlier version had a `fiscal_year`
-   dimension and it was rejected as redundant with the parameter. Do not add one
-   back without asking.
-2. **No `case()` mapping table.** A version mapping each FY to a literal date
-   range was rejected as ineffective. The parameter is a **year number** and AQL
-   resolves it into the window.
-3. **Keep the metrics short.** A version with an inline current-FY fallback was
-   rejected as clunky and repetitive.
+`fiscal_year_offset` is 0 for the current fiscal year and -1 for the prior one,
+so a card pinned to 0 is permanently "current FY" with no date written down.
 
-The current shape, two lines of filter per metric:
+### The one real trap: do not use date_diff on `date_key`
+
+The obvious derivation counts months from an anchor Oct 1 with `date_diff`.
+**It is off by a whole month.** `date_key` is a DATE; Holistics casts it to
+timestamptz and applies the tenant timezone (America/Los_Angeles), which rolls
+every month-start back into the previous month, while the anchor literal carries
+its own offset and does not shift. This was verified live: it produced fiscal
+years running 1 Nov to 31 Oct, and it looked correct on the orders table only
+because that data had no rows on the first few days of October.
+
+Use `year` and `month_number` instead. They come from `to_char()` evaluated in
+the warehouse on the raw date, so they carry no timezone distortion:
 
 ```
->= cast(concat(cast(N - 1, 'text'), '-10-01'), 'date')
-<  cast(concat(cast(N,     'text'), '-10-01'), 'date')
+case(when: cast(month_number,'number') >= 10, then: cast(year,'number') + 1,
+     else: cast(year,'number'))
 ```
 
-where `N` is `seed_fy_param.fy_year | first()`. Upper bound is "< 1 Oct of
-year N" rather than "<= 30 Sep", which sidesteps any end-of-day question.
-Works for any year with no AML change.
+Verified boundaries: every fiscal year runs exactly Oct 01 to Sep 30.
 
-### Why it is repeated per metric
+### Why `max(fiscal_year)` is the current fiscal year
 
-It would be nicer to bind the window once. **AQL cannot, in a row-level
-filter.** Four routes were tried against this instance and all failed:
+The base `dim_dates` query is `generate_series(..., current_date, ...)`, so the
+last row of the calendar is always today. `max(fiscal_year)` is therefore the
+fiscal year containing today, by construction. That is what makes
+`fiscal_year_offset` self-maintaining.
 
-| Route | Result |
+It also means **no `@now` anywhere in this folder**, which is deliberate. `@now`
+inlines as a full timestamp, so the generated SQL changes on every execution and
+the query cache never hits. Seed is cost-sensitive about warehouse queries.
+
+If the date dimension is ever repointed at a fixed-end calendar rather than
+`current_date`, `fiscal_year_offset` silently breaks. Check that first if
+"current FY" ever looks wrong.
+
+### Multiple date fields
+
+Lori noted the relevant date differs per dataset (forecast uses close date).
+Only ONE relationship to the date dimension can be active. For a second date
+role, either add an inactive relationship and reach it with
+`with_relationships()`, or extend `seed_dim_dates` again into a separate role
+model with its own active relationship.
+
+### Approaches already tried and rejected
+
+Do not re-litigate these without new information:
+
+| Approach | Why it went | 
 |---|---|
-| `matches <computed string>` | rejected at parse |
-| reference a number metric | "must be grouped or aggregated" |
-| reference a param-model dimension | same aggregate-context error |
-| reference date-typed metrics | works with ONE in the where, fails with two |
+| `case()` mapping each FY to a literal date range | clunky, and filter-only |
+| Year-number param resolved into date bounds in each metric | clunky, repetitive, filter-only |
+| Derived fiscal dimensions on the orders table | works, but duplicates per fact table |
 
-So the repetition is structural, not sloppiness. Do not spend time trying to
-DRY it again without new platform capability.
+The parameter versions were all **filter-only**: with no field to group by, you
+could not put fiscal year on a chart axis or let the AI use it. A column on the
+date dimension gives that for free, and matches what Chukwudi told the customer
+on the call: "we're just going to route it through the date dimension model,
+which means it can adapt to any field it needs to adapt".
 
-### Where the default year lives
-
-The dashboard filter's `default`, so a year appears in exactly one place per
-dashboard and gets bumped on 1 October. An earlier version carried a
-`coalesce(param, <fiscal year containing today>)` fallback so a blank filter
-meant "current FY". It made each metric ~14 lines with the same block repeated
-four times and was dropped as not worth it. If zero annual edits becomes a hard
-requirement, that fallback or a derived dimension is the price.
-
-### Traps, all hit and verified
-
-- **A `number` param with numeric `allowed_values` breaks the dataset.** Every
-  query against it returns HTTP 500, including unrelated base metrics, while
-  `holistics aml validate` still passes locally. `allowed_values` is omitted for
-  this reason. Worth reporting to the product team.
-- **If `@now` is ever reintroduced, do not write
-  `date_diff('month', @(2000-10-01), @now)`.** That inlines `@now` as a full
-  timestamp, so the generated SQL changes on every execution and the query cache
-  never hits. Route `@now` through a comparison with the date column so it
-  coerces to a plain date. Seed is cost-sensitive about warehouse queries.
-- **`cast(...)` bounds and `matches @(a to b)` disagree slightly.** `matches`
-  applies a timezone conversion that `cast` does not, so rows within the tenant's
-  UTC offset of a boundary fall differently. On this demo data FY26 is 6,996,534
-  (cast) vs 6,990,976 (matches). Confirm which timezone Seed defines fiscal
-  boundaries in before porting.
-
-### What this shape gives up
-
-Filtering only. No fiscal year chart axis, no drill by fiscal year, and
-Holistics AI cannot group by it. If Seed asks for "GMV by fiscal year" as a bar
-chart, that needs a dimension and this file is the wrong shape. The verified
-dimension expression, if ever reinstated, is
-`2001 + floor(date_diff('month', @(2000-10-01), <date> | month()) / 12)`.
+One unrelated bug found along the way, still worth reporting: a `number` param
+with numeric `allowed_values` makes a dataset return HTTP 500 on every query,
+including unrelated base metrics, while `holistics aml validate` passes locally.
 
 ## Porting to Seed's tenant
 
-Swap `ecommerce_orders.created_at` for Seed's close date in
-`seed_fiscal_year.dataset.aml`. The param and dashboard carry over unchanged.
+Two things: point `seed_dim_dates` at their date dimension (or ship this one,
+it is warehouse-agnostic), and repoint the single relationship line in
+`seed_fiscal_year.dataset.aml` from `ecommerce_orders.created_date` to their
+close date.
 
 ## Rules
 
