@@ -1,0 +1,30 @@
+Model repro_document {
+  type: 'query'
+  label: '[Repro] Document'
+  description: 'Model used by the failing dataset while demo_fact_task exists outside it.'
+  data_source_name: 'demodb'
+
+  dimension document_id {
+    label: 'Document ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.document_id }};;
+  }
+
+  dimension organization_id {
+    label: 'Organization ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.organization_id }};;
+  }
+
+  dimension document_name {
+    label: 'Document Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.document_name }};;
+  }
+
+  query: @sql
+    select 1 as document_id, 'org_a' as organization_id, 'Document A' as document_name
+    union all
+    select 2 as document_id, 'org_b' as organization_id, 'Document B' as document_name;;
+}

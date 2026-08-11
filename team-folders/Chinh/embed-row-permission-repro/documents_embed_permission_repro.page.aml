@@ -1,0 +1,35 @@
+Dashboard documents_embed_permission_repro {
+  title: '[Repro] Embedded permission model lookup'
+  block documents: VizBlock {
+    label: 'Documents'
+    viz: DataTable {
+      dataset: documents
+      fields: [
+        VizFieldFull {
+          ref: r(repro_document.document_id)
+        },
+        VizFieldFull {
+          ref: r(repro_document.organization_id)
+        },
+        VizFieldFull {
+          ref: r(repro_document.document_name)
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+  interactions: []
+  view: CanvasLayout {
+    label: 'Canvas Layout'
+    width: 920
+    height: 440
+    grid_size: 20
+    block documents {
+      position: pos(20, 20, 880, 400)
+      layer: 1
+    }
+  }
+  theme: H.themes.vanilla
+}

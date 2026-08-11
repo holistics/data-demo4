@@ -1,0 +1,30 @@
+Model demo_fact_task {
+  type: 'query'
+  label: '[Repro] Fact Task'
+  description: 'Minimal reproduction for embedded row-based permissions.'
+  data_source_name: 'demodb'
+
+  dimension task_id {
+    label: 'Task ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.task_id }};;
+  }
+
+  dimension organization_id {
+    label: 'Organization ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.organization_id }};;
+  }
+
+  dimension task_name {
+    label: 'Task Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.task_name }};;
+  }
+
+  query: @sql
+    select 1 as task_id, 'org_a' as organization_id, 'Task A' as task_name
+    union all
+    select 2 as task_id, 'org_b' as organization_id, 'Task B' as task_name;;
+}

@@ -1,0 +1,9 @@
+Dataset documents {
+  label: '[Repro] Documents'
+  description: 'Failing case: demo_fact_task exists in AML but is not included in this dataset.'
+  data_source_name: 'demodb'
+  models: [
+    repro_document
+  ]
+  relationships: []
+}

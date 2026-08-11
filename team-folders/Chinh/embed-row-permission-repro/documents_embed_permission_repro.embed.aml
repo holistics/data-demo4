@@ -1,0 +1,8 @@
+EmbedPortal documents_embed_permission_repro_portal {
+  description: 'Reproduces a JWT permission that names a globally defined model missing from the selected dataset.'
+  objects: [
+    documents_embed_permission_repro,
+    documents,
+  ]
+  required_permissions: []
+}

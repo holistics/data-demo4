@@ -1,0 +1,9 @@
+Dataset documents_with_demo_fact_task {
+  label: '[Repro] Documents with Fact Task'
+  description: 'Control case: the embedded permission model is included in this dataset.'
+  data_source_name: 'demodb'
+  models: [
+    demo_fact_task
+  ]
+  relationships: []
+}
