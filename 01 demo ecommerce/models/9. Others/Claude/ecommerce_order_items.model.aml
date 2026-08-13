@@ -1,4 +1,3 @@
-@tag('Endorsed')
 Model ecommerce_order_items_copy {
   type: 'table'
   label: 'Order Items'

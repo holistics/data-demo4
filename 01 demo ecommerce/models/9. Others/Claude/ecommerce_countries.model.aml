@@ -1,4 +1,3 @@
-@tag('Endorsed')
 Model ecommerce_countries_copy {
   type: 'table'
   label: 'Countries'
