@@ -1,0 +1,152 @@
+CustomChartDef centered_simple_table {
+  label: 'Centered Simple Table'
+  description: 'A simple 2-column table with centered header and cell text.'
+
+  fields {
+    field country {
+      type: 'dimension'
+      label: 'Country'
+      data_type: 'string'
+      sort { apply_order: 1 direction: 'asc' }
+    }
+
+    field gmv {
+      type: 'measure'
+      label: 'GMV'
+      data_type: 'number'
+      sort { apply_order: 2 direction: 'desc' }
+    }
+  }
+
+  template: @vg {
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "padding": 0,
+
+    "signals": [
+      { "name": "rowHeight", "value": 36 },
+      { "name": "headerHeight", "value": 40 },
+      { "name": "countryColWidth", "value": 220 },
+      { "name": "gmvColWidth", "value": 180 },
+      { "name": "tableWidth", "update": "countryColWidth + gmvColWidth" },
+      { "name": "tableHeight", "update": "headerHeight + length(data('table')) * rowHeight" }
+    ],
+
+    "width": { "signal": "tableWidth" },
+    "height": { "signal": "tableHeight" },
+
+    "data": [
+      {
+        "name": "table",
+        "values": @{values}
+      },
+      {
+        "name": "header",
+        "values": [
+          { "label": "Country Name", "x": 0, "w": 220 },
+          { "label": "GMV", "x": 220, "w": 180 }
+        ]
+      }
+    ],
+
+    "marks": [
+      {
+        "type": "rect",
+        "from": { "data": "header" },
+        "encode": {
+          "enter": {
+            "x": { "field": "x" },
+            "y": { "value": 0 },
+            "width": { "field": "w" },
+            "height": { "signal": "headerHeight" },
+            "fill": { "value": "#F3F4F6" },
+            "stroke": { "value": "#D1D5DB" }
+          }
+        }
+      },
+      {
+        "type": "text",
+        "from": { "data": "header" },
+        "encode": {
+          "enter": {
+            "x": { "signal": "datum.x + datum.w / 2" },
+            "y": { "signal": "headerHeight / 2" },
+            "align": { "value": "center" },
+            "baseline": { "value": "middle" },
+            "fontSize": { "value": 12 },
+            "fontWeight": { "value": "bold" },
+            "fill": { "value": "#111827" },
+            "text": { "field": "label" }
+          }
+        }
+      },
+      {
+        "type": "group",
+        "from": {
+          "facet": {
+            "name": "rows",
+            "data": "table",
+            "field": @{fields.country.name}
+          }
+        },
+        "encode": {
+          "enter": {
+            "y": { "signal": "headerHeight" }
+          }
+        },
+        "marks": [
+          {
+            "type": "rect",
+            "encode": {
+              "enter": {
+                "x": { "value": 0 },
+                "y": { "signal": "datum.index * rowHeight" },
+                "width": { "signal": "tableWidth" },
+                "height": { "signal": "rowHeight" },
+                "fill": [
+                  {
+                    "test": "datum.index % 2 === 0",
+                    "value": "#FFFFFF"
+                  },
+                  { "value": "#F9FAFB" }
+                ],
+                "stroke": { "value": "#E5E7EB" }
+              }
+            }
+          },
+          {
+            "type": "text",
+            "encode": {
+              "enter": {
+                "x": { "signal": "countryColWidth / 2" },
+                "y": { "signal": "datum.index * rowHeight + rowHeight / 2" },
+                "align": { "value": "center" },
+                "baseline": { "value": "middle" },
+                "fontSize": { "value": 12 },
+                "fill": { "value": "#111827" },
+                "text": { "field": @{fields.country.name} }
+              }
+            }
+          },
+          {
+            "type": "text",
+            "encode": {
+              "enter": {
+                "x": { "signal": "countryColWidth + gmvColWidth / 2" },
+                "y": { "signal": "datum.index * rowHeight + rowHeight / 2" },
+                "align": { "value": "center" },
+                "baseline": { "value": "middle" },
+                "fontSize": { "value": 12 },
+                "fill": { "value": "#111827" },
+                "text": { "signal": "format(datum[@{fields.gmv.name}], '$,.0f')" }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  };;
+}
