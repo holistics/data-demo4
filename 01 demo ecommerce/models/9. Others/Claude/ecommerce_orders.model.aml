@@ -27,13 +27,15 @@ Model ecommerce_orders_copy {
   dimension created_at {
     label: 'Created At'
     type: 'datetime'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.created_at }};;
+    primary_key: false
   }
   dimension user_id {
     label: 'User Id'
     type: 'number'
-    description: ''
+    description: '   '
     hidden: true
     definition: @sql {{ #SOURCE.user_id }};;
     primary_key: false
@@ -41,14 +43,18 @@ Model ecommerce_orders_copy {
   dimension discount {
     label: 'Discount'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.discount }};;
+    primary_key: false
   }
   dimension delivery_attempts {
     label: 'Delivery Attempts'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.delivery_attempts }};;
+    primary_key: false
   }
   dimension created_date {
     label: 'Created Date'

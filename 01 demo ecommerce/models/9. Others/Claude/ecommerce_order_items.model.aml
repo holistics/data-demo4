@@ -21,8 +21,10 @@ Model ecommerce_order_items_copy {
   dimension quantity {
     label: 'Quantity'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.quantity }};;
+    primary_key: false
   }
 
   owner: 'vincent+demo4@holistics.io'

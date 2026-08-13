@@ -16,8 +16,10 @@ Model ecommerce_products_copy {
   dimension category_id {
     label: 'Category Id'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.category_id }};;
+    primary_key: false
   }
   dimension name {
     label: 'Product Name'
@@ -30,8 +32,10 @@ Model ecommerce_products_copy {
   dimension merchant_id {
     label: 'Merchant Id'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.merchant_id }};;
+    primary_key: false
   }
   dimension price {
     label: 'Price'
