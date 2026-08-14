@@ -32,7 +32,7 @@ Model ecommerce_orders {
     label: 'Created At FY'
     type: 'datetime'
     hidden: false
-    definition: @aql ecommerce_orders.created_at + interval 3 month;;
+    definition: @aql ecommerce_orders.created_at + interval(3 month);;
   }
   dimension user_id {
     label: 'User Id'
