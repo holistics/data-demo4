@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FanServ Game Calendar — HTML prototype</title>
+  <style>
+    @layer reset, base, components, states, motion;
+
+    @layer reset {
+      :where(body, h1, h2, h3, p, ul, ol, dl, dd) {
+        margin: 0;
+      }
+
+      :where(button, select) {
+        font: inherit;
+      }
+
+      :where(button) {
+        border: 0;
+      }
+
+      :where(ul, ol) {
+        padding: 0;
+        list-style: none;
+      }
+    }
+
+    @layer base {
+      :root {
+        color-scheme: light;
+        --brand-primary: #009247;
+        --primary-lighter: #c8facd;
+        --primary-light: #5be584;
+        --primary: #00ab55;
+        --primary-dark: #007b55;
+        --primary-darker: #005249;
+        --secondary-lighter: #d6e4ff;
+        --secondary-light: #84a9ff;
+        --secondary: #3366ff;
+        --secondary-dark: #1939b7;
+        --secondary-darker: #091a7a;
+        --success-lighter: #d8fbde;
+        --success-light: #86e8ab;
+        --success: #36b37e;
+        --success-dark: #1b806a;
+        --success-darker: #0a5554;
+        --grey-0: #ffffff;
+        --grey-100: #f9fafb;
+        --grey-200: #f4f6f8;
+        --grey-300: #dfe3e8;
+        --grey-400: #c4cdd5;
+        --grey-500: #919eab;
+        --grey-600: #637381;
+        --grey-700: #454f5b;
+        --grey-800: #212b36;
+        --grey-900: #161c24;
+        --text-primary: var(--grey-800);
+        --text-secondary: var(--grey-600);
+        --background-paper: var(--grey-0);
+        --background-neutral: var(--grey-200);
+        --divider: rgb(145 158 171 / 24%);
+        --action-hover: rgb(145 158 171 / 8%);
+        --action-selected: rgb(145 158 171 / 16%);
+        --action-focus: rgb(145 158 171 / 24%);
+        --white: var(--grey-0);
+        --shadow-sm: 0 0.25rem 0.75rem -0.35rem rgb(22 28 36 / 16%);
+        --shadow-md: 0 0.75rem 2rem -1rem rgb(22 28 36 / 18%);
+        --radius-xs: 0.25rem;
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-pill: 999px;
+        --font-sans: Inter, Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        --ease-material: cubic-bezier(.2, .7, .3, 1.05);
+      }
+
+      html {
+        min-inline-size: 74rem;
+        background: var(--background-neutral);
+        scrollbar-color: var(--grey-400) var(--grey-100);
+      }
+
+      body {
+        min-block-size: 100dvh;
+        color: var(--text-primary);
+        background: var(--background-neutral);
+        font-family: var(--font-sans);
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        text-rendering: optimizeLegibility;
+      }
+
+      ::selection {
+        color: var(--white);
+        background: var(--primary-dark);
+      }
+
+      button,
+      select {
+        min-block-size: 1.75rem;
+        min-inline-size: 1.75rem;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      select:focus-visible {
+        outline: 0.1875rem solid var(--primary-dark);
+        outline-offset: 0.125rem;
+      }
+
+      .prototype {
+        inline-size: min(100% - 3rem, 90rem);
+        min-inline-size: 71rem;
+        margin-inline: auto;
+        padding-block: 1.5rem 3rem;
+      }
+
+      .eyebrow,
+      .field-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
+      .tabular {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .sr-only {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    }
+
+    @layer components {
+      .command-rail {
+        position: relative;
+        padding: 1.5rem;
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        background: var(--background-paper);
+        box-shadow: var(--shadow-md);
+      }
+
+      .command-top {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        min-block-size: 2.5rem;
+      }
+
+      .brand-wordmark {
+        display: block;
+        inline-size: 7.75rem;
+        block-size: auto;
+      }
+
+      .title-wrap {
+        min-inline-size: 0;
+      }
+
+      .title-wrap .eyebrow {
+        color: var(--text-secondary);
+      }
+
+      .title-wrap h1 {
+        margin-block-start: 0.25rem;
+        color: var(--text-primary);
+        font-size: 1.875rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+      }
+
+      .title-wrap p {
+        margin-block-start: 0.35rem;
+        color: var(--text-secondary);
+        font-size: 0.8125rem;
+      }
+
+      .review-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid var(--primary-light);
+        border-radius: var(--radius-xs);
+        color: var(--primary-darker);
+        background: var(--primary-lighter);
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .review-badge::before {
+        inline-size: 0.45rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--primary-dark);
+        content: "";
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: 1.35fr repeat(3, minmax(8.5rem, 1fr)) auto;
+        gap: 1rem;
+        margin-block-start: 1.5rem;
+      }
+
+      .field {
+        min-inline-size: 0;
+      }
+
+      .field-label {
+        display: block;
+        margin-block-end: 0.4rem;
+        color: var(--text-secondary);
+      }
+
+      .field-control,
+      .view-control {
+        box-sizing: border-box;
+        inline-size: 100%;
+        block-size: 2.5rem;
+        padding-inline: 0.75rem;
+        border: 1px solid var(--grey-400);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        background: var(--background-paper);
+        font-size: 0.8125rem;
+        font-weight: 650;
+      }
+
+      select.field-control {
+        appearance: auto;
+      }
+
+      .view-control {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-block-start: 1.025rem;
+        border-color: var(--primary-darker);
+        color: var(--white);
+        background: var(--primary-darker);
+        white-space: nowrap;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+        gap: 1rem;
+        margin-block-start: 1rem;
+      }
+
+      .calendar-panel,
+      .detail-panel {
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-md);
+        background: var(--background-paper);
+        box-shadow: var(--shadow-md);
+      }
+
+      .calendar-panel {
+        overflow: hidden;
+      }
+
+      .calendar-toolbar {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        min-block-size: 4.5rem;
+        padding-inline: 1rem;
+        border-block-end: 1px solid var(--divider);
+      }
+
+      .month-nav {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 2.25rem;
+        block-size: 2.25rem;
+        border: 1px solid var(--grey-400);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        background: var(--background-paper);
+        font-size: 1rem;
+        transition: border-color 180ms ease, background-color 180ms ease, transform 100ms ease;
+      }
+
+      .calendar-title {
+        text-align: center;
+      }
+
+      .calendar-title h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+
+      .calendar-title p {
+        margin-block-start: 0.2rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .legend {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0.65rem 1rem;
+        border-block-end: 1px solid var(--divider);
+        color: var(--text-secondary);
+        background: var(--background-neutral);
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .legend-dot {
+        inline-size: 0.5rem;
+        aspect-ratio: 1;
+        border-radius: 0.125rem;
+        background: var(--grey-500);
+      }
+
+      .legend-dot.completed {
+        background: var(--success-dark);
+      }
+
+      .legend-dot.upcoming {
+        background: var(--secondary);
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        background: var(--divider);
+        gap: 1px;
+      }
+
+      .weekday {
+        display: flex;
+        align-items: center;
+        min-block-size: 2.25rem;
+        padding-inline: 0.65rem;
+        color: var(--text-secondary);
+        background: var(--background-paper);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .day-cell {
+        box-sizing: border-box;
+        min-inline-size: 0;
+        min-block-size: 8.75rem;
+        padding: 0.5rem;
+        background: var(--background-paper);
+      }
+
+      .day-cell.padding-day {
+        color: var(--grey-600);
+        background: var(--grey-100);
+      }
+
+      .day-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        min-block-size: 1.25rem;
+        margin-block-end: 0.35rem;
+      }
+
+      .day-number {
+        display: grid;
+        flex: none;
+        place-items: center;
+        inline-size: 1.5rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        font-size: 0.75rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .planning-cut .day-number {
+        color: var(--white);
+        background: var(--primary-darker);
+      }
+
+      .cut-label {
+        color: var(--primary-dark);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .games {
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .game-card {
+        box-sizing: border-box;
+        inline-size: 100%;
+        min-inline-size: 0;
+        min-block-size: 6.5rem;
+        padding: 0.5rem 0.55rem;
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        background: var(--background-paper);
+        box-shadow: var(--shadow-sm);
+        text-align: start;
+        transform: translateY(0) scale(1);
+        transition:
+          transform 190ms var(--ease-material),
+          border-color 190ms ease,
+          box-shadow 190ms ease,
+          background-color 190ms ease;
+      }
+
+      .game-card.completed {
+        border-color: var(--success-light);
+        background: var(--success-lighter);
+      }
+
+      .game-card.upcoming {
+        border-color: var(--secondary-light);
+        background: var(--secondary-lighter);
+      }
+
+      .game-card.unknown {
+        border-color: var(--grey-400);
+        background: var(--grey-100);
+      }
+
+      .game-card.selected {
+        border-color: var(--primary-dark);
+        box-shadow:
+          0 0 0 0.1875rem var(--primary-lighter),
+          var(--shadow-md);
+      }
+
+      .card-top,
+      .card-signal,
+      .card-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.35rem;
+        min-inline-size: 0;
+      }
+
+      .card-top {
+        gap: 0.2rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      .game-card.completed .card-top,
+      .game-card.completed .card-meta,
+      .game-card.upcoming .card-top,
+      .game-card.upcoming .card-meta {
+        color: var(--grey-700);
+      }
+
+      .card-top span {
+        flex: none;
+      }
+
+      .card-top span,
+      .card-meta span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .card-matchup {
+        display: block;
+        margin-block: 0.42rem 0.32rem;
+        overflow: hidden;
+        font-size: 0.8125rem;
+        font-weight: 850;
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .card-result {
+        color: var(--success-darker);
+        font-weight: 850;
+      }
+
+      .card-signal {
+        align-items: baseline;
+      }
+
+      .pulse-value {
+        font-size: 0.8125rem;
+        font-weight: 850;
+      }
+
+      .pulse-band {
+        padding: 0.2rem 0.4rem;
+        border-radius: var(--radius-xs);
+        color: var(--success-darker);
+        background: var(--success-lighter);
+        font-size: 0.75rem;
+        font-weight: 850;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .completed .pulse-band {
+        color: var(--success-darker);
+        background: var(--success-lighter);
+      }
+
+      .not-scored {
+        color: var(--text-secondary);
+        font-size: 0.8125rem;
+        font-weight: 750;
+      }
+
+      .game-card.completed .not-scored {
+        color: var(--grey-700);
+      }
+
+      .card-meta {
+        gap: 0.2rem;
+        margin-block-start: 0.3rem;
+        padding-inline-end: 0.1rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .game-card.unknown .card-meta {
+        gap: 0.1rem;
+        font-size: 0.75rem;
+      }
+
+      .supply-marker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        color: var(--primary-darker);
+        font-weight: 800;
+      }
+
+      .legend-dot:not(.completed, .upcoming) {
+        border: 1px solid var(--grey-600);
+      }
+
+      .supply-marker::before {
+        inline-size: 0.35rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--brand-primary);
+        content: "";
+      }
+
+      .overflow-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 100%;
+        min-block-size: 1.75rem;
+        border: 1px dashed var(--secondary-light);
+        border-radius: var(--radius-sm);
+        color: var(--secondary-dark);
+        background: var(--secondary-lighter);
+        font-size: 0.75rem;
+        font-weight: 800;
+        transition: border-color 180ms ease, background-color 180ms ease, transform 100ms ease;
+      }
+
+      .detail-panel {
+        overflow: hidden;
+      }
+
+      .detail-accent {
+        block-size: 0.35rem;
+        background: var(--primary-dark);
+      }
+
+      .detail-card {
+        padding: 1rem;
+      }
+
+      .detail-card--wide {
+        display: grid;
+        grid-template-columns: minmax(14rem, 0.8fr) minmax(20rem, 1.2fr) minmax(16rem, 1fr);
+        align-items: start;
+        gap: 1rem;
+      }
+
+      .detail-card--wide .matchup-sheet,
+      .detail-card--wide .signal-panel,
+      .detail-card--wide .detail-section,
+      .detail-card--wide .guardrail-note {
+        margin-block-start: 0;
+      }
+
+      .detail-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+
+      .detail-head .eyebrow {
+        color: var(--primary-dark);
+      }
+
+      .detail-head h2 {
+        margin-block-start: 0.3rem;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1.1;
+      }
+
+      .detail-state {
+        flex: none;
+        padding: 0.3rem 0.5rem;
+        border-radius: var(--radius-xs);
+        color: var(--secondary-darker);
+        background: var(--secondary-lighter);
+        font-size: 0.75rem;
+        font-weight: 850;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .detail-schedule {
+        margin-block-start: 0.55rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .matchup-sheet {
+        display: grid;
+        gap: 0.6rem;
+        margin-block-start: 1rem;
+        padding: 0.85rem;
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-md);
+        background: var(--background-neutral);
+      }
+
+      .team-row {
+        display: grid;
+        grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.65rem;
+      }
+
+      .team-mark {
+        display: grid;
+        place-items: center;
+        inline-size: 2.25rem;
+        aspect-ratio: 1;
+        border: 1px solid var(--divider);
+        border-radius: 50%;
+        color: var(--white);
+        background: var(--grey-700);
+        font-size: 0.625rem;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+      }
+
+      .team-mark.sea {
+        background: #005c5c;
+      }
+
+      .team-mark.hou {
+        background: #002d62;
+      }
+
+      .team-mark.tex {
+        background: #003278;
+      }
+
+      .team-name {
+        min-inline-size: 0;
+      }
+
+      .team-name strong,
+      .team-name span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .team-name strong {
+        font-size: 0.8125rem;
+      }
+
+      .team-name span {
+        margin-block-start: 0.1rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .team-role {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 750;
+        text-transform: uppercase;
+      }
+
+      .signal-panel {
+        margin-block-start: 0.75rem;
+        padding: 0.9rem;
+        border: 1px solid var(--success-light);
+        border-radius: var(--radius-md);
+        background: var(--success-lighter);
+      }
+
+      .signal-score {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .signal-score strong {
+        color: var(--success-darker);
+        font-size: 1.375rem;
+        font-weight: 850;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+
+      .signal-score span {
+        color: var(--grey-700);
+        font-size: 0.75rem;
+        font-weight: 750;
+      }
+
+      .signal-note {
+        margin-block-start: 0.4rem;
+        color: var(--grey-700);
+        font-size: 0.75rem;
+      }
+
+      .signal-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        margin-block-start: 0.7rem;
+      }
+
+      .signal-tag {
+        padding: 0.22rem 0.45rem;
+        border: 1px solid var(--success-light);
+        border-radius: var(--radius-pill);
+        color: var(--success-darker);
+        background: var(--background-paper);
+        font-size: 0.75rem;
+        font-weight: 750;
+      }
+
+      .detail-section {
+        margin-block-start: 1rem;
+      }
+
+      .detail-section h3 {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 850;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .detail-list {
+        display: grid;
+        gap: 0.5rem;
+        margin-block-start: 0.6rem;
+      }
+
+      .detail-list > div {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.75rem;
+        padding-block-end: 0.5rem;
+        border-block-end: 1px solid var(--divider);
+      }
+
+      .detail-list dt {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .detail-list dd {
+        color: var(--text-primary);
+        font-size: 0.75rem;
+        font-weight: 750;
+        text-align: end;
+      }
+
+      .perspective {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.75rem;
+        margin-block-start: 0.5rem;
+        padding: 0.55rem 0.65rem;
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-sm);
+      }
+
+      .perspective strong,
+      .perspective span {
+        display: block;
+        font-size: 0.75rem;
+      }
+
+      .perspective span {
+        color: var(--text-secondary);
+      }
+
+      .perspective b {
+        color: var(--primary-darker);
+        font-size: 0.875rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .guardrail-note {
+        margin-block-start: 1rem;
+        padding: 0.7rem;
+        border: 1px solid var(--divider);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        background: var(--background-neutral);
+        font-size: 0.75rem;
+        line-height: 1.45;
+      }
+
+      .artifact-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-block-start: 1rem;
+        padding-inline: 0.25rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+    }
+
+    @layer states {
+      @media (hover: hover) and (pointer: fine) {
+        .game-card:hover {
+          border-color: var(--primary-dark);
+          box-shadow: var(--shadow-md);
+          transform: translateY(-0.15rem) scale(1.008);
+        }
+
+        .month-nav:hover,
+        .overflow-row:hover {
+          border-color: var(--primary-dark);
+          background: var(--action-hover);
+          transform: translateY(-0.1rem);
+        }
+
+        .field-control:hover {
+          border-color: var(--grey-600);
+        }
+
+        .view-control:hover {
+          border-color: var(--primary-dark);
+          background: var(--primary-dark);
+        }
+      }
+
+      .game-card:focus-visible {
+        outline: 0.1875rem solid var(--primary-dark);
+        outline-offset: 0.125rem;
+        border-color: var(--primary-darker);
+      }
+
+      .game-card:active,
+      .month-nav:active,
+      .overflow-row:active {
+        box-shadow: var(--shadow-sm);
+        transform: translateY(0) scale(0.985);
+      }
+
+      @media (forced-colors: active) {
+        .game-card,
+        .calendar-panel,
+        .detail-panel {
+          border-color: CanvasText;
+        }
+
+        .game-card.selected {
+          outline: 0.1875rem solid Highlight;
+          outline-offset: 0.125rem;
+        }
+
+        .legend-dot,
+        .supply-marker::before {
+          background: CanvasText;
+        }
+      }
+    }
+
+    @layer motion {
+      @keyframes rail-settle {
+        from {
+          opacity: 0;
+          transform: translateY(-0.4rem);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes card-deal {
+        from {
+          opacity: 0;
+          transform: translateY(0.7rem) scale(0.985);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes detail-settle {
+        from {
+          opacity: 0;
+          transform: translateY(0.5rem) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .command-rail {
+        animation: rail-settle 500ms cubic-bezier(.2, .7, .25, 1) both;
+      }
+
+      .game-card {
+        animation: card-deal 440ms cubic-bezier(.2, .7, .25, 1) both;
+      }
+
+      .deal-1 { animation-delay: 300ms; }
+      .deal-2 { animation-delay: 335ms; }
+      .deal-3 { animation-delay: 370ms; }
+      .deal-4 { animation-delay: 405ms; }
+      .deal-5 { animation-delay: 440ms; }
+      .deal-6 { animation-delay: 475ms; }
+      .deal-7 { animation-delay: 510ms; }
+      .deal-8 { animation-delay: 545ms; }
+      .deal-9 { animation-delay: 580ms; }
+      .deal-10 { animation-delay: 615ms; }
+      .deal-11 { animation-delay: 650ms; }
+      .deal-12 { animation-delay: 685ms; }
+      .deal-13 { animation-delay: 720ms; }
+      .deal-14 { animation-delay: 755ms; }
+      .deal-15 { animation-delay: 790ms; }
+
+      .detail-card {
+        animation: detail-settle 220ms cubic-bezier(.2, .7, .25, 1) 720ms both;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .command-rail,
+        .game-card,
+        .detail-card {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+
+        .game-card,
+        .month-nav,
+        .overflow-row,
+        .field-control,
+        .view-control {
+          transition: none;
+        }
+
+        .game-card:hover,
+        .game-card:active,
+        .month-nav:hover,
+        .month-nav:active,
+        .overflow-row:hover,
+        .overflow-row:active {
+          transform: none;
+        }
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="prototype">
+    <header class="command-rail">
+      <div class="command-top">
+
+        <div class="brand" role="img" aria-label="FanServ">
+          <img class="brand-wordmark" src="assets/fanserv-wordmark.svg" alt="">
+        </div>
+
+        <div class="title-wrap">
+          <span class="eyebrow">Season Board · planning view</span>
+          <h1>Game Calendar</h1>
+          <p>Choose a game, then inspect its signal.</p>
+        </div>
+        <span class="review-badge">Mock data · visual review</span>
+      </div>
+
+      <div class="filters" aria-label="Representative planning controls">
+        <div class="field">
+          <span class="field-label">Flight window</span>
+          <button class="field-control tabular" type="button" aria-label="Flight window, 1 July to 31 July 2026">01 Jul – 31 Jul 2026</button>
+        </div>
+        <label class="field">
+          <span class="field-label">League</span>
+          <select class="field-control" aria-label="League">
+            <option>MLB</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Focal team</span>
+          <select class="field-control" aria-label="Focal team">
+            <option>Texas Rangers</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Supply context</span>
+          <select class="field-control" aria-label="Supply context">
+            <option>FanServ supply teams</option>
+          </select>
+        </label>
+        <button class="view-control" type="button" aria-pressed="true">Calendar + detail</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <section class="calendar-panel" aria-labelledby="calendar-heading">
+        <div class="calendar-toolbar">
+          <button class="month-nav" type="button" aria-label="Previous month">←</button>
+          <div class="calendar-title">
+            <h2 id="calendar-heading">July 2026</h2>
+            <p>Planning cut: 16 July · display timezone: America/Los_Angeles</p>
+          </div>
+          <button class="month-nav" type="button" aria-label="Next month">→</button>
+        </div>
+
+        <div class="legend" aria-label="Calendar state legend">
+          <span class="legend-item"><span class="legend-dot completed"></span>Completed evidence</span>
+          <span class="legend-item"><span class="legend-dot upcoming"></span>Upcoming opportunity</span>
+          <span class="legend-item"><span class="legend-dot"></span>Unknown</span>
+          <span class="legend-item"><span class="supply-marker">Supply affiliation</span></span>
+        </div>
+
+        <div class="calendar-grid" aria-label="July 2026 game calendar, Monday to Sunday">
+          <div class="weekday">Mon</div>
+          <div class="weekday">Tue</div>
+          <div class="weekday">Wed</div>
+          <div class="weekday">Thu</div>
+          <div class="weekday">Fri</div>
+          <div class="weekday">Sat</div>
+          <div class="weekday">Sun</div>
+
+          <div class="day-cell padding-day" aria-label="29 June, outside selected month"><div class="day-head"><span class="day-number">29</span></div></div>
+          <div class="day-cell padding-day" aria-label="30 June, outside selected month"><div class="day-head"><span class="day-number">30</span></div></div>
+          <div class="day-cell" aria-label="1 July, one completed game">
+            <div class="day-head"><span class="day-number">1</span></div>
+            <div class="games">
+              <button class="game-card completed deal-1" type="button" aria-pressed="false" aria-label="Completed: Seattle Mariners at Texas Rangers. Texas won 5 to 3. GamePulse 72, Hot. FanServ supply affiliation.">
+                <span class="card-top"><span>Completed</span><span class="card-result">W 5–3</span></span>
+                <span class="card-matchup">SEA @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 72</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>Victory+</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="2 July, no games"><div class="day-head"><span class="day-number">2</span></div></div>
+          <div class="day-cell" aria-label="3 July, one completed game">
+            <div class="day-head"><span class="day-number">3</span></div>
+            <div class="games">
+              <button class="game-card completed deal-2" type="button" aria-pressed="false" aria-label="Completed: Texas Rangers at Boston Red Sox. Texas lost 2 to 4. Not scored. Broadcast ESPN.">
+                <span class="card-top"><span>Completed</span><span class="card-result">L 2–4</span></span>
+                <span class="card-matchup">TEX @ BOS</span>
+                <span class="card-signal"><span class="not-scored">Not scored</span></span>
+                <span class="card-meta"><span>ESPN</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="4 July, no games"><div class="day-head"><span class="day-number">4</span></div></div>
+          <div class="day-cell" aria-label="5 July, no games"><div class="day-head"><span class="day-number">5</span></div></div>
+
+          <div class="day-cell" aria-label="6 July, one completed game">
+            <div class="day-head"><span class="day-number">6</span></div>
+            <div class="games">
+              <button class="game-card completed deal-3" type="button" aria-pressed="false" aria-label="Completed: Texas Rangers at New York Yankees. Texas won 6 to 4. GamePulse 81, Hot.">
+                <span class="card-top"><span>Completed</span><span class="card-result">W 6–4</span></span>
+                <span class="card-matchup">TEX @ NYY</span>
+                <span class="card-signal"><span class="pulse-value">GP 81</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>FOX</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="7 July, no games"><div class="day-head"><span class="day-number">7</span></div></div>
+          <div class="day-cell" aria-label="8 July, one completed game">
+            <div class="day-head"><span class="day-number">8</span></div>
+            <div class="games">
+              <button class="game-card completed deal-4" type="button" aria-pressed="false" aria-label="Completed: Texas Rangers at New York Yankees. Texas lost 1 to 3. GamePulse 58, Average.">
+                <span class="card-top"><span>Completed</span><span class="card-result">L 1–3</span></span>
+                <span class="card-matchup">TEX @ NYY</span>
+                <span class="card-signal"><span class="pulse-value">GP 58</span><span class="pulse-band">Average</span></span>
+                <span class="card-meta"><span>YES</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="9 July, no games"><div class="day-head"><span class="day-number">9</span></div></div>
+          <div class="day-cell" aria-label="10 July, one completed game">
+            <div class="day-head"><span class="day-number">10</span></div>
+            <div class="games">
+              <button class="game-card completed deal-5" type="button" aria-pressed="false" aria-label="Completed: Toronto Blue Jays at Texas Rangers. Texas won 4 to 2. GamePulse 64, Average.">
+                <span class="card-top"><span>Completed</span><span class="card-result">W 4–2</span></span>
+                <span class="card-matchup">TOR @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 64</span><span class="pulse-band">Average</span></span>
+                <span class="card-meta"><span>Victory+</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="11 July, no games"><div class="day-head"><span class="day-number">11</span></div></div>
+          <div class="day-cell" aria-label="12 July, one completed game">
+            <div class="day-head"><span class="day-number">12</span></div>
+            <div class="games">
+              <button class="game-card completed deal-6" type="button" aria-pressed="false" aria-label="Completed: Toronto Blue Jays at Texas Rangers. Texas lost 3 to 5. GamePulse 39, Low.">
+                <span class="card-top"><span>Completed</span><span class="card-result">L 3–5</span></span>
+                <span class="card-matchup">TOR @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 39</span><span class="pulse-band">Low</span></span>
+                <span class="card-meta"><span>Victory+</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="day-cell" aria-label="13 July, no games"><div class="day-head"><span class="day-number">13</span></div></div>
+          <div class="day-cell" aria-label="14 July, no games"><div class="day-head"><span class="day-number">14</span></div></div>
+          <div class="day-cell" aria-label="15 July, one completed game">
+            <div class="day-head"><span class="day-number">15</span></div>
+            <div class="games">
+              <button class="game-card completed deal-7" type="button" aria-pressed="false" aria-label="Completed: Texas Rangers at Cleveland Guardians. Texas won 7 to 6. GamePulse 76, Hot.">
+                <span class="card-top"><span>Completed</span><span class="card-result">W 7–6</span></span>
+                <span class="card-matchup">TEX @ CLE</span>
+                <span class="card-signal"><span class="pulse-value">GP 76</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>FS1</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell planning-cut" aria-label="16 July, planning cut, no games">
+            <div class="day-head"><span class="day-number">16</span><span class="cut-label">Planning cut</span></div>
+          </div>
+          <div class="day-cell" aria-label="17 July, one upcoming game">
+            <div class="day-head"><span class="day-number">17</span></div>
+            <div class="games">
+              <button class="game-card upcoming deal-8" type="button" aria-pressed="false" aria-label="Upcoming: Houston Astros at Texas Rangers, 5:05 PM. GamePulse 69, Average. FanServ supply affiliation.">
+                <span class="card-top"><span>Upcoming</span><span class="tabular">5:05 PM</span></span>
+                <span class="card-matchup">HOU @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 69</span><span class="pulse-band">Average</span></span>
+                <span class="card-meta"><span>Victory+</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="18 July, one upcoming game selected">
+            <div class="day-head"><span class="day-number">18</span></div>
+            <div class="games">
+              <button class="game-card upcoming selected deal-9" type="button" aria-pressed="true" aria-label="Selected. Upcoming: Houston Astros at Texas Rangers, 4:10 PM. GamePulse 74, Hot. FanServ supply affiliation.">
+                <span class="card-top"><span>Selected</span><span class="tabular">4:10 PM</span></span>
+                <span class="card-matchup">HOU @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 74</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>FOX</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="19 July, one game with unknown lifecycle state">
+            <div class="day-head"><span class="day-number">19</span></div>
+            <div class="games">
+              <button class="game-card unknown deal-10" type="button" aria-pressed="false" aria-label="Unknown state: Kansas City Royals at Texas Rangers. Schedule incomplete. Not scored. Broadcast to be confirmed.">
+                <span class="card-top"><span>Unknown</span><span>Time TBC</span></span>
+                <span class="card-matchup">KC @ TEX</span>
+                <span class="card-signal"><span class="not-scored">Not scored</span></span>
+                <span class="card-meta"><span>Broadcast TBC</span></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="day-cell" aria-label="20 July, no games"><div class="day-head"><span class="day-number">20</span></div></div>
+          <div class="day-cell" aria-label="21 July, one upcoming game">
+            <div class="day-head"><span class="day-number">21</span></div>
+            <div class="games">
+              <button class="game-card upcoming deal-11" type="button" aria-pressed="false" aria-label="Upcoming: Seattle Mariners at Texas Rangers, 5:05 PM. GamePulse 65, Average. FanServ supply affiliation.">
+                <span class="card-top"><span>Upcoming</span><span class="tabular">5:05 PM</span></span>
+                <span class="card-matchup">SEA @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 65</span><span class="pulse-band">Average</span></span>
+                <span class="card-meta"><span>Victory+</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="22 July, three upcoming games">
+            <div class="day-head"><span class="day-number">22</span></div>
+            <div class="games">
+              <button class="game-card upcoming deal-12" type="button" aria-pressed="false" aria-label="Upcoming: Seattle Mariners at Texas Rangers, 6:05 PM. GamePulse 78, Hot. FanServ supply affiliation.">
+                <span class="card-top"><span>Upcoming</span><span class="tabular">6:05 PM</span></span>
+                <span class="card-matchup">SEA @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 78</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>ESPN+</span><span class="supply-marker">Supply</span></span>
+              </button>
+              <button class="overflow-row" type="button" aria-label="Two more games on 22 July, not shown in this visual prototype">+2 more games</button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="23 July, no games"><div class="day-head"><span class="day-number">23</span></div></div>
+          <div class="day-cell" aria-label="24 July, one upcoming game">
+            <div class="day-head"><span class="day-number">24</span></div>
+            <div class="games">
+              <button class="game-card upcoming deal-13" type="button" aria-pressed="false" aria-label="Upcoming: Texas Rangers at Oakland Athletics, 7:05 PM. GamePulse 52, Average. FanServ supply affiliation.">
+                <span class="card-top"><span>Upcoming</span><span class="tabular">7:05 PM</span></span>
+                <span class="card-matchup">TEX @ ATH</span>
+                <span class="card-signal"><span class="pulse-value">GP 52</span><span class="pulse-band">Average</span></span>
+                <span class="card-meta"><span>NBCS-CA</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="25 July, no games"><div class="day-head"><span class="day-number">25</span></div></div>
+          <div class="day-cell" aria-label="26 July, no games"><div class="day-head"><span class="day-number">26</span></div></div>
+
+          <div class="day-cell" aria-label="27 July, no games"><div class="day-head"><span class="day-number">27</span></div></div>
+          <div class="day-cell" aria-label="28 July, one upcoming game">
+            <div class="day-head"><span class="day-number">28</span></div>
+            <div class="games">
+              <button class="game-card upcoming deal-14" type="button" aria-pressed="false" aria-label="Upcoming: Texas Rangers at Los Angeles Angels, 6:38 PM. GamePulse 71, Hot. FanServ supply affiliation.">
+                <span class="card-top"><span>Upcoming</span><span class="tabular">6:38 PM</span></span>
+                <span class="card-matchup">TEX @ LAA</span>
+                <span class="card-signal"><span class="pulse-value">GP 71</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>FDSW</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell" aria-label="29 July, no games"><div class="day-head"><span class="day-number">29</span></div></div>
+          <div class="day-cell" aria-label="30 July, no games"><div class="day-head"><span class="day-number">30</span></div></div>
+          <div class="day-cell" aria-label="31 July, one upcoming game">
+            <div class="day-head"><span class="day-number">31</span></div>
+            <div class="games">
+              <button class="game-card upcoming deal-15" type="button" aria-pressed="false" aria-label="Upcoming: New York Yankees at Texas Rangers, 5:05 PM. GamePulse 84, Hot. FanServ supply affiliation.">
+                <span class="card-top"><span>Upcoming</span><span class="tabular">5:05 PM</span></span>
+                <span class="card-matchup">NYY @ TEX</span>
+                <span class="card-signal"><span class="pulse-value">GP 84</span><span class="pulse-band">Hot</span></span>
+                <span class="card-meta"><span>FOX</span><span class="supply-marker">Supply</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="day-cell padding-day" aria-label="1 August, outside selected month"><div class="day-head"><span class="day-number">1</span></div></div>
+          <div class="day-cell padding-day" aria-label="2 August, outside selected month"><div class="day-head"><span class="day-number">2</span></div></div>
+
+          <div class="day-cell padding-day" aria-label="3 August, outside selected month"><div class="day-head"><span class="day-number">3</span></div></div>
+          <div class="day-cell padding-day" aria-label="4 August, outside selected month"><div class="day-head"><span class="day-number">4</span></div></div>
+          <div class="day-cell padding-day" aria-label="5 August, outside selected month"><div class="day-head"><span class="day-number">5</span></div></div>
+          <div class="day-cell padding-day" aria-label="6 August, outside selected month"><div class="day-head"><span class="day-number">6</span></div></div>
+          <div class="day-cell padding-day" aria-label="7 August, outside selected month"><div class="day-head"><span class="day-number">7</span></div></div>
+          <div class="day-cell padding-day" aria-label="8 August, outside selected month"><div class="day-head"><span class="day-number">8</span></div></div>
+          <div class="day-cell padding-day" aria-label="9 August, outside selected month"><div class="day-head"><span class="day-number">9</span></div></div>
+        </div>
+      </section>
+
+      <section class="detail-panel" aria-labelledby="detail-heading">
+        <div class="detail-accent"></div>
+        <article class="detail-card detail-card--wide">
+            <div class="detail-summary">
+              <div class="detail-head">
+                <div>
+                  <span class="eyebrow">Selected game detail</span>
+                  <h2 id="detail-heading">HOU at TEX</h2>
+                </div>
+                <span class="detail-state">Upcoming</span>
+              </div>
+              <p class="detail-schedule tabular">Sat, 18 Jul · 4:10 PM PT<br>Globe Life Field · Arlington, TX</p>
+            </div>
+
+            <div class="matchup-sheet" aria-label="Houston Astros at Texas Rangers">
+              <div class="team-row">
+                <span class="team-mark hou" aria-hidden="true">HOU</span>
+                <span class="team-name"><strong>Houston Astros</strong><span>Away team</span></span>
+                <span class="team-role">Away</span>
+              </div>
+              <div class="team-row">
+                <span class="team-mark tex" aria-hidden="true">TEX</span>
+                <span class="team-name"><strong>Texas Rangers</strong><span>FanServ supply affiliation</span></span>
+                <span class="team-role">Home</span>
+              </div>
+            </div>
+
+            <section class="signal-panel" aria-labelledby="signal-heading">
+              <div class="signal-score">
+                <strong id="signal-heading" class="tabular">74 · Hot</strong>
+                <span>GamePulse · TEX perspective</span>
+              </div>
+              <p class="signal-note">Directional modeled signal; not an impression forecast.</p>
+              <div class="signal-tags" aria-label="GamePulse labels">
+                <span class="signal-tag">Prime time</span>
+                <span class="signal-tag">Divisional</span>
+                <span class="signal-tag">National</span>
+              </div>
+            </section>
+
+            <section class="detail-section" aria-labelledby="schedule-heading">
+              <h3 id="schedule-heading">Schedule and broadcast</h3>
+              <dl class="detail-list">
+                <div><dt>Primary broadcast</dt><dd>FOX</dd></div>
+                <div><dt>Additional broadcast</dt><dd>Victory+</dd></div>
+                <div><dt>Supply context</dt><dd>Texas Rangers</dd></div>
+                <div><dt>Game ID</dt><dd class="tabular">MLB-0718-TEX</dd></div>
+              </dl>
+            </section>
+
+            <section class="detail-section" aria-labelledby="perspective-heading">
+              <h3 id="perspective-heading">Focal-team perspectives</h3>
+              <div class="perspective"><span><strong>Texas Rangers</strong><span>Hot · supply perspective</span></span><b>74</b></div>
+              <div class="perspective"><span><strong>Houston Astros</strong><span>Average · second perspective</span></span><b>63</b></div>
+            </section>
+
+            <p class="guardrail-note">Supply affiliation identifies a potential FanServ path. This mock POC makes no claim about inventory availability, price, affordability, forecast impressions, or authoritative live/cancelled status.</p>
+        </article>
+      </section>
+    </div>
+
+    <footer class="artifact-footer">
+      <span>Static visual contract · representative mock data · no JavaScript</span>
+      <span>Selected state and controls do not prove Holistics interaction support</span>
+    </footer>
+  </main>
+</body>
+</html>

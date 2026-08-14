@@ -1,7 +1,7 @@
 Dashboard fanserv_game_calendar {
   title: 'FanServ Game Calendar'
   description: '''
-Customer-facing Canvas POC for a 42-day season board backed by imported FanServ CSV extracts.
+Development-only HTML Layout POC for a 42-day season board backed by imported FanServ CSV extracts.
 GamePulse is a directional score, not an impression forecast, and is shown as Not scored when absent.
 '''
 
@@ -693,8 +693,9 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
       content: @md
 <style>
 .fs-detail-wrap { height:100%; color:#12332e; font-family:Inter,Manrope,system-ui,sans-serif; }
-.fs-detail-card { box-sizing:border-box; height:100%; padding:22px; animation:fs-detail-settle .22s cubic-bezier(.25,1,.5,1) both; }
+.fs-detail-card { box-sizing:border-box; min-height:100%; display:grid; grid-template-columns:minmax(15rem,.9fr) minmax(15rem,.8fr) minmax(19rem,1fr); align-items:start; gap:18px; padding:22px; animation:fs-detail-settle .22s cubic-bezier(.25,1,.5,1) both; }
 .fs-detail-card:not(:first-child) { display:none; }
+.fs-detail-intro { min-width:0; }
 .fs-detail-kicker { font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#007b55; }
 .fs-detail-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-top:7px; }
 .fs-detail-head h2 { margin:0; font-size:21px; line-height:1.12; letter-spacing:-.02em; }
@@ -707,10 +708,11 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 .fs-detail-logo[src=""] { display:none; }
 .fs-detail-score b { min-width:28px; text-align:right; font-size:22px; }
 .fs-detail-score b:empty::after { content:"—"; color:#8ba099; }
-.fs-detail-pulse { margin-top:16px; padding:15px; border:1px solid #c8facd; border-radius:13px; background:#f1fff5; }
+.fs-detail-pulse { min-height:100%; padding:15px; border:1px solid #c8facd; border-radius:13px; background:#f1fff5; }
 .fs-detail-pulse strong { display:block; font-size:25px; color:#005249; }
 .fs-detail-pulse span { display:block; margin-top:4px; font-size:10px; color:#365b54; }
-.fs-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+.fs-detail-context { min-width:0; }
+.fs-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .fs-detail-item { padding:10px 11px; border:1px solid #e4ece8; border-radius:10px; }
 .fs-detail-item small { display:block; font-size:8px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#6c7f74; }
 .fs-detail-item span { display:block; margin-top:4px; font-size:11px; }
@@ -722,19 +724,23 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 <div class="fs-detail-wrap" role="complementary" aria-label="Persistent game detail sheet">
 {% map(rows) %}
   <article class="fs-detail-card">
-    <div class="fs-detail-kicker">Persistent game detail</div>
-    <div class="fs-detail-head"><h2>{{ `Away Code`.formatted }} at {{ `Home Code`.formatted }}</h2><span class="fs-detail-state">Source state · {{ `Status`.formatted }}</span></div>
-    <div class="fs-detail-time">{{ `Game Date`.formatted }} · {{ `Start`.formatted }} · display zone {{ `Timezone`.formatted }}</div>
-    <div class="fs-detail-score"><span class="fs-detail-team"><img class="fs-detail-logo" src="{{ `Away Logo`.raw }}" alt="" width="32" height="32" loading="lazy" decoding="async"><span>{{ `Away`.formatted }}</span></span><b>{{ `Away Score`.formatted }}</b><span class="fs-detail-team"><img class="fs-detail-logo" src="{{ `Home Logo`.raw }}" alt="" width="32" height="32" loading="lazy" decoding="async"><span>{{ `Home`.formatted }}</span></span><b>{{ `Home Score`.formatted }}</b></div>
-    <div class="fs-detail-pulse"><strong>GamePulse · {{ `GamePulse`.formatted }}</strong><span>Directional score only; not an impression forecast.</span></div>
-    <div class="fs-detail-grid">
-      <div class="fs-detail-item"><small>Planning context</small><span>{{ `Phase Label`.formatted }}</span></div>
-      <div class="fs-detail-item"><small>League</small><span>{{ `League`.formatted }}</span></div>
-      <div class="fs-detail-item"><small>First listed broadcast</small><span>{{ `Primary Network`.formatted }}</span></div>
-      <div class="fs-detail-item"><small>Additional broadcast</small><span>{{ `Secondary Network`.formatted }}</span></div>
-      <div class="fs-detail-item"><small>Original schedule</small><span>{{ `Original Start`.formatted }}</span></div>
+    <div class="fs-detail-intro">
+      <div class="fs-detail-kicker">Persistent game detail</div>
+      <div class="fs-detail-head"><h2>{{ `Away Code`.formatted }} at {{ `Home Code`.formatted }}</h2><span class="fs-detail-state">Source state · {{ `Status`.formatted }}</span></div>
+      <div class="fs-detail-time">{{ `Game Date`.formatted }} · {{ `Start`.formatted }} · display zone {{ `Timezone`.formatted }}</div>
+      <div class="fs-detail-score"><span class="fs-detail-team"><img class="fs-detail-logo" src="{{ `Away Logo`.raw }}" alt="" width="32" height="32" loading="lazy" decoding="async"><span>{{ `Away`.formatted }}</span></span><b>{{ `Away Score`.formatted }}</b><span class="fs-detail-team"><img class="fs-detail-logo" src="{{ `Home Logo`.raw }}" alt="" width="32" height="32" loading="lazy" decoding="async"><span>{{ `Home`.formatted }}</span></span><b>{{ `Home Score`.formatted }}</b></div>
     </div>
-    <p class="fs-detail-note">No inventory availability, pricing, affordability, or forecast-impression claim is made in this POC.</p>
+    <div class="fs-detail-pulse"><strong>GamePulse · {{ `GamePulse`.formatted }}</strong><span>Directional score only; not an impression forecast.</span></div>
+    <div class="fs-detail-context">
+      <div class="fs-detail-grid">
+        <div class="fs-detail-item"><small>Planning context</small><span>{{ `Phase Label`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>League</small><span>{{ `League`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>First listed broadcast</small><span>{{ `Primary Network`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>Additional broadcast</small><span>{{ `Secondary Network`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>Original schedule</small><span>{{ `Original Start`.formatted }}</span></div>
+      </div>
+      <p class="fs-detail-note">No inventory availability, pricing, affordability, or forecast-impression claim is made in this POC.</p>
+    </div>
   </article>
 {% end %}
 </div>
@@ -760,51 +766,117 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
     }
   }
 
-  view: CanvasLayout {
-    label: 'Game Calendar'
-    width: 1500
-    height: 1720
-    auto_expand_vertically: true
-    block calendar_header {
-      position: pos(10, 30, 1480, 180)
-      layer: 2
+  view: HTMLLayout {
+    content: @html
+<div class="fs-game-calendar-layout">
+  <style>
+    .fs-game-calendar-layout,
+    .fs-game-calendar-layout * {
+      box-sizing: border-box;
     }
-    block filter_date {
-      position: pos(10, 230, 350, 80)
-      layer: 3
+
+    .fs-game-calendar-layout {
+      --fs-layout-paper: #ffffff;
+      --fs-layout-surface: #f4f6f8;
+      --fs-layout-divider: rgb(145 158 171 / 24%);
+      --fs-layout-ink: #212b36;
+      inline-size: min(100%, 90rem);
+      min-inline-size: 74rem;
+      margin-inline: auto;
+      padding: 1.5rem;
+      color: var(--fs-layout-ink);
+      background: var(--fs-layout-surface);
+      font-family: Inter, Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    block filter_league {
-      position: pos(385, 230, 350, 80)
-      layer: 3
+
+    .fs-game-calendar-layout h-block {
+      display: block;
+      min-inline-size: 0;
     }
-    block filter_team {
-      position: pos(760, 230, 350, 80)
-      layer: 3
+
+    .fs-layout-header {
+      min-block-size: 11.25rem;
     }
-    block filter_game {
-      position: pos(1135, 230, 355, 80)
-      layer: 3
+
+    .fs-layout-filters {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-block-start: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--fs-layout-divider);
+      border-radius: .75rem;
+      background: var(--fs-layout-paper);
     }
-    block calendar_scaffold {
-      position: pos(10, 320, 1480, 860)
-      layer: 1
+
+    .fs-layout-filter {
+      min-block-size: 5rem;
     }
-    block calendar_games {
-      position: pos(10, 320, 1480, 860)
-      layer: 4
+
+    .fs-layout-calendar {
+      position: relative;
+      min-block-size: 53.75rem;
+      margin-block-start: 1rem;
+      overflow: hidden;
+      border-radius: 1.125rem;
     }
-    block focus_games {
-      position: pos(10, 1210, 930, 500)
-      layer: 2
+
+    .fs-layout-calendar > h-block {
+      position: absolute;
+      inset: 0;
     }
-    block game_detail {
-      position: pos(970, 1210, 520, 500)
-      layer: 2
+
+    .fs-layout-calendar > h-block:last-child {
+      z-index: 1;
+      pointer-events: none;
     }
-    mobile {
-      mode: 'none'
+
+    .fs-layout-calendar > h-block:last-child h-drill,
+    .fs-layout-calendar > h-block:last-child button {
+      pointer-events: auto;
     }
-    default_zoom: 1
+
+    .fs-layout-detail {
+      min-block-size: 24rem;
+      margin-block-start: 1rem;
+      overflow: hidden;
+      border: 1px solid var(--fs-layout-divider);
+      border-radius: .75rem;
+      background: var(--fs-layout-paper);
+    }
+
+    .fs-layout-detail > h-block {
+      min-block-size: 24rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fs-game-calendar-layout * {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+
+  <header class="fs-layout-header">
+    <h-block name="calendar_header" />
+  </header>
+
+  <section class="fs-layout-filters" aria-label="Game Calendar filters">
+    <div class="fs-layout-filter"><h-block name="filter_date" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_league" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_team" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_game" /></div>
+  </section>
+
+  <section class="fs-layout-calendar" aria-label="July 2026 game calendar">
+    <h-block name="calendar_scaffold" />
+    <h-block name="calendar_games" />
+  </section>
+
+  <section class="fs-layout-detail" aria-label="Selected game detail">
+    <h-block name="game_detail" />
+  </section>
+</div>
+;;
   }
 
   interactions: [
