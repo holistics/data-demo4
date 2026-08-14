@@ -815,24 +815,27 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 
     .fs-layout-calendar {
       position: relative;
-      min-block-size: 53.75rem;
+      min-block-size: 60rem;
       margin-block-start: 1rem;
       overflow: hidden;
       border-radius: 1.125rem;
     }
 
-    .fs-layout-calendar > h-block {
+    .fs-layout-calendar > div {
       position: absolute;
       inset: 0;
+      block-size: 100%;
+      min-inline-size: 0;
+      min-block-size: 0;
     }
 
-    .fs-layout-calendar > h-block:last-child {
+    .fs-layout-calendar > div:last-child {
       z-index: 1;
       pointer-events: none;
     }
 
-    .fs-layout-calendar > h-block:last-child h-drill,
-    .fs-layout-calendar > h-block:last-child button {
+    .fs-layout-calendar > div:last-child h-drill,
+    .fs-layout-calendar > div:last-child button {
       pointer-events: auto;
     }
 
