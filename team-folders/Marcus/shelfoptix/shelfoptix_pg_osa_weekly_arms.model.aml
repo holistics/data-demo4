@@ -1,0 +1,76 @@
+// P&G RetailFocus — same weekly availability counts, split by test/control arm.
+//
+// arm values (from the customer export):
+//   TREATED_PRE   treated stores, before the service started
+//   TREATED_POST  the same stores, after it started
+//   UNTREATED     matched control stores
+// pair_count is the number of matched store-SKU pairs behind each week, which is how
+// they keep the comparison like-for-like.
+//
+// This is a SEPARATE population from shelfoptix_pg_osa_weekly (30-166 stores per arm
+// vs ~278 overall), so the two models are intentionally not related to each other.
+Model shelfoptix_pg_osa_weekly_arms {
+  type: 'table'
+  label: 'PG OSA Weekly by Arm'
+  description: 'Weekly on-shelf availability counts for the P&G RetailFocus programme, split by treated/control arm.'
+  data_source_name: 'demo_bigquery'
+
+  dimension week_date {
+    label: 'Week'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.week_date }};;
+  }
+  dimension arm {
+    label: 'Arm'
+    description: 'TREATED_PRE, TREATED_POST or UNTREATED.'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.arm }};;
+  }
+  dimension observed_ct {
+    label: 'Observed Facings'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.observed_ct }};;
+  }
+  dimension instock_ct {
+    label: 'In-Stock Facings'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.instock_ct }};;
+  }
+  dimension oos_ct {
+    label: 'OOS Facings'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.oos_ct }};;
+  }
+  dimension ghost_ct {
+    label: 'Ghost Facings'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ghost_ct }};;
+  }
+  dimension negoh_ct {
+    label: 'Negative On-Hand Facings'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.negoh_ct }};;
+  }
+  dimension store_count {
+    label: 'Stores Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_count }};;
+  }
+  dimension pair_count {
+    label: 'Matched Pairs'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.pair_count }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: 'shelfoptix_pg.pg_osa_weekly_arms'
+}

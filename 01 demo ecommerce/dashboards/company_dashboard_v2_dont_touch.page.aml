@@ -2523,6 +2523,130 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       }
     }
   }
+  block v_41e2: VizBlock {
+    label: 'Users Sign Up Over Time copy'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      calculation cumulative_total_users {
+        label: 'Cumulative of total users'
+        formula: @aql total_users | running_total();;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_cumulative_users {
+        label: 'Total Cumulative Users'
+        formula: @aql running_total(total_users, keep_filters: false);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_users.sign_up_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          axis_min: 0
+          show_data_label_by: 'value'
+          hidden: true
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_users)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#05264C'
+          }
+        }
+      }
+      y_axis {
+        settings {
+          alignment: 'right'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'cumulative_total_users'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        legend_label: 'hidden'
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_4uad: VizBlock {
+    label: 'Total Users copy'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      theme {
+        metric_kpi {
+          label {
+            font_color: '#05264c'
+            font_size: 18
+          }
+          value {
+            font_color: '#05264C'
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: 'Total Users'
+        ref: r(demo_ecommerce_version_2.total_users)
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_users.sign_up_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'quarter'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark_2_2a24b81
+  }
+  block t_pyqe: TextBlock {
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="#05264c" opacity="0.4"/><ellipse cx="16" cy="17" fill="#05264c" opacity="0.4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="#05264c"/><ellipse cx="9.001" cy="17.001" fill="#05264c" rx="7" ry="4"/></svg>;;
+  }
+  block t_m0xo: block_ha_card()
+  block t_3mrm: block_ha_info_icon_only('Explore user signups over time', " <h4>Drill Down for Deeper Insights</h4>   <p>     Right-click any bar to drill into dimensions such as <strong>Gender</strong>, <strong>Age Group</strong>,      <strong>Country</strong>, and more. This helps you identify which segments contributed most to user growth     during a specific period.   </p>    <h4>Cross Filter</h4>   <p>     Click any bar to view the filtered demographic details on the right. This allows you to instantly compare      trends and understand how different segments interact within your data.   </p>    <h4>View Underlying Data</h4>   <p>Whether you're on the main chart or in a drilled-down view:</p>   <ul>     <li>       Click <strong>View Underlying Data</strong> to see the exact list of users who signed up.     </li>     <li>       Filter or export this raw data to investigate anomalies, evaluate campaign performance,        or follow up with specific user cohorts.     </li>   </ul>", 'Pro tip • Last updated: Oct 2025', 'right', 'info')
   view: TabLayout {
     label: 'View 1'
     tab tab_5dpo: CanvasLayout {
@@ -2905,11 +3029,30 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
     tab tab_1nwe: CanvasLayout {
       label: 'More'
       width: 1300
-      height: 800
+      height: 1140
       grid_size: 20
       auto_expand_vertically: true
       block v_938c {
         position: pos(20, 20, 620, 420)
+      }
+      block t_3mrm {
+        position: pos(1460, 400, 40, 40)
+        layer: 15
+      }
+      block t_m0xo {
+        position: pos(300, 500, 500, 480)
+      }
+      block t_pyqe {
+        position: pos(320, 520, 40, 40)
+        layer: 1
+      }
+      block v_41e2 {
+        position: pos(320, 520, 460, 440)
+        layer: 1
+      }
+      block v_4uad {
+        position: pos(320, 560, 220, 120)
+        layer: 2
       }
       mobile {
         mode: 'auto'
@@ -2921,7 +3064,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v34'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2930,7 +3077,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v37'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2939,7 +3090,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'f2'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2948,7 +3103,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'f3'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2957,7 +3116,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'f4'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2966,7 +3129,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v44'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2975,7 +3142,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v52a'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2984,7 +3155,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v53a'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -2993,7 +3168,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_5ty3'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3002,7 +3181,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_hkuz'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3011,7 +3194,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_co2u'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3020,7 +3207,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_mwo5'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3029,7 +3220,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_7wqj'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3038,7 +3233,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_80yo'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3047,7 +3246,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_mz6i'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3056,7 +3259,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_vs7p'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3065,7 +3272,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_mb64'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3074,7 +3285,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_xvgb'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3083,7 +3298,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_3dy9'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3092,7 +3311,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'f_xzr7'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3101,7 +3324,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'f_29w2'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3110,7 +3337,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_mfrz'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3119,7 +3350,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_wtl8'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3128,7 +3363,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_68gi'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3137,7 +3376,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_530w'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3146,7 +3389,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'v_kp1e'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3155,7 +3402,11 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
       from: 'f_lmkf'
       to: [
         CustomMapping {
-          block: 'v_hrkv'
+          block: [
+            'v_hrkv',
+            'v_41e2',
+            'v_4uad'
+          ]
           disabled: true
         }
       ]
@@ -3185,7 +3436,73 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
             'v_wtl8',
             'v_68gi',
             'v_530w',
-            'v_kp1e'
+            'v_kp1e',
+            'v_41e2',
+            'v_4uad'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_41e2'
+      to: [
+        CustomMapping {
+          block: [
+            'v34',
+            'v37',
+            'v44',
+            'v52a',
+            'v53a',
+            'v_5ty3',
+            'v_hkuz',
+            'v_co2u',
+            'v_mwo5',
+            'v_7wqj',
+            'v_80yo',
+            'v_mz6i',
+            'v_vs7p',
+            'v_mb64',
+            'v_xvgb',
+            'v_3dy9',
+            'v_mfrz',
+            'v_wtl8',
+            'v_68gi',
+            'v_530w',
+            'v_kp1e',
+            'v_hrkv'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_4uad'
+      to: [
+        CustomMapping {
+          block: [
+            'v34',
+            'v37',
+            'v44',
+            'v52a',
+            'v53a',
+            'v_5ty3',
+            'v_hkuz',
+            'v_co2u',
+            'v_mwo5',
+            'v_7wqj',
+            'v_80yo',
+            'v_mz6i',
+            'v_vs7p',
+            'v_mb64',
+            'v_xvgb',
+            'v_3dy9',
+            'v_mfrz',
+            'v_wtl8',
+            'v_68gi',
+            'v_530w',
+            'v_kp1e',
+            'v_hrkv'
           ]
           disabled: true
         }

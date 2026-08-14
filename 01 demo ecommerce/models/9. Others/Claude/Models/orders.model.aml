@@ -1,5 +1,4 @@
-@tag('Endorsed')
-Model ecommerce_orders {
+Model ecommerce_orders_copy {
   type: 'table'
   label: 'Orders'
   description: ''
@@ -11,59 +10,63 @@ Model ecommerce_orders {
   dimension id {
     label: 'Id'
     type: 'number'
-    description: 'Unique identifier for each order'
+    description: ''
     hidden: false
-    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
   }
   dimension status {
     label: 'Status'
     type: 'text'
+    description: ""
+    hidden: false
     definition: @sql {{ #SOURCE.status }};;
-    description: "Delivered / Refunded / Canceled"
+    primary_key: false
   }
   dimension created_at {
     label: 'Created At'
     type: 'datetime'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.created_at }};;
-  }
-  dimension created_at_fy {
-    label: 'Created At FY'
-    type: 'datetime'
-    hidden: false
-    definition: @aql ecommerce_orders.created_at + interval(3 month);;
+    primary_key: false
   }
   dimension user_id {
     label: 'User Id'
     type: 'number'
-    description: 'Reference to the user who placed the order'
+    description: '   '
     hidden: true
     definition: @sql {{ #SOURCE.user_id }};;
+    primary_key: false
   }
   dimension discount {
     label: 'Discount'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.discount }};;
+    primary_key: false
   }
   dimension delivery_attempts {
     label: 'Delivery Attempts'
     type: 'number'
+    description: "   "
     hidden: false
     definition: @sql {{ #SOURCE.delivery_attempts }};;
+    primary_key: false
   }
   dimension created_date {
     label: 'Created Date'
     type: 'date'
-    definition: @sql {{ #SOURCE.created_at }}::date;;
-    description: "Date-stamp of the order when it was created"
+    description: ""
     hidden: true
+    definition: @sql {{ #SOURCE.created_at }}::date;;
+    primary_key: false
   }
   dimension applied_promo_codes {
     label: 'Applied Promo Codes'
     type: 'text'
-    description: "The **applied_promo_codes** field contains the promotional codes used on each order.  \nIt records one or multiple promo codes applied to the order, enclosed in braces and separated by commas.  \nThis helps analyze the impact of discounts and promotions on sales and customer behavior.  \nExamples include `{FLASHSALE}`, `{FREESHIP}`, `{PROMO10,FLASHSALE}`, and `{WELCOME,PROMO10,FREESHIP,STACK5}`."
+    description: ""
     hidden: false
     definition: @sql {{ #SOURCE.applied_promo_codes }}::text;;
     primary_key: false
@@ -71,13 +74,15 @@ Model ecommerce_orders {
   dimension order_month {
     label: "Order Month"
     type: "text"
+    description: ""
+    hidden: false
     definition: @sql LPAD((DATE_PART('month', {{ created_at }}))::text, 2, '0') || ' ' || TO_CHAR({{ created_at }}, 'Month');;
-    description: "Month created of order"
+    primary_key: false
   }
   measure cumm_orders {
     label: 'Cumulative Orders'
     type: 'number'
-    description: "The cumulative total of orders."
+    description: ""
     hidden: true
     definition: @aql running_total(ecommerce_orders.total_order, ecommerce_orders.order_month) ;;
     aggregation_type: "custom"
@@ -85,41 +90,51 @@ Model ecommerce_orders {
   measure delivered_orders_count {
     label: "Delivered Orders Count"
     type: "number"
+    description: ""
+    hidden: false
     definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'delivered');;
-    description: "The total number of orders we delivered this period."
+    aggregation_type: "custom"
   }
   measure cancelled_orders_count {
     label: 'Cancelled Orders Count'
     type: 'number'
+    description: ""
+    hidden: false
     definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'cancelled');;
-    description: "The total number of orders we canceled this period."
+    aggregation_type: "custom"
   }
   measure refunded_orders_count {
     label: 'Refunded Orders Count'
     type: 'number'
+    description: ""
+    hidden: false
     definition: @aql count_distinct(ecommerce_orders.id) | where(ecommerce_orders.status == 'refunded');;
-    description: "The total number of orders we refunded this period."
+    aggregation_type: "custom"
   }
   measure total_order {
     label: "Total Orders Count"
     type: "number"
+    description: ""
+    hidden: false
     definition: @aql count(ecommerce_orders.id);;
-    description: "The total number of orders"
+    aggregation_type: "custom"
   }
   measure total_orders_count {
     label: "Total Orders Count"
     type: "number"
-    description: "**Total number of orders recorded in the system.**  \nThis field counts every order entry regardless of status or other attributes.  \nFor example, if there are 150 orders placed by customers, this value will be 150."
+    description: ""
     hidden: true
     definition: @aql count(ecommerce_orders.id);;
+    aggregation_type: "custom"
   }
 
   measure first_order_date {
     label: "First Order Date"
     type: "datetime"
-    description: "The date and time when the very first order was placed in the system.  \nThis field helps identify the starting point of order activity for analysis of user acquisition and sales trends.  \nFor example, if the earliest order was placed on `2022-01-15 10:30:00`, this value will reflect that timestamp."
+    description: ""
     hidden: false
     definition: @aql min(ecommerce_orders.created_at) ;;
+    aggregation_type: "custom"
   }
 
   measure days_since_last_order {

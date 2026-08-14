@@ -1,0 +1,31 @@
+Model ecommerce_order_items_copy {
+  type: 'table'
+  label: 'Order Items'
+  description: ''
+  data_source_name: 'demodb'
+  dimension order_id {
+    label: 'Order Id'
+    type: 'number'
+    description: ""
+    hidden: false
+    definition: @sql {{ #SOURCE.order_id }};;
+    primary_key: false
+  }
+  dimension product_id {
+    label: 'Product Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    description: "   "
+    hidden: false
+    definition: @sql {{ #SOURCE.quantity }};;
+    primary_key: false
+  }
+
+  owner: 'vincent+demo4@holistics.io'
+  table_name: '"ecommerce"."order_items"'
+}
