@@ -283,7 +283,7 @@ Dashboard company_dashboard_v2 {
       field: r(ecommerce_countries.name)
     }
     default {
-      operator: 'contains'
+      operator: 'is'
       value: '$H_NIL$'
     }
   }
