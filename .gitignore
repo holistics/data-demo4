@@ -8,3 +8,6 @@
 *.Report/
 *.SemanticModel/
 .pbi/
+
+# FanServ source extract is already imported into the demo4 warehouse.
+clients/fanserv/game-calendar/data/gamedata.csv
