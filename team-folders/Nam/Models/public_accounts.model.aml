@@ -1,0 +1,72 @@
+Model public_accounts {
+  type: 'table'
+  label: 'Accounts'
+  description: 'Delinquent accounts placed with the agency for collection. This is the central fact-like model of the SCSI demo: one row per placed account, linked to the client that placed it and the collector working it. Payments and contact attempts both fan out from here.'
+  data_source_name: 'demo_scsi_nam'
+
+  dimension account_id {
+    label: 'Account Id'
+    type: 'number'
+    description: "The **Account Id** uniquely identifies each placed account.  \nIt is the primary key of this model and the target of the `payments.account_id` and `contact_attempts.account_id` relationships.  \nExamples include `1`, `10`, `100`, `101`, and `102`."
+    hidden: false
+    definition: @sql {{ #SOURCE.account_id }};;
+    primary_key: true
+  }
+
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    description: "The **Client Id** identifies the creditor client that placed this account with the agency.  \nJoin to `public_clients` for client name and industry.  \nExamples include `1`, `2`, `3`, `4`, and `5`."
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+    primary_key: false
+  }
+
+  dimension collector_id {
+    label: 'Collector Id'
+    type: 'number'
+    description: "The **Collector Id** identifies the collection agent currently assigned to work this account.  \nJoin to `public_collectors` for agent name and team.  \nExamples include `3`, `5`, `6`, `8`, and `15`."
+    hidden: false
+    definition: @sql {{ #SOURCE.collector_id }};;
+    primary_key: false
+  }
+
+  dimension original_balance {
+    label: 'Original Balance'
+    type: 'number'
+    description: "The **Original Balance** is the amount owed at the moment the account was placed, before any payments or adjustments.  \nIt is the denominator for liquidation rate (payments collected ÷ original balance) and is fixed at placement — it does not decrease as the debtor pays.  \nExamples include `100.25`, `1010.50`, and `1320.10`."
+    hidden: false
+    definition: @sql {{ #SOURCE.original_balance }};;
+    primary_key: false
+  }
+
+  dimension placement_date {
+    label: 'Placement Date'
+    type: 'date'
+    description: "The **Placement Date** is the date the client assigned this account to the agency, marking the start of its collections lifecycle.  \nThis is the account's own date lens — use it for cohort and vintage analysis, and do not mix it with `payments.payment_date` in the same time series without saying which lens applies."
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_date }};;
+    primary_key: false
+  }
+
+  dimension account_status {
+    label: 'Account Status'
+    type: 'text'
+    description: "**Account Status** is the current stage of the account in the collections process.  \nObserved values are `New`, `Working`, `Payment Plan`, `Legal`, `Settled`, `Paid in Full`, and `Closed - No Recovery`.  \n`Paid in Full` and `Settled` are the recovered outcomes; `Closed - No Recovery` is the terminal write-off."
+    hidden: false
+    definition: @sql {{ #SOURCE.account_status }};;
+    primary_key: false
+  }
+
+  dimension aging_bucket {
+    label: 'Aging Bucket'
+    type: 'text'
+    description: "The **Aging Bucket** groups accounts by how long the balance has been outstanding.  \nObserved values are `0-30`, `31-60`, `61-90`, `91-180`, and `180+` days.  \nRecovery probability falls sharply as the bucket ages, so this is the standard prioritisation and risk cut.  \nIt is a text label, not a number — sort it explicitly rather than alphabetically, or `180+` will sort before `31-60`."
+    hidden: false
+    definition: @sql {{ #SOURCE.aging_bucket }};;
+    primary_key: false
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."accounts"'
+}

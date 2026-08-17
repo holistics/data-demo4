@@ -1,0 +1,823 @@
+Dashboard scsi_collections_analytics {
+  title: 'SCSI Collections Analytics'
+  description: '''Two-audience collections dashboard. Tab 1 gives the agency full portfolio and operations visibility. Tab 2 is the external client portal, showing the same mechanics scoped to a single client.'''
+  owner: 'nam.tran@holistics.io'
+
+  // ─────────────────────────── Filters ───────────────────────────
+
+  block f_placement_date: FilterBlock {
+    label: 'Placement Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_accounts.placement_date)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_client_name: FilterBlock {
+    label: 'Client'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_clients.client_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_collector_name: FilterBlock {
+    label: 'Collector'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_collectors.collector_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_account_status: FilterBlock {
+    label: 'Account Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_accounts.account_status)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_portal_date: FilterBlock {
+    label: 'Placement Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_accounts.placement_date)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  // ──────────────────── Tab 1 — text blocks ────────────────────
+
+  block t_internal_header: TextBlock {
+    content: @md
+# 🏢 Internal Portfolio & Operations
+
+Full agency visibility across every client, collector and account. Recovery performance, aging exposure, agent productivity and per-account collections activity.
+    ;;
+  }
+
+  block t_activity_header: TextBlock {
+    content: @md
+## Per-Account Collections Activity
+
+Every contact attempt made against each account, with the account's client, collector, status and aging context on the same row.
+    ;;
+  }
+
+  // ──────────────────── Tab 1 — visualizations ────────────────────
+
+  block v_recovery_by_client: VizBlock {
+    label: 'Recovery Rate by Client'
+    viz: DataTable {
+      dataset: scsi
+      calculation total_original_balance {
+        label: 'Total Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_payments_collected {
+        label: 'Total Payments Collected'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation recovery_rate {
+        label: 'Recovery Rate'
+        formula: @aql safe_divide(total_payments_collected, total_original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(public_clients.client_name)
+          label: 'Client'
+          format {
+            type: 'text'
+          }
+          uname: 'rbc_client_name'
+        },
+        VizFieldFull {
+          ref: 'total_original_balance'
+          label: 'Original Balance'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'rbc_original_balance'
+        },
+        VizFieldFull {
+          ref: 'total_payments_collected'
+          label: 'Collected'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'rbc_collected'
+        },
+        VizFieldFull {
+          ref: 'recovery_rate'
+          label: 'Recovery Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'rbc_recovery_rate'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        show_row_with_no_data: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'rbc_recovery_rate'
+            direction: 'desc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'rbc_client_name'
+            width: 200
+          },
+          ColumnStyle {
+            key: 'rbc_original_balance'
+            width: 160
+          },
+          ColumnStyle {
+            key: 'rbc_collected'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'rbc_recovery_rate'
+            width: 140
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_collector_leaderboard: VizBlock {
+    label: 'Collector Performance Leaderboard'
+    viz: DataTable {
+      dataset: scsi
+      calculation accounts_worked {
+        label: 'Accounts Worked'
+        formula: @aql public_accounts | count_distinct(public_accounts.account_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_amount_recovered {
+        label: 'Amount Recovered'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation collector_original_balance {
+        label: 'Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation collector_recovery_rate {
+        label: 'Recovery Rate'
+        formula: @aql safe_divide(total_amount_recovered, collector_original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(public_collectors.collector_name)
+          label: 'Collector'
+          format {
+            type: 'text'
+          }
+          uname: 'cl_collector_name'
+        },
+        VizFieldFull {
+          ref: r(public_collectors.team)
+          label: 'Team'
+          format {
+            type: 'text'
+          }
+          uname: 'cl_team'
+        },
+        VizFieldFull {
+          ref: 'accounts_worked'
+          label: 'Accounts Worked'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'cl_accounts_worked'
+        },
+        VizFieldFull {
+          ref: 'total_amount_recovered'
+          label: 'Amount Recovered'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'cl_recovered'
+        },
+        VizFieldFull {
+          ref: 'collector_recovery_rate'
+          label: 'Recovery Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'cl_recovery_rate'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        show_row_with_no_data: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'cl_recovery_rate'
+            direction: 'desc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'cl_collector_name'
+            width: 180
+          },
+          ColumnStyle {
+            key: 'cl_team'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'cl_accounts_worked'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'cl_recovered'
+            width: 160
+          },
+          ColumnStyle {
+            key: 'cl_recovery_rate'
+            width: 140
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_aging_bucket: VizBlock {
+    label: 'Aging Bucket Breakdown'
+    viz: BarChart {
+      dataset: scsi
+      calculation aging_original_balance {
+        label: 'Total Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Aging Bucket'
+        ref: r(public_accounts.aging_bucket)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Original Balance'
+            ref: 'aging_original_balance'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+          settings {
+            color: '#3478D4'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Aging Bucket'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block v_account_activity: VizBlock {
+    label: 'Account Collections Activity Detail'
+    viz: DataTable {
+      dataset: scsi
+      fields: [
+        VizFieldFull {
+          ref: r(public_accounts.account_id)
+          label: 'Account'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'aa_account_id'
+        },
+        VizFieldFull {
+          ref: r(public_clients.client_name)
+          label: 'Client'
+          format {
+            type: 'text'
+          }
+          uname: 'aa_client_name'
+        },
+        VizFieldFull {
+          ref: r(public_accounts.account_status)
+          label: 'Status'
+          format {
+            type: 'text'
+          }
+          uname: 'aa_status'
+        },
+        VizFieldFull {
+          ref: r(public_accounts.aging_bucket)
+          label: 'Aging'
+          format {
+            type: 'text'
+          }
+          uname: 'aa_aging'
+        },
+        VizFieldFull {
+          ref: r(public_collectors.collector_name)
+          label: 'Collector'
+          format {
+            type: 'text'
+          }
+          uname: 'aa_collector'
+        },
+        VizFieldFull {
+          ref: r(public_contact_attempts.attempt_date)
+          label: 'Attempt Date'
+          format {
+            type: 'date'
+            pattern: 'YYYY-MM-DD'
+          }
+          uname: 'aa_attempt_date'
+        },
+        VizFieldFull {
+          ref: r(public_contact_attempts.channel)
+          label: 'Channel'
+          format {
+            type: 'text'
+          }
+          uname: 'aa_channel'
+        },
+        VizFieldFull {
+          ref: r(public_contact_attempts.outcome)
+          label: 'Outcome'
+          format {
+            type: 'text'
+          }
+          uname: 'aa_outcome'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        show_row_with_no_data: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'aa_account_id'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'aa_attempt_date'
+            direction: 'desc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'aa_account_id'
+            width: 100
+          },
+          ColumnStyle {
+            key: 'aa_client_name'
+            width: 170
+          },
+          ColumnStyle {
+            key: 'aa_status'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'aa_aging'
+            width: 100
+          },
+          ColumnStyle {
+            key: 'aa_collector'
+            width: 160
+          },
+          ColumnStyle {
+            key: 'aa_attempt_date'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'aa_channel'
+            width: 120
+          },
+          ColumnStyle {
+            key: 'aa_outcome'
+            width: 160
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  // ──────────────────── Tab 2 — text blocks ────────────────────
+
+  block t_portal_header: TextBlock {
+    content: @md
+# 👤 Client Portal
+
+Your placed accounts and their recovery progress. This view is scoped to your own portfolio — you see only the accounts your organisation has placed with SCSI.
+    ;;
+  }
+
+  block t_portal_accounts_header: TextBlock {
+    content: @md
+## My Accounts
+
+Every account you have placed, with its current balance, status and aging bucket. Sortable and filterable.
+    ;;
+  }
+
+  // ──────────────────── Tab 2 — visualizations ────────────────────
+
+  block k_my_accounts: VizBlock {
+    label: 'Accounts Placed'
+    viz: MetricKpi {
+      dataset: scsi
+      calculation my_accounts_placed {
+        label: 'Accounts Placed'
+        formula: @aql public_accounts | count_distinct(public_accounts.account_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: ' '
+        ref: 'my_accounts_placed'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+    }
+  }
+
+  block k_my_recovered: VizBlock {
+    label: 'Amount Recovered'
+    viz: MetricKpi {
+      dataset: scsi
+      calculation my_amount_recovered {
+        label: 'Amount Recovered'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: ' '
+        ref: 'my_amount_recovered'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+    }
+  }
+
+  block k_my_recovery_rate: VizBlock {
+    label: 'Recovery Rate'
+    viz: MetricKpi {
+      dataset: scsi
+      calculation my_recovered_amt {
+        label: 'Recovered'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation my_placed_balance {
+        label: 'Placed Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation my_recovery_rate {
+        label: 'Recovery Rate'
+        formula: @aql safe_divide(my_recovered_amt, my_placed_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: ' '
+        ref: 'my_recovery_rate'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+    }
+  }
+
+  block v_my_accounts: VizBlock {
+    label: 'My Accounts'
+    viz: DataTable {
+      dataset: scsi
+      calculation account_balance {
+        label: 'Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation account_collected {
+        label: 'Collected'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(public_accounts.account_id)
+          label: 'Account'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'ma_account_id'
+        },
+        VizFieldFull {
+          ref: r(public_accounts.placement_date)
+          label: 'Placed On'
+          format {
+            type: 'date'
+            pattern: 'YYYY-MM-DD'
+          }
+          uname: 'ma_placement_date'
+        },
+        VizFieldFull {
+          ref: 'account_balance'
+          label: 'Original Balance'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'ma_balance'
+        },
+        VizFieldFull {
+          ref: 'account_collected'
+          label: 'Collected'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'ma_collected'
+        },
+        VizFieldFull {
+          ref: r(public_accounts.account_status)
+          label: 'Status'
+          format {
+            type: 'text'
+          }
+          uname: 'ma_status'
+        },
+        VizFieldFull {
+          ref: r(public_accounts.aging_bucket)
+          label: 'Aging Bucket'
+          format {
+            type: 'text'
+          }
+          uname: 'ma_aging'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        show_row_with_no_data: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'ma_placement_date'
+            direction: 'desc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'ma_account_id'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'ma_placement_date'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'ma_balance'
+            width: 170
+          },
+          ColumnStyle {
+            key: 'ma_collected'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'ma_status'
+            width: 160
+          },
+          ColumnStyle {
+            key: 'ma_aging'
+            width: 140
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_contact_activity: VizBlock {
+    label: 'Contact Activity by Channel & Outcome'
+    viz: PivotTable {
+      dataset: scsi
+      calculation attempt_count {
+        label: 'Attempts'
+        formula: @aql public_contact_attempts | count_distinct(public_contact_attempts.attempt_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      rows: [
+        VizFieldFull {
+          ref: r(public_contact_attempts.channel)
+          label: 'Channel'
+          format {
+            type: 'text'
+          }
+          uname: 'ca_channel'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(public_contact_attempts.outcome)
+          label: 'Outcome'
+          format {
+            type: 'text'
+          }
+          uname: 'ca_outcome'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: 'attempt_count'
+          label: 'Attempts'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+          uname: 'ca_attempts'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        pagination_size: 50
+        show_row_total: true
+        show_column_total: true
+        show_sub_total: false
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // ─────────────────────────── Layout ───────────────────────────
+
+  view: TabLayout {
+    tab internal_operations: CanvasLayout {
+      label: 'Internal Portfolio & Operations'
+      width: 1300
+      height: 1820
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block t_internal_header {
+        position: pos(20, 20, 1260, 140)
+      }
+      block f_placement_date {
+        position: pos(20, 180, 300, 100)
+      }
+      block f_client_name {
+        position: pos(340, 180, 300, 100)
+      }
+      block f_collector_name {
+        position: pos(660, 180, 300, 100)
+      }
+      block f_account_status {
+        position: pos(980, 180, 300, 100)
+      }
+      block v_recovery_by_client {
+        position: pos(20, 300, 620, 420)
+      }
+      block v_collector_leaderboard {
+        position: pos(660, 300, 620, 420)
+      }
+      block v_aging_bucket {
+        position: pos(20, 740, 1260, 400)
+      }
+      block t_activity_header {
+        position: pos(20, 1160, 1260, 100)
+      }
+      block v_account_activity {
+        position: pos(20, 1280, 1260, 520)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab client_portal: CanvasLayout {
+      label: 'Client Portal'
+      width: 1300
+      height: 1440
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block t_portal_header {
+        position: pos(20, 20, 1260, 140)
+      }
+      block f_portal_date {
+        position: pos(20, 180, 300, 100)
+      }
+      block k_my_accounts {
+        position: pos(20, 300, 400, 160)
+      }
+      block k_my_recovered {
+        position: pos(440, 300, 400, 160)
+      }
+      block k_my_recovery_rate {
+        position: pos(860, 300, 420, 160)
+      }
+      block t_portal_accounts_header {
+        position: pos(20, 480, 1260, 100)
+      }
+      block v_my_accounts {
+        position: pos(20, 600, 1260, 440)
+      }
+      block v_contact_activity {
+        position: pos(20, 1060, 1260, 360)
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+  theme: scsi_theme
+}

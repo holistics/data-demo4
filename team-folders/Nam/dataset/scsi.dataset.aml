@@ -1,0 +1,45 @@
+Dataset scsi {
+  label: 'SCSI Collections'
+  description: '''
+Debt-collections demo dataset for SCSI, built on the `demo_scsi_nam` data source.
+
+## What this dataset can answer
+- Recovery performance: amount collected, liquidation rate (payments ÷ original balance), and how both vary by client, industry, collector, team and aging bucket.
+- Portfolio composition: placed volume and balance by client, status and vintage.
+- Collections activity: contact attempt volume, channel mix and outcomes, and how activity relates to recovery.
+
+## Grain and joins
+`public_accounts` is the central model, at one row per placed account. `public_payments` and
+`public_contact_attempts` are both finer than that — an account can have many of each — so joining
+either one fans out account rows. Count `public_accounts.account_id` distinctly whenever those
+models are in the query.
+
+## Date lenses
+Three different dates mean three different things and must not be mixed silently:
+- `accounts.placement_date` — when the account entered collections (vintage/cohort lens)
+- `payments.payment_date` — when cash was received (recovery lens)
+- `contact_attempts.attempt_date` — when the agency worked the account (activity lens)
+
+Always state which lens a figure uses.
+
+## Caveats
+This is synthetic demo data. `original_balance` is fixed at placement and does not amortise, so
+remaining balance is not directly available — derive it as original balance minus payments received.
+'''
+  data_source_name: 'demo_scsi_nam'
+
+  models: [
+    public_accounts,
+    public_clients,
+    public_collectors,
+    public_contact_attempts,
+    public_payments
+  ]
+
+  relationships: [
+    relationship(public_accounts.client_id > public_clients.client_id, true),
+    relationship(public_accounts.collector_id > public_collectors.collector_id, true),
+    relationship(public_contact_attempts.account_id > public_accounts.account_id, true),
+    relationship(public_payments.account_id > public_accounts.account_id, true)
+  ]
+}
