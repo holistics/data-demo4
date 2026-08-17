@@ -34,8 +34,7 @@ Dataset demo_ecommerce {
     dim_dates,
     transform_order_items,
     ecommerce_product_images,
-    ecommerce_orders,
-    param_model_nam
+    ecommerce_orders
   ]
   dimension cohort_month {
     model: order_master
