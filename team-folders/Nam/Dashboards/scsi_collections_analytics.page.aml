@@ -2,9 +2,6 @@ Dashboard scsi_collections_analytics {
   title: 'SCSI Collections Analytics'
   description: '''Two-audience collections dashboard. Tab 1 gives the agency full portfolio and operations visibility. Tab 2 is the external client portal, showing the same mechanics scoped to a single client.'''
   owner: 'nam.tran@holistics.io'
-
-  // ─────────────────────────── Filters ───────────────────────────
-
   block f_placement_date: FilterBlock {
     label: 'Placement Date'
     type: 'field'
@@ -17,7 +14,6 @@ Dashboard scsi_collections_analytics {
       value: '$H_NIL$'
     }
   }
-
   block f_client_name: FilterBlock {
     label: 'Client'
     type: 'field'
@@ -30,7 +26,6 @@ Dashboard scsi_collections_analytics {
       value: '$H_NIL$'
     }
   }
-
   block f_collector_name: FilterBlock {
     label: 'Collector'
     type: 'field'
@@ -43,7 +38,6 @@ Dashboard scsi_collections_analytics {
       value: '$H_NIL$'
     }
   }
-
   block f_account_status: FilterBlock {
     label: 'Account Status'
     type: 'field'
@@ -56,7 +50,6 @@ Dashboard scsi_collections_analytics {
       value: '$H_NIL$'
     }
   }
-
   block f_portal_date: FilterBlock {
     label: 'Placement Date'
     type: 'field'
@@ -69,17 +62,11 @@ Dashboard scsi_collections_analytics {
       value: '$H_NIL$'
     }
   }
-
-  // ──────────────────── Tab 1 — text blocks ────────────────────
-
   block t_internal_header: TextBlock {
-    content: @md
-# 🏢 Internal Portfolio & Operations
+    content: @md # 🏢 SCSI - Internal Portfolio & Operations
 
-Full agency visibility across every client, collector and account. Recovery performance, aging exposure, agent productivity and per-account collections activity.
-    ;;
+Full agency visibility across every client, collector and account. Recovery performance, aging exposure, agent productivity and per-account collections activity.;;
   }
-
   block t_activity_header: TextBlock {
     content: @md
 ## Per-Account Collections Activity
@@ -87,9 +74,6 @@ Full agency visibility across every client, collector and account. Recovery perf
 Every contact attempt made against each account, with the account's client, collector, status and aging context on the same row.
     ;;
   }
-
-  // ──────────────────── Tab 1 — visualizations ────────────────────
-
   block v_recovery_by_client: VizBlock {
     label: 'Recovery Rate by Client'
     viz: DataTable {
@@ -183,7 +167,6 @@ Every contact attempt made against each account, with the account's client, coll
       }
     }
   }
-
   block v_collector_leaderboard: VizBlock {
     label: 'Collector Performance Leaderboard'
     viz: DataTable {
@@ -295,7 +278,6 @@ Every contact attempt made against each account, with the account's client, coll
       }
     }
   }
-
   block v_aging_bucket: VizBlock {
     label: 'Aging Bucket Breakdown'
     viz: BarChart {
@@ -471,9 +453,6 @@ Every contact attempt made against each account, with the account's client, coll
       }
     }
   }
-
-  // ──────────────────── Tab 2 — text blocks ────────────────────
-
   block t_portal_header: TextBlock {
     content: @md
 # 👤 Client Portal
@@ -481,7 +460,6 @@ Every contact attempt made against each account, with the account's client, coll
 Your placed accounts and their recovery progress. This view is scoped to your own portfolio — you see only the accounts your organisation has placed with SCSI.
     ;;
   }
-
   block t_portal_accounts_header: TextBlock {
     content: @md
 ## My Accounts
@@ -489,9 +467,6 @@ Your placed accounts and their recovery progress. This view is scoped to your ow
 Every account you have placed, with its current balance, status and aging bucket. Sortable and filterable.
     ;;
   }
-
-  // ──────────────────── Tab 2 — visualizations ────────────────────
-
   block k_my_accounts: VizBlock {
     label: 'Accounts Placed'
     viz: MetricKpi {
@@ -512,7 +487,6 @@ Every account you have placed, with its current balance, status and aging bucket
       }
     }
   }
-
   block k_my_recovered: VizBlock {
     label: 'Amount Recovered'
     viz: MetricKpi {
@@ -533,7 +507,6 @@ Every account you have placed, with its current balance, status and aging bucket
       }
     }
   }
-
   block k_my_recovery_rate: VizBlock {
     label: 'Recovery Rate'
     viz: MetricKpi {
@@ -566,7 +539,6 @@ Every account you have placed, with its current balance, status and aging bucket
       }
     }
   }
-
   block v_my_accounts: VizBlock {
     label: 'My Accounts'
     viz: DataTable {
@@ -679,7 +651,6 @@ Every account you have placed, with its current balance, status and aging bucket
       }
     }
   }
-
   block v_contact_activity: VizBlock {
     label: 'Contact Activity by Channel & Outcome'
     viz: PivotTable {
@@ -735,9 +706,6 @@ Every account you have placed, with its current balance, status and aging bucket
       }
     }
   }
-
-  // ─────────────────────────── Layout ───────────────────────────
-
   view: TabLayout {
     tab internal_operations: CanvasLayout {
       label: 'Internal Portfolio & Operations'
@@ -745,7 +713,6 @@ Every account you have placed, with its current balance, status and aging bucket
       height: 1820
       grid_size: 20
       auto_expand_vertically: true
-
       block t_internal_header {
         position: pos(20, 20, 1260, 140)
       }
@@ -776,19 +743,16 @@ Every account you have placed, with its current balance, status and aging bucket
       block v_account_activity {
         position: pos(20, 1280, 1260, 520)
       }
-
       mobile {
         mode: 'auto'
       }
     }
-
     tab client_portal: CanvasLayout {
       label: 'Client Portal'
       width: 1300
       height: 1440
       grid_size: 20
       auto_expand_vertically: true
-
       block t_portal_header {
         position: pos(20, 20, 1260, 140)
       }
@@ -813,7 +777,6 @@ Every account you have placed, with its current balance, status and aging bucket
       block v_contact_activity {
         position: pos(20, 1060, 1260, 360)
       }
-
       mobile {
         mode: 'auto'
       }
