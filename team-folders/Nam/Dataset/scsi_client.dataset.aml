@@ -8,7 +8,7 @@
 // Holistics evaluates row-level permission at the dataset level, and an embed token can
 // only supply VALUES to a permission the dataset already declares — it cannot create the
 // filter itself. So a single shared dataset carrying `client_scope` would restrict internal
-// staff too, and every internal non-Admin user would need `company_id` provisioned as the
+// staff too, and every internal non-Admin user would need `scsi_client_id` provisioned as the
 // "All" value type just to see their own agency's data. Anyone missed would silently get an
 // empty dashboard — no error, no signal.
 //
@@ -27,19 +27,8 @@ Dataset scsi_client = scsi.extend({
   // the accounts it placed with the agency. Rows are medical-debt PHI and the agency is a
   // HIPAA Business Associate of the placing provider.
   //
-  // DEMO-GRADE ATTRIBUTE — MUST CHANGE BEFORE ANY REAL PHI LANDS HERE.
-  // Scoped on `company_id` because that is what exists in this demo tenant today.
-  //
-  // `company_id` is ALREADY BOUND to Brainstorm APAC's company_access permission across
-  // three datasets (brainstorm_adoption, brainstorm_cases, brainstorm_speakup) on an
-  // unrelated id-space. A user provisioned for Brainstorm who reaches this dataset would
-  // silently resolve to a different organisation's rows — no error, no signal. That is
-  // acceptable for a controlled demo and NOT acceptable for production PHI.
-  //
-  // Production fix: create a dedicated `scsi_client_id` user attribute (Settings → User
-  // Attributes), then change `value:` below to 'scsi_client_id'. A dedicated attribute
-  // removes the cross-dataset collision and keeps "who was scoped to what, and why"
-  // answerable in a BAA audit.
+  // The dedicated `scsi_client_id` user attribute avoids colliding with the unrelated
+  // `company_id` id-space used by the Brainstorm APAC demo.
   //
   // Scoping on accounts (not clients) is deliberate: payments and contact_attempts inherit
   // the restriction through their joins to accounts, so no child row escapes it.
@@ -49,6 +38,6 @@ Dataset scsi_client = scsi.extend({
   permission client_scope {
     field: r(public_accounts.client_id)
     operator: 'matches_user_attribute'
-    value: 'company_id'
+    value: 'scsi_client_id'
   }
 })

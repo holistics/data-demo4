@@ -13,9 +13,8 @@
 //
 // ROW-LEVEL SECURITY:
 // Enforced by the `client_scope` permission on the `scsi_client` dataset (matches_user_attribute
-// on `company_id` — a demo-grade choice; see the dataset for the collision it carries and
-// the production fix). It is listed in `required_permissions` so the portal FAILS CLOSED:
-// a token that does not carry `company_id` is rejected outright, rather than falling
+// on the dedicated `scsi_client_id` attribute). It is listed in `required_permissions` so
+// the portal FAILS CLOSED: a token that does not carry `scsi_client_id` is rejected outright, rather than falling
 // through to every provider's medical-debt portfolio.
 //
 // The rows behind this portal are PHI. SCSI is a HIPAA Business Associate of the placing

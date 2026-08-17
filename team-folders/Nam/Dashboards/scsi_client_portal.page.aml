@@ -1,6 +1,6 @@
 // EXTERNAL dashboard — placing provider organisations only.
 // Reads `scsi_client` — the client-scoped dataset, whose client_scope permission restricts
-// rows by the `company_id` user attribute. Internal reporting reads the unscoped `scsi`
+// rows by the `scsi_client_id` user attribute. Internal reporting reads the unscoped `scsi`
 // dataset instead, so internal staff need no attribute provisioned. Contains no
 // collector-level, cross-client or agency-internal reporting: internal analytics live in
 // scsi_collections_analytics and are never exposed here. Rows are medical-debt PHI — treat any change to this file as a HIPAA-scope change.
