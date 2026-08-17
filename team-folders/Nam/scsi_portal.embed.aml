@@ -1,0 +1,41 @@
+// External client portal over the SCSI collections dataset.
+//
+// Row-level security is enforced by the `client_scope` permission on the `scsi` dataset
+// (matches_user_attribute on client_id), fed by the `client_id` user attribute in the
+// embed token. It is listed in `required_permissions` so the portal FAILS CLOSED: a token
+// that does not carry `client_id` is rejected rather than shown every client's portfolio.
+//
+// Internal staff are unaffected — RLS is not enforced for Admins or Analysts with data
+// source access, so the dashboard's internal tab keeps full agency visibility.
+EmbedPortal scsi_portal {
+  description: 'SCSI client portal — a creditor client sees only the accounts their own organisation placed, plus self-serve exploration and Ask AI over the same scoped data.'
+  objects: [
+    // Dashboards
+    scsi_collections_analytics,
+    // Datasets (self-serve exploration + AI)
+    scsi,
+  ]
+  required_permissions: [
+    scsi.permission.client_scope,
+  ]
+  initial_object: 'ai'
+  ai {
+    customization {
+      global {
+        assistant_name: 'SCSI Collections Assistant'
+      }
+      chat_page {
+        intro {
+          header: 'Ask about your placed accounts, recovery progress or collections activity.'
+          body: @md
+            ## 💰 Track recovery rate and amounts collected on your portfolio
+            ## 📂 Drill by account status, aging bucket or placement date
+            ## 📞 See the contact attempts made on your accounts
+            ## 📌 Save any insight to your dashboard
+          ;;
+        }
+        prompt_placeholder: 'e.g. What is my recovery rate by aging bucket this year?'
+      }
+    }
+  }
+}

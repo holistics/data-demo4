@@ -42,4 +42,16 @@ remaining balance is not directly available — derive it as original balance mi
     relationship(public_contact_attempts.account_id > public_accounts.account_id, true),
     relationship(public_payments.account_id > public_accounts.account_id, true)
   ]
+
+  // Row-level scoping for the external client portal: an embed user only sees the
+  // accounts their own organisation placed. Fed by the `client_id` user attribute in
+  // the embed token. Not enforced for Admins or Analysts with data source access, so
+  // the internal tab keeps full agency visibility.
+  // NOTE: requires a `client_id` user attribute to exist in Holistics admin, and
+  // RLS-as-code to be enabled for this tenant. Takes effect only after publishing.
+  permission client_scope {
+    field: r(public_accounts.client_id)
+    operator: 'matches_user_attribute'
+    value: 'client_id'
+  }
 }
