@@ -344,15 +344,14 @@ Every contact attempt made against each account, with the account's client, coll
       }
     }
   }
-
   block v_account_activity: VizBlock {
     label: 'Account Collections Activity Detail'
     viz: DataTable {
       dataset: scsi
       fields: [
         VizFieldFull {
-          ref: r(public_accounts.account_id)
           label: 'Account'
+          ref: r(public_accounts.account_id)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -360,57 +359,57 @@ Every contact attempt made against each account, with the account's client, coll
           uname: 'aa_account_id'
         },
         VizFieldFull {
-          ref: r(public_clients.client_name)
           label: 'Client'
+          ref: r(public_clients.client_name)
           format {
             type: 'text'
           }
           uname: 'aa_client_name'
         },
         VizFieldFull {
-          ref: r(public_accounts.account_status)
           label: 'Status'
+          ref: r(public_accounts.account_status)
           format {
             type: 'text'
           }
           uname: 'aa_status'
         },
         VizFieldFull {
-          ref: r(public_accounts.aging_bucket)
           label: 'Aging'
+          ref: r(public_accounts.aging_bucket)
           format {
             type: 'text'
           }
           uname: 'aa_aging'
         },
         VizFieldFull {
-          ref: r(public_collectors.collector_name)
           label: 'Collector'
+          ref: r(public_collectors.collector_name)
           format {
             type: 'text'
           }
           uname: 'aa_collector'
         },
         VizFieldFull {
-          ref: r(public_contact_attempts.attempt_date)
           label: 'Attempt Date'
+          ref: r(public_contact_attempts.attempt_date)
           format {
             type: 'date'
-            pattern: 'YYYY-MM-DD'
+            pattern: 'yyyy-LL-dd'
           }
           uname: 'aa_attempt_date'
         },
         VizFieldFull {
-          ref: r(public_contact_attempts.channel)
           label: 'Channel'
+          ref: r(public_contact_attempts.channel)
           format {
             type: 'text'
           }
           uname: 'aa_channel'
         },
         VizFieldFull {
-          ref: r(public_contact_attempts.outcome)
           label: 'Outcome'
+          ref: r(public_contact_attempts.outcome)
           format {
             type: 'text'
           }
@@ -419,20 +418,22 @@ Every contact attempt made against each account, with the account's client, coll
       ]
       settings {
         pagination_size: 100
-        show_row_number: false
         wrap_header_text: true
-        wrap_cell_text: false
-        show_row_with_no_data: false
         sorts: [
-          KeyBasedSortSetting {
+          SortSetting {
             key: 'aa_account_id'
             direction: 'asc'
           },
-          KeyBasedSortSetting {
+          SortSetting {
             key: 'aa_attempt_date'
             direction: 'desc'
           }
         ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
         column_styles: [
           ColumnStyle {
             key: 'aa_account_id'
@@ -467,7 +468,6 @@ Every contact attempt made against each account, with the account's client, coll
             width: 160
           }
         ]
-        single_cell_display: 'normal'
       }
     }
   }
