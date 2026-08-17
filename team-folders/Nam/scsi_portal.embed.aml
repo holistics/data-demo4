@@ -1,18 +1,25 @@
 // External client portal over the SCSI collections dataset.
 //
-// Row-level security is enforced by the `client_scope` permission on the `scsi` dataset
-// (matches_user_attribute on client_id), fed by the `client_id` user attribute in the
-// embed token. It is listed in `required_permissions` so the portal FAILS CLOSED: a token
-// that does not carry `client_id` is rejected rather than shown every client's portfolio.
+// SEPARATION OF INTERNAL AND EXTERNAL REPORTING:
+// This portal exposes ONLY scsi_client_portal. The internal dashboard
+// (scsi_collections_analytics) — collector leaderboards, cross-client recovery, agency
+// operations — is deliberately not listed here and is unreachable from the portal.
 //
-// Internal staff are unaffected — RLS is not enforced for Admins or Analysts with data
-// source access, so the dashboard's internal tab keeps full agency visibility.
+// ROW-LEVEL SECURITY:
+// Enforced by the `client_scope` permission on the `scsi` dataset (matches_user_attribute
+// on `company_id` — a demo-grade choice; see the dataset for the collision it carries and
+// the production fix). It is listed in `required_permissions` so the portal FAILS CLOSED:
+// a token that does not carry `company_id` is rejected outright, rather than falling
+// through to every provider's medical-debt portfolio.
+//
+// The rows behind this portal are PHI. SCSI is a HIPAA Business Associate of the placing
+// provider, so the embed token must carry the scoping attribute on every request.
 EmbedPortal scsi_portal {
   description: 'SCSI client portal — a creditor client sees only the accounts their own organisation placed, plus self-serve exploration and Ask AI over the same scoped data.'
   objects: [
-    // Dashboards
-    scsi_collections_analytics,
-    // Datasets (self-serve exploration + AI)
+    // Dashboards — external only
+    scsi_client_portal,
+    // Datasets (self-serve exploration + AI, row-scoped by client_scope)
     scsi,
   ]
   required_permissions: [

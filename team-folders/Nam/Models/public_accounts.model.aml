@@ -1,3 +1,23 @@
+// COLUMN-LEVEL PERMISSION — PHI redaction.
+// SCSI collects medical debt, so debtor_state is a geographic identifier attached to a
+// person's care-derived debt. It is the only debtor-identifying column in this model.
+//
+// Gated on the `pii_access` user attribute (Number: 1 = may see PHI, 0 / unset = may not).
+// Anyone without it receives the literal '(redacted)' instead of the real value — the
+// column stays present and queryable, so dashboards and AI exploration do not break, but
+// the value never leaves the warehouse.
+//
+// This matters most for the embed portal: scsi_portal exposes the `scsi` dataset for
+// self-serve exploration and Ask AI, so an external provider user could otherwise reach
+// debtor_state directly even though no dashboard widget displays it. Row-level scoping
+// alone would not stop that — it limits WHICH rows, not WHICH columns.
+const debtor_state_pii =
+  if (H.current_user.pii_access != 1) {
+    '\'(redacted)\''
+  } else {
+    '{{ #SOURCE.debtor_state }}'
+  }
+
 Model public_accounts {
   type: 'table'
   label: 'Accounts'
@@ -28,6 +48,15 @@ Model public_accounts {
     description: "The **Collector Id** identifies the collection agent currently assigned to work this account.  \nJoin to `public_collectors` for agent name and team.  \nExamples include `3`, `5`, `6`, `8`, and `15`."
     hidden: false
     definition: @sql {{ #SOURCE.collector_id }};;
+    primary_key: false
+  }
+
+  dimension debtor_state {
+    label: 'Debtor State'
+    type: 'text'
+    description: "The **Debtor State** is the U.S. state abbreviation where the debtor is located.  \nExamples include `FL`, `TX`, `CA`, `NY`, and `NC`.  \n**PHI — column-level protected.** Because these are medical-debt accounts, this is a geographic identifier tied to a person's care-derived debt. Users without the `pii_access` attribute see `(redacted)` instead of the real value; see the `debtor_state_pii` const at the top of this file."
+    hidden: false
+    definition: @sql ${debtor_state_pii};;
     primary_key: false
   }
 
