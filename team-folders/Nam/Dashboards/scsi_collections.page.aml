@@ -1,0 +1,550 @@
+Dashboard scsi_collections {
+  title: 'SCSI Collections Performance'
+  description: '''Collections performance dashboard for client recovery, aging exposure, collector productivity, contact effectiveness, and monthly placement vs recovery trend.'''
+  owner: 'nam.tran@holistics.io'
+
+  block title: TextBlock {
+    content: @md
+# SCSI Collections Performance
+Monitor recovery by client, aging exposure, collector productivity, contact effectiveness, and recent placement vs recovery trend.
+    ;;
+  }
+
+  block f_placement_date: FilterBlock {
+    label: 'Placement Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_accounts.placement_date)
+    }
+  }
+
+  block f_client_name: FilterBlock {
+    label: 'Client Name'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_clients.client_name)
+    }
+  }
+
+  block f_collector_name: FilterBlock {
+    label: 'Collector Name'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: scsi
+      field: r(public_collectors.collector_name)
+    }
+  }
+
+  block v_recovery_by_client: VizBlock {
+    label: 'Recovery Rate by Client'
+    viz: DataTable {
+      dataset: scsi
+      calculation total_original_balance {
+        label: 'Total Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_payments_collected {
+        label: 'Total Payments Collected'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation recovery_rate {
+        label: 'Recovery Rate'
+        formula: @aql safe_divide(total_payments_collected, total_original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(public_clients.client_name)
+          label: 'Client Name'
+          format {
+            type: 'text'
+          }
+          uname: 'public_clients_client_name_1'
+        },
+        VizFieldFull {
+          ref: 'total_original_balance'
+          label: 'Total Original Balance'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'total_original_balance_1'
+        },
+        VizFieldFull {
+          ref: 'total_payments_collected'
+          label: 'Total Payments Collected'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'total_payments_collected_1'
+        },
+        VizFieldFull {
+          ref: 'recovery_rate'
+          label: 'Recovery Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'recovery_rate_1'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        show_row_with_no_data: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'recovery_rate_1'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'public_clients_client_name_1'
+            direction: 'asc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'public_clients_client_name_1'
+            width: 220
+          },
+          ColumnStyle {
+            key: 'total_original_balance_1'
+            width: 180
+          },
+          ColumnStyle {
+            key: 'total_payments_collected_1'
+            width: 190
+          },
+          ColumnStyle {
+            key: 'recovery_rate_1'
+            width: 140
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_aging_bucket: VizBlock {
+    label: 'Aging Bucket Breakdown'
+    viz: BarChart {
+      dataset: scsi
+      calculation total_original_balance {
+        label: 'Total Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(public_accounts.aging_bucket)
+        label: 'Aging Bucket'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: 'total_original_balance'
+            label: 'Total Original Balance'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Aging Bucket'
+        row_limit: 100
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_collector_leaderboard: VizBlock {
+    label: 'Collector Performance Leaderboard'
+    viz: DataTable {
+      dataset: scsi
+      calculation accounts_worked {
+        label: 'Accounts Worked'
+        formula: @aql public_accounts | count_distinct(public_accounts.account_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_amount_recovered {
+        label: 'Total Amount Recovered'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_original_balance {
+        label: 'Total Original Balance'
+        formula: @aql public_accounts | sum(public_accounts.original_balance);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation recovery_rate {
+        label: 'Recovery Rate'
+        formula: @aql total_amount_recovered * 1.0 / total_original_balance;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(public_collectors.collector_name)
+          label: 'Collector Name'
+          format {
+            type: 'text'
+          }
+          uname: 'public_collectors_collector_name_1'
+        },
+        VizFieldFull {
+          ref: 'accounts_worked'
+          label: 'Accounts Worked'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'accounts_worked_1'
+        },
+        VizFieldFull {
+          ref: 'total_amount_recovered'
+          label: 'Total Amount Recovered'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'total_amount_recovered_1'
+        },
+        VizFieldFull {
+          ref: 'recovery_rate'
+          label: 'Recovery Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'recovery_rate_1'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        show_row_with_no_data: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'recovery_rate_1'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'public_collectors_collector_name_1'
+            direction: 'asc'
+          }
+        ]
+        single_cell_display: 'normal'
+        frozen_columns: 1
+        column_styles: [
+          ColumnStyle {
+            key: 'public_collectors_collector_name_1'
+            width: 220
+          },
+          ColumnStyle {
+            key: 'accounts_worked_1'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'total_amount_recovered_1'
+            width: 190
+          },
+          ColumnStyle {
+            key: 'recovery_rate_1'
+            width: 140
+          }
+        ]
+      }
+    }
+  }
+
+  block v_contact_effectiveness: VizBlock {
+    label: 'Contact Effectiveness by Channel'
+    viz: DataTable {
+      dataset: scsi
+      calculation attempt_count {
+        label: 'Attempt Count'
+        formula: @aql public_contact_attempts | count(public_contact_attempts.attempt_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation promise_to_pay_attempt_count {
+        label: 'Promise To Pay Attempt Count'
+        formula: @aql attempt_count | where(public_contact_attempts.outcome == 'Contacted - Promise to Pay');;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_attempt_count_by_channel {
+        label: 'Total Attempt Count By Channel'
+        formula: @aql attempt_count | exclude_grains(public_contact_attempts.outcome);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation promise_to_pay_rate_by_channel {
+        label: 'Promise To Pay Rate By Channel'
+        formula: @aql safe_divide(promise_to_pay_attempt_count * 1.0, total_attempt_count_by_channel);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(public_contact_attempts.channel)
+          label: 'Channel'
+          format {
+            type: 'text'
+          }
+          uname: 'public_contact_attempts_channel_1'
+        },
+        VizFieldFull {
+          ref: r(public_contact_attempts.outcome)
+          label: 'Outcome'
+          format {
+            type: 'text'
+          }
+          uname: 'public_contact_attempts_outcome_1'
+        },
+        VizFieldFull {
+          ref: 'attempt_count'
+          label: 'Attempt Count'
+          format {
+            type: 'number'
+            pattern: '#,###'
+          }
+          uname: 'custom_attempt_count_1'
+        },
+        VizFieldFull {
+          ref: 'promise_to_pay_rate_by_channel'
+          label: 'Promise-to-Pay Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'custom_promise_to_pay_rate_by_channel_1'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: true
+        show_row_with_no_data: false
+        single_cell_display: 'normal'
+        frozen_columns: 2
+        column_styles: [
+          ColumnStyle {
+            key: 'public_contact_attempts_channel_1'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'public_contact_attempts_outcome_1'
+            width: 280
+          },
+          ColumnStyle {
+            key: 'custom_attempt_count_1'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'custom_promise_to_pay_rate_by_channel_1'
+            width: 170
+          }
+        ]
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'public_contact_attempts_channel_1'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'custom_attempt_count_1'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'public_contact_attempts_outcome_1'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block v_monthly_trend: VizBlock {
+    label: 'Monthly Placement & Recovery Trend'
+    viz: LineChart {
+      dataset: scsi
+      calculation accounts_placed {
+        label: 'Accounts Placed'
+        formula: @aql public_accounts | count_distinct(public_accounts.account_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation payments_received {
+        label: 'Payments Received'
+        formula: @aql public_payments | sum(public_payments.payment_amount);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation payments_received_same_month {
+        label: 'Payments Received'
+        formula: @aql payments_received | relative_period(public_payments.payment_date, interval(0 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      filter {
+        field: r(public_accounts.placement_date)
+        operator: 'matches'
+        value: '11 months ago - this month'
+      }
+      x_axis: VizFieldFull {
+        label: 'Placement Month'
+        ref: r(public_accounts.placement_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+        uname: 'datetrunc_month_placement_date_1'
+      }
+      y_axis {
+        label: 'Accounts Placed'
+        series {
+          field: VizFieldFull {
+            label: 'Accounts Placed'
+            ref: 'accounts_placed'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#4593ff'
+          }
+        }
+      }
+      y_axis {
+        label: 'Payments Received'
+        settings {
+          alignment: 'right'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Payments Received'
+            ref: 'payments_received_same_month'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Accounts Placed'
+            ref: 'accounts_placed'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        },
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Payments Received'
+            ref: 'payments_received_same_month'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        show_data_points: true
+        connect_discontinuous_points: false
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        legend_label: 'top'
+        x_axis_label: 'Placement Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 1760
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block title {
+      position: pos(20, 20, 1260, 100)
+    }
+
+    block f_placement_date {
+      position: pos(20, 140, 300, 100)
+    }
+
+    block f_client_name {
+      position: pos(340, 140, 300, 100)
+    }
+
+    block f_collector_name {
+      position: pos(660, 140, 300, 100)
+    }
+
+    block v_recovery_by_client {
+      position: pos(20, 260, 620, 420)
+    }
+
+    block v_collector_leaderboard {
+      position: pos(660, 260, 620, 420)
+    }
+
+    block v_aging_bucket {
+      position: pos(20, 700, 620, 360)
+    }
+
+    block v_contact_effectiveness {
+      position: pos(660, 700, 620, 360)
+    }
+
+    block v_monthly_trend {
+      position: pos(20, 1080, 1260, 520)
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: ai_1786932884589_3
+}

@@ -1,0 +1,18 @@
+Dataset scsi {
+  label: 'scsi'
+  description: ''
+  data_source_name: 'demo_scsi_nam'
+  models: [
+    public_accounts,
+    public_clients,
+    public_collectors,
+    public_contact_attempts,
+    public_payments
+  ]
+  relationships: [
+    relationship(public_accounts.client_id > public_clients.client_id, true),
+    relationship(public_accounts.collector_id > public_collectors.collector_id, true),
+    relationship(public_contact_attempts.account_id > public_accounts.account_id, true),
+    relationship(public_payments.account_id > public_accounts.account_id, true)
+  ]
+}

@@ -1,0 +1,40 @@
+Model public_payments {
+  type: 'table'
+  label: 'Payments'
+  description: ''
+  data_source_name: 'demo_scsi_nam'
+  dimension account_id {
+    label: 'Account Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.account_id }};;
+  }
+  dimension payment_date {
+    label: 'Payment Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_date }};;
+  }
+  dimension payment_amount {
+    label: 'Payment Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_amount }};;
+  }
+  dimension payment_method {
+    label: 'Payment Method'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_method }};;
+  }
+  dimension payment_id {
+    label: 'Payment Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."payments"'
+}
