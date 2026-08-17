@@ -82,6 +82,41 @@ every new or edited AML file. Client work stays inside `clients/<company>/` and 
 12. **Do not guess AML syntax.** Use `develop-amql` to author and `search-docs` for any feature
     question.
 
+13. **Show the derivation, not the verdict.** The output is a record of how each decision was
+    reached — candidates considered, the test applied, what was ruled out. A table of conclusions
+    with a "why" column is not that. See the next section; it is the difference between a document
+    a customer can argue with and one they have to take on faith.
+
+## The output is a derivation
+
+**This is the part agents get wrong, so read it before writing anything.**
+
+The deliverable is not "here is the model set". It is **"here is how you get from that query to
+this model set, and here is where you could reasonably disagree."** The customer is not buying
+models — they can generate models. They are buying the method, so they can do the next twelve
+queries themselves. On the Judi onboarding call the customer said it outright: *"this is the
+workflow I want to understand the best."*
+
+Three consequences for how you write:
+
+**Work each decision in front of the reader.** Every non-trivial placement gets its candidates
+listed, the test that discriminated between them, and the fact that would flip the answer. A
+decision presented without its alternatives cannot be checked, and an unflippable decision is
+indistinguishable from a guess.
+
+**Order by dependency, not by the SQL.** Do not walk the `SELECT` list top to bottom. The spine and
+the grain get decided first because every later decision rests on them; relationships come before
+metrics because a metric's home depends on which models exist. Number the decisions and let each
+one cite the earlier ones it depends on.
+
+**Name the pattern before choosing the placement.** "This is a latest-record-per-key dedup" is the
+move that makes the placement obvious and transferable. "This should be a query model" teaches
+nothing and does not generalise to the next query.
+
+Where a decision was easy, say so in one line and move on. Reserve the worked treatment for the
+ones that were genuinely contested — typically the grain, the joins that could be relationships or
+SQL, the filters that could be model-level or report-level, and anything demoted below the dataset.
+
 ## Procedure
 
 ### 1. Probe and scope
@@ -266,35 +301,80 @@ Report the actual result. Never claim a validation you did not run.
 **Grain:** {one row per …} · **Provenance:** {reused / profiled / declared / inferred / asserted}
 **Parity:** {verified / pending offline re-validation / blocked — inferred grain}
 
-## Summary
-{3–5 sentences: what now exists, what the report became, the biggest risk carried forward.}
+# Part 1 — Reading the query
 
-## Construct inventory
-| Construct | Where in the SQL | Home | Confidence | Why |
-{every construct. Nothing omitted. This table is the artifact the customer argues with,
-and every argument it enables is a scoped disagreement instead of "the numbers are wrong".}
+## What kind of query is this?
+{Answer four questions before touching anything, because they constrain every later decision.
+Does the outer query aggregate, or is it a flat detail extract? What is the spine — the one table
+every other join hangs off? What does one output row represent? How many of the output columns are
+derived rather than selected? State each answer and what it rules out.}
 
-## Dropped as report artifacts
-| Construct | Why it has no home |
+## Where are the seams?
+{A seam is where the grain changes or the source changes: each CTE, each derived table, each join,
+each group of expressions over one source. List them. This is the decomposition, and the rest of
+the document works one seam at a time.}
+
+| # | Seam | Source tables | Its grain | Why it exists in the SQL |
+
+## What has to be decided
+{Derive the open decisions from the seams and order them by dependency. This list is the table of
+contents for Part 2. Say explicitly which decisions the later ones rest on.}
+
+# Part 2 — Working the decisions
+
+{One block per decision, numbered, in dependency order. Cite earlier decisions by number.
+Easy ones get a single line: "D7 — bucketing CASE → model dimension. Row-level and reusable,
+catalog 3.2. Uncontested." Reserve the full block for genuinely contested calls.}
+
+## D{n} — {the question, phrased as a question}
+
+**The SQL**
+```sql
+{the minimal snippet that shows the construct}
+```
+
+**What it is:** {the pattern name and catalog reference. Naming it is what makes the decision
+transferable to the next query.}
+
+**Candidates**
+
+| Option | Argues for | Ruled out because |
+
+**Test applied:** {what actually discriminated — a profiling query, `validate_aql`, a doc, a
+question to a human, or "none available, decided on the rule". Say which.}
+
+**Decision:** {the choice, and the AML shape it produces}
+
+**Flips if:** {the single fact that would change this. A decision with no flip condition is a
+guess wearing a verdict's clothes.}
+
+# Part 3 — The model set that falls out
+
+## The graph
+{diagram, then the model list. This is a consequence of Part 2, not a proposal in its own right —
+every model here should be traceable to a numbered decision.}
+
+| Model | Type | From seam | One row is | Grain provenance | Decided in |
+
+| From | To | Key | Cardinality | Compound key? | Decided in |
+
+## Metrics and measures
+| Metric | Definition | Model measure? | From seam | Decided in |
+
+## The exploration
+{the AQL, and the column mapping from the original SELECT list}
+
+## Constructs with no home
+{dropped report artifacts, one line each on why nothing was lost}
+
+# Part 4 — What could be wrong
+
+## Assumptions, by blast radius
+{worst first. Each one: what was assumed, what it would break, and the check that resolves it.}
 
 ## AQL verification log
 | Construct | AQL attempted | validate_aql result | Outcome |
 {every demotion candidate from step 7. A demotion with no row here is not justified.}
-
-## Models built
-| Model | Type | Source table | One row is | Key | Grain provenance |
-
-## Relationships
-| From | To | Key | Cardinality | Aggregate side | Compound key? | Verdict source |
-
-## Dataset and metrics
-| Metric | Definition | Backed by model measure? | Source construct |
-
-## Exploration
-{the AQL, and the column mapping from the original SELECT list}
-
-## Assumptions to confirm
-{one concise line each, per rule 9. Anything that would change the numbers goes first.}
 
 ## Reframes noted, not applied
 {platform-native alternatives found and deliberately not built — row-level permissions instead of
@@ -313,6 +393,13 @@ tenant join keys, date drills instead of derived date parts. Scope stays: replac
 {improvements the original query could not do, surfaced by the intent round}
 ```
 
+**Brownfield variant.** Where an implementation already exists, the shape is the same — Parts 1 and
+2 are unchanged, because you still have to derive the right answer before you can say whether the
+existing one is right. Part 3 becomes "where the existing implementation lands against this", with
+each divergence citing the decision it contradicts. Do not lead with a findings table; a list of
+verdicts against someone's work, with no derivation attached, reads as an audit rather than as
+teaching, and the customer cannot tell which findings they are allowed to push back on.
+
 ## Handing off
 
 The conversion record is the deliverable, not the AML. It is what makes a review meeting a
@@ -327,6 +414,16 @@ this skill is the wrong entry point. Use `new-analytics-onboarding`.
 
 ## Anti-patterns
 
+- **Reporting the destination instead of the route.** A construct-inventory table with a one-line
+  "why" column is a verdict list. The customer cannot see which calls were close, cannot tell where
+  they are allowed to disagree, and learns nothing they can apply to their next query. Rule 13.
+- **Walking the `SELECT` list top to bottom.** Column order is not decision order. The grain and the
+  spine decide everything downstream and have to come first, whatever line they appear on.
+- **Choosing a placement without naming the pattern.** "This should be a query model" is untethered
+  and does not generalise. "This is a latest-record-per-key dedup, so it is a grain correction and
+  has to precede the model" transfers to every future query.
+- **Decisions with no flip condition.** If nothing could change your mind, you did not decide, you
+  assumed — and the reader has no way to tell the two apart.
 - **Wrapping the query in a query model and adding dimensions.** It validates, the numbers match,
   and it demonstrates that the modelling layer is optional. This is the failure the skill exists to
   prevent.
