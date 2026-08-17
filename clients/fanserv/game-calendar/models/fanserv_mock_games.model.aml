@@ -1,14 +1,25 @@
 Model fanserv_mock_games {
   type: 'query'
   label: 'FanServ Game Calendar Games'
-  description: 'One row per game in the fixed 42-day POC board, sourced from the imported FanServ game, league, and team CSV extracts.'
+  description: 'One row per game and calendar-board month, sourced from the imported FanServ game, league, and team CSV extracts.'
   data_source_name: 'demodb'
+
+  dimension board_game_id {
+    label: 'Board Game ID'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
 
   dimension game_id {
     label: 'Game ID'
     type: 'text'
-    primary_key: true
     hidden: true
+  }
+
+  dimension board_month_start {
+    label: 'Board Month Start'
+    type: 'date'
   }
 
   dimension game_date {
@@ -18,21 +29,21 @@ Model fanserv_mock_games {
 
   dimension board_grid_column {
     label: 'Board Grid Column'
-    description: 'Monday-start calendar column for the fixed July 2026 POC board.'
+    description: 'Monday-start calendar column for the selected board month.'
     type: 'number'
     hidden: true
   }
 
   dimension board_grid_row {
     label: 'Board Grid Row'
-    description: 'Calendar week row for the fixed July 2026 POC board.'
+    description: 'Calendar week row for the selected board month.'
     type: 'number'
     hidden: true
   }
 
   dimension detail_priority {
     label: 'Detail Priority'
-    description: 'Distance from the fixed POC today, 16 July 2026; used only to choose the default detail card.'
+    description: 'Distance from today; used only to choose the default detail card.'
     type: 'number'
     hidden: true
   }
@@ -193,7 +204,7 @@ Model fanserv_mock_games {
 
   dimension planning_phase {
     label: 'Planning Phase'
-    description: 'Past, today, or future relative to the fixed POC date; this is not an inventory or impression state.'
+    description: 'Past, today, or future relative to the current date; this is not an inventory or impression state.'
     type: 'text'
   }
 
@@ -288,9 +299,40 @@ Model fanserv_mock_games {
       join "dbt_khai"."holistics_fanserv_teams_3d44f_202607160945" as away_team
         on games.away_id = away_team.id
     )
+    , month_bounds as (
+      select
+        least(
+          date_trunc('month', min(game_date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as first_month
+        , greatest(
+          date_trunc('month', max(game_date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as last_month
+        , (current_timestamp at time zone 'America/Los_Angeles')::date as today_date
+      from source_games
+    )
+    , board_months as (
+      select
+        board_month_start::date
+        , (
+            board_month_start::date
+            - (extract(isodow from board_month_start)::integer - 1)
+          )::date as grid_start
+        , today_date
+      from month_bounds
+      cross join lateral generate_series(
+        first_month
+        , last_month
+        , interval '1 month'
+      ) as board_month_start
+    )
     , board_games as (
       select
         source_games.*
+        , board_months.board_month_start
+        , board_months.grid_start
+        , board_months.today_date
         , case
             when source_status = 'closed' then 'completed'
             when source_status = 'scheduled'
@@ -302,15 +344,18 @@ Model fanserv_mock_games {
             else 'unknown'
           end as status
       from source_games
-      where game_date between date '2026-06-29' and date '2026-08-09'
+      join board_months
+        on source_games.game_date between board_months.grid_start and board_months.grid_start + 41
     )
 
     select
-      game_id
+      to_char(board_month_start, 'YYYY-MM-DD') || '|' || game_id as board_game_id
+      , game_id
+      , board_month_start
       , game_date
       , extract(isodow from game_date)::integer as board_grid_column
-      , (floor((game_date - date '2026-06-29') / 7.0)::integer + 1) as board_grid_row
-      , abs(game_date - date '2026-07-16')::integer as detail_priority
+      , (floor((game_date - grid_start) / 7.0)::integer + 1) as board_grid_row
+      , abs(game_date - today_date)::integer as detail_priority
       , scheduled_start_at
       , to_char(scheduled_start_at at time zone 'America/Los_Angeles', 'HH24:MI') as scheduled_start_display
       , null::timestamp with time zone as scheduled_end_at
@@ -346,8 +391,8 @@ Model fanserv_mock_games {
       , case
           when status = 'completed' then 'past'
           when status in ('cancelled', 'postponed', 'unknown') then 'neutral'
-          when game_date = date '2026-07-16' then 'today'
-          when game_date > date '2026-07-16' then 'future'
+          when game_date = today_date then 'today'
+          when game_date > today_date then 'future'
           else 'past'
         end as planning_phase
       , case
@@ -355,8 +400,8 @@ Model fanserv_mock_games {
           when status = 'cancelled' then 'Cancelled · no planning claim'
           when status = 'postponed' then 'Postponed · schedule pending'
           when status = 'unknown' then 'Unknown source state'
-          when game_date < date '2026-07-16' then 'Past game · evidence context'
-          when game_date = date '2026-07-16' then 'Today · planning focus'
+          when game_date < today_date then 'Past game · evidence context'
+          when game_date = today_date then 'Today · planning focus'
           else 'Future game · opportunity context'
         end as planning_phase_label
       , away_team_code || ',' || home_team_code as team_codes

@@ -1,7 +1,7 @@
 Dataset fanserv_game_calendar_mock {
   __engine__: 'aql'
   label: 'FanServ Game Calendar'
-  description: 'CSV-backed POC dataset for the fixed 42-day month board, selected-day cards, persistent game detail, and exact participating-team filtering.'
+  description: 'CSV-backed POC dataset for month-selectable 42-day boards, game cards, persistent game detail, and exact participating-team filtering.'
   data_source_name: 'demodb'
 
   models: [
@@ -9,7 +9,7 @@ Dataset fanserv_game_calendar_mock {
     fanserv_game_team_bridge
   ]
   relationships: [
-    relationship(fanserv_game_team_bridge.game_id > fanserv_mock_games.game_id, true, 'two_way')
+    relationship(fanserv_game_team_bridge.board_game_id > fanserv_mock_games.board_game_id, true, 'two_way')
   ]
 
   metric day_game_order {

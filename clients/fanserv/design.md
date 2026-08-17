@@ -148,7 +148,7 @@ Evidence precedence is:
 2. FDS visual examples and lifecycle labels;
 3. the existing FanServ public-brand and Holistics implementation only where FDS is silent.
 
-The current `fanserv.theme.aml` predates this Figma-derived contract. It implements the darker Stadium demo with public-brand green `#009247`, live green `#00E66F`, and the Inter/Manrope stack. Keep those values for that existing dashboard until its theme is deliberately migrated; use the FDS application tokens for new product-like surfaces.
+The legacy `stadium/themes/fanserv.theme.aml` predates this Figma-derived contract. It implements the darker Stadium demo with public-brand green `#009247`, live green `#00E66F`, and the Inter/Manrope stack. Keep those values for that existing dashboard until its theme is deliberately migrated; use the FDS application tokens for new product-like surfaces.
 
 ## Colors
 
@@ -269,11 +269,11 @@ Use dark-green section headers with white text for design-system documentation. 
 
 ### Holistics implementation
 
-- Existing theme file: `clients/fanserv/fanserv.theme.aml`
+- Legacy theme file: `clients/fanserv/stadium/themes/fanserv.theme.aml`
 - Existing dark theme: `fanserv_stadium`
 - Existing light theme: `fanserv_stadium_light`
 - Existing chart palette: `fanserv_categorical_palette`
-- Existing Stadium dashboard: `clients/fanserv/fanserv_demo_dashboard.page.aml`
+- Legacy Stadium dashboard: `clients/fanserv/stadium/dashboards/fanserv_demo_dashboard.page.aml`
 - Game Calendar assets: `clients/fanserv/game-calendar/`
 
 The AML themes still implement the earlier Stadium visual identity. Do not claim FDS conformance until their colors, components, and typography have been deliberately mapped and visually verified.

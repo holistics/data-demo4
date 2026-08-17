@@ -1,7 +1,7 @@
 Dataset fanserv_game_calendar_days {
   __engine__: 'aql'
   label: 'FanServ Game Calendar — 42 Day Scaffold'
-  description: 'Fixed July 2026 date scaffold used to preserve every calendar cell independently of game filters.'
+  description: 'Month-selectable 42-day date scaffold used to preserve every calendar cell independently of game filters.'
   data_source_name: 'demodb'
 
   models: [

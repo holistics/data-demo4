@@ -1,5 +1,6 @@
 .claude/settings.local.json
 .envrc
+.amp/
 
 # Power BI project assets
 *.pbix

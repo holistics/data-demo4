@@ -19,7 +19,8 @@ Use sources only for the responsibility they own, in this order:
 1. FanServ's `FDS - Web Components` Figma file controls components and spacing.
 2. `../fanserv-season-board-design-contract.md` and the captured Texas Rangers
    GamePulse calendar control structure and information hierarchy.
-3. `../design.md` and `../fanserv.theme.aml` fill visual-token gaps.
+3. `../design.md` and the legacy `../stadium/themes/fanserv.theme.aml` fill
+   visual-token gaps.
 4. The World Cup dashboard supplies motion grammar, not interaction proof.
 5. This folder's CSV files, AML models/datasets, and `../gamepulse-data-contract.md`
    control data meaning and supported claims.
@@ -28,6 +29,8 @@ Use sources only for the responsibility they own, in this order:
 
 - Build the presentation layer with `HTMLLayout`; mount native filters and
   query-backed Dynamic Content with `<h-block>`.
+- Keep AML objects grouped by type: models in `models/`, datasets in `datasets/`,
+  dashboards in `dashboards/`, and any future standalone themes in `themes/`.
 - Select calendar games with `<h-drill row="0" value="{{ Game ID.raw }}">`, cross-filter
   detail blocks on the same Game ID field, and style selected cards with
   `.h-drill-selected`.
@@ -45,13 +48,18 @@ Use sources only for the responsibility they own, in this order:
 After every AML edit, run this from the repository root with the edited path:
 
 ```sh
-holistics aml validate clients/fanserv/game-calendar/<changed-file>.aml
+holistics aml validate clients/fanserv/game-calendar/<object-type>/<changed-file>.aml
 ```
 
 Before review, validate the complete FanServ AML surface together:
 
 ```sh
-holistics aml validate clients/fanserv/*.aml clients/fanserv/game-calendar/*.aml
+holistics aml validate \
+  clients/fanserv/stadium/themes/*.aml \
+  clients/fanserv/stadium/dashboards/*.aml \
+  clients/fanserv/game-calendar/models/*.aml \
+  clients/fanserv/game-calendar/datasets/*.aml \
+  clients/fanserv/game-calendar/dashboards/*.aml
 ```
 
 After validation and explicit sync authority, review the Development-branch dashboard

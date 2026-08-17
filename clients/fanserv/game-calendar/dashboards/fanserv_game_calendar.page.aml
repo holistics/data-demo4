@@ -1,11 +1,9 @@
 Dashboard fanserv_game_calendar {
   title: 'FanServ Game Calendar'
-  description: '''
-Development-only HTML Layout POC for a 42-day season board backed by imported FanServ CSV extracts.
-GamePulse is a directional score, not an impression forecast, and is shown as Not scored when absent.
-'''
+  description: @md Development-only HTML Layout POC for a 42-day season board backed by imported FanServ CSV extracts.
+GamePulse is a directional score, not an impression forecast, and is shown as Not scored when absent.;;
 
-  block calendar_header: TextBlock {
+  block calendar_header: VizBlock {
     theme: BlockTheme {
       background {
         bg_color: 'transparent'
@@ -18,7 +16,23 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
       padding: 0
       shadow: 'none'
     }
-    content: @md
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: fanserv_game_calendar_days
+      rows: [
+        VizFieldFull {
+          label: 'Board Month'
+          ref: r(fanserv_calendar_days.board_month_start)
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        }
+      ]
+      content: @md
 <style>
 .fs-gc-head { box-sizing:border-box; height:100%; display:grid; grid-template-columns:1.35fr .65fr; gap:32px;
   padding:26px 30px; border-radius:20px; overflow:hidden; color:#f7fffa;
@@ -34,10 +48,11 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 .fs-gc-key span { display:block; margin-top:3px; font-size:10px; line-height:1.35; color:rgba(247,255,250,.68); }
 @media (prefers-reduced-motion:reduce) { .fs-gc-head * { scroll-behavior:auto !important; } }
 </style>
+{% map(rows) %}
 <header class="fs-gc-head">
   <div>
     <div class="fs-gc-kicker">FanServ · planning surface · imported schedule</div>
-    <h1>Game Calendar <span aria-hidden="true">/</span> July 2026</h1>
+    <h1>Game Calendar <span aria-hidden="true">/</span> {{ `Board Month`.formatted }}</h1>
     <p>Scan the full 42-day board and narrow games with native filters. Use the Game filter to choose the persistent detail sheet. Source status is presented conservatively. GamePulse is directional, not an impression forecast, and remains Not scored when no evaluation was supplied.</p>
   </div>
   <div class="fs-gc-legend" aria-label="Calendar phase legend">
@@ -46,19 +61,21 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
     <div class="fs-gc-key" style="--key:#5be584"><i></i><b>Future</b><span>Opportunity context</span></div>
   </div>
 </header>
+{% end %}
 ;;
+    }
   }
 
-  block filter_date: FilterBlock {
-    label: 'Focus Date'
+  block filter_month: FilterBlock {
+    label: 'View Month'
     type: 'field'
     source: FieldFilterSource {
-      dataset: fanserv_game_calendar_mock
-      field: r(fanserv_mock_games.game_date)
+      dataset: fanserv_game_calendar_days
+      field: r(fanserv_calendar_days.board_month_start)
     }
     default {
-      operator: 'is'
-      value: '2026-07-16'
+      operator: 'matches'
+      value: 'this month'
     }
   }
 
@@ -121,6 +138,14 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
       dataset: fanserv_game_calendar_days
       rows: [
         VizFieldFull {
+          label: 'Board Month'
+          ref: r(fanserv_calendar_days.board_month_start)
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        },
+        VizFieldFull {
           label: 'Calendar Date'
           ref: r(fanserv_calendar_days.calendar_date)
           format {
@@ -166,7 +191,7 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 .fs-cal-date time { font-size:9px; color:#6c7f74; }
 .fs-cal-day.is-today .fs-cal-date::after { content:"Today"; padding:2px 6px; border-radius:999px; color:#fff; background:#005249; font-size:8px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
 </style>
-<div class="fs-cal-frame" aria-label="July 2026, Monday-start 42-day calendar">
+<div class="fs-cal-frame" aria-label="Selected month, Monday-start 42-day calendar">
   <div class="fs-cal-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
   <div class="fs-cal-days">
   {% map(rows) %}
@@ -326,19 +351,20 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
       content: @md
 <style>
 .fs-cal-overlay { box-sizing:border-box; height:100%; padding:50px 12px 12px; display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); grid-template-rows:repeat(6,minmax(0,1fr)); gap:8px; pointer-events:none; font-family:Inter,Manrope,system-ui,sans-serif; }
-.fs-cal-overlay h-drill { display:block; min-width:0; margin:34px 8px 7px; pointer-events:auto; animation:fs-board-deal .36s cubic-bezier(.25,1,.5,1) backwards; }
-.fs-cal-overlay h-drill.week-2 { animation-delay:40ms; }
-.fs-cal-overlay h-drill.week-3 { animation-delay:80ms; }
-.fs-cal-overlay h-drill.week-4 { animation-delay:120ms; }
-.fs-cal-overlay h-drill.week-5 { animation-delay:160ms; }
-.fs-cal-overlay h-drill.week-6 { animation-delay:200ms; }
+.fs-cal-overlay h-drill { display:block; min-width:0; margin:34px 8px 7px; pointer-events:auto; }
+.fs-cal-overlay h-drill:nth-child(-n+6) { animation:fs-board-deal .42s cubic-bezier(.2,.7,.3,1) backwards; }
+.fs-cal-overlay h-drill:nth-child(2) { animation-delay:40ms; }
+.fs-cal-overlay h-drill:nth-child(3) { animation-delay:80ms; }
+.fs-cal-overlay h-drill:nth-child(4) { animation-delay:120ms; }
+.fs-cal-overlay h-drill:nth-child(5) { animation-delay:160ms; }
+.fs-cal-overlay h-drill:nth-child(6) { animation-delay:200ms; }
 .fs-board-card { width:100%; min-width:0; height:72px; display:flex; flex-direction:column; justify-content:space-between; padding:8px 9px; border:1px solid #c6d8d0; border-left:4px solid #5be584; border-radius:9px; color:#12332e; background:#fff; box-shadow:0 8px 16px -14px rgba(0,82,73,.8); cursor:pointer; text-align:left; font:inherit; transform:translateY(0) scale(1); transition:transform .16s cubic-bezier(.25,1,.5,1),border-color .16s ease,box-shadow .16s ease; }
 .fs-board-card.past { border-left-color:#3366ff; }
 .fs-board-card.today { border-left-color:#005249; background:#f5fff8; }
-.fs-board-card:hover,.fs-board-card:focus-visible { transform:translateY(-2px) scale(1.01); border-color:#00ab55; box-shadow:0 12px 22px -15px rgba(0,82,73,.9); }
+.fs-board-card:hover,.fs-board-card:focus-visible { transform:translateY(-2px); border-color:#00ab55; box-shadow:0 12px 22px -15px rgba(0,82,73,.9); }
 .fs-board-card:focus-visible { outline:3px solid #c8facd; outline-offset:2px; }
 .fs-board-card:active { transform:translateY(0) scale(.985); }
-.h-drill-selected.fs-board-card { outline:3px solid #c8facd; outline-offset:2px; border-color:#005249; }
+.h-drill-selected.fs-board-card { border-color:#005249; box-shadow:inset 0 0 0 2px #005249,0 10px 20px -16px rgba(0,82,73,.9); }
 .fs-board-top,.fs-board-match,.fs-board-foot { display:flex; align-items:center; justify-content:space-between; gap:6px; min-width:0; }
 .fs-board-top { font-size:9px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#516a65; }
 .fs-board-match { justify-content:center; font-size:12px; font-weight:800; }
@@ -357,10 +383,10 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 .fs-overflow:focus-visible { outline:3px solid #d6e4ff; outline-offset:2px; }
 .fs-overflow:active { transform:translateY(0) scale(.985); }
 .fs-cal-overlay h-drill:not(.rank-1):not(.rank-2) { display:none; }
-@keyframes fs-board-deal { from { opacity:.68; transform:translateY(7px) scale(.992); } to { opacity:1; transform:none; } }
-@media (prefers-reduced-motion:reduce) { .fs-cal-overlay h-drill { animation:none; opacity:1; transform:none; } .fs-board-card,.fs-overflow { transition:none; transform:none; } }
+@keyframes fs-board-deal { from { opacity:.82; transform:translateY(12px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce) { .fs-cal-overlay h-drill,.fs-board-card,.fs-overflow { animation:none !important; transition:none !important; opacity:1 !important; transform:none !important; } }
 </style>
-<div class="fs-cal-overlay" aria-label="Filtered games on the July calendar">
+<div class="fs-cal-overlay" aria-label="Filtered games in the selected month">
 {% map(rows) %}
   <h-drill row="0" value="{{ `Game ID`.raw }}" class="rank-{{ values.`Day Order`.formatted }} week-{{ `Grid Row`.formatted }}" style="grid-column:{{ `Grid Column`.formatted }};grid-row:{{ `Grid Row`.formatted }};">
     <button type="button" class="fs-board-card {{ `Phase`.raw }}" aria-label="Select {{ `Matchup`.raw }} on {{ `Game Date`.formatted }} at {{ `Start`.formatted }}. {{ `Phase Label`.raw }}. GamePulse {{ `GamePulse`.formatted }}.">
@@ -399,7 +425,7 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
   }
 
   block focus_games: VizBlock {
-    label: 'Selected-day games'
+    label: 'Selected-month games'
     theme: BlockTheme {
       background {
         bg_color: '#ffffff'
@@ -510,11 +536,17 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 .fs-focus-head b { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#007b55; }
 .fs-focus-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding-top:14px; max-height:340px; overflow:auto; }
 .fs-focus-list h-drill { display:block; }
+.fs-focus-list h-drill:nth-child(-n+6) { animation:fs-focus-arrive .42s cubic-bezier(.2,.7,.3,1) backwards; }
+.fs-focus-list h-drill:nth-child(2) { animation-delay:40ms; }
+.fs-focus-list h-drill:nth-child(3) { animation-delay:80ms; }
+.fs-focus-list h-drill:nth-child(4) { animation-delay:120ms; }
+.fs-focus-list h-drill:nth-child(5) { animation-delay:160ms; }
+.fs-focus-list h-drill:nth-child(6) { animation-delay:200ms; }
 .fs-focus-card { width:100%; min-height:124px; padding:14px; border:1px solid #dcebe3; border-radius:12px; color:#12332e; background:#fbfdfc; text-align:left; cursor:pointer; font:inherit; transform:translateY(0) scale(1); transition:border-color .16s ease,transform .16s cubic-bezier(.25,1,.5,1),box-shadow .16s ease; }
-.fs-focus-card:hover,.fs-focus-card:focus-visible { transform:translateY(-2px) scale(1.005); border-color:#00ab55; box-shadow:0 12px 24px -20px rgba(0,82,73,.9); }
+.fs-focus-card:hover,.fs-focus-card:focus-visible { transform:translateY(-2px); border-color:#00ab55; box-shadow:0 12px 24px -20px rgba(0,82,73,.9); }
 .fs-focus-card:focus-visible { outline:3px solid #c8facd; outline-offset:2px; }
 .fs-focus-card:active { transform:translateY(0) scale(.99); }
-.h-drill-selected.fs-focus-card { border-color:#005249; outline:3px solid #c8facd; outline-offset:2px; }
+.h-drill-selected.fs-focus-card { border-color:#005249; box-shadow:inset 0 0 0 2px #005249,0 10px 20px -18px rgba(0,82,73,.9); }
 .fs-focus-meta,.fs-focus-team,.fs-focus-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .fs-focus-meta { font-size:10px; color:#516a65; }
 .fs-focus-state { padding:3px 7px; border-radius:999px; background:#eef4f1; font-size:9px; font-weight:800; text-transform:uppercase; }
@@ -527,10 +559,11 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 .fs-focus-team .score:empty::after { content:"—"; color:#8ba099; }
 .fs-focus-foot { margin-top:11px; padding-top:9px; border-top:1px solid #e4ece8; font-size:10px; color:#516a65; }
 .fs-focus-pulse { font-weight:800; color:#005249; }
-@media (prefers-reduced-motion:reduce) { .fs-focus-card { transition:none; transform:none; } }
+@keyframes fs-focus-arrive { from { opacity:.82; transform:translateY(12px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce) { .fs-focus-list h-drill,.fs-focus-card { animation:none !important; transition:none !important; opacity:1 !important; transform:none !important; } }
 </style>
 <div class="fs-focus" role="region" aria-labelledby="fs-focus-title">
-  <header class="fs-focus-head"><div><h2 id="fs-focus-title">Selected-day view</h2><p>The Focus Date filter is scoped here; league, team, and game filters also apply.</p></div><b>Game filter controls detail</b></header>
+  <header class="fs-focus-head"><div><h2 id="fs-focus-title">Selected-month games</h2><p>The View Month, league, team, and game filters apply here.</p></div><b>Game filter controls detail</b></header>
   <div class="fs-focus-list">
   {% map(rows) %}
   <h-drill row="0" value="{{ `Game ID`.raw }}">
@@ -840,15 +873,10 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
     }
 
     .fs-layout-detail {
-      min-block-size: 24rem;
       margin-block-start: 1rem;
-      overflow: hidden;
-      border: 1px solid var(--fs-layout-divider);
-      border-radius: .75rem;
-      background: var(--fs-layout-paper);
     }
 
-    .fs-layout-detail > h-block {
+    .fs-layout-detail > div.dac-html-layout-block {
       min-block-size: 24rem;
     }
 
@@ -864,13 +892,13 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
   </header>
 
   <section class="fs-layout-filters" aria-label="Game Calendar filters">
-    <div class="fs-layout-filter"><h-block name="filter_date" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_month" /></div>
     <div class="fs-layout-filter"><h-block name="filter_league" /></div>
     <div class="fs-layout-filter"><h-block name="filter_team" /></div>
     <div class="fs-layout-filter"><h-block name="filter_game" /></div>
   </section>
 
-  <section class="fs-layout-calendar" aria-label="July 2026 game calendar">
+  <section class="fs-layout-calendar" aria-label="Selected month game calendar">
     <h-block name="calendar_scaffold" />
     <h-block name="calendar_games" />
   </section>
@@ -884,19 +912,22 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
 
   interactions: [
     FilterInteraction {
-      from: 'filter_date'
+      from: 'filter_month'
       to: [
         CustomMapping {
-          block: 'focus_games'
-          field: r(fanserv_mock_games.game_date)
+          block: [
+            'calendar_games',
+            'focus_games',
+            'game_detail'
+          ]
+          field: r(fanserv_mock_games.board_month_start)
         },
         CustomMapping {
           block: [
-            'calendar_scaffold',
-            'calendar_games',
-            'game_detail'
+            'calendar_header',
+            'calendar_scaffold'
           ]
-          disabled: true
+          field: r(fanserv_calendar_days.board_month_start)
         }
       ]
     },
@@ -952,10 +983,10 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
       ]
     }
   ]
-
   settings {
     timezone: 'America/Los_Angeles'
     cache_duration: 10
     autorun_on_open: true
+    autorun_on_changes: true
   }
 }
