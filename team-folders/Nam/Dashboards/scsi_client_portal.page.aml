@@ -126,8 +126,8 @@ Every account you have placed, with its current balance, status and aging bucket
       }
       fields: [
         VizFieldFull {
-          ref: r(public_accounts.account_id)
           label: 'Account'
+          ref: r(public_accounts.account_id)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -135,28 +135,25 @@ Every account you have placed, with its current balance, status and aging bucket
           uname: 'ma_account_id'
         },
         VizFieldFull {
-          ref: r(public_accounts.placement_date)
           label: 'Placed On'
+          ref: r(public_accounts.placement_date)
           format {
             type: 'date'
-            pattern: 'YYYY-MM-DD'
+            pattern: 'yyyy-LL-dd'
           }
           uname: 'ma_placement_date'
         },
-        // PHI column — renders '(redacted)' unless the viewer carries pii_access = 1.
-        // Present deliberately: the external client sees the column exist but not its
-        // value, which demonstrates the control rather than hiding that it applies.
         VizFieldFull {
-          ref: r(public_accounts.debtor_state)
           label: 'Debtor State'
+          ref: r(public_accounts.debtor_state)
           format {
             type: 'text'
           }
           uname: 'ma_debtor_state'
         },
         VizFieldFull {
-          ref: 'account_balance'
           label: 'Original Balance'
+          ref: 'account_balance'
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -164,8 +161,8 @@ Every account you have placed, with its current balance, status and aging bucket
           uname: 'ma_balance'
         },
         VizFieldFull {
-          ref: 'account_collected'
           label: 'Collected'
+          ref: 'account_collected'
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -173,16 +170,16 @@ Every account you have placed, with its current balance, status and aging bucket
           uname: 'ma_collected'
         },
         VizFieldFull {
-          ref: r(public_accounts.account_status)
           label: 'Status'
+          ref: r(public_accounts.account_status)
           format {
             type: 'text'
           }
           uname: 'ma_status'
         },
         VizFieldFull {
-          ref: r(public_accounts.aging_bucket)
           label: 'Aging Bucket'
+          ref: r(public_accounts.aging_bucket)
           format {
             type: 'text'
           }
@@ -191,16 +188,18 @@ Every account you have placed, with its current balance, status and aging bucket
       ]
       settings {
         pagination_size: 100
-        show_row_number: false
         wrap_header_text: true
-        wrap_cell_text: false
-        show_row_with_no_data: false
         sorts: [
-          KeyBasedSortSetting {
+          SortSetting {
             key: 'ma_placement_date'
             direction: 'desc'
           }
         ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
         column_styles: [
           ColumnStyle {
             key: 'ma_account_id'
@@ -231,7 +230,6 @@ Every account you have placed, with its current balance, status and aging bucket
             width: 140
           }
         ]
-        single_cell_display: 'normal'
       }
     }
   }
