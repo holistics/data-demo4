@@ -352,8 +352,6 @@ Every contact attempt made against each account, with the account's client, coll
           }
           uname: 'aa_aging'
         },
-        // PHI column — real value only for staff carrying pii_access = 1
-        // (app_internal_hipaa); app_internal_general sees '(redacted)'.
         VizFieldFull {
           label: 'Debtor State'
           ref: r(public_accounts.debtor_state)
@@ -467,7 +465,6 @@ Every contact attempt made against each account, with the account's client, coll
       value: '$H_NIL$'
     }
   }
-
   block t_portal_header: TextBlock {
     content: @md
 # 👤 Client Portal
@@ -572,8 +569,8 @@ Every account you have placed, with its current balance, status and aging bucket
       }
       fields: [
         VizFieldFull {
-          ref: r(public_accounts.account_id)
           label: 'Account'
+          ref: r(public_accounts.account_id)
           format {
             type: 'number'
             pattern: '#,##0'
@@ -581,28 +578,25 @@ Every account you have placed, with its current balance, status and aging bucket
           uname: 'ma_account_id'
         },
         VizFieldFull {
-          ref: r(public_accounts.placement_date)
           label: 'Placed On'
+          ref: r(public_accounts.placement_date)
           format {
             type: 'date'
-            pattern: 'YYYY-MM-DD'
+            pattern: 'yyyy-LL-dd'
           }
           uname: 'ma_placement_date'
         },
-        // PHI column — renders '(redacted)' unless the viewer carries pii_access = 1.
-        // Present deliberately: the external client sees the column exist but not its
-        // value, which demonstrates the control rather than hiding that it applies.
         VizFieldFull {
-          ref: r(public_accounts.debtor_state)
           label: 'Debtor State'
+          ref: r(public_accounts.debtor_state)
           format {
             type: 'text'
           }
           uname: 'ma_debtor_state'
         },
         VizFieldFull {
-          ref: 'account_balance'
           label: 'Original Balance'
+          ref: 'account_balance'
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -610,8 +604,8 @@ Every account you have placed, with its current balance, status and aging bucket
           uname: 'ma_balance'
         },
         VizFieldFull {
-          ref: 'account_collected'
           label: 'Collected'
+          ref: 'account_collected'
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -619,16 +613,16 @@ Every account you have placed, with its current balance, status and aging bucket
           uname: 'ma_collected'
         },
         VizFieldFull {
-          ref: r(public_accounts.account_status)
           label: 'Status'
+          ref: r(public_accounts.account_status)
           format {
             type: 'text'
           }
           uname: 'ma_status'
         },
         VizFieldFull {
-          ref: r(public_accounts.aging_bucket)
           label: 'Aging Bucket'
+          ref: r(public_accounts.aging_bucket)
           format {
             type: 'text'
           }
@@ -637,28 +631,26 @@ Every account you have placed, with its current balance, status and aging bucket
       ]
       settings {
         pagination_size: 100
-        show_row_number: false
         wrap_header_text: true
-        wrap_cell_text: false
-        show_row_with_no_data: false
         sorts: [
-          KeyBasedSortSetting {
+          SortSetting {
             key: 'ma_placement_date'
             direction: 'desc'
           }
         ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
         column_styles: [
           ColumnStyle {
-            key: 'ma_account_id'
-            width: 110
-          },
-          ColumnStyle {
-            key: 'ma_placement_date'
+            key: 'ma_aging'
             width: 140
           },
           ColumnStyle {
-            key: 'ma_debtor_state'
-            width: 130
+            key: 'ma_status'
+            width: 160
           },
           ColumnStyle {
             key: 'ma_balance'
@@ -669,15 +661,18 @@ Every account you have placed, with its current balance, status and aging bucket
             width: 150
           },
           ColumnStyle {
-            key: 'ma_status'
-            width: 160
+            key: 'ma_account_id'
+            width: 110
           },
           ColumnStyle {
-            key: 'ma_aging'
+            key: 'ma_debtor_state'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'ma_placement_date'
             width: 140
           }
         ]
-        single_cell_display: 'normal'
       }
     }
   }
@@ -736,7 +731,6 @@ Every account you have placed, with its current balance, status and aging bucket
       }
     }
   }
-
   view: TabLayout {
     tab internal_operations: CanvasLayout {
       label: 'Internal Portfolio & Operations'
