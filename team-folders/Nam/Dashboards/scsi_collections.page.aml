@@ -2,14 +2,12 @@ Dashboard scsi_collections {
   title: 'SCSI Collections Performance'
   description: '''Collections performance dashboard for client recovery, aging exposure, collector productivity, contact effectiveness, and monthly placement vs recovery trend.'''
   owner: 'nam.tran@holistics.io'
-
   block title: TextBlock {
     content: @md
 # SCSI Collections Performance
 Monitor recovery by client, aging exposure, collector productivity, contact effectiveness, and recent placement vs recovery trend.
     ;;
   }
-
   block f_placement_date: FilterBlock {
     label: 'Placement Date'
     type: 'field'
@@ -18,7 +16,6 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       field: r(public_accounts.placement_date)
     }
   }
-
   block f_client_name: FilterBlock {
     label: 'Client Name'
     type: 'field'
@@ -27,7 +24,6 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       field: r(public_clients.client_name)
     }
   }
-
   block f_collector_name: FilterBlock {
     label: 'Collector Name'
     type: 'field'
@@ -36,7 +32,6 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       field: r(public_collectors.collector_name)
     }
   }
-
   block v_recovery_by_client: VizBlock {
     label: 'Recovery Rate by Client'
     viz: DataTable {
@@ -134,7 +129,6 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       }
     }
   }
-
   block v_aging_bucket: VizBlock {
     label: 'Aging Bucket Breakdown'
     viz: BarChart {
@@ -146,8 +140,8 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
         data_type: 'number'
       }
       x_axis: VizFieldFull {
-        ref: r(public_accounts.aging_bucket)
         label: 'Aging Bucket'
+        ref: r(public_accounts.aging_bucket)
         format {
           type: 'text'
         }
@@ -155,26 +149,34 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       y_axis {
         series {
           field: VizFieldFull {
-            ref: 'total_original_balance'
             label: 'Total Original Balance'
+            ref: 'total_original_balance'
             format {
               type: 'number'
               pattern: '[$$]#,###0.00'
             }
           }
+          settings {
+            color: '#3478D4'
+          }
         }
       }
       settings {
-        x_axis_label: 'Aging Bucket'
         row_limit: 100
-        sort: LineFamilySort {
-          type: 'xaxis'
+        sort {
+          field_index: 0
           direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Aging Bucket'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
   }
-
   block v_collector_leaderboard: VizBlock {
     label: 'Collector Performance Leaderboard'
     viz: DataTable {
@@ -279,7 +281,6 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       }
     }
   }
-
   block v_contact_effectiveness: VizBlock {
     label: 'Contact Effectiveness by Channel'
     viz: DataTable {
@@ -497,54 +498,42 @@ Monitor recovery by client, aging exposure, collector productivity, contact effe
       }
     }
   }
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
     height: 1760
     grid_size: 20
     auto_expand_vertically: true
-
     block title {
       position: pos(20, 20, 1260, 100)
     }
-
     block f_placement_date {
       position: pos(20, 140, 300, 100)
     }
-
     block f_client_name {
       position: pos(340, 140, 300, 100)
     }
-
     block f_collector_name {
       position: pos(660, 140, 300, 100)
     }
-
     block v_recovery_by_client {
       position: pos(20, 260, 620, 420)
     }
-
     block v_collector_leaderboard {
       position: pos(660, 260, 620, 420)
     }
-
     block v_aging_bucket {
       position: pos(20, 700, 620, 360)
     }
-
     block v_contact_effectiveness {
       position: pos(660, 700, 620, 360)
     }
-
     block v_monthly_trend {
       position: pos(20, 1080, 1260, 520)
     }
-
     mobile {
       mode: 'auto'
     }
   }
-
   theme: ai_1786932884589_3
 }
