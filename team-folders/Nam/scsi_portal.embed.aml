@@ -1,4 +1,10 @@
-// External client portal over the SCSI collections dataset.
+// External client portal over the SCSI collections data.
+//
+// DATASET-LAYER SEPARATION:
+// This portal reads `scsi_client`, a dataset that exists solely to carry the row-level
+// restriction. Internal reporting reads the unscoped `scsi` dataset, so internal staff are
+// never subject to client scoping and need no user attribute provisioned to see their own
+// agency's data. The two audiences are separated at the dataset layer, not by per-user setup.
 //
 // SEPARATION OF INTERNAL AND EXTERNAL REPORTING:
 // This portal exposes ONLY scsi_client_portal. The internal dashboard
@@ -6,7 +12,7 @@
 // operations — is deliberately not listed here and is unreachable from the portal.
 //
 // ROW-LEVEL SECURITY:
-// Enforced by the `client_scope` permission on the `scsi` dataset (matches_user_attribute
+// Enforced by the `client_scope` permission on the `scsi_client` dataset (matches_user_attribute
 // on `company_id` — a demo-grade choice; see the dataset for the collision it carries and
 // the production fix). It is listed in `required_permissions` so the portal FAILS CLOSED:
 // a token that does not carry `company_id` is rejected outright, rather than falling
@@ -20,10 +26,10 @@ EmbedPortal scsi_portal {
     // Dashboards — external only
     scsi_client_portal,
     // Datasets (self-serve exploration + AI, row-scoped by client_scope)
-    scsi,
+    scsi_client,
   ]
   required_permissions: [
-    scsi.permission.client_scope,
+    scsi_client.permission.client_scope,
   ]
   initial_object: 'ai'
   ai {
