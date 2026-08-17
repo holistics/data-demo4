@@ -1,0 +1,54 @@
+// Client-scoped derivation of the `scsi` dataset — NOT a second copy.
+//
+// This inherits every model, relationship, metric and description from `scsi` and adds one
+// thing: the row-level restriction. Anything added to `scsi` appears here automatically,
+// so the two cannot drift.
+//
+// WHY A SEPARATE DATASET AT ALL:
+// Holistics evaluates row-level permission at the dataset level, and an embed token can
+// only supply VALUES to a permission the dataset already declares — it cannot create the
+// filter itself. So a single shared dataset carrying `client_scope` would restrict internal
+// staff too, and every internal non-Admin user would need `company_id` provisioned as the
+// "All" value type just to see their own agency's data. Anyone missed would silently get an
+// empty dashboard — no error, no signal.
+//
+// Splitting the restriction into this derivation makes the internal/external boundary a
+// property of the model rather than of per-user setup:
+//   scsi         → unscoped → internal reporting (scsi_collections_analytics)
+//   scsi_client  → scoped   → external portal    (scsi_client_portal, scsi_portal)
+//
+// Column-level PHI redaction is NOT here: it lives on the public_accounts model
+// (`debtor_state_pii`), so it applies to both datasets automatically and composes with,
+// rather than duplicates, this restriction.
+Dataset scsi_client = scsi.extend({
+  label: 'SCSI Collections (Client-Scoped)'
+
+  // Row-level scoping for the external client portal: a provider organisation sees only
+  // the accounts it placed with the agency. Rows are medical-debt PHI and the agency is a
+  // HIPAA Business Associate of the placing provider.
+  //
+  // DEMO-GRADE ATTRIBUTE — MUST CHANGE BEFORE ANY REAL PHI LANDS HERE.
+  // Scoped on `company_id` because that is what exists in this demo tenant today.
+  //
+  // `company_id` is ALREADY BOUND to Brainstorm APAC's company_access permission across
+  // three datasets (brainstorm_adoption, brainstorm_cases, brainstorm_speakup) on an
+  // unrelated id-space. A user provisioned for Brainstorm who reaches this dataset would
+  // silently resolve to a different organisation's rows — no error, no signal. That is
+  // acceptable for a controlled demo and NOT acceptable for production PHI.
+  //
+  // Production fix: create a dedicated `scsi_client_id` user attribute (Settings → User
+  // Attributes), then change `value:` below to 'scsi_client_id'. A dedicated attribute
+  // removes the cross-dataset collision and keeps "who was scoped to what, and why"
+  // answerable in a BAA audit.
+  //
+  // Scoping on accounts (not clients) is deliberate: payments and contact_attempts inherit
+  // the restriction through their joins to accounts, so no child row escapes it.
+  //
+  // Not enforced for Admins or Analysts with data source access.
+  // NOTE: RLS-as-code must be enabled for this tenant and only takes effect after publish.
+  permission client_scope {
+    field: r(public_accounts.client_id)
+    operator: 'matches_user_attribute'
+    value: 'company_id'
+  }
+})

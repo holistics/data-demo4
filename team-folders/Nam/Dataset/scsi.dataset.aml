@@ -1,5 +1,14 @@
-Dataset scsi_client {
-  label: 'SCSI Collections (Client-Scoped)'
+// Base SCSI collections dataset — UNSCOPED, for internal reporting.
+//
+// Carries no row-level permission by design. Internal staff read this dataset and see the
+// full agency portfolio with no user attribute provisioned. The client-scoped derivation
+// `scsi_client` extends this one and adds the restriction; see that file for why the
+// boundary lives at the dataset layer rather than in per-user setup.
+//
+// Column-level PHI redaction on debtor_state is defined on the public_accounts model, so it
+// applies here too — internal users without `pii_access = 1` see '(redacted)'.
+Dataset scsi {
+  label: 'SCSI Collections'
   description: '''
 Debt-collections demo dataset for SCSI, built on the `demo_scsi_nam` data source.
 
@@ -42,34 +51,4 @@ remaining balance is not directly available — derive it as original balance mi
     relationship(public_contact_attempts.account_id > public_accounts.account_id, true),
     relationship(public_payments.account_id > public_accounts.account_id, true)
   ]
-
-  // Row-level scoping for the external client portal: a provider organisation sees only
-  // the accounts it placed with the agency. SCSI collects medical debt, so these rows are
-  // PHI and the agency is a HIPAA Business Associate of the placing provider.
-  //
-  // DEMO-GRADE ATTRIBUTE — MUST CHANGE BEFORE ANY REAL PHI LANDS HERE.
-  // Scoped on `company_id` because that is what exists in this demo tenant today.
-  //
-  // `company_id` is ALREADY BOUND to Brainstorm APAC's company_access permission across
-  // three datasets (brainstorm_adoption, brainstorm_cases, brainstorm_speakup) on an
-  // unrelated id-space. A user provisioned for Brainstorm who reaches this dataset would
-  // silently resolve to a different organisation's rows — no error, no signal. That is
-  // acceptable for a controlled demo and NOT acceptable for production PHI.
-  //
-  // Production fix: create a dedicated `scsi_client_id` user attribute (Settings → User
-  // Attributes), then change `value:` below to 'scsi_client_id'. A dedicated attribute
-  // removes the cross-dataset collision and keeps "who was scoped to what, and why"
-  // answerable in a BAA audit.
-  //
-  // Scoping on accounts (not clients) is deliberate: payments and contact_attempts inherit
-  // the restriction through their joins to accounts, so no child row escapes it.
-  //
-  // Not enforced for Admins or Analysts with data source access, so internal staff keep
-  // full agency visibility on scsi_collections_analytics.
-  // NOTE: RLS-as-code must be enabled for this tenant and only takes effect after publish.
-  permission client_scope {
-    field: r(public_accounts.client_id)
-    operator: 'matches_user_attribute'
-    value: 'company_id'
-  }
 }
