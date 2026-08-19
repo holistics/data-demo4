@@ -8,7 +8,7 @@
 // Holistics evaluates row-level permission at the dataset level, and an embed token can only
 // supply VALUES to a permission the dataset already declares — it cannot create the filter
 // itself. So a single shared dataset carrying `owner_group_scope` would restrict Laasie's own
-// staff too, and every internal non-Admin user would need `laasie_owner_group_id` provisioned
+// staff too, and every internal non-Admin user would need the scoping attribute provisioned
 // as the "All" value type just to see the whole platform. Anyone missed would silently get an
 // empty dashboard — no error, no signal.
 //
@@ -37,15 +37,28 @@ Dataset laasie_client = laasie.extend({
   // at EVERY client. Scoping it through the owner group is what stops one hotel group from
   // listing another group's staff. A fact-anchored permission would not touch it at all.
   //
-  // The dedicated `laasie_owner_group_id` user attribute avoids colliding with the unrelated
-  // `company_id` id-space used by the Brainstorm APAC demo and with SCSI's `scsi_client_id`.
+  // DEMO-GRADE ATTRIBUTE — MUST CHANGE BEFORE THIS CARRIES ANYTHING REAL.
+  // Scoped on `company_id` because that is what already exists in this demo tenant, so the
+  // portal can be demoed without an Admin creating an attribute first. This is the same
+  // shortcut SCSI shipped on, before commit 20912f39 moved it to a dedicated attribute.
+  //
+  // `company_id` is ALREADY BOUND to Brainstorm APAC's company_access permission across
+  // three datasets (brainstorm_adoption, brainstorm_cases, brainstorm_speakup) on an
+  // unrelated id-space. A user provisioned for Brainstorm who reaches this dataset would
+  // silently resolve to a different organisation's rows — no error, no signal. That is
+  // acceptable for a controlled hospitality demo and NOT acceptable for anything real.
+  // Concretely: do not demo Laasie and Brainstorm APAC in one session on the same login.
+  //
+  // UPGRADE PATH (exactly what SCSI did): create a dedicated `laasie_owner_group_id` Number
+  // user attribute — Manage Users > any user > Attributes > "Add or manage User Attributes" —
+  // then change `value:` below back to 'laasie_owner_group_id'. Nothing else has to move.
   //
   // Not enforced for Admins or Analysts with data source access.
-  // NOTE: RLS-as-code must be enabled for this tenant, `laasie_owner_group_id` must exist as a
-  // Number user attribute, and the permission only takes effect after publish.
+  // NOTE: RLS-as-code must be enabled for this tenant, and the permission only takes effect
+  // after publish. `company_id` already exists, so no Admin step is required to demo.
   permission owner_group_scope {
     field: r(public_owner_groups.owner_group_id)
     operator: 'matches_user_attribute'
-    value: 'laasie_owner_group_id'
+    value: 'company_id'
   }
 })

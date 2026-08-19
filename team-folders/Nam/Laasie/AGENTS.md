@@ -39,7 +39,10 @@ Keep every change inside `team-folders/Nam/Laasie/`. Do not touch `01 demo ecomm
 
 ## Prerequisites before the portal works
 
-- User attribute `laasie_owner_group_id` (Number) must exist on the tenant. It does not yet.
+- Scoping runs on the **borrowed** `company_id` user attribute, which already exists — no Admin
+  step needed to demo. It is Brainstorm APAC's id-space, so **do not demo Laasie and Brainstorm
+  in one session on the same login.** Upgrade path to a dedicated `laasie_owner_group_id` is
+  documented in `Datasets/laasie_client.dataset.aml`; SCSI made the same move in `20912f39`.
 - `pii_access` (Number) already exists and gates guest + stakeholder email.
 - RLS-as-code must be enabled for the tenant; permissions only take effect after publish.
 

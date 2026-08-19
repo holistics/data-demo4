@@ -18,10 +18,11 @@
 //
 // ROW-LEVEL SECURITY:
 // Enforced by the `owner_group_scope` permission on the `laasie_client` dataset
-// (matches_user_attribute on the dedicated `laasie_owner_group_id` attribute). It is listed in
-// `required_permissions` so the portal FAILS CLOSED: a token that does not carry
-// `laasie_owner_group_id` is rejected outright, rather than falling through to every hotel
-// group's revenue. The value to put on a stakeholder's token is their row in
+// (matches_user_attribute on `company_id` today — a demo-grade BORROWED attribute; see
+// laasie_client.dataset.aml for why and for the upgrade path). It is listed in
+// `required_permissions` so the portal FAILS CLOSED: a token that does not carry the scoping
+// attribute is rejected outright, rather than falling through to every hotel group's revenue.
+// The value to put on a stakeholder's token is their row in
 // `public_external_stakeholders.owner_group_id`.
 //
 // COLUMN-LEVEL SECURITY:

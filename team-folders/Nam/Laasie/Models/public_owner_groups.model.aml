@@ -14,7 +14,7 @@ Model public_owner_groups {
   dimension owner_group_id {
     label: 'Owner Group Id'
     type: 'number'
-    description: "The **Owner Group Id** uniquely identifies each hotel owner or management company on the platform.  \nIt is the primary key of this model and the field the client portal's row-level permission matches against the `laasie_owner_group_id` user attribute — so an embedded viewer only ever sees rows belonging to their own group."
+    description: "The **Owner Group Id** uniquely identifies each hotel owner or management company on the platform.  \nIt is the primary key of this model and the field the client portal's row-level permission matches against the scoping user attribute — so an embedded viewer only ever sees rows belonging to their own group. That attribute is `company_id` today; see `laasie_client.dataset.aml` for why it is borrowed and how to move it to a dedicated one."
     hidden: false
     definition: @sql {{ #SOURCE.owner_group_id }};;
     primary_key: true

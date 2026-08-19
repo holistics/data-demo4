@@ -1,7 +1,8 @@
 // EXTERNAL dashboard — hotel owner and management companies only.
 //
 // Reads `laasie_client` — the client-scoped dataset, whose `owner_group_scope` permission
-// restricts rows by the `laasie_owner_group_id` user attribute. Internal reporting reads the
+// restricts rows by the scoping user attribute (`company_id` today — see
+// laasie_client.dataset.aml). Internal reporting reads the
 // unscoped `laasie` dataset instead, so Laasie staff need no attribute provisioned.
 //
 // SEPARATION OF INTERNAL AND EXTERNAL REPORTING:

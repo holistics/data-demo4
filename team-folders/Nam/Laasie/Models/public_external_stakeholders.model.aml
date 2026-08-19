@@ -31,7 +31,7 @@ Model public_external_stakeholders {
   dimension owner_group_id {
     label: 'Owner Group Id'
     type: 'number'
-    description: "The **Owner Group Id** is the group this person represents.  \nIt joins directly to `public_owner_groups` and is what makes this model the reference list for portal provisioning: the value here is the value that belongs in a stakeholder's `laasie_owner_group_id` user attribute on their embed token."
+    description: "The **Owner Group Id** is the group this person represents.  \nIt joins directly to `public_owner_groups` and is what makes this model the reference list for portal provisioning: the value here is the value that belongs in the scoping user attribute on a stakeholder's embed token. That attribute is `company_id` today; see `laasie_client.dataset.aml`."
     hidden: false
     definition: @sql {{ #SOURCE.owner_group_id }};;
   }
