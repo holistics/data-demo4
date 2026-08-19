@@ -1,0 +1,40 @@
+Model public_external_stakeholders {
+  type: 'table'
+  label: 'External Stakeholders'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension external_role {
+    label: 'External Role'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.external_role }};;
+  }
+  dimension stakeholder_id {
+    label: 'Stakeholder Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.stakeholder_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."external_stakeholders"'
+}

@@ -1,0 +1,46 @@
+Model public_properties {
+  type: 'table'
+  label: 'Properties'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+  dimension property_name {
+    label: 'Property Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.property_name }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension state {
+    label: 'State'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.state }};;
+  }
+  dimension room_count {
+    label: 'Room Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.room_count }};;
+  }
+  dimension property_id {
+    label: 'Property Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.property_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."properties"'
+}

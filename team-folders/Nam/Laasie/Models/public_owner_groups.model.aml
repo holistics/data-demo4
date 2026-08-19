@@ -1,0 +1,28 @@
+Model public_owner_groups {
+  type: 'table'
+  label: 'Owner Groups'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension group_name {
+    label: 'Group Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.group_name }};;
+  }
+  dimension group_type {
+    label: 'Group Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.group_type }};;
+  }
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."owner_groups"'
+}

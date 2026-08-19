@@ -1,0 +1,34 @@
+Model public_reward_catalog {
+  type: 'table'
+  label: 'Reward Catalog'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension reward_name {
+    label: 'Reward Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_name }};;
+  }
+  dimension reward_type {
+    label: 'Reward Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_type }};;
+  }
+  dimension value_usd {
+    label: 'Value Usd'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.value_usd }};;
+  }
+  dimension reward_id {
+    label: 'Reward Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."reward_catalog"'
+}

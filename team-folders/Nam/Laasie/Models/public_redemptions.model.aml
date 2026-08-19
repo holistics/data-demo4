@@ -1,0 +1,52 @@
+Model public_redemptions {
+  type: 'table'
+  label: 'Redemptions'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+  }
+  dimension reward_id {
+    label: 'Reward Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_id }};;
+  }
+  dimension booking_id {
+    label: 'Booking Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_id }};;
+  }
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+  dimension redeemed_date {
+    label: 'Redeemed Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.redeemed_date }};;
+  }
+  dimension value_redeemed {
+    label: 'Value Redeemed'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.value_redeemed }};;
+  }
+  dimension redemption_id {
+    label: 'Redemption Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.redemption_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."redemptions"'
+}

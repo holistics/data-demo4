@@ -1,0 +1,52 @@
+Model public_guests {
+  type: 'table'
+  label: 'Guests'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension enrollment_date {
+    label: 'Enrollment Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.enrollment_date }};;
+  }
+  dimension loyalty_tier {
+    label: 'Loyalty Tier'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.loyalty_tier }};;
+  }
+  dimension preferred_reward_type {
+    label: 'Preferred Reward Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.preferred_reward_type }};;
+  }
+  dimension traveler_segment {
+    label: 'Traveler Segment'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.traveler_segment }};;
+  }
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."guests"'
+}

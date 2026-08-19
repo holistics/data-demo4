@@ -1,0 +1,70 @@
+Model public_bookings {
+  type: 'table'
+  label: 'Bookings'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+  }
+  dimension property_id {
+    label: 'Property Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.property_id }};;
+  }
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+  dimension check_in_date {
+    label: 'Check In Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.check_in_date }};;
+  }
+  dimension check_out_date {
+    label: 'Check Out Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.check_out_date }};;
+  }
+  dimension adr {
+    label: 'Adr'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.adr }};;
+  }
+  dimension total_spend {
+    label: 'Total Spend'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.total_spend }};;
+  }
+  dimension booking_channel {
+    label: 'Booking Channel'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_channel }};;
+  }
+  dimension booking_id {
+    label: 'Booking Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_id }};;
+    primary_key: true
+  }
+  dimension is_member_booking {
+    label: 'Is Member Booking'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_member_booking }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."bookings"'
+}

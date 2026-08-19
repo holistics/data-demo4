@@ -1,0 +1,58 @@
+Model public_loyalty_transactions {
+  type: 'table'
+  label: 'Loyalty Transactions'
+  description: ''
+  data_source_name: 'demo_laasie_nam'
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+  }
+  dimension booking_id {
+    label: 'Booking Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_id }};;
+  }
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+  dimension transaction_type {
+    label: 'Transaction Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_type }};;
+  }
+  dimension reward_type {
+    label: 'Reward Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_type }};;
+  }
+  dimension amount {
+    label: 'Amount'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.amount }};;
+  }
+  dimension transaction_date {
+    label: 'Transaction Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_date }};;
+  }
+  dimension transaction_id {
+    label: 'Transaction Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_id }};;
+    primary_key: true
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."loyalty_transactions"'
+}
