@@ -31,12 +31,12 @@
 // stakeholder email are therefore gated separately at the MODEL layer on `pii_access`, so a
 // portal viewer without that attribute sees '(redacted)' no matter how they ask for it.
 EmbedPortal laasie_portal {
-  description: 'Laasie owner portal — a hotel owner or management company sees only the properties their own group operates, plus self-serve exploration and Ask AI over the same scoped data.'
+  description: 'Laasie owner portal — a hotel owner or management company sees only the dashboard rows for properties their own group operates.'
   objects: [
     // Dashboards — external only
     laasie_owner_portal,
-    // Datasets (self-serve exploration + AI, row-scoped by owner_group_scope)
-    laasie_client,
+
+
   ]
   required_permissions: [
     laasie_client.permission.owner_group_scope,
