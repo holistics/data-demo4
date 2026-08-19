@@ -605,6 +605,10 @@ Your properties and how their Laasie programme is performing. This view is scope
       }
       settings {
         row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -644,7 +648,7 @@ Your properties and how their Laasie programme is performing. This view is scope
       position: pos(980, 1380, 300, 180)
     }
     block t_trend {
-      position: pos(20, 1580, 1260, 65)
+      position: pos(20, 1570, 1260, 70)
     }
     block v_revenue_trend {
       position: pos(20, 1650, 1260, 400)

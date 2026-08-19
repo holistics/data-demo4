@@ -63,7 +63,7 @@ CustomChartDef laasie_sankey {
     "autosize": {"type": "fit", "contains": "padding"},
     "padding": {"left": 6, "right": 6, "top": 10, "bottom": 10},
     "width": 1000,
-    "height": 400,
+    "height": 500,
 
     "signals": [
       {"name": "fSource", "value": @{fields.source.name}},
