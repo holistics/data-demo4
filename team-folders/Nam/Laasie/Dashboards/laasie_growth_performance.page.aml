@@ -1,33 +1,13 @@
-// INTERNAL dashboard — Laasie's own commercial and customer-success teams.
-//
-// Reads the UNSCOPED `laasie` dataset, so it shows every owner group on the platform and
-// needs no user attribute provisioned. The external view is a separate page
-// (laasie_owner_portal) on the scoped `laasie_client` dataset, and is NOT a tab here:
-// mixing an internal and an external audience in one file makes it far too easy to ship a
-// widget that reads the unscoped dataset into a client's hands.
-//
-// TIME-OVER-TIME IS THE POINT OF THIS PAGE. Laasie's stated frustration is that growth
-// analysis is hard in their current stack, so comparison is built in three ways rather than
-// left to the analyst:
-//   1. `DateDrillBlock` — change the time grain of every chart (day/week/month/quarter) live.
-//   2. `PopBlock` — change what every widget compares against, without editing anything.
-//   3. Governed growth metrics on the dataset (Revenue YoY Growth, MoM, ADR YoY ...) so the
-//      arithmetic is defined once in the semantic layer instead of per-report.
-// Every comparison shifts against `bookings.check_in_date` — the revenue lens.
 Dashboard laasie_growth_performance {
   title: 'Laasie — Growth & Programme Performance'
   description: '''Internal view across the whole Laasie platform: revenue and booking growth against prior periods, loyalty programme penetration and value uplift, reward economics, and property-level performance. Reads the unscoped dataset — every owner group is visible.'''
   owner: 'nam.tran@holistics.io'
-
-  // --- Interactive time controls: the answer to "growth analysis is hard" ---
   block b_date_drill: DateDrillBlock {
     label: 'Time Grain'
   }
   block b_pop: PopBlock {
     label: 'Compare Against'
   }
-
-  // --- Filters ---
   block f_check_in: FilterBlock {
     label: 'Check-In Date'
     type: 'field'
@@ -35,8 +15,6 @@ Dashboard laasie_growth_performance {
       dataset: laasie
       field: r(public_bookings.check_in_date)
     }
-    // Two years, so that every year-over-year comparison on the page has a prior period
-    // to land in. A shorter default would silently render the YoY widgets blank.
     default {
       operator: 'matches'
       value: 'last 2 years to today'
@@ -102,8 +80,6 @@ Dashboard laasie_growth_performance {
       value: '$H_NIL$'
     }
   }
-
-  // --- Headers ---
   block t_header: TextBlock {
     content: @md
 # 📈 Growth & Programme Performance
@@ -126,8 +102,6 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
 ## Reward economics
     ;;
   }
-
-  // --- KPI row, each with a period-over-period comparison chip ---
   block k_revenue: VizBlock {
     label: 'Total Revenue'
     viz: MetricKpi {
@@ -212,8 +186,6 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
-
-  // --- Trend with built-in prior-period overlay and growth rate ---
   block v_revenue_trend: VizBlock {
     label: 'Revenue vs Same Period Last Year'
     viz: LineChart {
@@ -260,8 +232,6 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
-
-  // --- Who is growing, and through which channel ---
   block v_group_growth: VizBlock {
     label: 'Revenue YoY Growth by Owner Group'
     viz: BarChart {
@@ -344,8 +314,6 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
-
-  // --- The programme value case, per client ---
   block v_member_uplift: VizBlock {
     label: 'Member vs Non-Member Value by Owner Group'
     viz: DataTable {
@@ -530,8 +498,6 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
-
-  // --- What gets claimed, and what it costs ---
   block v_reward_economics: VizBlock {
     label: 'Redemption Value by Reward Type & Loyalty Tier'
     viz: PivotTable {
@@ -581,8 +547,6 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
-
-  // --- Property-level detail, with growth carried through ---
   block v_property_table: VizBlock {
     label: 'Property Performance'
     viz: DataTable {
@@ -735,14 +699,12 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
-
   view: CanvasLayout {
     label: 'Growth & Performance'
     width: 1300
     height: 3330
     grid_size: 20
     auto_expand_vertically: true
-
     block t_header {
       position: pos(20, 20, 1260, 150)
     }
@@ -795,7 +757,7 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       position: pos(660, 1130, 620, 380)
     }
     block t_member {
-      position: pos(20, 1530, 1260, 60)
+      position: pos(20, 1520, 1260, 80)
     }
     block v_member_uplift {
       position: pos(20, 1610, 1260, 380)
@@ -807,7 +769,7 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       position: pos(660, 2010, 620, 380)
     }
     block t_rewards {
-      position: pos(20, 2410, 1260, 60)
+      position: pos(20, 2400, 1260, 80)
     }
     block v_reward_economics {
       position: pos(20, 2490, 1260, 340)
@@ -819,6 +781,5 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       mode: 'auto'
     }
   }
-
   theme: laasie_theme
 }
