@@ -1,0 +1,53 @@
+// External client portal over the SCSI collections data.
+//
+// DATASET-LAYER SEPARATION:
+// This portal reads `scsi_client`, a dataset that exists solely to carry the row-level
+// restriction. Internal reporting reads the unscoped `scsi` dataset, so internal staff are
+// never subject to client scoping and need no user attribute provisioned to see their own
+// agency's data. The two audiences are separated at the dataset layer, not by per-user setup.
+//
+// SEPARATION OF INTERNAL AND EXTERNAL REPORTING:
+// This portal exposes ONLY scsi_client_portal. The internal dashboard
+// (scsi_collections_analytics) — collector leaderboards, cross-client recovery, agency
+// operations — is deliberately not listed here and is unreachable from the portal.
+//
+// ROW-LEVEL SECURITY:
+// Enforced by the `client_scope` permission on the `scsi_client` dataset (matches_user_attribute
+// on the dedicated `scsi_client_id` attribute). It is listed in `required_permissions` so
+// the portal FAILS CLOSED: a token that does not carry `scsi_client_id` is rejected outright, rather than falling
+// through to every provider's medical-debt portfolio.
+//
+// The rows behind this portal are PHI. SCSI is a HIPAA Business Associate of the placing
+// provider, so the embed token must carry the scoping attribute on every request.
+EmbedPortal scsi_portal {
+  description: 'SCSI client portal — a creditor client sees only the accounts their own organisation placed, plus self-serve exploration and Ask AI over the same scoped data.'
+  objects: [
+    // Dashboards — external only
+    scsi_client_portal,
+    // Datasets (self-serve exploration + AI, row-scoped by client_scope)
+    scsi_client,
+  ]
+  required_permissions: [
+    scsi_client.permission.client_scope,
+  ]
+  initial_object: 'ai'
+  ai {
+    customization {
+      global {
+        assistant_name: 'SCSI Collections Assistant'
+      }
+      chat_page {
+        intro {
+          header: 'Ask about your placed accounts, recovery progress or collections activity.'
+          body: @md
+            ## 💰 Track recovery rate and amounts collected on your portfolio
+            ## 📂 Drill by account status, aging bucket or placement date
+            ## 📞 See the contact attempts made on your accounts
+            ## 📌 Save any insight to your dashboard
+          ;;
+        }
+        prompt_placeholder: 'e.g. What is my recovery rate by aging bucket this year?'
+      }
+    }
+  }
+}

@@ -118,6 +118,34 @@ Dataset dabble_trading {
     definition: @aql safe_divide(bonus_cash_stake, combined_stake);;
     description: 'Bonus Cash Stake divided by Combined Stake. Recalculate at each grouping; do not sum percentages.'
   }
+  metric brg {
+    label: 'BRG (Generosity)'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.brg);;
+    description: 'Allocated bonus and generosity give-back in Australian dollars - the deduction between Gross Win and Trading Net Win. Additive across all exposed dimensions, on settled reporting date. Report as a cost: rising BRG dilutes margin without any pricing change, and it is owned by Marketing rather than Trading.'
+  }
+  metric brg_pct {
+    label: 'BRG % of Turnover'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(brg, combined_stake);;
+    description: 'BRG divided by Combined Stake - the share of turnover given back as generosity. Equals Gross Win % less Trading Net Win %. Recalculate from components at each grouping; never sum or average this percentage.'
+  }
+  metric cogs {
+    label: 'COGS'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.cogs);;
+    description: 'Allocated cost of goods sold in Australian dollars - racing product and race-field fees, sports controlling-body fees, point-of-consumption tax and GST - deducted between Trading Net Win and Trading Net Revenue. Additive across all exposed dimensions, on settled reporting date. Scales with racing turnover and with customer home-state mix, so a COGS move can be pure mix rather than a cost change.'
+  }
+  metric cogs_pct {
+    label: 'COGS % of Turnover'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(cogs, combined_stake);;
+    description: 'COGS divided by Combined Stake. Equals Trading Net Win % less Trading Net Revenue %. Recalculate from components at each grouping; never sum or average this percentage.'
+  }
   metric trading_net_win {
     label: 'Trading Net Win'
     type: 'number'
@@ -340,6 +368,10 @@ Dataset dabble_trading {
       metric gross_win_pct
       metric rocket_boost
       metric bonus_cash_pct
+      metric brg
+      metric brg_pct
+      metric cogs
+      metric cogs_pct
       metric trading_net_win
       metric trading_net_win_pct
       metric trading_net_revenue

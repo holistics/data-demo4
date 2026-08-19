@@ -114,7 +114,8 @@ route section or skill. Until that exists, its data sits under "Everything else"
 design — an unrouted dataset is safe, a mis-routed one is not.
 
 Maintainer references (for humans and coding agents — not readable at query time):
-`01 demo ecommerce/docs/core-demo.md`, `clients/dabble/docs/`, `clients/AGENTS.md`.
+`01 demo ecommerce/docs/core-demo.md`, `clients/dabble/docs/`,
+`clients/dabble/dabble-refrence/`, `clients/AGENTS.md`.
 
 Maintainers: this file is paired with the repo's root `AGENTS.md`, which steers CLI
 and coding agents. Any change to the default context, a client route, a data source
