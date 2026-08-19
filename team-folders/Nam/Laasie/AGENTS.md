@@ -22,8 +22,27 @@ Keep every change inside `team-folders/Nam/Laasie/`. Do not touch `01 demo ecomm
 |---|---|
 | `Models/` | 8 table models over `demo_laasie_nam` |
 | `Datasets/` | `laasie` (unscoped, internal) and `laasie_client` (scoped derivation) |
-| `Dashboards/` | `laasie.theme.aml`, internal page, external page |
+| `Dashboards/` | `laasie.theme.aml`, internal page, external page, `laasie_sankey.chart.aml` |
 | `laasie_portal.embed.aml` | The external embed portal |
+
+## Editing dashboards: Studio and the syncer fight
+
+`holistics sync-code` and Holistics Studio both write these `.page.aml` files, and Studio wins
+whatever it holds in memory. Two consequences, both observed on this folder:
+
+- **Close a dashboard in Studio before editing its AML**, then reopen after the sync settles.
+  Otherwise Studio re-serialises the page from its own copy: a block it has no `position` for is
+  either dropped (it then renders nowhere) or auto-placed in a corner on top of other blocks.
+  This is how `v_metric_sheet`, `t_sheet` and `t_flow` vanished and `v_sankey` landed at
+  `pos(0, 0, ...)` — the AML was fine, the round-trip was not.
+- **Studio strips comments from inside the `Dashboard { ... }` body**, though it preserves the
+  header comment at the top of the file. A comment placed just above `view: CanvasLayout` will
+  conflict on every single sync cycle. Put layout notes here instead.
+
+Intended layout, so a mangled page is recognisable: both pages run KPIs → trend → **monthly
+metric sheet** → … → **Sankey as the last block**. Internal canvas height 4570 (28 blocks),
+portal 2950 (19 blocks). Verify with a quick parse of the `pos(...)` values rather than by eye —
+every block must be placed, and none may overlap.
 
 ## The two rules that matter most here
 

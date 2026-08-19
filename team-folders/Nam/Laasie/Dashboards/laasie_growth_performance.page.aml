@@ -699,10 +699,232 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
       }
     }
   }
+  // --- Monthly business review: every governed metric, one row per month ---
+  // A MetricSheet is the densest way to answer "what changed and when" — the growth metrics
+  // defined on the dataset become rows, and the date_field grain becomes the columns, so the
+  // whole review reads without touching a filter. The Growth section carries the same YoY
+  // metrics as the KPI chips above, which is deliberate: the chips give the current number,
+  // this gives the shape of how it got there.
+  block t_sheet: TextBlock {
+    content: @md
+## Monthly business review
+    ;;
+  }
+  block v_metric_sheet: VizBlock {
+    label: 'Metrics by Month (Check-In Lens)'
+    viz: MetricSheet {
+      dataset: laasie
+      date_field: VizFieldFull {
+        ref: r(public_bookings.check_in_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      rows: [
+        MetricHeading {
+          label: '🏨 Demand'
+          settings {
+            background_color: '#ede9fe'
+            text_color: '#4c4368'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'bookings'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'member_bookings'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'member_booking_rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricHeading {
+          label: '💰 Revenue'
+          settings {
+            background_color: '#ede9fe'
+            text_color: '#4c4368'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'total_revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'avg_adr'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'avg_booking_value'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricHeading {
+          label: '📈 Growth vs Last Year'
+          settings {
+            background_color: '#fef3c7'
+            text_color: '#4c4368'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'revenue_yoy_growth'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'bookings_yoy_growth'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'adr_yoy_growth'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'member_bookings_yoy_growth'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricHeading {
+          label: '🎁 Programme Cost'
+          settings {
+            background_color: '#ede9fe'
+            text_color: '#4c4368'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'redemptions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'redemption_value'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: 'reward_cost_ratio'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // --- Sankey: where revenue comes from, and who it belongs to ---
+  // Channel -> tier is the one flow that carries the whole commercial argument. Direct
+  // bookings avoid distribution commission, high tiers spend more, and the ribbon widths
+  // show immediately whether the programme is actually converting OTA demand into
+  // high-tier direct demand — or whether the two populations barely overlap.
+  block t_flow: TextBlock {
+    content: @md
+## Where revenue flows
+    ;;
+  }
+  block v_sankey: VizBlock {
+    label: 'Revenue Flow: Booking Channel → Loyalty Tier'
+    viz: CustomChart {
+      dataset: laasie
+      custom_chart: laasie_sankey
+      field source: VizFieldFull {
+        label: 'Booking Channel'
+        ref: r(public_bookings.booking_channel)
+        format {
+          type: 'text'
+        }
+      }
+      field target: VizFieldFull {
+        label: 'Loyalty Tier'
+        ref: r(public_guests.loyalty_tier)
+        format {
+          type: 'text'
+        }
+      }
+      field value: VizFieldFull {
+        label: 'Total Revenue'
+        ref: r(laasie.total_revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
   view: CanvasLayout {
     label: 'Growth & Performance'
     width: 1300
-    height: 3330
+    height: 4570
     grid_size: 20
     auto_expand_vertically: true
     block t_header {
@@ -750,32 +972,44 @@ Every figure below is on the **check-in date** lens. Use *Time Grain* to change 
     block v_revenue_trend {
       position: pos(20, 710, 1260, 400)
     }
+    block t_sheet {
+      position: pos(20, 1130, 1260, 80)
+    }
+    block v_metric_sheet {
+      position: pos(20, 1230, 1260, 520)
+    }
     block v_group_growth {
-      position: pos(20, 1130, 620, 380)
+      position: pos(20, 1770, 620, 380)
     }
     block v_channel_mix {
-      position: pos(660, 1130, 620, 380)
+      position: pos(660, 1770, 620, 380)
     }
     block t_member {
-      position: pos(20, 1520, 1260, 80)
+      position: pos(20, 2170, 1260, 80)
     }
     block v_member_uplift {
-      position: pos(20, 1610, 1260, 380)
+      position: pos(20, 2270, 1260, 380)
     }
     block v_tier_mix {
-      position: pos(20, 2010, 620, 380)
+      position: pos(20, 2670, 620, 380)
     }
     block v_segment_mix {
-      position: pos(660, 2010, 620, 380)
+      position: pos(660, 2670, 620, 380)
     }
     block t_rewards {
-      position: pos(20, 2400, 1260, 80)
+      position: pos(20, 3070, 1260, 80)
     }
     block v_reward_economics {
-      position: pos(20, 2490, 1260, 340)
+      position: pos(20, 3170, 1260, 340)
     }
     block v_property_table {
-      position: pos(20, 2850, 1260, 460)
+      position: pos(20, 3530, 1260, 460)
+    }
+    block t_flow {
+      position: pos(20, 4010, 1260, 80)
+    }
+    block v_sankey {
+      position: pos(20, 4110, 1260, 440)
     }
     mobile {
       mode: 'auto'

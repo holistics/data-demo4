@@ -1,0 +1,239 @@
+// Two-level Sankey, written in Vega because neither Vega-Lite nor any built-in Holistics viz
+// can draw one: ribbons need a computed layout (stack the nodes, then stack each link inside
+// its node band at BOTH ends) that no declarative chart type exposes.
+//
+// Deliberately generic — `source`, `target`, `value` carry no business meaning — so one
+// definition serves both dashboards:
+//   internal : Booking Channel -> Loyalty Tier, weighted by Total Revenue
+//   portal   : Loyalty Tier   -> Reward Type,  weighted by Redemption Value
+//
+// NO SCALE IN THE DATA PATH — THIS IS LOAD-BEARING.
+// The obvious way to write this is a linear `y` scale whose range is the drawable height, then
+// call scale('y', ...) inside the data transforms. That deadlocks Vega: the scale's range
+// depends on how many nodes there are, node count is derived from `sourceTotals`, and
+// `sourceTotals` would then depend on the scale — "Cycle detected in dataflow graph".
+// So all layout stays in VALUE units through the transforms, and the single value->pixel
+// factor `vScale` is applied in formulas and mark encoders instead. Nothing upstream of a
+// signal reads a scale.
+//
+// OTHER LAYOUT NOTES
+// - One `vScale` for both columns, so a ribbon is the same thickness at each end. Per-side
+//   scaling would be easier but reads as flow being lost between the columns.
+// - Node gaps are applied in PIXELS after scaling, so they never distort the proportions.
+// - linkpath needs orient "horizontal"; the default is vertical and bows the ribbons the
+//   wrong way for a left-to-right flow.
+// - Ribbons are thick curved strokes, not filled polygons. A true polygon ribbon needs four
+//   bezier edges per link; at these sizes the stroke is visually equivalent and far more robust.
+//
+// NO containerSize(), AND NO SIGNALS IN linkpath — BOTH CAUSE "invalid SVG path".
+// Sizing off containerSize() returns NaN when the first paint has zero size, NaN flows through
+// vScale into every coordinate, and linkpath emits "M NaN,NaN ..." which the SVG renderer
+// rejects. Fixed numeric width/height with autosize "fit" cannot produce NaN, and Holistics
+// scales the result into the block anyway.
+// Likewise linkpath's sourceX/targetX are passed as FIELDS (xFrom / xTo, materialised by
+// formula) rather than as {"signal": ...}: signal-valued transform params are the other way
+// these coordinates silently arrive undefined. A final isFinite() filter guarantees the
+// transform never sees a non-numeric coordinate whatever the data does.
+//
+// Field names reach the spec through SIGNALS (`fSource` etc.) rather than being interpolated
+// into expression strings, because `@{...}` placeholders expand in JSON value position, not
+// inside string literals.
+CustomChartDef laasie_sankey {
+  label: 'Sankey Flow'
+  description: 'Two-level flow diagram. Ribbon thickness is the measure; nodes on each side are ordered largest-first. Use it to show how one categorical population distributes across another.'
+
+  fields {
+    field source {
+      label: 'From'
+      type: 'dimension'
+    }
+    field target {
+      label: 'To'
+      type: 'dimension'
+    }
+    field value {
+      label: 'Flow'
+      type: 'measure'
+      data_type: 'number'
+    }
+  }
+
+  template: @vg {
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "autosize": {"type": "fit", "contains": "padding"},
+    "padding": {"left": 6, "right": 6, "top": 10, "bottom": 10},
+    "width": 1000,
+    "height": 400,
+
+    "signals": [
+      {"name": "fSource", "value": @{fields.source.name}},
+      {"name": "fTarget", "value": @{fields.target.name}},
+      {"name": "fValue",  "value": @{fields.value.name}},
+      {"name": "nodeW", "value": 12},
+      {"name": "gap", "value": 10},
+      {"name": "rightX", "update": "width - nodeW"},
+      {"name": "srcCount", "update": "length(data('sourceTotals'))"},
+      {"name": "tgtCount", "update": "length(data('targetTotals'))"},
+      {"name": "maxCount", "update": "max(max(srcCount, tgtCount), 1)"},
+      {"name": "innerH", "update": "max(20, height - gap * (maxCount - 1))"},
+      {"name": "grandTotal", "update": "length(data('grand')) > 0 && isFinite(data('grand')[0].gt) && data('grand')[0].gt > 0 ? data('grand')[0].gt : 1"},
+      {"name": "vScale", "update": "innerH > 0 && grandTotal > 0 ? innerH / grandTotal : 0"}
+    ],
+
+    "data": [
+      {
+        "name": "links",
+        "values": @{values},
+        "transform": [
+          {"type": "formula", "as": "src", "expr": "datum[fSource]"},
+          {"type": "formula", "as": "tgt", "expr": "datum[fTarget]"},
+          {"type": "formula", "as": "val", "expr": "datum[fValue]"},
+          {"type": "filter", "expr": "datum.src != null && datum.tgt != null && datum.val > 0"}
+        ]
+      },
+      {
+        "name": "grand",
+        "source": "links",
+        "transform": [
+          {"type": "aggregate", "ops": ["sum"], "fields": ["val"], "as": ["gt"]}
+        ]
+      },
+      {
+        "name": "sourceTotals",
+        "source": "links",
+        "transform": [
+          {"type": "aggregate", "groupby": ["src"], "ops": ["sum"], "fields": ["val"], "as": ["total"]},
+          {"type": "collect", "sort": {"field": "total", "order": "descending"}},
+          {"type": "stack", "field": "total", "offset": "zero"},
+          {"type": "window", "ops": ["row_number"], "as": ["idx"]}
+        ]
+      },
+      {
+        "name": "targetTotals",
+        "source": "links",
+        "transform": [
+          {"type": "aggregate", "groupby": ["tgt"], "ops": ["sum"], "fields": ["val"], "as": ["total"]},
+          {"type": "collect", "sort": {"field": "total", "order": "descending"}},
+          {"type": "stack", "field": "total", "offset": "zero"},
+          {"type": "window", "ops": ["row_number"], "as": ["idx"]}
+        ]
+      },
+      {
+        "name": "ribbons",
+        "source": "links",
+        "transform": [
+          {"type": "stack", "groupby": ["src"], "field": "val", "offset": "zero", "sort": {"field": "tgt"}, "as": ["sy0", "sy1"]},
+          {"type": "stack", "groupby": ["tgt"], "field": "val", "offset": "zero", "sort": {"field": "src"}, "as": ["ty0", "ty1"]},
+          {"type": "lookup", "from": "sourceTotals", "key": "src", "fields": ["src"], "values": ["y0", "idx"], "as": ["srcBase", "srcIdx"]},
+          {"type": "lookup", "from": "targetTotals", "key": "tgt", "fields": ["tgt"], "values": ["y0", "idx"], "as": ["tgtBase", "tgtIdx"]},
+          {"type": "formula", "as": "yFrom", "expr": "(datum.srcBase + (datum.sy0 + datum.sy1) / 2) * vScale + (datum.srcIdx - 1) * gap"},
+          {"type": "formula", "as": "yTo", "expr": "(datum.tgtBase + (datum.ty0 + datum.ty1) / 2) * vScale + (datum.tgtIdx - 1) * gap"},
+          {"type": "formula", "as": "thick", "expr": "max(1, datum.val * vScale)"},
+          {"type": "formula", "as": "xFrom", "expr": "nodeW"},
+          {"type": "formula", "as": "xTo", "expr": "rightX"},
+          {"type": "filter", "expr": "isFinite(datum.xFrom) && isFinite(datum.xTo) && isFinite(datum.yFrom) && isFinite(datum.yTo) && isFinite(datum.thick)"},
+          {
+            "type": "linkpath",
+            "orient": "horizontal",
+            "shape": "diagonal",
+            "sourceX": {"field": "xFrom"},
+            "sourceY": {"field": "yFrom"},
+            "targetX": {"field": "xTo"},
+            "targetY": {"field": "yTo"}
+          }
+        ]
+      }
+    ],
+
+    "scales": [
+      {
+        "name": "color",
+        "type": "ordinal",
+        "domain": {"data": "sourceTotals", "field": "src"},
+        "range": ["#7c3aed", "#f59e0b", "#0ea5e9", "#10b981", "#ec4899", "#8b5cf6", "#f97316", "#14b8a6"]
+      }
+    ],
+
+    "marks": [
+      {
+        "type": "path",
+        "from": {"data": "ribbons"},
+        "encode": {
+          "update": {
+            "path": {"field": "path"},
+            "stroke": {"scale": "color", "field": "src"},
+            "strokeWidth": {"field": "thick"},
+            "strokeOpacity": {"value": 0.38},
+            "fill": {"value": "transparent"},
+            "tooltip": {"signal": "{'From': datum.src, 'To': datum.tgt, 'Flow': format(datum.val, ',.0f')}"}
+          },
+          "hover": {
+            "strokeOpacity": {"value": 0.75}
+          }
+        }
+      },
+      {
+        "type": "rect",
+        "from": {"data": "sourceTotals"},
+        "encode": {
+          "update": {
+            "x": {"value": 0},
+            "width": {"signal": "nodeW"},
+            "y": {"signal": "datum.y0 * vScale + (datum.idx - 1) * gap"},
+            "y2": {"signal": "datum.y1 * vScale + (datum.idx - 1) * gap"},
+            "fill": {"scale": "color", "field": "src"},
+            "cornerRadius": {"value": 2},
+            "tooltip": {"signal": "{'From': datum.src, 'Total': format(datum.total, ',.0f')}"}
+          }
+        }
+      },
+      {
+        "type": "rect",
+        "from": {"data": "targetTotals"},
+        "encode": {
+          "update": {
+            "x": {"signal": "rightX"},
+            "width": {"signal": "nodeW"},
+            "y": {"signal": "datum.y0 * vScale + (datum.idx - 1) * gap"},
+            "y2": {"signal": "datum.y1 * vScale + (datum.idx - 1) * gap"},
+            "fill": {"value": "#c4b5fd"},
+            "cornerRadius": {"value": 2},
+            "tooltip": {"signal": "{'To': datum.tgt, 'Total': format(datum.total, ',.0f')}"}
+          }
+        }
+      },
+      {
+        "type": "text",
+        "from": {"data": "sourceTotals"},
+        "encode": {
+          "update": {
+            "x": {"signal": "nodeW + 6"},
+            "y": {"signal": "((datum.y0 + datum.y1) / 2) * vScale + (datum.idx - 1) * gap"},
+            "baseline": {"value": "middle"},
+            "align": {"value": "left"},
+            "text": {"field": "src"},
+            "fontSize": {"value": 11},
+            "font": {"value": "Plus Jakarta Sans, sans-serif"},
+            "fill": {"value": "#1e1b33"}
+          }
+        }
+      },
+      {
+        "type": "text",
+        "from": {"data": "targetTotals"},
+        "encode": {
+          "update": {
+            "x": {"signal": "rightX - 6"},
+            "y": {"signal": "((datum.y0 + datum.y1) / 2) * vScale + (datum.idx - 1) * gap"},
+            "baseline": {"value": "middle"},
+            "align": {"value": "right"},
+            "text": {"field": "tgt"},
+            "fontSize": {"value": 11},
+            "font": {"value": "Plus Jakarta Sans, sans-serif"},
+            "fill": {"value": "#1e1b33"}
+          }
+        }
+      }
+    ]
+  };;
+}
