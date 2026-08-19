@@ -1,0 +1,475 @@
+// EXTERNAL dashboard — hotel owner and management companies only.
+//
+// Reads `laasie_client` — the client-scoped dataset, whose `owner_group_scope` permission
+// restricts rows by the `laasie_owner_group_id` user attribute. Internal reporting reads the
+// unscoped `laasie` dataset instead, so Laasie staff need no attribute provisioned.
+//
+// SEPARATION OF INTERNAL AND EXTERNAL REPORTING:
+// This page carries no cross-client comparison, no platform benchmark, no other group's
+// properties and no stakeholder directory. Those live in laasie_growth_performance, which is
+// deliberately not reachable from the embed portal. If a widget here is ever repointed at the
+// `laasie` dataset it silently becomes a cross-client leak — check the `dataset:` line on
+// every block before shipping a change.
+//
+// Guest email is redacted at the model layer for anyone without `pii_access`, so even the
+// self-serve exploration and Ask AI surfaces exposed alongside this page cannot be used to
+// pull a mailing list of the group's guests.
+Dashboard laasie_owner_portal {
+  title: 'Laasie — My Portfolio'
+  description: '''External owner view. A hotel owner or management company sees only its own properties: revenue and booking growth against prior periods, loyalty programme penetration, and the rewards its guests are claiming.'''
+  owner: 'nam.tran@holistics.io'
+
+  block b_date_drill: DateDrillBlock {
+    label: 'Time Grain'
+  }
+  block b_pop: PopBlock {
+    label: 'Compare Against'
+  }
+
+  block f_check_in: FilterBlock {
+    label: 'Check-In Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie_client
+      field: r(public_bookings.check_in_date)
+    }
+    // Same two-year default as the internal page, for the same reason: every year-over-year
+    // widget needs a prior period inside the filtered range or it renders blank.
+    default {
+      operator: 'matches'
+      value: 'last 2 years to today'
+    }
+  }
+  block f_property: FilterBlock {
+    label: 'Property'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie_client
+      field: r(public_properties.property_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block t_header: TextBlock {
+    content: @md
+# 🏨 My Portfolio
+
+Your properties and how their Laasie programme is performing. This view is scoped to your own portfolio — you see only the properties your group operates. Use *Time Grain* and *Compare Against* to change the period and the comparison for the whole page.
+    ;;
+  }
+  block t_trend: TextBlock {
+    content: @md
+## Revenue growth over time
+    ;;
+  }
+  block t_rewards: TextBlock {
+    content: @md
+## What your guests are claiming
+    ;;
+  }
+
+  block k_revenue: VizBlock {
+    label: 'My Revenue'
+    viz: MetricKpi {
+      dataset: laasie_client
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie_client.total_revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+  block k_bookings: VizBlock {
+    label: 'My Bookings'
+    viz: MetricKpi {
+      dataset: laasie_client
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie_client.bookings)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+  block k_adr: VizBlock {
+    label: 'ADR'
+    viz: MetricKpi {
+      dataset: laasie_client
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie_client.avg_adr)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+  block k_member_rate: VizBlock {
+    label: 'Member Booking Rate'
+    viz: MetricKpi {
+      dataset: laasie_client
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie_client.member_booking_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+
+  block v_revenue_trend: VizBlock {
+    label: 'My Revenue vs Same Period Last Year'
+    viz: LineChart {
+      dataset: laasie_client
+      x_axis: VizFieldFull {
+        label: 'Check-In Month'
+        ref: r(public_bookings.check_in_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(laasie_client.total_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7c3aed'
+          }
+        }
+      }
+      settings {
+        pop {
+          field: r(public_bookings.check_in_date)
+          value: RelativePopValue {
+            duration: 1
+            granularity: 'year'
+          }
+          show_growth_rate: true
+        }
+        x_axis_label: 'Check-In Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block v_property_table: VizBlock {
+    label: 'My Properties'
+    viz: DataTable {
+      dataset: laasie_client
+      fields: [
+        VizFieldFull {
+          label: 'Property'
+          ref: r(public_properties.property_name)
+          format {
+            type: 'text'
+          }
+          uname: 'op_property'
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(public_properties.city)
+          format {
+            type: 'text'
+          }
+          uname: 'op_city'
+        },
+        VizFieldFull {
+          label: 'Bookings'
+          ref: r(laasie_client.bookings)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'op_bookings'
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(laasie_client.total_revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'op_revenue'
+        },
+        VizFieldFull {
+          label: 'Revenue LY'
+          ref: r(laasie_client.revenue_prev_year)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'op_revenue_ly'
+        },
+        VizFieldFull {
+          label: 'Revenue YoY'
+          ref: r(laasie_client.revenue_yoy_growth)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'op_revenue_yoy'
+        },
+        VizFieldFull {
+          label: 'ADR'
+          ref: r(laasie_client.avg_adr)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'op_adr'
+        },
+        VizFieldFull {
+          label: 'Member Rate'
+          ref: r(laasie_client.member_booking_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'op_member_rate'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'op_revenue'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+        column_styles: [
+          ColumnStyle {
+            key: 'op_property'
+            width: 240
+          },
+          ColumnStyle {
+            key: 'op_city'
+            width: 160
+          },
+          ColumnStyle {
+            key: 'op_bookings'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'op_revenue'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'op_revenue_ly'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'op_revenue_yoy'
+            width: 150
+          },
+          ColumnStyle {
+            key: 'op_adr'
+            width: 120
+          },
+          ColumnStyle {
+            key: 'op_member_rate'
+            width: 150
+          }
+        ]
+      }
+    }
+  }
+
+  block v_reward_mix: VizBlock {
+    label: 'Redemption Value by Reward Type'
+    viz: BarChart {
+      dataset: laasie_client
+      x_axis: VizFieldFull {
+        label: 'Reward Type'
+        ref: r(public_reward_catalog.reward_type)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Redemption Value'
+            ref: r(laasie_client.redemption_value)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Reward Type'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_tier_bookings: VizBlock {
+    label: 'Member Bookings by Loyalty Tier'
+    viz: BarChart {
+      dataset: laasie_client
+      x_axis: VizFieldFull {
+        label: 'Loyalty Tier'
+        ref: r(public_guests.loyalty_tier)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Member Bookings'
+            ref: r(laasie_client.member_bookings)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7c3aed'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Loyalty Tier'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'My Portfolio'
+    width: 1300
+    height: 1890
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block t_header {
+      position: pos(20, 20, 1260, 150)
+    }
+    block b_date_drill {
+      position: pos(20, 190, 300, 100)
+    }
+    block b_pop {
+      position: pos(340, 190, 300, 100)
+    }
+    block f_check_in {
+      position: pos(660, 190, 300, 100)
+    }
+    block f_property {
+      position: pos(980, 190, 300, 100)
+    }
+    block k_revenue {
+      position: pos(20, 310, 300, 180)
+    }
+    block k_bookings {
+      position: pos(340, 310, 300, 180)
+    }
+    block k_adr {
+      position: pos(660, 310, 300, 180)
+    }
+    block k_member_rate {
+      position: pos(980, 310, 300, 180)
+    }
+    block t_trend {
+      position: pos(20, 510, 1260, 60)
+    }
+    block v_revenue_trend {
+      position: pos(20, 590, 1260, 400)
+    }
+    block v_property_table {
+      position: pos(20, 1010, 1260, 380)
+    }
+    block t_rewards {
+      position: pos(20, 1410, 1260, 60)
+    }
+    block v_reward_mix {
+      position: pos(20, 1490, 620, 380)
+    }
+    block v_tier_bookings {
+      position: pos(660, 1490, 620, 380)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: laasie_theme
+}

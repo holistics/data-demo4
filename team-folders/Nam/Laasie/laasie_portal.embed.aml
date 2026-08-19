@@ -1,0 +1,64 @@
+// External owner portal over the Laasie loyalty data.
+//
+// This is the asset that answers Laasie's stated requirement for "easy-to-use embedded
+// dashboard functionality for external web access": one declaration, dropped into their own
+// web app as an iframe, carrying the dashboard, self-serve exploration and Ask AI — all three
+// under the same row-level restriction rather than three separate integrations to secure.
+//
+// DATASET-LAYER SEPARATION:
+// This portal reads `laasie_client`, a dataset that exists solely to carry the row-level
+// restriction. Internal reporting reads the unscoped `laasie` dataset, so Laasie staff are
+// never subject to client scoping and need no user attribute provisioned. The two audiences
+// are separated at the dataset layer, not by per-user setup.
+//
+// SEPARATION OF INTERNAL AND EXTERNAL REPORTING:
+// This portal exposes ONLY laasie_owner_portal. The internal dashboard
+// (laasie_growth_performance) — cross-client growth, platform benchmarks, the stakeholder
+// directory — is deliberately not listed here and is unreachable from the portal.
+//
+// ROW-LEVEL SECURITY:
+// Enforced by the `owner_group_scope` permission on the `laasie_client` dataset
+// (matches_user_attribute on the dedicated `laasie_owner_group_id` attribute). It is listed in
+// `required_permissions` so the portal FAILS CLOSED: a token that does not carry
+// `laasie_owner_group_id` is rejected outright, rather than falling through to every hotel
+// group's revenue. The value to put on a stakeholder's token is their row in
+// `public_external_stakeholders.owner_group_id`.
+//
+// COLUMN-LEVEL SECURITY:
+// Because this portal exposes the dataset itself for exploration and Ask AI — not just a
+// fixed dashboard — an external user can reach columns no widget displays. Guest and
+// stakeholder email are therefore gated separately at the MODEL layer on `pii_access`, so a
+// portal viewer without that attribute sees '(redacted)' no matter how they ask for it.
+EmbedPortal laasie_portal {
+  description: 'Laasie owner portal — a hotel owner or management company sees only the properties their own group operates, plus self-serve exploration and Ask AI over the same scoped data.'
+  objects: [
+    // Dashboards — external only
+    laasie_owner_portal,
+    // Datasets (self-serve exploration + AI, row-scoped by owner_group_scope)
+    laasie_client,
+  ]
+  required_permissions: [
+    laasie_client.permission.owner_group_scope,
+  ]
+  initial_object: 'ai'
+  ai {
+    customization {
+      global {
+        assistant_name: 'Laasie Insights'
+      }
+      chat_page {
+        intro {
+          header: 'Ask about your properties, your guests and how your rewards programme is performing.'
+          body: @md
+            ## 📈 Compare revenue, bookings and ADR against last year or last month
+            ## 🏨 Break performance down by property, city or booking channel
+            ## 🎁 See which rewards your guests actually claim, and what they cost
+            ## 👥 Track loyalty tier mix and member booking rate over time
+            ## 📌 Save any insight straight to your dashboard
+          ;;
+        }
+        prompt_placeholder: 'e.g. How did revenue at my properties grow versus the same quarter last year?'
+      }
+    }
+  }
+}

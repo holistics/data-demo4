@@ -1,44 +1,56 @@
 Model public_properties {
   type: 'table'
   label: 'Properties'
-  description: ''
+  description: 'Individual hotels operating the Laasie rewards programme. One row per property, each belonging to exactly one owner group. This model carries the geography of the portfolio (city, state) and its physical capacity (room count), and it is the join hop that connects every booking to its owner group.'
   data_source_name: 'demo_laasie_nam'
-  dimension owner_group_id {
-    label: 'Owner Group Id'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.owner_group_id }};;
-  }
-  dimension property_name {
-    label: 'Property Name'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.property_name }};;
-  }
-  dimension city {
-    label: 'City'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.city }};;
-  }
-  dimension state {
-    label: 'State'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.state }};;
-  }
-  dimension room_count {
-    label: 'Room Count'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.room_count }};;
-  }
+
   dimension property_id {
     label: 'Property Id'
     type: 'number'
+    description: "The **Property Id** uniquely identifies each hotel.  \nIt is the primary key of this model and the target of the `bookings.property_id` relationship."
     hidden: false
     definition: @sql {{ #SOURCE.property_id }};;
     primary_key: true
+  }
+
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    description: "The **Owner Group Id** identifies the owner or management company this property belongs to.  \nThis is the active join to `public_owner_groups`, and therefore the path by which bookings, loyalty transactions and redemptions inherit their owner group. Row-level scoping in the client dataset reaches every fact through this hop."
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+
+  dimension property_name {
+    label: 'Property Name'
+    type: 'text'
+    description: "The **Property Name** is the display name of the hotel.  \nUse this rather than the numeric id for property-level reporting and leaderboards."
+    hidden: false
+    definition: @sql {{ #SOURCE.property_name }};;
+  }
+
+  dimension city {
+    label: 'City'
+    type: 'text'
+    description: "The **City** the property is located in.  \nPaired with `state` for geographic breakdowns. City names are not unique across states — group by city and state together when comparing markets."
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+
+  dimension state {
+    label: 'State'
+    type: 'text'
+    description: "The **State** the property is located in.  \nThe standard geographic rollup for regional performance comparisons."
+    hidden: false
+    definition: @sql {{ #SOURCE.state }};;
+  }
+
+  dimension room_count {
+    label: 'Room Count'
+    type: 'number'
+    description: "The **Room Count** is the property's physical inventory — how many rooms it has.  \nThis is a property ATTRIBUTE, not a fact: it does not vary over time, so summing it across a booking-level query multiplies it by the number of bookings. Aggregate it only over `public_properties` on its own, and use it as a denominator for capacity-normalised comparisons (revenue per room) rather than as a measure in its own right."
+    hidden: false
+    definition: @sql {{ #SOURCE.room_count }};;
   }
 
   owner: 'nam.tran@holistics.io'

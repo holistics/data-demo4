@@ -1,56 +1,72 @@
 Model public_loyalty_transactions {
   type: 'table'
   label: 'Loyalty Transactions'
-  description: ''
+  description: 'The loyalty ledger: every reward value earned or spent by a member. One row per transaction, so a single booking can generate several. Grain is FINER than bookings — joining this model fans out booking rows, so always count `bookings.booking_id` distinctly when the two appear in the same query. This model answers what the programme is issuing; `public_redemptions` answers what members actually took.'
   data_source_name: 'demo_laasie_nam'
-  dimension guest_id {
-    label: 'Guest Id'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.guest_id }};;
-  }
-  dimension booking_id {
-    label: 'Booking Id'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.booking_id }};;
-  }
-  dimension owner_group_id {
-    label: 'Owner Group Id'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.owner_group_id }};;
-  }
-  dimension transaction_type {
-    label: 'Transaction Type'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.transaction_type }};;
-  }
-  dimension reward_type {
-    label: 'Reward Type'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.reward_type }};;
-  }
-  dimension amount {
-    label: 'Amount'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.amount }};;
-  }
-  dimension transaction_date {
-    label: 'Transaction Date'
-    type: 'date'
-    hidden: false
-    definition: @sql {{ #SOURCE.transaction_date }};;
-  }
+
   dimension transaction_id {
     label: 'Transaction Id'
     type: 'number'
+    description: "The **Transaction Id** uniquely identifies each ledger entry.  \nIt is the primary key of this model and the correct field to count distinctly for transaction volume."
     hidden: false
     definition: @sql {{ #SOURCE.transaction_id }};;
     primary_key: true
+  }
+
+  dimension booking_id {
+    label: 'Booking Id'
+    type: 'number'
+    description: "The **Booking Id** links this transaction to the stay that triggered it.  \nThis is the active join to `public_bookings`, and the path by which this model inherits its property, owner group and client scoping. It may be unset for activity not tied to a stay — enrolment bonuses and promotional grants — and those rows drop out of any query that joins through bookings, so a booking-joined transaction total can be lower than the raw ledger total."
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_id }};;
+  }
+
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    description: "The **Guest Id** identifies the member whose balance moved.  \nGuest attributes are reached through the booking (`booking_id > bookings > guests`) rather than directly from here, so that the dataset has a single unambiguous path to `public_guests`. Use this column to identify the member on ledger rows that have no booking."
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+  }
+
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    description: "The **Owner Group Id** denormalised onto the ledger entry — the group whose programme funded it.  \nAs on bookings, this duplicates what the booking's property lineage already provides and is therefore not the active join path. Group by `public_owner_groups.group_name` instead."
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+
+  dimension transaction_type {
+    label: 'Transaction Type'
+    type: 'text'
+    description: "The **Transaction Type** says which direction the ledger moved — value being credited to a member versus value being spent.  \n**This column governs the sign of `amount`, so never total `amount` without either filtering or splitting by transaction type**; a mixed total nets earnings against spend and produces a number that means nothing on its own."
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_type }};;
+  }
+
+  dimension reward_type {
+    label: 'Reward Type'
+    type: 'text'
+    description: "The **Reward Type** is the category of reward the entry relates to.  \nIt mirrors `reward_catalog.reward_type`, letting you analyse issuance by category here and redemption by category through `public_redemptions`. Comparing the two shows which categories are being issued but not taken up."
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_type }};;
+  }
+
+  dimension amount {
+    label: 'Amount'
+    type: 'number'
+    description: "The **Amount** of reward value moved by this entry, in USD.  \nAdditive, but only within a single `transaction_type` — see that column. This is the issuance-side cost measure of the programme; the realised cost is `redemptions.value_redeemed`, and the gap between the two is outstanding liability."
+    hidden: false
+    definition: @sql {{ #SOURCE.amount }};;
+  }
+
+  dimension transaction_date {
+    label: 'Transaction Date'
+    type: 'date'
+    description: "The **Transaction Date** is when the ledger entry was posted.  \nThis is the loyalty-activity date lens, and it is distinct from the stay: an entry can post days after check-in. Report issuance by this date and revenue by `bookings.check_in_date`, and say which lens a figure uses — mixing them in one time series silently misaligns the periods."
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_date }};;
   }
 
   owner: 'nam.tran@holistics.io'

@@ -1,0 +1,349 @@
+// Base Laasie loyalty dataset — UNSCOPED, for Laasie's own internal teams.
+//
+// Carries no row-level permission by design. Internal staff read this dataset and see every
+// owner group on the platform with no user attribute provisioned. The client-scoped derivation
+// `laasie_client` extends this one and adds the restriction; see that file for why the
+// boundary lives at the dataset layer rather than in per-user setup.
+//
+// Column-level PII redaction on guest and stakeholder email is defined on the models, so it
+// applies here too — internal users without `pii_access = 1` see '(redacted)'.
+//
+// JOIN PATH NOTE: `owner_group_id` is denormalised onto bookings, loyalty_transactions and
+// redemptions. Only ONE route to owner group is active — bookings > properties > owner_groups —
+// so the dataset has no ambiguous join paths. The denormalised columns are declared as
+// INACTIVE relationships below: the redundancy stays documented and available to activate,
+// without creating a second path the query planner could pick.
+Dataset laasie {
+  label: 'Laasie Loyalty'
+  description: '''
+Hospitality loyalty and rewards dataset for Laasie, built on the `demo_laasie_nam` data source.
+
+## What this dataset can answer
+- Commercial performance: bookings, total spend and ADR by property, owner group, market, channel and period — with period-over-period growth as a first-class metric rather than a manual calculation.
+- Programme impact: member versus non-member booking volume, spend and rate, and the channel mix that loyalty is meant to shift toward direct.
+- Reward economics: what was issued on the loyalty ledger, what members actually redeemed, and what that cost against the revenue of the stays it drove.
+- Membership: enrolment over time, tier and traveler-segment mix, and the gap between the rewards members say they prefer and the ones they claim.
+
+## Grain and joins
+`public_bookings` is the central model, at one row per stay. `public_loyalty_transactions` and
+`public_redemptions` are both finer than that — a booking can have many of each — so joining
+either one fans out booking rows. Count `public_bookings.booking_id` distinctly whenever those
+models are in the query.
+
+Every fact reaches its owner group through one path: `bookings > properties > owner_groups`.
+Group by `public_owner_groups.group_name`, not by the denormalised `owner_group_id` columns
+on the fact tables.
+
+## Date lenses
+Three different dates mean three different things and must not be mixed silently:
+- `bookings.check_in_date` — when the stay began (the revenue lens; all growth metrics shift against this)
+- `loyalty_transactions.transaction_date` — when reward value was posted (the issuance lens)
+- `redemptions.redeemed_date` — when a member claimed a reward (the redemption lens)
+
+Always state which lens a figure uses. There is no reservation date in the source, so booking
+lead time and pace-to-arrival are not answerable here.
+
+## Non-additive measures
+- `adr` is already a per-night average — average it across bookings, never sum it.
+- `loyalty_transactions.amount` changes sign with `transaction_type` — always split or filter by type.
+- `properties.room_count` and `reward_catalog.value_usd` are dimension attributes, not facts —
+  summing them alongside bookings or redemptions multiplies them by the fan-out.
+
+## Caveats
+This is synthetic demo data. Revenue is attributed wholly to the check-in date rather than
+spread across the nights of a stay, so a stay spanning a month boundary sits entirely in its
+check-in month.
+'''
+  data_source_name: 'demo_laasie_nam'
+
+  models: [
+    public_bookings,
+    public_guests,
+    public_properties,
+    public_owner_groups,
+    public_loyalty_transactions,
+    public_redemptions,
+    public_reward_catalog,
+    public_external_stakeholders
+  ]
+
+  relationships: [
+    // Active spine — one unambiguous path from every fact to owner group.
+    relationship(public_bookings.guest_id > public_guests.guest_id, true),
+    relationship(public_bookings.property_id > public_properties.property_id, true),
+    relationship(public_properties.owner_group_id > public_owner_groups.owner_group_id, true),
+    relationship(public_loyalty_transactions.booking_id > public_bookings.booking_id, true),
+    relationship(public_redemptions.booking_id > public_bookings.booking_id, true),
+    relationship(public_redemptions.reward_id > public_reward_catalog.reward_id, true),
+    relationship(public_external_stakeholders.owner_group_id > public_owner_groups.owner_group_id, true),
+
+    // Inactive — denormalised shortcuts that would create a second path to owner group
+    // (and to guests). Documented here rather than deleted, so the redundancy in the source
+    // is visible and any one of them can be activated deliberately if the spine changes.
+    relationship(public_bookings.owner_group_id > public_owner_groups.owner_group_id, false),
+    relationship(public_loyalty_transactions.owner_group_id > public_owner_groups.owner_group_id, false),
+    relationship(public_redemptions.owner_group_id > public_owner_groups.owner_group_id, false),
+    relationship(public_loyalty_transactions.guest_id > public_guests.guest_id, false),
+    relationship(public_redemptions.guest_id > public_guests.guest_id, false)
+  ]
+
+  // ---------------------------------------------------------------------------------
+  // VOLUME AND REVENUE
+  // ---------------------------------------------------------------------------------
+  metric bookings {
+    label: 'Bookings'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_bookings.booking_id);;
+    description: 'Distinct stays in the selected context. Counted distinctly so that joining loyalty transactions or redemptions — both finer than a booking — cannot inflate it.'
+  }
+
+  metric total_revenue {
+    label: 'Total Revenue'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(public_bookings.total_spend);;
+    description: 'Total guest spend in USD across the stays in context, room plus ancillary. Additive across every dimension. Attributed to check-in date.'
+  }
+
+  metric avg_adr {
+    label: 'ADR'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql avg(public_bookings.adr);;
+    description: 'Average daily rate across the bookings in context. ADR is already a per-night average, so this is an unweighted mean of booking-level rates — every stay counts once regardless of length. Never sum ADR.'
+  }
+
+  metric avg_booking_value {
+    label: 'Avg Booking Value'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql safe_divide(total_revenue, bookings);;
+    description: 'Total revenue divided by distinct bookings — what an average stay is worth. Distinct from ADR: this is the whole stay including ancillary spend, ADR is one night of room rate.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // LOYALTY PROGRAMME IMPACT
+  // ---------------------------------------------------------------------------------
+  metric member_bookings {
+    label: 'Member Bookings'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_bookings.booking_id) | where(public_bookings.is_member_booking == true);;
+    description: 'Distinct stays made by enrolled loyalty members. The volume side of programme impact.'
+  }
+
+  metric member_booking_rate {
+    label: 'Member Booking Rate'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(member_bookings, bookings);;
+    description: 'Share of stays made by enrolled members. The single clearest measure of programme penetration at a property or owner group.'
+  }
+
+  metric member_revenue {
+    label: 'Member Revenue'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(public_bookings.total_spend) | where(public_bookings.is_member_booking == true);;
+    description: 'Total guest spend from stays by enrolled members.'
+  }
+
+  metric avg_member_booking_value {
+    label: 'Avg Member Booking Value'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql safe_divide(member_revenue, member_bookings);;
+    description: 'What an average member stay is worth. Compare against Avg Non-Member Booking Value — the difference is the commercial case for the programme.'
+  }
+
+  metric non_member_bookings {
+    label: 'Non-Member Bookings'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_bookings.booking_id) | where(public_bookings.is_member_booking == false);;
+    description: 'Distinct stays by guests not enrolled in the programme — the comparison baseline.'
+  }
+
+  metric non_member_revenue {
+    label: 'Non-Member Revenue'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(public_bookings.total_spend) | where(public_bookings.is_member_booking == false);;
+    description: 'Total guest spend from stays by non-enrolled guests.'
+  }
+
+  metric avg_non_member_booking_value {
+    label: 'Avg Non-Member Booking Value'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql safe_divide(non_member_revenue, non_member_bookings);;
+    description: 'What an average non-member stay is worth. The baseline for the member uplift metric.'
+  }
+
+  metric member_value_uplift {
+    label: 'Member Value Uplift'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(avg_member_booking_value - avg_non_member_booking_value, avg_non_member_booking_value);;
+    description: 'How much more an average member stay is worth than an average non-member stay, as a percentage. This is the headline programme-value number. It is a correlation, not a proven causal uplift: members may simply be the guests who would have spent more anyway. State that caveat when quoting it.'
+  }
+
+  metric enrolled_guests {
+    label: 'Enrolled Guests'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_guests.guest_id);;
+    description: 'Distinct loyalty members in context. Guests are platform-wide, so in the client-scoped dataset this counts only members who have stayed at one of the viewer own properties.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // REWARD ECONOMICS
+  // ---------------------------------------------------------------------------------
+  metric loyalty_transactions {
+    label: 'Loyalty Transactions'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_loyalty_transactions.transaction_id);;
+    description: 'Distinct entries on the loyalty ledger. Volume of programme activity, regardless of direction.'
+  }
+
+  metric loyalty_value_posted {
+    label: 'Loyalty Value Posted'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(public_loyalty_transactions.amount);;
+    description: 'Total reward value moved on the ledger in USD. NON-ADDITIVE ACROSS TRANSACTION TYPES: the sign of the underlying amount depends on `transaction_type`, so an unsplit total nets issuance against spend. Always split or filter by transaction type before quoting this.'
+  }
+
+  metric redemptions {
+    label: 'Redemptions'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_redemptions.redemption_id);;
+    description: 'Distinct rewards actually claimed by members.'
+  }
+
+  metric redemption_value {
+    label: 'Redemption Value'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(public_redemptions.value_redeemed);;
+    description: 'USD value members actually took. This is the realised cost of the programme, as opposed to list value in the catalogue or issuance on the ledger.'
+  }
+
+  metric redemption_rate {
+    label: 'Redemptions per Member Booking'
+    type: 'number'
+    format: '#,##0.00'
+    definition: @aql safe_divide(redemptions, member_bookings);;
+    description: 'Rewards claimed per member stay. Measures whether the programme is actually being used, not just enrolled in. Uses member bookings as the denominator because non-member stays cannot redeem.'
+  }
+
+  metric reward_cost_ratio {
+    label: 'Reward Cost Ratio' 
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(redemption_value, total_revenue);;
+    description: 'Redemption value as a share of total guest spend — what the programme costs per revenue dollar it is attached to. The core ROI guardrail: it should stay well below the member value uplift for the programme to pay for itself.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // PORTFOLIO
+  // ---------------------------------------------------------------------------------
+  metric properties {
+    label: 'Properties'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(public_properties.property_id);;
+    description: 'Distinct hotels in context.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // TIME-OVER-TIME GROWTH
+  //
+  // These exist so that growth is a governed metric rather than something each analyst
+  // re-derives by hand. Every one shifts against `bookings.check_in_date` — the revenue
+  // lens — using `strict: true` so the comparison window is a true like-for-like shift
+  // and a partial current period is not compared against a complete prior one.
+  // ---------------------------------------------------------------------------------
+  metric revenue_prev_year {
+    label: 'Total Revenue LY'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql total_revenue | relative_period(public_bookings.check_in_date, interval(-1 year), strict: true);;
+    description: 'Total revenue for the same window one year earlier, on the check-in lens. Adapts to whatever period the surrounding report is showing.'
+  }
+
+  metric revenue_yoy_growth {
+    label: 'Revenue YoY Growth'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(total_revenue - revenue_prev_year, revenue_prev_year);;
+    description: 'Year-over-year change in total revenue. Returns blank rather than an error when the prior-year window has no revenue, so an empty comparison reads as unknown instead of as infinite growth.'
+  }
+
+  metric revenue_prev_month {
+    label: 'Total Revenue PM'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql total_revenue | relative_period(public_bookings.check_in_date, interval(-1 month), strict: true);;
+    description: 'Total revenue for the same window one month earlier, on the check-in lens.'
+  }
+
+  metric revenue_mom_growth {
+    label: 'Revenue MoM Growth'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(total_revenue - revenue_prev_month, revenue_prev_month);;
+    description: 'Month-over-month change in total revenue. In a seasonal business read this alongside the year-over-year figure — hospitality demand swings monthly for reasons that have nothing to do with performance.'
+  }
+
+  metric bookings_prev_year {
+    label: 'Bookings LY'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql bookings | relative_period(public_bookings.check_in_date, interval(-1 year), strict: true);;
+    description: 'Distinct bookings for the same window one year earlier.'
+  }
+
+  metric bookings_yoy_growth {
+    label: 'Bookings YoY Growth'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(bookings - bookings_prev_year, bookings_prev_year);;
+    description: 'Year-over-year change in booking volume. Read together with Revenue YoY Growth: revenue growing faster than volume means rate or spend per stay is rising, slower means the opposite.'
+  }
+
+  metric adr_prev_year {
+    label: 'ADR LY'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql avg_adr | relative_period(public_bookings.check_in_date, interval(-1 year), strict: true);;
+    description: 'Average daily rate for the same window one year earlier.'
+  }
+
+  metric adr_yoy_growth {
+    label: 'ADR YoY Growth'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(avg_adr - adr_prev_year, adr_prev_year);;
+    description: 'Year-over-year change in average daily rate — the rate component of revenue growth, isolated from volume.'
+  }
+
+  metric member_bookings_prev_year {
+    label: 'Member Bookings LY'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql member_bookings | relative_period(public_bookings.check_in_date, interval(-1 year), strict: true);;
+    description: 'Member stays for the same window one year earlier.'
+  }
+
+  metric member_bookings_yoy_growth {
+    label: 'Member Bookings YoY Growth'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(member_bookings - member_bookings_prev_year, member_bookings_prev_year);;
+    description: 'Year-over-year change in member stay volume. Compare against Bookings YoY Growth — member volume growing faster than total volume is the programme gaining share of the business.'
+  }
+}

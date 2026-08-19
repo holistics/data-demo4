@@ -1,38 +1,63 @@
+// COLUMN-LEVEL PERMISSION — stakeholder contact PII.
+//
+// This model is the directory of named human contacts at each owner group, and it is the
+// most directly identifying table in the project: real people, their role, and a working
+// email address. Row-level scoping keeps a client from seeing OTHER groups' contacts, but
+// it is `pii_access` that decides whether the address is visible at all — the same gate
+// used for guest email, so both are governed by one attribute rather than two rules that
+// can drift apart.
+const stakeholder_email_pii =
+  if (H.current_user.pii_access != 1) {
+    '\'(redacted)\''
+  } else {
+    '{{ #SOURCE.email }}'
+  }
+
 Model public_external_stakeholders {
   type: 'table'
   label: 'External Stakeholders'
-  description: ''
+  description: 'Named contacts at each owner group — the people on the client side who receive reporting. One row per stakeholder. This is a directory, not a fact: it has no dates and no measures, and it does not join to bookings, so it should not be mixed into commercial queries. Its purpose in this project is to drive the embedded portal, where each stakeholder maps to an owner group and therefore to what they are allowed to see.'
   data_source_name: 'demo_laasie_nam'
-  dimension owner_group_id {
-    label: 'Owner Group Id'
-    type: 'number'
-    hidden: false
-    definition: @sql {{ #SOURCE.owner_group_id }};;
-  }
-  dimension full_name {
-    label: 'Full Name'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.full_name }};;
-  }
-  dimension email {
-    label: 'Email'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.email }};;
-  }
-  dimension external_role {
-    label: 'External Role'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.external_role }};;
-  }
+
   dimension stakeholder_id {
     label: 'Stakeholder Id'
     type: 'number'
+    description: "The **Stakeholder Id** uniquely identifies each named contact.  \nIt is the primary key of this model and the correct field to count distinctly."
     hidden: false
     definition: @sql {{ #SOURCE.stakeholder_id }};;
     primary_key: true
+  }
+
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    description: "The **Owner Group Id** is the group this person represents.  \nIt joins directly to `public_owner_groups` and is what makes this model the reference list for portal provisioning: the value here is the value that belongs in a stakeholder's `laasie_owner_group_id` user attribute on their embed token."
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    description: "The **Full Name** of the client-side contact.  \nPersonal data belonging to a named individual at the client — treat any export of this model accordingly."
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    description: "The **Email** address of the client-side contact, and the identity an embed session is issued against.  \n**Contact PII — column-level protected.** Users without the `pii_access` attribute see `(redacted)`; see the `stakeholder_email_pii` const at the top of this file. Never use it as a join or grouping key — `stakeholder_id` is the stable identifier, and grouping by a redacted column collapses every row into one."
+    hidden: false
+    definition: @sql ${stakeholder_email_pii};;
+  }
+
+  dimension external_role {
+    label: 'External Role'
+    type: 'text'
+    description: "The **External Role** is the contact's job function at the owner group.  \nIt is the natural basis for deciding what a portal viewer should see beyond row scoping — an asset manager and a revenue manager want different first screens — but note it carries no enforcement on its own: entitlement comes from the row-level permission and the attributes on the embed token, not from this label."
+    hidden: false
+    definition: @sql {{ #SOURCE.external_role }};;
   }
 
   owner: 'nam.tran@holistics.io'

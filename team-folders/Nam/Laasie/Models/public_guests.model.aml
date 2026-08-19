@@ -1,50 +1,86 @@
+// COLUMN-LEVEL PERMISSION — guest contact PII.
+// `email` is directly identifying, contactable personal data belonging to a loyalty member.
+// Owner groups are entitled to see WHO stayed with them, but a member's email address is
+// Laasie's relationship with the guest and is subject to marketing-consent and privacy
+// (GDPR / CCPA) obligations that differ per group.
+//
+// Gated on the `pii_access` user attribute (Number: 1 = may see contact PII, 0 / unset = may not).
+// Anyone without it receives the literal '(redacted)' instead of the real value — the column
+// stays present and queryable, so dashboards and AI exploration do not break, but the address
+// never leaves the warehouse.
+//
+// This matters most for the embed portal: laasie_portal exposes the `laasie_client` dataset for
+// self-serve exploration and Ask AI, so an external hotel user could otherwise pull a mailing
+// list of every guest who stayed with them, even though no dashboard widget displays email.
+// Row-level scoping alone would not stop that — it limits WHICH rows, not WHICH columns.
+const guest_email_pii =
+  if (H.current_user.pii_access != 1) {
+    '\'(redacted)\''
+  } else {
+    '{{ #SOURCE.email }}'
+  }
+
 Model public_guests {
   type: 'table'
   label: 'Guests'
-  description: ''
+  description: 'Enrolled members of the Laasie loyalty programme. One row per guest, independent of any single hotel — a guest can stay across several properties and owner groups. This model carries the membership attributes used for segmentation: tier, traveler segment, reward preference and enrollment date. Note that guests are a platform-wide entity, so in the client-scoped dataset a viewer sees only guests who have stayed at one of their own properties.'
   data_source_name: 'demo_laasie_nam'
-  dimension full_name {
-    label: 'Full Name'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.full_name }};;
-  }
-  dimension email {
-    label: 'Email'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.email }};;
-  }
-  dimension enrollment_date {
-    label: 'Enrollment Date'
-    type: 'date'
-    hidden: false
-    definition: @sql {{ #SOURCE.enrollment_date }};;
-  }
-  dimension loyalty_tier {
-    label: 'Loyalty Tier'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.loyalty_tier }};;
-  }
-  dimension preferred_reward_type {
-    label: 'Preferred Reward Type'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.preferred_reward_type }};;
-  }
-  dimension traveler_segment {
-    label: 'Traveler Segment'
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.traveler_segment }};;
-  }
+
   dimension guest_id {
     label: 'Guest Id'
     type: 'number'
+    description: "The **Guest Id** uniquely identifies each enrolled loyalty member.  \nIt is the primary key of this model and the correct field to count distinctly for member counts. Counting guest rows after joining bookings overstates the number, because a guest with several stays appears once per booking."
     hidden: false
     definition: @sql {{ #SOURCE.guest_id }};;
     primary_key: true
+  }
+
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    description: "The **Full Name** of the loyalty member.  \nUsed for guest-level lookup and service recovery. Personal data: avoid putting it in aggregate reporting that leaves the platform."
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    description: "The **Email** address the member enrolled with, and the channel through which rewards are delivered.  \n**Contact PII — column-level protected.** Users without the `pii_access` attribute see `(redacted)` instead of the real address; see the `guest_email_pii` const at the top of this file. Use `guest_id` as the join and counting key, never email."
+    hidden: false
+    definition: @sql ${guest_email_pii};;
+  }
+
+  dimension enrollment_date {
+    label: 'Enrollment Date'
+    type: 'date'
+    description: "The **Enrollment Date** is when the guest joined the loyalty programme.  \nThis is the guest's own date lens — use it for membership-growth and cohort analysis. Do not mix it with `bookings.check_in_date` in one time series without saying which lens applies: enrolment counts new members, check-in counts stays."
+    hidden: false
+    definition: @sql {{ #SOURCE.enrollment_date }};;
+  }
+
+  dimension loyalty_tier {
+    label: 'Loyalty Tier'
+    type: 'text'
+    description: "The **Loyalty Tier** is the member's current standing in the programme.  \nThis is the primary value segmentation — higher tiers are expected to book more often and spend more, and the tier mix is a headline health measure for an owner group's programme. Tiers are ordinal but stored as text, so sort them explicitly rather than alphabetically. It reflects the member's status NOW, not at the time of any past booking, so tier-sliced history is a current-tier view of past behaviour."
+    hidden: false
+    definition: @sql {{ #SOURCE.loyalty_tier }};;
+  }
+
+  dimension preferred_reward_type {
+    label: 'Preferred Reward Type'
+    type: 'text'
+    description: "The **Preferred Reward Type** is the reward category the member has indicated they most want.  \nCompare it against what they actually redeem (`redemptions` joined to `reward_catalog.reward_type`) to find gaps between stated preference and revealed behaviour — that gap is the main lever for improving redemption rates."
+    hidden: false
+    definition: @sql {{ #SOURCE.preferred_reward_type }};;
+  }
+
+  dimension traveler_segment {
+    label: 'Traveler Segment'
+    type: 'text'
+    description: "The **Traveler Segment** classifies the member by trip purpose or travel pattern (for example business versus leisure).  \nUse it alongside `loyalty_tier` — segment describes WHY they travel, tier describes HOW valuable they are, and the two cut the portfolio very differently."
+    hidden: false
+    definition: @sql {{ #SOURCE.traveler_segment }};;
   }
 
   owner: 'nam.tran@holistics.io'

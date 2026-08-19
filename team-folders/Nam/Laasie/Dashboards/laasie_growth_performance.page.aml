@@ -1,0 +1,824 @@
+// INTERNAL dashboard — Laasie's own commercial and customer-success teams.
+//
+// Reads the UNSCOPED `laasie` dataset, so it shows every owner group on the platform and
+// needs no user attribute provisioned. The external view is a separate page
+// (laasie_owner_portal) on the scoped `laasie_client` dataset, and is NOT a tab here:
+// mixing an internal and an external audience in one file makes it far too easy to ship a
+// widget that reads the unscoped dataset into a client's hands.
+//
+// TIME-OVER-TIME IS THE POINT OF THIS PAGE. Laasie's stated frustration is that growth
+// analysis is hard in their current stack, so comparison is built in three ways rather than
+// left to the analyst:
+//   1. `DateDrillBlock` — change the time grain of every chart (day/week/month/quarter) live.
+//   2. `PopBlock` — change what every widget compares against, without editing anything.
+//   3. Governed growth metrics on the dataset (Revenue YoY Growth, MoM, ADR YoY ...) so the
+//      arithmetic is defined once in the semantic layer instead of per-report.
+// Every comparison shifts against `bookings.check_in_date` — the revenue lens.
+Dashboard laasie_growth_performance {
+  title: 'Laasie — Growth & Programme Performance'
+  description: '''Internal view across the whole Laasie platform: revenue and booking growth against prior periods, loyalty programme penetration and value uplift, reward economics, and property-level performance. Reads the unscoped dataset — every owner group is visible.'''
+  owner: 'nam.tran@holistics.io'
+
+  // --- Interactive time controls: the answer to "growth analysis is hard" ---
+  block b_date_drill: DateDrillBlock {
+    label: 'Time Grain'
+  }
+  block b_pop: PopBlock {
+    label: 'Compare Against'
+  }
+
+  // --- Filters ---
+  block f_check_in: FilterBlock {
+    label: 'Check-In Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie
+      field: r(public_bookings.check_in_date)
+    }
+    // Two years, so that every year-over-year comparison on the page has a prior period
+    // to land in. A shorter default would silently render the YoY widgets blank.
+    default {
+      operator: 'matches'
+      value: 'last 2 years to today'
+    }
+  }
+  block f_owner_group: FilterBlock {
+    label: 'Owner Group'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie
+      field: r(public_owner_groups.group_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_state: FilterBlock {
+    label: 'State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie
+      field: r(public_properties.state)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_channel: FilterBlock {
+    label: 'Booking Channel'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie
+      field: r(public_bookings.booking_channel)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_tier: FilterBlock {
+    label: 'Loyalty Tier'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie
+      field: r(public_guests.loyalty_tier)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_segment: FilterBlock {
+    label: 'Traveler Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: laasie
+      field: r(public_guests.traveler_segment)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  // --- Headers ---
+  block t_header: TextBlock {
+    content: @md
+# 📈 Growth & Programme Performance
+
+Every figure below is on the **check-in date** lens. Use *Time Grain* to change the granularity of the trend and *Compare Against* to change the comparison period — both apply to the whole page.
+    ;;
+  }
+  block t_growth: TextBlock {
+    content: @md
+## Revenue growth over time
+    ;;
+  }
+  block t_member: TextBlock {
+    content: @md
+## Does the loyalty programme pay for itself?
+    ;;
+  }
+  block t_rewards: TextBlock {
+    content: @md
+## Reward economics
+    ;;
+  }
+
+  // --- KPI row, each with a period-over-period comparison chip ---
+  block k_revenue: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: laasie
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie.total_revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+  block k_bookings: VizBlock {
+    label: 'Bookings'
+    viz: MetricKpi {
+      dataset: laasie
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie.bookings)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+  block k_adr: VizBlock {
+    label: 'ADR'
+    viz: MetricKpi {
+      dataset: laasie
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie.avg_adr)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+  block k_member_rate: VizBlock {
+    label: 'Member Booking Rate'
+    viz: MetricKpi {
+      dataset: laasie
+      value: VizFieldFull {
+        label: ' '
+        ref: r(laasie.member_booking_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(public_bookings.check_in_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+    }
+  }
+
+  // --- Trend with built-in prior-period overlay and growth rate ---
+  block v_revenue_trend: VizBlock {
+    label: 'Revenue vs Same Period Last Year'
+    viz: LineChart {
+      dataset: laasie
+      x_axis: VizFieldFull {
+        label: 'Check-In Month'
+        ref: r(public_bookings.check_in_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(laasie.total_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7c3aed'
+          }
+        }
+      }
+      settings {
+        pop {
+          field: r(public_bookings.check_in_date)
+          value: RelativePopValue {
+            duration: 1
+            granularity: 'year'
+          }
+          show_growth_rate: true
+        }
+        x_axis_label: 'Check-In Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // --- Who is growing, and through which channel ---
+  block v_group_growth: VizBlock {
+    label: 'Revenue YoY Growth by Owner Group'
+    viz: BarChart {
+      dataset: laasie
+      x_axis: VizFieldFull {
+        label: 'Owner Group'
+        ref: r(public_owner_groups.group_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Revenue YoY Growth'
+            ref: r(laasie.revenue_yoy_growth)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7c3aed'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Owner Group'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_channel_mix: VizBlock {
+    label: 'Revenue by Booking Channel'
+    viz: BarChart {
+      dataset: laasie
+      x_axis: VizFieldFull {
+        label: 'Booking Channel'
+        ref: r(public_bookings.booking_channel)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(laasie.total_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Booking Channel'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // --- The programme value case, per client ---
+  block v_member_uplift: VizBlock {
+    label: 'Member vs Non-Member Value by Owner Group'
+    viz: DataTable {
+      dataset: laasie
+      fields: [
+        VizFieldFull {
+          label: 'Owner Group'
+          ref: r(public_owner_groups.group_name)
+          format {
+            type: 'text'
+          }
+          uname: 'mu_group'
+        },
+        VizFieldFull {
+          label: 'Member Bookings'
+          ref: r(laasie.member_bookings)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'mu_member_bookings'
+        },
+        VizFieldFull {
+          label: 'Member Booking Rate'
+          ref: r(laasie.member_booking_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'mu_member_rate'
+        },
+        VizFieldFull {
+          label: 'Avg Member Stay'
+          ref: r(laasie.avg_member_booking_value)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'mu_avg_member'
+        },
+        VizFieldFull {
+          label: 'Avg Non-Member Stay'
+          ref: r(laasie.avg_non_member_booking_value)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'mu_avg_non_member'
+        },
+        VizFieldFull {
+          label: 'Value Uplift'
+          ref: r(laasie.member_value_uplift)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'mu_uplift'
+        }
+      ]
+      settings {
+        pagination_size: 50
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'mu_uplift'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+        column_styles: [
+          ColumnStyle {
+            key: 'mu_group'
+            width: 260
+          },
+          ColumnStyle {
+            key: 'mu_member_bookings'
+            width: 170
+          },
+          ColumnStyle {
+            key: 'mu_member_rate'
+            width: 190
+          },
+          ColumnStyle {
+            key: 'mu_avg_member'
+            width: 190
+          },
+          ColumnStyle {
+            key: 'mu_avg_non_member'
+            width: 210
+          },
+          ColumnStyle {
+            key: 'mu_uplift'
+            width: 150
+          }
+        ]
+      }
+    }
+  }
+  block v_tier_mix: VizBlock {
+    label: 'Avg Booking Value by Loyalty Tier'
+    viz: BarChart {
+      dataset: laasie
+      x_axis: VizFieldFull {
+        label: 'Loyalty Tier'
+        ref: r(public_guests.loyalty_tier)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Avg Booking Value'
+            ref: r(laasie.avg_booking_value)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7c3aed'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Loyalty Tier'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_segment_mix: VizBlock {
+    label: 'Member Booking Rate by Traveler Segment'
+    viz: BarChart {
+      dataset: laasie
+      x_axis: VizFieldFull {
+        label: 'Traveler Segment'
+        ref: r(public_guests.traveler_segment)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Member Booking Rate'
+            ref: r(laasie.member_booking_rate)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#f59e0b'
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Traveler Segment'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // --- What gets claimed, and what it costs ---
+  block v_reward_economics: VizBlock {
+    label: 'Redemption Value by Reward Type & Loyalty Tier'
+    viz: PivotTable {
+      dataset: laasie
+      rows: [
+        VizFieldFull {
+          label: 'Reward Type'
+          ref: r(public_reward_catalog.reward_type)
+          format {
+            type: 'text'
+          }
+          uname: 're_reward_type'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Loyalty Tier'
+          ref: r(public_guests.loyalty_tier)
+          format {
+            type: 'text'
+          }
+          uname: 're_tier'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Redemption Value'
+          ref: r(laasie.redemption_value)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 're_value'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        pagination_size: 50
+        show_row_total: true
+        show_column_total: true
+        show_sub_total: false
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // --- Property-level detail, with growth carried through ---
+  block v_property_table: VizBlock {
+    label: 'Property Performance'
+    viz: DataTable {
+      dataset: laasie
+      fields: [
+        VizFieldFull {
+          label: 'Property'
+          ref: r(public_properties.property_name)
+          format {
+            type: 'text'
+          }
+          uname: 'pp_property'
+        },
+        VizFieldFull {
+          label: 'Owner Group'
+          ref: r(public_owner_groups.group_name)
+          format {
+            type: 'text'
+          }
+          uname: 'pp_group'
+        },
+        VizFieldFull {
+          label: 'State'
+          ref: r(public_properties.state)
+          format {
+            type: 'text'
+          }
+          uname: 'pp_state'
+        },
+        VizFieldFull {
+          label: 'Bookings'
+          ref: r(laasie.bookings)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_bookings'
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(laasie.total_revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_revenue'
+        },
+        VizFieldFull {
+          label: 'Revenue LY'
+          ref: r(laasie.revenue_prev_year)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_revenue_ly'
+        },
+        VizFieldFull {
+          label: 'Revenue YoY'
+          ref: r(laasie.revenue_yoy_growth)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_revenue_yoy'
+        },
+        VizFieldFull {
+          label: 'ADR'
+          ref: r(laasie.avg_adr)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_adr'
+        },
+        VizFieldFull {
+          label: 'Member Rate'
+          ref: r(laasie.member_booking_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_member_rate'
+        },
+        VizFieldFull {
+          label: 'Reward Cost Ratio'
+          ref: r(laasie.reward_cost_ratio)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'pp_reward_ratio'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'pp_revenue'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+        column_styles: [
+          ColumnStyle {
+            key: 'pp_property'
+            width: 200
+          },
+          ColumnStyle {
+            key: 'pp_group'
+            width: 180
+          },
+          ColumnStyle {
+            key: 'pp_state'
+            width: 90
+          },
+          ColumnStyle {
+            key: 'pp_bookings'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'pp_revenue'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'pp_revenue_ly'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'pp_revenue_yoy'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'pp_adr'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'pp_member_rate'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'pp_reward_ratio'
+            width: 160
+          }
+        ]
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'Growth & Performance'
+    width: 1300
+    height: 3330
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block t_header {
+      position: pos(20, 20, 1260, 150)
+    }
+    block b_date_drill {
+      position: pos(20, 190, 300, 100)
+    }
+    block b_pop {
+      position: pos(340, 190, 300, 100)
+    }
+    block f_check_in {
+      position: pos(660, 190, 300, 100)
+    }
+    block f_owner_group {
+      position: pos(980, 190, 300, 100)
+    }
+    block f_state {
+      position: pos(20, 310, 300, 100)
+    }
+    block f_channel {
+      position: pos(340, 310, 300, 100)
+    }
+    block f_tier {
+      position: pos(660, 310, 300, 100)
+    }
+    block f_segment {
+      position: pos(980, 310, 300, 100)
+    }
+    block k_revenue {
+      position: pos(20, 430, 300, 180)
+    }
+    block k_bookings {
+      position: pos(340, 430, 300, 180)
+    }
+    block k_adr {
+      position: pos(660, 430, 300, 180)
+    }
+    block k_member_rate {
+      position: pos(980, 430, 300, 180)
+    }
+    block t_growth {
+      position: pos(20, 620, 1260, 80)
+    }
+    block v_revenue_trend {
+      position: pos(20, 710, 1260, 400)
+    }
+    block v_group_growth {
+      position: pos(20, 1130, 620, 380)
+    }
+    block v_channel_mix {
+      position: pos(660, 1130, 620, 380)
+    }
+    block t_member {
+      position: pos(20, 1530, 1260, 60)
+    }
+    block v_member_uplift {
+      position: pos(20, 1610, 1260, 380)
+    }
+    block v_tier_mix {
+      position: pos(20, 2010, 620, 380)
+    }
+    block v_segment_mix {
+      position: pos(660, 2010, 620, 380)
+    }
+    block t_rewards {
+      position: pos(20, 2410, 1260, 60)
+    }
+    block v_reward_economics {
+      position: pos(20, 2490, 1260, 340)
+    }
+    block v_property_table {
+      position: pos(20, 2850, 1260, 460)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: laasie_theme
+}
