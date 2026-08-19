@@ -1,135 +1,124 @@
-// Laasie page theme — deliberately a light, high-contrast, typographic look.
-//
-// Laasie's stated frustration with their current stack is "outdated visualizations", and this
-// theme is the direct answer: generous white canvas, one confident violet accent instead of a
-// rainbow default palette, a modern geometric typeface, soft borders rather than heavy grid
-// lines, and KPI trend chips that read green/red at a glance for period-over-period movement.
-//
-// It is also built to survive embedding. External hotel users see this inside Laasie's own web
-// app, so the palette is neutral enough to sit next to a client's chrome without clashing, and
-// the light background matches the typical SaaS surface it will be iframed into.
 PageTheme laasie_theme {
-  title: "Laasie"
+  title: "Laasie Theme"
   background {
-    bg_color: "#f4f2fa"
+    bg_color: "#f1f5f9"
   }
   canvas {
     background {
-      bg_color: "#f4f2fa"
+      bg_image: "linear-gradient(135deg, #f5a62310 0%, #2563eb05 100%)"
     }
     border {
-      border_radius: 12
-      border_color: "#e7e3f3"
+      border_radius: 16
+      border_color: "#e2e8f0"
+      border_style: "none"
     }
-    shadow: "none"
+    shadow: "sm"
   }
   block {
     background {
       bg_color: "#ffffff"
     }
     label {
-      font_family: "Plus Jakarta Sans, sans-serif"
+      font_family: "Sora, sans-serif"
       font_size: 11
-      font_color: "#4c4368"
-      font_weight: "semibold"
-      letter_spacing: 1.2
+      font_color: "#0f172a"
+      font_weight: "bold"
+      letter_spacing: 1
       text_transform: "uppercase"
     }
     text {
-      font_family: "Plus Jakarta Sans, sans-serif"
-      font_color: "#5b5478"
+      font_family: "Outfit, sans-serif"
+      font_color: "#475569"
     }
     border {
-      border_radius: 12
-      border_width: 1
-      border_color: "#e7e3f3"
-      border_style: "solid"
+      border_radius: 16
     }
-    padding: 20
+    padding: 16
     shadow: "sm"
   }
   viz {
     table {
       general {
         bg_color: "#ffffff"
-        hover_color: "#f4f2fa"
-        banding_color: "#faf9fd"
-        font_color: "#1e1b33"
-        font_family: "Plus Jakarta Sans, sans-serif"
-        border_color: "#e7e3f3"
-        grid_color: "#eeebf7"
+        hover_color: "#dbeafe"
+        banding_color: "#f8fafc"
+        font_color: "#0f172a"
+        font_family: "Outfit, sans-serif"
+        border_color: "#e2e8f0"
+        grid_color: "#e2e8f0"
       }
       header {
-        bg_color: "#ffffff"
-        font_color: "#4c4368"
+        bg_color: "#2563eb"
+        font_color: "#ffffff"
         font_size: 11
         font_weight: "semibold"
       }
       sub_header {
-        bg_color: "#faf9fd"
-        font_color: "#4c4368"
+        bg_color: "#f8fafc"
+        font_color: "#0f172a"
         font_size: 11
       }
       sub_title {
-        font_color: "#7a7396"
+        font_color: "#475569"
         font_size: 11
       }
     }
     metric_kpi {
       label {
-        font_family: "Plus Jakarta Sans, sans-serif"
-        font_size: 13
-        font_color: "#7a7396"
+        font_family: "Sora, sans-serif"
+        font_size: 14
+        font_color: "#475569"
         font_weight: "medium"
         letter_spacing: 0
       }
       value {
-        font_family: "Plus Jakarta Sans, sans-serif"
-        font_size: 34
-        font_color: "#1e1b33"
-        letter_spacing: -0.5
+        font_family: "Sora, sans-serif"
+        font_size: 36
+        font_color: "#0f172a"
+        letter_spacing: "-0.5px"
       }
       progress {
         text {
-          font_family: "Plus Jakarta Sans, sans-serif"
-          font_color: "#7a7396"
+          font_family: "Outfit, sans-serif"
+          font_color: "#475569"
         }
         indicator {
-          bg_color: "#7c3aed"
+          bg_color: "#2563eb"
         }
         track {
-          bg_color: "#eeebf7"
+          bg_color: "#e0e0e0"
         }
       }
       trend {
         positive {
           text {
-            font_color: "#047857"
+            font_color: "#166534"
           }
           background {
-            bg_color: "#d1fae5"
+            bg_color: "#a4f7c0"
           }
         }
         negative {
           text {
-            font_color: "#be123c"
+            font_color: "#991b1b"
           }
           background {
-            bg_color: "#ffe4e6"
+            bg_color: "#fdcece"
           }
         }
         neutral {
           text {
-            font_color: "#4c4368"
+            font_color: "#475569"
           }
           background {
-            bg_color: "#eeebf7"
+            bg_color: "#e0e0e0"
           }
         }
       }
     }
   }
   custom_css: @css
-    @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
   ;;
 }
