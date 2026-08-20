@@ -48,16 +48,14 @@ EmbedPortal laasie_portal {
       }
       chat_page {
         intro {
-          header: 'Ask about your properties, your guests and how your rewards programme is performing.'
+          header: 'Ask about your portfolio'
           body: @md
-            ## 📈 Compare revenue, bookings and ADR against last year or last month
-            ## 🏨 Break performance down by property, city or booking channel
-            ## 🎁 See which rewards your guests actually claim, and what they cost
-            ## 👥 Track loyalty tier mix and member booking rate over time
-            ## 📌 Save any insight straight to your dashboard
+            - Compare revenue and bookings
+            - Check property performance
+            - Track rewards and loyalty
           ;;
         }
-        prompt_placeholder: 'e.g. How did revenue at my properties grow versus the same quarter last year?'
+        prompt_placeholder: 'Ask about your portfolio'
       }
     }
   }
