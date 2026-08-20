@@ -1,0 +1,124 @@
+PageTheme laasie_theme {
+  title: "Laasie Theme"
+  background {
+    bg_color: "#f1f5f9"
+  }
+  canvas {
+    background {
+      bg_image: "linear-gradient(135deg, #f5a62310 0%, #2563eb05 100%)"
+    }
+    border {
+      border_radius: 16
+      border_color: "#e2e8f0"
+      border_style: "none"
+    }
+    shadow: "sm"
+  }
+  block {
+    background {
+      bg_color: "#ffffff"
+    }
+    label {
+      font_family: "Sora, sans-serif"
+      font_size: 11
+      font_color: "#0f172a"
+      font_weight: "bold"
+      letter_spacing: 1
+      text_transform: "uppercase"
+    }
+    text {
+      font_family: "Outfit, sans-serif"
+      font_color: "#475569"
+    }
+    border {
+      border_radius: 16
+    }
+    padding: 16
+    shadow: "sm"
+  }
+  viz {
+    table {
+      general {
+        bg_color: "#ffffff"
+        hover_color: "#dbeafe"
+        banding_color: "#f8fafc"
+        font_color: "#0f172a"
+        font_family: "Outfit, sans-serif"
+        border_color: "#e2e8f0"
+        grid_color: "#e2e8f0"
+      }
+      header {
+        bg_color: "#2563eb"
+        font_color: "#ffffff"
+        font_size: 11
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: "#f8fafc"
+        font_color: "#0f172a"
+        font_size: 11
+      }
+      sub_title {
+        font_color: "#475569"
+        font_size: 11
+      }
+    }
+    metric_kpi {
+      label {
+        font_family: "Sora, sans-serif"
+        font_size: 14
+        font_color: "#475569"
+        font_weight: "medium"
+        letter_spacing: 0
+      }
+      value {
+        font_family: "Sora, sans-serif"
+        font_size: 36
+        font_color: "#0f172a"
+        letter_spacing: "-0.5px"
+      }
+      progress {
+        text {
+          font_family: "Outfit, sans-serif"
+          font_color: "#475569"
+        }
+        indicator {
+          bg_color: "#2563eb"
+        }
+        track {
+          bg_color: "#e0e0e0"
+        }
+      }
+      trend {
+        positive {
+          text {
+            font_color: "#166534"
+          }
+          background {
+            bg_color: "#a4f7c0"
+          }
+        }
+        negative {
+          text {
+            font_color: "#991b1b"
+          }
+          background {
+            bg_color: "#fdcece"
+          }
+        }
+        neutral {
+          text {
+            font_color: "#475569"
+          }
+          background {
+            bg_color: "#e0e0e0"
+          }
+        }
+      }
+    }
+  }
+  custom_css: @css
+    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
+  ;;
+}

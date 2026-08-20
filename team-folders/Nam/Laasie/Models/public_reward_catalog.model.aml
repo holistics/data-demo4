@@ -1,0 +1,42 @@
+Model public_reward_catalog {
+  type: 'table'
+  label: 'Reward Catalog'
+  description: 'The menu of rewards a member can claim. One row per catalogue item — a dimension, not a fact. It carries list value, so joining it to redemptions lets you separate what a reward is nominally worth from what was actually paid out. Because it is a small dimension, aggregate its own columns over this model alone; summed alongside redemptions it multiplies by the number of times each reward was claimed.'
+  data_source_name: 'demo_laasie_nam'
+
+  dimension reward_id {
+    label: 'Reward Id'
+    type: 'number'
+    description: "The **Reward Id** uniquely identifies each catalogue item.  \nIt is the primary key of this model and the target of the `redemptions.reward_id` relationship."
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_id }};;
+    primary_key: true
+  }
+
+  dimension reward_name {
+    label: 'Reward Name'
+    type: 'text'
+    description: "The **Reward Name** is the display name of the item as a member sees it.  \nUse it for the reward leaderboard — which specific offers actually get taken — rather than the numeric id."
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_name }};;
+  }
+
+  dimension reward_type {
+    label: 'Reward Type'
+    type: 'text'
+    description: "The **Reward Type** groups catalogue items into categories.  \nIt aligns with `guests.preferred_reward_type` and `loyalty_transactions.reward_type`, so it is the join key for the most useful question in the programme: does what members say they want match what they actually claim?"
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_type }};;
+  }
+
+  dimension value_usd {
+    label: 'Value USD'
+    type: 'number'
+    description: "The **Value USD** is the reward's list value.  \nThis is the catalogue PRICE, not realised cost — for what an owner group actually paid, use `redemptions.value_redeemed`. As a dimension attribute it does not vary by redemption, so summing it across a redemption-level query multiplies it by claim count; average it, or sum `value_redeemed` instead."
+    hidden: false
+    definition: @sql {{ #SOURCE.value_usd }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."reward_catalog"'
+}
