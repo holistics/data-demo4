@@ -51,7 +51,7 @@ typography:
     lineHeight: 1.3
   kpi-value:
     fontFamily: 'Inter, Arial, sans-serif'
-    fontSize: 3rem
+    fontSize: 2.25rem
     fontWeight: 600
     lineHeight: 1.05
 rounded:
@@ -180,7 +180,7 @@ Use 20px for canvases and cards, reflecting Lassie's repeated 20–24px card rad
 
 - Cards: white, 20px radius, 16px padding, `sm` shadow, navy headings, and muted body copy.
 - Tables and metric sheets: cream header, off-white banding, pale-blue hover, dark text, quiet grid lines, and 13px data text.
-- KPI blocks: left-aligned 48px navy values, 20px muted labels, blue progress indicator, and labeled semantic trend badges.
+- KPI blocks: left-aligned 36px navy values, 20px muted labels, blue progress indicator, and labeled semantic trend badges.
 - Charts: inherit `laasie_palette`. Use the blue first for single-series analysis; preserve legends/direct labels for multi-series charts.
 - Text blocks: Inter, muted navy-gray body copy, navy headings, and the same 1.6/1.3 line-height hierarchy as the rendered site.
 
