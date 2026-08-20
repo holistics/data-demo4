@@ -147,7 +147,7 @@ PageTheme laasie_theme {
       }
       value {
         font_family: laasie_theme_tokens("font_display")
-        font_size: 48
+        font_size: 36
         font_color: laasie_theme_tokens("text_primary")
       }
       progress {
