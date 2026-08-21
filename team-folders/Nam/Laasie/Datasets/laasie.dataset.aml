@@ -87,6 +87,12 @@ check-in month.
     relationship(public_redemptions.guest_id > public_guests.guest_id, false)
   ]
 
+  permission owner_group_scope {
+    field: r(public_owner_groups.owner_group_id)
+    operator: 'matches_user_attribute'
+    value: 'company_id'
+  }
+
   // ---------------------------------------------------------------------------------
   // VOLUME AND REVENUE
   // ---------------------------------------------------------------------------------

@@ -31,7 +31,7 @@ Dashboard laasie_owner_portal {
     label: 'Check-In Date'
     type: 'field'
     source: FieldFilterSource {
-      dataset: laasie_client
+      dataset: laasie
       field: r(public_bookings.check_in_date)
     }
     // Same two-year default as the internal page, for the same reason: every year-over-year
@@ -45,7 +45,7 @@ Dashboard laasie_owner_portal {
     label: 'Property'
     type: 'field'
     source: FieldFilterSource {
-      dataset: laasie_client
+      dataset: laasie
       field: r(public_properties.property_name)
     }
     default {
@@ -75,7 +75,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block k_revenue: VizBlock {
     label: 'My Revenue'
     viz: MetricKpi {
-      dataset: laasie_client
+      dataset: laasie
       value: VizFieldFull {
         label: ' '
         ref: r(laasie_client.total_revenue)
@@ -96,7 +96,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block k_bookings: VizBlock {
     label: 'My Bookings'
     viz: MetricKpi {
-      dataset: laasie_client
+      dataset: laasie
       value: VizFieldFull {
         label: ' '
         ref: r(laasie_client.bookings)
@@ -117,7 +117,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block k_adr: VizBlock {
     label: 'ADR'
     viz: MetricKpi {
-      dataset: laasie_client
+      dataset: laasie
       value: VizFieldFull {
         label: ' '
         ref: r(laasie_client.avg_adr)
@@ -138,7 +138,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block k_member_rate: VizBlock {
     label: 'Member Booking Rate'
     viz: MetricKpi {
-      dataset: laasie_client
+      dataset: laasie
       value: VizFieldFull {
         label: ' '
         ref: r(laasie_client.member_booking_rate)
@@ -160,7 +160,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block v_revenue_trend: VizBlock {
     label: 'My Revenue vs Same Period Last Year'
     viz: LineChart {
-      dataset: laasie_client
+      dataset: laasie
       x_axis: VizFieldFull {
         label: 'Check-In Month'
         ref: r(public_bookings.check_in_date)
@@ -207,7 +207,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block v_property_table: VizBlock {
     label: 'My Properties'
     viz: DataTable {
-      dataset: laasie_client
+      dataset: laasie
       fields: [
         VizFieldFull {
           label: 'Property'
@@ -335,7 +335,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block v_reward_mix: VizBlock {
     label: 'Redemption Value by Reward Type'
     viz: BarChart {
-      dataset: laasie_client
+      dataset: laasie
       x_axis: VizFieldFull {
         label: 'Reward Type'
         ref: r(public_reward_catalog.reward_type)
@@ -376,7 +376,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block v_tier_bookings: VizBlock {
     label: 'Member Bookings by Loyalty Tier'
     viz: BarChart {
-      dataset: laasie_client
+      dataset: laasie
       x_axis: VizFieldFull {
         label: 'Loyalty Tier'
         ref: r(public_guests.loyalty_tier)
@@ -428,7 +428,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block v_metric_sheet: VizBlock {
     label: 'My Metrics by Month (Check-In Lens)'
     viz: MetricSheet {
-      dataset: laasie_client
+      dataset: laasie
       date_field: VizFieldFull {
         ref: r(public_bookings.check_in_date)
         transformation: 'datetrunc month'
@@ -579,7 +579,7 @@ Your properties and how their Laasie programme is performing. This view is scope
   block v_sankey: VizBlock {
     label: 'Redemption Flow: Loyalty Tier → Reward Type'
     viz: CustomChart {
-      dataset: laasie_client
+      dataset: laasie
       custom_chart: laasie_sankey
       field source: VizFieldFull {
         label: 'Loyalty Tier'
@@ -680,6 +680,7 @@ Your properties and how their Laasie programme is performing. This view is scope
     mobile {
       mode: 'auto'
     }
+    default_zoom: 'fit_to_width'
   }
 
   theme: laasie_theme
