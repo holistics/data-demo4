@@ -140,7 +140,13 @@ Rules:
 - State what's translated vs. not (esp. dimension **data values**, which stay in source language
   unless case-mapped dimensions are added — offer that as a follow-up).
 
+<<<<<<< local:.claude/skills/localize-dashboard/SKILL.md
+=======
+<<<<<<< local:.claude/skills/localize-dashboard/SKILL.md
+=======
 <<<<<<< HEAD
+>>>>>>> cloud:.claude/skills/localize-dashboard/SKILL.md
+>>>>>>> cloud:.claude/skills/localize-dashboard/SKILL.md
 ## Quick reference — what to translate where (all via `.extend()`)
 | Text | Override point | How |
 |---|---|---|
@@ -152,6 +158,10 @@ Rules:
 | metrics catalog Name/Description | `block X.extend({ … })` | `${dict('cat_x_name')('spa')}` + `cat_*` keys |
 | dataset/metric inherited labels | `Dataset <orig>_<lang> = <orig>.extend({ metric x { label } })` | point blocks at extended dataset |
 | dimension data values (US, delivered, …) | model/dataset | case-mapped dimension (separate task) |
+<<<<<<< local:.claude/skills/localize-dashboard/SKILL.md
+=======
+<<<<<<< local:.claude/skills/localize-dashboard/SKILL.md
+=======
 =======
 ## Quick reference — what to translate where
 | Text | Where | How |
@@ -163,3 +173,5 @@ Rules:
 | metrics catalog Name/Description | localized catalog block | `${dict('cat_x_name')('spa')}` + `cat_*` keys |
 | dimension data values (US, delivered, …) | model/dataset | case-mapped dimension (separate task) |
 >>>>>>> origin/dong-ln-dev
+>>>>>>> cloud:.claude/skills/localize-dashboard/SKILL.md
+>>>>>>> cloud:.claude/skills/localize-dashboard/SKILL.md

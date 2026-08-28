@@ -1,32 +1,41 @@
 // =====================================================================
 // Lowbyte Studio dashboard theme — matches lowbytestudio.com
-// Light mode, bright-red brand accent on clean white surfaces, near-black
-// text, Poppins display + Inter body. Built per build_dashboard_theme skill.
+// Dark mode: bright-red brand accent lifted for dark surfaces, near-white
+// text on layered near-black blue-greys, Poppins display + Inter body.
+// Built per build_dashboard_theme skill.
 // Apply with:  theme: lowbyte_theme
+//
+// Dark-mode notes:
+//   - Surfaces layer by lightness, not by shadow: canvas_bg < background < block_bg.
+//     Shadows are invisible on dark, so blocks are separated with a 1px border
+//     and `shadow: "none"` instead.
+//   - The brand red (L≈0.61 in light mode) is lifted to L≈0.70 so it keeps
+//     contrast against block_bg; the same lift is applied across the
+//     categorical palette.
 // =====================================================================
 
 const lowbyte_theme_tokens = {
-  primary: "oklch(0.61 0.21 27)",        secondary: "oklch(0.55 0.16 255)",     mode: "light",
-  background: "oklch(0.966 0.004 255)",  canvas_bg: "oklch(0.985 0.002 255)",   block_bg: "oklch(1 0 0)",
-  text_primary: "oklch(0.22 0.012 266)", text_muted: "oklch(0.56 0.024 256)",   text_subtle: "oklch(0.70 0.016 256)",
-  border: "oklch(0.925 0.005 256)",      focus_ring: "oklch(0.61 0.21 27)",
-  semantic_success: "oklch(0.62 0.15 150)", semantic_warning: "oklch(0.76 0.14 75)", semantic_danger: "oklch(0.58 0.20 27)",
+  primary: "oklch(0.70 0.19 27)",         secondary: "oklch(0.68 0.14 255)",     mode: "dark",
+  background: "oklch(0.185 0.012 266)",  canvas_bg: "oklch(0.155 0.010 266)",   block_bg: "oklch(0.225 0.014 266)",
+  text_primary: "oklch(0.97 0.003 255)", text_muted: "oklch(0.76 0.016 256)",   text_subtle: "oklch(0.60 0.018 256)",
+  border: "oklch(0.315 0.014 266)",      focus_ring: "oklch(0.70 0.19 27)",
+  semantic_success: "oklch(0.74 0.15 150)", semantic_warning: "oklch(0.81 0.13 75)", semantic_danger: "oklch(0.70 0.19 27)",
   font_body: "Inter, sans-serif",        font_display: "Poppins, sans-serif",
-  corner_style: "rounded",               density: "comfortable",                elevation: "shadow"
+  corner_style: "rounded",               density: "comfortable",                elevation: "border"
 }
 
 ColorPalette lowbyte_palette {
   title: "Lowbyte"
   categorical {
     colors: [
-      "oklch(0.61 0.21 27)",
-      "oklch(0.70 0.15 75)",
-      "oklch(0.64 0.15 140)",
-      "oklch(0.64 0.13 190)",
-      "oklch(0.55 0.16 255)",
-      "oklch(0.58 0.17 300)",
-      "oklch(0.62 0.19 350)",
-      "oklch(0.66 0.14 110)"
+      "oklch(0.70 0.19 27)",
+      "oklch(0.79 0.14 75)",
+      "oklch(0.74 0.14 140)",
+      "oklch(0.75 0.12 190)",
+      "oklch(0.68 0.14 255)",
+      "oklch(0.69 0.15 300)",
+      "oklch(0.72 0.17 350)",
+      "oklch(0.76 0.13 110)"
     ]
   }
 }
@@ -52,12 +61,12 @@ PageTheme lowbyte_theme {
   block {
     background { bg_color: lowbyte_theme_tokens("block_bg") }
     border {
-      border_width: 0
-      border_style: "none"
+      border_width: 1
+      border_style: "solid"
       border_radius: 12
       border_color: lowbyte_theme_tokens("border")
     }
-    shadow: "sm"
+    shadow: "none"
     padding: 16
     opacity: 1
     label {
@@ -87,8 +96,8 @@ PageTheme lowbyte_theme {
         border_color: lowbyte_theme_tokens("border")
         grid_color: lowbyte_theme_tokens("border")
         border_width: 1
-        hover_color: "oklch(0.98 0.004 255)"
-        banding_color: "oklch(0.985 0.003 255)"
+        hover_color: "oklch(0.275 0.016 266)"
+        banding_color: "oklch(0.205 0.013 266)"
         cell_padding: DetailedSpacing { top: 10, right: 16, bottom: 10, left: 16 }
         borders { outer: true, vertical: false, horizontal: true, header: true, row_header: false }
       }
@@ -99,7 +108,7 @@ PageTheme lowbyte_theme {
         font_weight: "semibold"
       }
       sub_header {
-        bg_color: "oklch(0.985 0.003 255)"
+        bg_color: "oklch(0.205 0.013 266)"
         font_color: lowbyte_theme_tokens("text_muted")
         font_size: 13
         font_weight: "medium"
@@ -132,9 +141,9 @@ PageTheme lowbyte_theme {
         text { font_color: lowbyte_theme_tokens("text_muted") }
       }
       trend {
-        positive { text { font_color: lowbyte_theme_tokens("semantic_success") font_weight: "medium" }  background { bg_color: "oklch(0.92 0.05 150)" } }
-        negative { text { font_color: lowbyte_theme_tokens("semantic_danger") font_weight: "medium" }  background { bg_color: "oklch(0.92 0.06 27)" } }
-        neutral  { text { font_color: lowbyte_theme_tokens("text_muted") font_weight: "normal" }  background { bg_color: "oklch(0.94 0.004 256)" } }
+        positive { text { font_color: lowbyte_theme_tokens("semantic_success") font_weight: "medium" }  background { bg_color: "oklch(0.30 0.06 150)" } }
+        negative { text { font_color: lowbyte_theme_tokens("semantic_danger") font_weight: "medium" }  background { bg_color: "oklch(0.30 0.07 27)" } }
+        neutral  { text { font_color: lowbyte_theme_tokens("text_muted") font_weight: "normal" }  background { bg_color: "oklch(0.27 0.010 266)" } }
       }
     }
   }
@@ -144,12 +153,12 @@ PageTheme lowbyte_theme {
     .dac-text-block {
       font-family: Inter, sans-serif;
       font-size: 14px;
-      color: oklch(0.56 0.024 256);
+      color: oklch(0.76 0.016 256);
       line-height: 1.6;
     }
     .dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
       font-family: Poppins, sans-serif;
-      color: oklch(0.22 0.012 266);
+      color: oklch(0.97 0.003 255);
       line-height: 1.3;
       margin-top: 0;
       margin-bottom: 0.5em;
