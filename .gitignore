@@ -1,6 +1,5 @@
 .claude/settings.local.json
 .envrc
-.amp/
 
 # Power BI project assets
 *.pbix
@@ -9,6 +8,3 @@
 *.Report/
 *.SemanticModel/
 .pbi/
-
-# FanServ source extract is already imported into the demo4 warehouse.
-clients/fanserv/game-calendar/data/gamedata.csv

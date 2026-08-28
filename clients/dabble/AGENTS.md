@@ -81,11 +81,21 @@ Measurement rules that survive any other instruction:
 ## Tenant-wide AI context
 
 Dabble is the one client with its own routing block in `settings/ai/context.aml`, plus
-three skills in `settings/ai/skills/`: `dabble_trading_context`,
-`dabble_trading_measurement_rules`, `dabble_executive_readout`. The route is bound to
-the `dabble_*` models on data source `dabble_neon` and the `dabble_trading` dataset
-that assembles them. Names, titles and labels are only hints to check the underlying
-model binding, not routing proof.
+three Dabble-owned AML reference skills under `dabble-refrence/`:
+
+- `dabble-refrence/dabble_trading_context/skill.aml` — domain and dashboard context.
+- `dabble-refrence/dabble_trading_measurement_rules/skill.aml` — aggregation rules,
+  diagnosis playbooks and synthetic-data caveats.
+- `dabble-refrence/dabble_executive_readout/skill.aml` — the manually invoked
+  leadership-readout format.
+
+Coding agents must read these references when their task depends on the corresponding
+domain, measurement or executive-output rules. Holistics runtime loading remains
+controlled by the skill object names in `settings/ai/context.aml`; moving the files
+does not change their invocation mode. The route is bound to the `dabble_*` models on
+data source `dabble_neon` and the `dabble_trading` dataset that assembles them. Names,
+titles and labels are only hints to check the underlying model binding, not routing
+proof.
 
 Per `clients/AGENTS.md`: after changing anything here, **ask the operator whether
 `context.aml` or those skills need updating** — especially on new or renamed models,

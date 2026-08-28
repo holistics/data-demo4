@@ -283,8 +283,8 @@ Dashboard company_dashboard_v2 {
       field: r(ecommerce_countries.name)
     }
     default {
-      operator: 'is'
-      value: []
+      operator: 'contains'
+      value: '$H_NIL$'
     }
   }
   block f3: FilterBlock {
@@ -2750,7 +2750,7 @@ background: #EFF6FF;
       mobile {
         mode: 'auto'
       }
-      default_zoom: 0.9
+      default_zoom: 0.86
     }
     tab tab_dstw: CanvasLayout {
       label: 'Key Metrics'

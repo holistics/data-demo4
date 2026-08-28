@@ -69,8 +69,8 @@ Prompt them specifically when the change involves:
 - A **new or changed data source**, schema or table mapping.
 - **Business vocabulary or metric definitions** (how a KPI is calculated, which date
   lens applies, what must never be summed or averaged).
-- **New or edited skills** in `settings/ai/skills/` that the routing block should
-  load, or ones it references that no longer exist.
+- **New, moved or edited client skills** that the routing block should load, or ones
+  it references that no longer exist. The client `AGENTS.md` owns their location.
 - Anything that makes the client's context **diverge from the default ecommerce
   business context** in `context.aml` — which is the normal case for every top-level
   client folder, and normally *not* the case for `branded-themes/`.

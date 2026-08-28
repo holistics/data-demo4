@@ -28,7 +28,8 @@ US markets, migrating off AWS QuickSight.
 - Read `clients/dabble/dashboards/AGENTS.md` (audience + design constraints),
   `clients/dabble/design.md` and `clients/dabble/docs/` before editing.
 - Runtime AI behaviour is defined by conditional routing in
-  `settings/ai/context.aml` plus three skills in `settings/ai/skills/`:
+  `settings/ai/context.aml` plus three Dabble-owned reference skills in
+  `clients/dabble/dabble-refrence/`:
   `dabble_trading_context`, `dabble_trading_measurement_rules`,
   `dabble_executive_readout`.
 
@@ -60,8 +61,8 @@ When working on a PoC:
    scope boundary, naming prefix and validate command.
 6. **Client context in `settings/ai/context.aml`** is global to the tenant, so
    client-specific rules must be conditional routing (see the Dabble block) plus a
-   scoped skill in `settings/ai/skills/<name>/skill.aml`. Never replace the default
-   ecommerce context with a client's.
+   scoped AML skill kept with the client and documented by that client's `AGENTS.md`.
+   Never replace the default ecommerce context with a client's.
 
 Prospect data is confidential — no credentials, connection strings or tokens in
 files or command output.
@@ -92,5 +93,6 @@ Holistics AI at query time. They describe the same tenant, so **they must not dr
 
 ## User's rules
 
+- Before using the Holistics CLI, ensure it is authenticated with `demo4.holistics.io`.
 - When developing AMQL, use tools from the holistics cli (`holistics mcp ...`)
 - SUPER IMPORTANT: everytime, you must run `holistics aml validate` after new/edit AMQL files to validate syntax

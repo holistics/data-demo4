@@ -1708,7 +1708,7 @@ This dashboard tracks the KPIs of CTOs and financial managers. This will also be
         layer: 1
       }
       block t4 {
-        position: pos(20, 200, 480, 60)
+        position: pos(120, 200, 480, 60)
         layer: 1
       }
       block v1 {

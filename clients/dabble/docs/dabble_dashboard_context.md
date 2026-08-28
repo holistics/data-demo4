@@ -134,7 +134,29 @@ A staged narrative. Each tab answers one question and hands off to the next.
 | **Sport & Competition Drivers** | Where is realised margin diverging from the book we priced? | Trading | Realised vs Priced Margin, sport profitability quadrant, turnover-and-margin by sport, sport driver matrix, competition and fixture leaderboards | A sport or competition with material turnover and negative margin variance |
 | **Customer, Rocket & Risk** | Who carries the exposure, and is the risk framework working? | Risk + Trading | Margin by risk bracket, market group, leg count, restricted stake by bet type, Rocket category performance, customer turnover-vs-net-revenue scatter, three customer leaderboards | Margin flat or non-monotonic across risk brackets; Rocket boost growing faster than the turnover it buys |
 
-Two date filters coexist deliberately and are the most common source of confusion:
+### 5.3 `dabble_au_trading_board_pack` — "Dabble AU Executive Board Pack"
+
+One page, board/quarterly cadence. It answers the question no command-centre tab answers end
+to end: *where did turnover become net revenue, what is dragging it, and how much of this can
+the board trust?*
+
+| Block | What it owns |
+|---|---|
+| Six KPI tiles | Turnover, Gross Win %, Trading Net Revenue, Net Revenue %, Actives, Avg Bet Size — all against the same period last year |
+| Trading P&L Waterfall | The whole chain in one chart, each step labelled in dollars and as % of turnover. Custom Vega-Lite chart (`dabble_pnl_waterfall`) |
+| Margin Chain by Month | Gross Win % → Trading Net Win % → Trading Net Revenue % against the priced book, with turnover as columns behind it |
+| Customer Home State | POCT exposure — state is a financial dimension |
+| Net Revenue Drag by Sport | Which sports add and which destroy net revenue, worst first |
+| Racing vs Sport cost chain | Racing's wider gross hold against what survives BRG and COGS |
+| Monthly Board Scorecard | Scale, margin chain and cost chain, one governed metric per row |
+| Data confidence panel | Per-figure trust / do-not-quote / artefact ruling, inline on the page |
+
+**Settled-date lens only, on purpose.** A board pack that mixes date lenses invites the wrong
+argument, so there is no event-date filter on this page. Filters are Settled Date (default
+last 12 months), Sport, Customer Home State and the `Compare` control.
+
+Two date filters coexist deliberately on the command centre and are the most common source of
+confusion:
 
 - **Settled Date (financials)** — `dabble_fact_bet.reporting_date`. Governs every financial metric. This is the default lens.
 - **Event Date (fixtures)** — `dabble_dim_fixture.advertised_start`. Governs event-shaped questions ("how did Saturday's card go").
@@ -180,7 +202,7 @@ Rocket Boost is spend. Judge it on `Copy Actives #`, `Copy Bets #` and `Copy Com
 Turnover *and* margin together, with average reference lines to form quadrants: high stake / high margin → protect; high stake / low margin → price review; low stake / high margin → grow; low stake / low margin → deprioritise. Never rank on margin alone — a 50% hold on $130k of turnover is not a priority.
 
 **"Is the risk framework working?"**
-Realised margin by `risk_factor_bracket`, ordered numerically (not lexically — see §8). A working framework is monotonic. Flat or random means the framework is not protecting margin, which is an escalation, not a chart.
+Realised margin by `risk_factor_bracket`. The bracket labels are now zero-padded (`00.31 - 00.49`, `01.11`, `05.00 - 09.99`, `10.00+`), so lexical sort and numeric sort agree and there is no longer an "Other / Unclassified" catch-all. A working framework is monotonic. Flat or random means the framework is not protecting margin, which is an escalation, not a chart — and in the current seed it *is* random (see §8).
 
 ---
 
@@ -195,10 +217,15 @@ This prototype runs on deterministic synthetic seed data (`clients/dabble/databa
 | Turnover | ~$9.4M over 2.5 years | Orders of magnitude below a real operator — reads as a toy dataset |
 | Rocket Boost | 0.32% of stake | Implies the flagship social product barely exists |
 | Actives / Bets | exactly 3,000 / exactly 90,000 | Exactly 30.00 bets per active — visibly generated |
-| Risk brackets | exactly 7,500 bets each, margin random | Risk factor currently influences nothing; the largest and most profitable bucket is literally "Other / Unclassified" (uncovered ranges in the `risk_factor_bracket` case statement) |
-| Two sports | Boxing −74.6%, Ice Hockey −74.8% | No book runs a whole sport at −75% for 2.5 years |
-| Cohort analysis | Impossible | All 3,000 users sign up in one 2023 window and are active in every period. A named buying criterion with zero coverage. |
-| `risk_factor_bracket` ordering | Lexical | `10.00+` sorts between `1.11` and `5.00 - 9.99` |
+| Risk brackets | exactly 7,500 bets and 250 actives each, margin non-monotonic | Risk factor influences nothing: `00.31 - 00.49` holds +45.7% while `01.11` holds −10.8%. The framework is decorative. |
+| Restricted stake | exactly 1.5% of turnover in **every** bracket | Restriction is a flat haircut, not a risk response. Nothing to calibrate. |
+| Expected Gross Win % | flat at 10.7–10.8% in all 31 months and all 24 sports | Overround is a fixed four-bucket lookup on `dividend`, and `dividend` is uniform-random (stake-weighted mean 4.52 everywhere). So `Margin Variance (pts)` is realised margin minus a constant — the "did we hold what we priced" benchmark carries no information in this seed. |
+| BRG and COGS | ≈3.05% and ≈5.10% of turnover in every cut | Both are constant-rate haircuts. COGS does not scale with racing turnover and does not vary by `home_state`, so state-level Net Revenue % differences are pure gross-win result variance, not POCT. |
+| Two sports | Boxing −74.6%, Ice Hockey −74.8% | No book runs a whole sport at −75%. Identical to ±3pts in all 10 full quarters — a payout-multiplier defect, not a trading event. Together −$377k of Trading Net Revenue, on 4.8% of turnover. |
+| Each Way | +89.5% Gross Win % on $850k | Physically impossible for a real book |
+| Year-over-year | 2024 $3,662,785 → 2025 $3,660,832 turnover (−0.05%), Gross Win % 25.0% both years | The book is a flat line. YoY tiles will always read ~0%, so the dashboards cannot demonstrate a growth story. |
+| Cohort analysis | Impossible | Signups land in exactly 5 months of 2023, 600 users each, and each month maps 1:1 to one `acquisition_category`. So "channel performance" *is* the signup cohort — Organic +49.0% Net Revenue % vs Referral +1.1% is generator noise, not channel quality. A named buying criterion with zero coverage. |
+| Competition names | mismatched to sports | "AFL Matches" sits under Racing Futures, "Brownlow Medal" under Commonwealth Games; most are generic `Competition NN` |
 
 Also documented as demo assumptions pending Dabble confirmation: restricted-stake logic, weighted-dividend aggregation, expected-margin overrounds, Rocket categories, the definition of "active", and use of an Australian settled reporting date.
 

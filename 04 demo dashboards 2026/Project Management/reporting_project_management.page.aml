@@ -277,13 +277,13 @@ Dashboard squad_command_center {
       dataset: reporting_project_management
       calculation metric_e98dbc4 {
         label: 'LM - Completed issue'
-        formula: @aql metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
+        formula: @aql completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }
       calculation metric_abbd5a2 {
         label: '%LM - Completed issue'
-        formula: @aql safe_divide(metric_63f4786, metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
+        formula: @aql safe_divide(completed_issue, completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
         calc_type: 'measure'
         data_type: 'number'
       }
@@ -458,13 +458,13 @@ Dashboard squad_command_center {
       dataset: reporting_project_management
       calculation metric_e98dbc4 {
         label: 'LM - Completed issue'
-        formula: @aql metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
+        formula: @aql completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }
       calculation metric_abbd5a2 {
         label: '%LM - Completed issue'
-        formula: @aql safe_divide(metric_63f4786, metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
+        formula: @aql safe_divide(completed_issue, completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
         calc_type: 'measure'
         data_type: 'number'
       }
@@ -490,7 +490,7 @@ Dashboard squad_command_center {
       }
       calculation metric_bcc0c1b {
         label: '%LW - Avg Cycle Time'
-        formula: @aql safe_divide(avg(reporting_issues, reporting_issues.dimension_ffede77), avg(reporting_issues, reporting_issues.dimension_ffede77) | relative_period(reporting_issues.completed_at, interval(-1 week), strict: true)) - 1;;
+        formula: @aql safe_divide(avg(reporting_issues, reporting_issues.cycle_time_hours), avg(reporting_issues, reporting_issues.cycle_time_hours) | relative_period(reporting_issues.completed_at, interval(-1 week), strict: true)) - 1;;
         calc_type: 'measure'
         data_type: 'number'
       }
@@ -621,13 +621,13 @@ Dashboard squad_command_center {
       dataset: reporting_project_management
       calculation metric_e98dbc4 {
         label: 'LM - Completed issue'
-        formula: @aql metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
+        formula: @aql completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }
       calculation metric_abbd5a2 {
         label: '%LM - Completed issue'
-        formula: @aql safe_divide(metric_63f4786, metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
+        formula: @aql safe_divide(completed_issue, completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
         calc_type: 'measure'
         data_type: 'number'
       }
@@ -1287,7 +1287,7 @@ Dashboard squad_command_center {
       dataset: reporting_project_management
       calculation metric_e98dbc4 {
         label: 'LM - Completed issue'
-        formula: @aql metric_63f4786 | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
+        formula: @aql completed_issue | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }

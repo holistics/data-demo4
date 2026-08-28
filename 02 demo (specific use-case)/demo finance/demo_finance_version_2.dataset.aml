@@ -104,6 +104,14 @@ Dataset demo_finance_version_2 {
     format: "[\$\$]#,###0"
   }
 
+  metric total_cancelled_orders {
+    label: "Total Cancelled Orders"
+    type: "number"
+    hidden: false
+    definition: @aql total_orders | where(ecommerce_orders.status is 'cancelled');;
+    description: 'Count of orders with status `cancelled`.'
+  }
+
   metric cancelled_order_ratio {
     label: "Cancelled Order Ratio"
     type: "number"

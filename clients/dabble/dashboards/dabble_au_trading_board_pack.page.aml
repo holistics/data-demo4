@@ -1,0 +1,953 @@
+// Dabble AU - Executive Board Pack.
+//
+// One page, one story, for the quarterly board / commercial review. It deliberately does
+// NOT duplicate dabble_au_trading_performance_command_center: that dashboard owns the
+// daily/weekly/monthly operating cadence across four tabs. This page owns the question no
+// tab there answers end to end - "where did $9.4M of turnover become $1.6M of net revenue,
+// what is dragging it, and how much of this can the board actually trust?"
+//
+// Reading order top to bottom:
+//   1. Six KPI tiles          - scale and the two margins, against the same period last year.
+//   2. Trading P&L Waterfall  - the whole chain in one chart. Turnover is not revenue.
+//   3. Margin Chain Trend     - where margin leaks month to month, with turnover behind it.
+//   4. State Mix (POCT)       - home state is a financial dimension, not a demographic one.
+//   5. Net Revenue Drag       - which sports add and which destroy net revenue.
+//   6. Racing vs Sport Chain  - racing's wider gross hold against what survives COGS.
+//   7. Monthly Board Scorecard- the cost chain month by month, one governed metric per row.
+//   8. Data Confidence        - what on this page is a finding and what is a seed artefact.
+//
+// Every financial number on this page uses the settled reporting-date lens
+// (dabble_fact_bet.reporting_date). No event-date filter appears here on purpose: a board
+// pack that mixes date lenses invites the wrong argument.
+//
+// All metrics resolve in the dabble_trading dataset - no per-widget expressions - so the
+// semantic layer stays the single source of truth.
+Dashboard dabble_au_trading_board_pack {
+  title: 'Dabble AU Executive Board Pack'
+  description: 'Board-cadence view of the Australian book: the turnover to net revenue chain as a waterfall, where margin leaks month to month, which sports and states drag net revenue, and an explicit statement of which figures are trustworthy.'
+  theme: dabble_light
+  block header_board_pack: block_dabble_page_header('Executive Board Pack', 'Turnover to net revenue, what drags it, and what to trust - settled-date lens throughout', 'AU Book')
+  block reporting_date_filter: FilterBlock {
+    label: 'Settled Date (financials)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_fact_bet.reporting_date)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months - today'
+    }
+  }
+  block sport_filter: FilterBlock {
+    label: 'Sport'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_dim_sport.sport_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block home_state_filter: FilterBlock {
+    label: 'Customer Home State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: dabble_trading
+      field: r(dabble_dim_user.home_state)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block period_comparison: PopBlock {
+    label: 'Compare'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'year'
+    }
+  }
+  block kpi_turnover: VizBlock {
+    label: 'Turnover (Combined Stake)'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        label: ' '
+        ref: r(dabble_trading.combined_stake)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00,"K"'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+  block kpi_gross_win_pct: VizBlock {
+    label: 'Gross Win % (hold)'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        label: ' '
+        ref: r(dabble_trading.gross_win_pct)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+  block kpi_net_revenue: VizBlock {
+    label: 'Trading Net Revenue'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        label: ' '
+        ref: r(dabble_trading.trading_net_revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00,"K"'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+  block kpi_net_revenue_pct: VizBlock {
+    label: 'Net Revenue % of Turnover'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        label: ' '
+        ref: r(dabble_trading.trading_net_revenue_pct)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+  block kpi_actives: VizBlock {
+    label: 'Actives (non-additive)'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        label: ' '
+        ref: r(dabble_trading.actives)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+  block kpi_avg_bet_size: VizBlock {
+    label: 'Avg Bet Size'
+    viz: MetricKpi {
+      dataset: dabble_trading
+      value: VizFieldFull {
+        label: ' '
+        ref: r(dabble_trading.avg_bet_size)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(dabble_fact_bet.reporting_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+  block pnl_waterfall: VizBlock {
+    label: 'Trading P&L Waterfall - Turnover to Net Revenue (settled date, AUD)'
+    viz: CustomChart {
+      dataset: dabble_trading
+      custom_chart: dabble_pnl_waterfall
+      field stake: VizFieldFull {
+        ref: r(dabble_trading.combined_stake)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field payout: VizFieldFull {
+        ref: r(dabble_trading.combined_payout)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field boost: VizFieldFull {
+        ref: r(dabble_trading.rocket_boost)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field gross_win: VizFieldFull {
+        ref: r(dabble_trading.gross_win)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field brg: VizFieldFull {
+        ref: r(dabble_trading.brg)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field trading_net_win: VizFieldFull {
+        ref: r(dabble_trading.trading_net_win)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field cogs: VizFieldFull {
+        ref: r(dabble_trading.cogs)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field trading_net_revenue: VizFieldFull {
+        ref: r(dabble_trading.trading_net_revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        row_limit: 1
+      }
+    }
+  }
+  block margin_chain_trend: VizBlock {
+    label: 'Margin Chain by Month - where the hold leaks (turnover shown behind it)'
+    viz: CombinationChart {
+      dataset: dabble_trading
+      x_axis: VizFieldFull {
+        ref: r(dabble_fact_bet.reporting_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Combined Stake'
+            ref: r(dabble_trading.combined_stake)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00,"K"'
+            }
+          }
+          settings {
+            color: '#DDD8EA'
+          }
+        }
+      }
+      y_axis {
+        settings {
+          alignment: 'right'
+          axis_min: 0
+          axis_max: 0.32
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Win % (hold)'
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#28AC26'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Trading Net Win % (after generosity)'
+            ref: r(dabble_trading.trading_net_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#8A5DFF'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Trading Net Revenue % (after COGS)'
+            ref: r(dabble_trading.trading_net_revenue_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#180666'
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Expected Gross Win % (priced book)'
+            ref: r(dabble_trading.expected_gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#8B8B8B'
+            line_style: 'dashed'
+          }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: false
+        show_data_points: true
+        legend_label: 'bottom'
+        row_limit: 5000
+      }
+    }
+  }
+  block state_mix: VizBlock {
+    label: 'Customer Home State - POCT exposure'
+    viz: DataTable {
+      dataset: dabble_trading
+      theme {
+        table {
+          general {
+            bg_color: '#FFFFFFFF'
+            hover_color: '#EEE9FA'
+            font_size: 13
+            font_color: '#21099B'
+            border_color: '#DDD8EA'
+            grid_color: '#DDD8EA'
+            borders {
+              outer: true
+              vertical: true
+              header: true
+            }
+          }
+          header {
+            bg_color: '#21099B'
+            font_size: 12
+            font_weight: 'semibold'
+            font_color: '#FFFFFFFF'
+          }
+        }
+      }
+      fields: [
+        VizFieldFull {
+          label: 'State'
+          ref: r(dabble_dim_user.home_state)
+          uname: 'home_state'
+        },
+        VizFieldFull {
+          label: 'Turnover'
+          ref: r(dabble_trading.combined_stake)
+          uname: 'combined_stake'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00,"K"'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Rev %'
+          ref: r(dabble_trading.trading_net_revenue_pct)
+          uname: 'trading_net_revenue_pct'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 1
+        row_limit: 20
+        sorts: [
+          SortSetting {
+            key: 'trading_net_revenue_pct'
+            direction: 'asc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'trading_net_revenue_pct'
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#FE8885'
+              }
+              mid {
+                type: 'percentage'
+                value: 50
+                color: '#FFFFFF'
+              }
+              max {
+                type: 'percentage'
+                value: 100
+                color: '#8BD98A'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+  block net_revenue_drag: VizBlock {
+    label: 'Net Revenue Contribution and Drag by Sport (worst first)'
+    viz: BarChart {
+      dataset: dabble_trading
+      x_axis: r(dabble_dim_sport.sport_name)
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Trading Net Revenue'
+            ref: r(dabble_trading.trading_net_revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00,"K"'
+            }
+          }
+          settings {
+            color: '#5C3BC4'
+          }
+        }
+      }
+      settings {
+        row_limit: 30
+        legend_label: 'hidden'
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+  block racing_vs_sport_chain: VizBlock {
+    label: 'Racing vs Sport - the cost chain'
+    viz: DataTable {
+      dataset: dabble_trading
+      theme {
+        table {
+          general {
+            bg_color: '#FFFFFFFF'
+            hover_color: '#EEE9FA'
+            font_size: 13
+            font_color: '#21099B'
+            border_color: '#DDD8EA'
+            grid_color: '#DDD8EA'
+            borders {
+              outer: true
+              vertical: true
+              header: true
+            }
+          }
+          header {
+            bg_color: '#21099B'
+            font_size: 12
+            font_weight: 'semibold'
+            font_color: '#FFFFFFFF'
+          }
+        }
+      }
+      fields: [
+        VizFieldFull {
+          label: 'Category'
+          ref: r(dabble_dim_sport.sport_category)
+          uname: 'sport_category'
+        },
+        VizFieldFull {
+          label: 'Turnover'
+          ref: r(dabble_trading.combined_stake)
+          uname: 'combined_stake'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00,"K"'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Win %'
+          ref: r(dabble_trading.gross_win_pct)
+          uname: 'gross_win_pct'
+        },
+        VizFieldFull {
+          label: 'BRG %'
+          ref: r(dabble_trading.brg_pct)
+          uname: 'brg_pct'
+        },
+        VizFieldFull {
+          label: 'COGS %'
+          ref: r(dabble_trading.cogs_pct)
+          uname: 'cogs_pct'
+        },
+        VizFieldFull {
+          label: 'Net Rev %'
+          ref: r(dabble_trading.trading_net_revenue_pct)
+          uname: 'trading_net_revenue_pct'
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        frozen_columns: 1
+        row_limit: 20
+        sorts: [
+          SortSetting {
+            key: 'combined_stake'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block board_scorecard: VizBlock {
+    label: 'Monthly Board Scorecard - scale, the margin chain, and the cost chain'
+    viz: MetricSheet {
+      dataset: dabble_trading
+      theme {
+        table {
+          general {
+            bg_color: '#FFFFFFFF'
+            hover_color: '#EEE9FA'
+            font_size: 13
+            font_color: '#21099B'
+            border_color: '#DDD8EA'
+            grid_color: '#DDD8EA'
+            borders {
+              outer: true
+              vertical: true
+              header: true
+            }
+          }
+          header {
+            bg_color: '#21099B'
+            font_size: 13
+            font_weight: 'semibold'
+            font_color: '#FFFFFFFF'
+          }
+          sub_header {
+            bg_color: '#EEE9FA'
+            font_size: 13
+            font_weight: 'bold'
+            font_color: '#180666'
+          }
+        }
+      }
+      date_field: VizFieldFull {
+        ref: r(dabble_fact_bet.reporting_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      rows: [
+        MetricHeading {
+          label: 'Scale'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.combined_stake)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.combined_stake_yoy_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.actives)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricHeading {
+          label: 'Margin chain (never sum these percentages)'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.expected_gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.gross_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_win_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_revenue_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricHeading {
+          label: 'Cost chain (dollars)'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.gross_win)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.brg)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.cogs)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+            mark_type: 'line'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.trading_net_revenue_yoy_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricHeading {
+          label: 'Generosity and incentives'
+          settings {
+            background_color: '#EEE9FA'
+            text_color: '#180666'
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.bonus_cash_pct)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(dabble_trading.rocket_boost)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            indent: 8
+          }
+        }
+      ]
+    }
+  }
+  block data_confidence: TextBlock {
+    content: @md <div style="border-left:6px solid #E58A00;padding:14px 20px;background:#FFFFFF;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;">
+  <h2 style="color:#21099B;margin:0 0 6px 0;font-size:16px;">Data confidence - read before quoting a number from this page</h2>
+  <p style="margin:0 0 10px 0;color:#4D4566;font-size:12.5px;line-height:1.5;">This prototype runs on deterministic synthetic seed data. The <strong>chain arithmetic and the semantic layer are sound</strong> - every figure recomputes from additive leg-level components on the settled reporting-date lens. Several <em>levels</em> are not plausible for an AU wagering book. Treat the structure as the deliverable and the levels as placeholders.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;color:#21099B;">
+    <thead>
+      <tr style="background:#EEE9FA;color:#180666;text-align:left;">
+        <th style="padding:5px 8px;border:1px solid #DDD8EA;">Figure on this page</th>
+        <th style="padding:5px 8px;border:1px solid #DDD8EA;">Status</th>
+        <th style="padding:5px 8px;border:1px solid #DDD8EA;">Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">Waterfall shape, BRG and COGS steps</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#176B35;font-weight:600;">Trust</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">Governed metrics, leg-grain, additive</td></tr>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">Gross Win % ~25%</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#A61B1B;font-weight:600;">Do not quote</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">AU blended runs ~11-15%; this is roughly double</td></tr>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">Expected Gross Win % flat at 10.8%</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#A61B1B;font-weight:600;">Benchmark is inert</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">Overround is a fixed dividend-bucket lookup, so Margin Variance is realised margin minus a constant</td></tr>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">Boxing and Ice Hockey at ~-75%</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#A61B1B;font-weight:600;">Seed defect</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">Identical every quarter for 10 quarters - a payout bug, not a trading event</td></tr>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">Turnover $9.4M / Avg bet ~$104</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#7A4700;font-weight:600;">Scale placeholder</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">Orders of magnitude small for an operator; bet size several times too high for a social micro-stakes app</td></tr>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">Rocket Boost 0.32% of turnover</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#7A4700;font-weight:600;">Understated</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">Implies the flagship social product barely exists</td></tr>
+      <tr><td style="padding:5px 8px;border:1px solid #DDD8EA;">State and acquisition margin spreads</td><td style="padding:5px 8px;border:1px solid #DDD8EA;color:#7A4700;font-weight:600;">Artefact</td><td style="padding:5px 8px;border:1px solid #DDD8EA;">Exactly 375 actives per state and 600 per channel; each channel is one 2023 signup month, so channel differences are cohort noise</td></tr>
+    </tbody>
+  </table>
+  <p style="margin:10px 0 0 0;color:#4D4566;font-size:12px;line-height:1.5;"><strong>Measurement rules on this page.</strong> Every financial figure uses the settled reporting date, never the fixture event date. Percentages recompute from additive components at each grouping and are never summed or averaged. Actives are distinct users and do not add across months. Restricted stake, weighted dividend, expected-margin overrounds, Rocket categories and the definition of active are documented demo assumptions pending Dabble confirmation. Customer-level detail is deliberately absent from this board view - it lives on the Customer, Rocket &amp; Risk tab of the command centre and is responsible-gambling sensitive.</p>
+</div>;;
+  }
+  view: TabLayout {
+    tab board_pack: CanvasLayout {
+      label: 'Executive Board Pack'
+      width: 1300
+      height: 2600
+      grid_size: 10
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block header_board_pack {
+        position: pos(0, 0, 1300, 110)
+      }
+      block reporting_date_filter {
+        position: pos(20, 130, 300, 80)
+      }
+      block sport_filter {
+        position: pos(340, 130, 300, 80)
+      }
+      block home_state_filter {
+        position: pos(660, 130, 300, 80)
+      }
+      block period_comparison {
+        position: pos(980, 130, 300, 80)
+      }
+      block kpi_turnover {
+        position: pos(20, 230, 200, 120)
+      }
+      block kpi_gross_win_pct {
+        position: pos(230, 230, 200, 120)
+      }
+      block kpi_net_revenue {
+        position: pos(440, 230, 200, 120)
+      }
+      block kpi_net_revenue_pct {
+        position: pos(660, 230, 200, 120)
+      }
+      block kpi_actives {
+        position: pos(870, 230, 200, 120)
+      }
+      block kpi_avg_bet_size {
+        position: pos(1080, 230, 200, 120)
+      }
+      block pnl_waterfall {
+        position: pos(20, 370, 1260, 440)
+      }
+      block margin_chain_trend {
+        position: pos(20, 830, 840, 400)
+      }
+      block state_mix {
+        position: pos(880, 830, 400, 400)
+      }
+      block net_revenue_drag {
+        position: pos(20, 1250, 840, 440)
+      }
+      block racing_vs_sport_chain {
+        position: pos(880, 1250, 400, 440)
+      }
+      block board_scorecard {
+        position: pos(20, 1710, 1260, 520)
+      }
+      block data_confidence {
+        position: pos(20, 2250, 1260, 330)
+      }
+      default_zoom: 'fit_to_width'
+    }
+  }
+  interactions: [
+    PopInteraction {
+      from: 'period_comparison'
+      to: [
+        CustomMapping {
+          block: [
+            'kpi_turnover',
+            'kpi_gross_win_pct',
+            'kpi_net_revenue',
+            'kpi_net_revenue_pct',
+            'kpi_actives',
+            'kpi_avg_bet_size'
+          ]
+          field: r(dabble_fact_bet.reporting_date)
+        }
+      ]
+    }
+  ]
+  settings {
+    autorun_on_open: true
+  }
+}

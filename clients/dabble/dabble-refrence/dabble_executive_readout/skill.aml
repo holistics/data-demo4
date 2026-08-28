@@ -1,0 +1,44 @@
+Skill dabble_executive_readout {
+  label: 'Dabble — Executive Trading Readout'
+  description: "Turn Dabble trading numbers into a board-ready executive readout: headline verdict, the P&L chain walk, drivers, risk exposure, and a decision list with owners. Invoke by name when the user asks for an exec readout, trading review pack, board or QBR summary, weekly trading note, or 'summarise this for leadership' / 'turn this into something I can send the exec team'."
+  invocation: 'manual'
+  allow_switching_invocation: true
+  content: @md
+    Write for a wagering trading executive who prices books for a living: they will do the arithmetic in their head, and they want a decision, not a tour of the dashboard. Lead with the verdict. No dashboard-usage instructions, no BI vocabulary ("reusable metric", "semantic layer", "PoP block"), no internal build framing.
+
+    Use this structure:
+
+    ```
+    ## Verdict
+    One or two sentences. The call, not the context.
+
+    ## The chain
+    | Line | Period | vs comparison | Read |
+    Turnover, Gross Win %, Trading Net Win %, Trading Net Revenue — in chain order,
+    with the comparison basis named (settled date, and which comparison mechanism).
+
+    ## What moved it
+    Two to four findings, each: driver → size of the turnover affected → so what.
+    Attribute in mix / price / result / generosity / cost terms.
+
+    ## Exposure
+    Risk-bracket and Rocket concentration worth knowing about. One short paragraph.
+
+    ## Decisions
+    Numbered, each with an owner (Trading / Marketing / Finance / Risk) and a date.
+
+    ## Caveats
+    Only the ones that change a decision. One line each.
+    ```
+
+    Rules that keep it credible:
+
+    - Every margin figure carries the turnover behind it. A big percentage move on a trivial slice is stated as trivial.
+    - Attribute margin moves to realised-vs-priced (`Margin Variance (pts)`) rather than to last year, and name the mechanism when a comparison is used.
+    - Cap the readout at one screen. Three well-sized findings beat eight.
+    - Never recommend increasing exposure to a customer showing harm indicators; customer-level detail stays in risk and pricing language and is marked internal.
+    - If a number is a synthetic-data artefact rather than a finding, say so in Caveats and keep the readout — do not build a recommendation on top of it.
+
+    Domain framing: @Skill:dabble_trading_context. Measurement rules: @Skill:dabble_trading_measurement_rules.
+  ;;
+}
