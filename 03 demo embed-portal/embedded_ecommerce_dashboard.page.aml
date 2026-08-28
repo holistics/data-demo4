@@ -636,7 +636,7 @@ ecommerce_users.sign_up_date
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
@@ -644,7 +644,8 @@ ecommerce_users.sign_up_date
         sources: [
           CustomDrillthroughSource {
             sources: [
-              '_1_country_breakdown'
+              '_1_country_breakdown',
+              'ssbi_demo'
             ]
           }
         ]

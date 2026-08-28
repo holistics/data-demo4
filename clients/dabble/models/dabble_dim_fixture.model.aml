@@ -1,0 +1,46 @@
+Model dabble_dim_fixture {
+  type: 'table'
+  label: 'Fixtures'
+  data_source_name: 'dabble_neon'
+  table_name: '"dabble_demo"."dim_fixture"'
+
+  dimension fixture_id {
+    label: 'Fixture ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.fixture_id }};;
+  }
+  dimension source_fixture_id {
+    label: 'Source Fixture ID'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.source_fixture_id }};;
+  }
+  dimension competition_id {
+    label: 'Competition ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.competition_id }};;
+  }
+  dimension fixture_name {
+    label: 'Fixture'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fixture_name }};;
+  }
+  dimension advertised_start {
+    label: 'Advertised Start'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.advertised_start }};;
+  }
+  dimension actual_close_time {
+    label: 'Actual Close Time'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.actual_close_time }};;
+  }
+  dimension fixture_status {
+    label: 'Fixture Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fixture_status }};;
+  }
+}

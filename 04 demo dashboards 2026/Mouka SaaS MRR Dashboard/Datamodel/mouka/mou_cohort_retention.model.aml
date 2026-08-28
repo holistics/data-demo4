@@ -77,8 +77,8 @@ Model mou_cohort_retention {
     )
     -- Step 7: Output retention as decimal (0-1) for proper % formatting
     SELECT
-      TO_CHAR(cd.cohort_month, 'Mon YYYY') AS cohort_label,
-      cd.cohort_month::DATE AS cohort_month,
+      TO_CHAR(cd.cohort_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day', 'Mon YYYY') AS cohort_label,
+      (cd.cohort_month::DATE + ${MOUKA_DATE_OFFSET_DAYS} * INTERVAL '1 day')::DATE AS cohort_month,
       cd.months_since::INT AS months_since,
       CASE WHEN cb.base_mrr > 0
         THEN ROUND((cd.cohort_mrr / cb.base_mrr)::NUMERIC, 3)

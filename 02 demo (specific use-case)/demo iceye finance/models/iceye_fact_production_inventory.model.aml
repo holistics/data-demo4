@@ -1,0 +1,54 @@
+Model iceye_fact_production_inventory {
+  type: 'table'
+  label: 'Fact Production Inventory'
+  description: 'Work-order / inventory lines with EUR amounts (prod_reporting_finance_fact_production_inventory).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension transaction_date { label: 'Transaction Date' type: 'datetime' definition: @sql {{ #SOURCE.transaction_date }};; }
+  dimension document_id { label: 'Document Id' type: 'text' definition: @sql {{ #SOURCE.document_id }};; }
+  dimension transaction_id { label: 'Transaction Id' type: 'number' definition: @sql {{ #SOURCE.transaction_id }};; }
+  dimension transaction_line_id { label: 'Transaction Line Id' type: 'number' primary_key: true definition: @sql {{ #SOURCE.transaction_line_id }};; }
+  dimension transaction_type { label: 'Transaction Type' type: 'text' definition: @sql {{ #SOURCE.transaction_type }};; }
+  dimension tl_created_from { label: 'TL Created From' type: 'text' definition: @sql {{ #SOURCE.tl_created_from }};; }
+  dimension tl_created_from_id { label: 'TL Created From Id' type: 'number' definition: @sql {{ #SOURCE.tl_created_from_id }};; }
+  dimension wo_production_start_date { label: 'WO Production Start Date' type: 'datetime' definition: @sql {{ #SOURCE.wo_production_start_date }};; }
+  dimension wo_production_end_date { label: 'WO Production End Date' type: 'datetime' definition: @sql {{ #SOURCE.wo_production_end_date }};; }
+  dimension wo_actual_production_start_date { label: 'WO Actual Production Start Date' type: 'datetime' definition: @sql {{ #SOURCE.wo_actual_production_start_date }};; }
+  dimension wo_actual_production_end_date { label: 'WO Actual Production End Date' type: 'datetime' definition: @sql {{ #SOURCE.wo_actual_production_end_date }};; }
+  dimension tl_item_number { label: 'TL Item Number' type: 'text' definition: @sql {{ #SOURCE.tl_item_number }};; }
+  dimension tl_item_display_name { label: 'TL Item Display Name' type: 'text' definition: @sql {{ #SOURCE.tl_item_display_name }};; }
+  dimension tl_item_id { label: 'TL Item Id' type: 'number' definition: @sql {{ #SOURCE.tl_item_id }};; }
+  dimension item_class_name { label: 'Item Class Name' type: 'text' definition: @sql {{ #SOURCE.item_class_name }};; }
+  dimension wo_unit_of_measure { label: 'WO Unit Of Measure' type: 'text' definition: @sql {{ #SOURCE.wo_unit_of_measure }};; }
+  dimension tl_quantity { label: 'TL Quantity' type: 'number' definition: @sql {{ #SOURCE.tl_quantity }};; }
+  dimension unit_cost { label: 'Unit Cost' type: 'number' definition: @sql {{ #SOURCE.unit_cost }};; }
+  dimension accounting_line_amount { label: 'Accounting Line Amount' type: 'number' definition: @sql {{ #SOURCE.accounting_line_amount }};; }
+  dimension accounting_line_debit_amount { label: 'Accounting Line Debit Amount' type: 'number' definition: @sql {{ #SOURCE.accounting_line_debit_amount }};; }
+  dimension accounting_line_credit_amount { label: 'Accounting Line Credit Amount' type: 'number' definition: @sql {{ #SOURCE.accounting_line_credit_amount }};; }
+  dimension accounting_line_debit_amount_eur { label: 'Accounting Line Debit Amount EUR' type: 'number' definition: @sql {{ #SOURCE.accounting_line_debit_amount_eur }};; }
+  dimension accounting_line_credit_amount_eur { label: 'Accounting Line Credit Amount EUR' type: 'number' definition: @sql {{ #SOURCE.accounting_line_credit_amount_eur }};; }
+  dimension accounting_line_account_type { label: 'Accounting Line Account Type' type: 'text' definition: @sql {{ #SOURCE.accounting_line_account_type }};; }
+  dimension iceye_subsidiary_id { label: 'ICEYE Subsidiary Id' type: 'number' definition: @sql {{ #SOURCE.iceye_subsidiary_id }};; }
+  dimension iceye_subsidiary_name { label: 'ICEYE Subsidiary Name' type: 'text' definition: @sql {{ #SOURCE.iceye_subsidiary_name }};; }
+  dimension department_id { label: 'Department Id' type: 'number' definition: @sql {{ #SOURCE.department_id }};; }
+  dimension account_id { label: 'Account Id' type: 'number' definition: @sql {{ #SOURCE.account_id }};; }
+  dimension posting_period_id { label: 'Posting Period Id' type: 'number' definition: @sql {{ #SOURCE.posting_period_id }};; }
+  dimension posting_period_name { label: 'Posting Period Name' type: 'text' definition: @sql {{ #SOURCE.posting_period_name }};; }
+  dimension posting_period_date { label: 'Posting Period Date' type: 'datetime' definition: @sql {{ #SOURCE.posting_period_date }};; }
+  dimension transaction_currency { label: 'Transaction Currency' type: 'text' definition: @sql {{ #SOURCE.transaction_currency }};; }
+  dimension exchange_rate { label: 'Exchange Rate' type: 'number' definition: @sql {{ #SOURCE.exchange_rate }};; }
+  dimension parent_work_order_number { label: 'Parent Work Order Number' type: 'number' definition: @sql {{ #SOURCE.parent_work_order_number }};; }
+  dimension assembly_part_number { label: 'Assembly Part Number' type: 'text' definition: @sql {{ #SOURCE.assembly_part_number }};; }
+  dimension assembly_name { label: 'Assembly Name' type: 'text' definition: @sql {{ #SOURCE.assembly_name }};; }
+  dimension production_location_name { label: 'Production Location Name' type: 'text' definition: @sql {{ #SOURCE.production_location_name }};; }
+  dimension wo_production_location_id { label: 'WO Production Location Id' type: 'number' definition: @sql {{ #SOURCE.wo_production_location_id }};; }
+  dimension wo_completion_line_id { label: 'WO Completion Line Id' type: 'number' definition: @sql {{ #SOURCE.wo_completion_line_id }};; }
+  dimension wo_issue_line_id { label: 'WO Issue Line Id' type: 'number' definition: @sql {{ #SOURCE.wo_issue_line_id }};; }
+  dimension top_level_assembly_name { label: 'Top Level Assembly Name' type: 'text' definition: @sql {{ #SOURCE.top_level_assembly_name }};; }
+  dimension top_level_assembly_part_number { label: 'Top Level Assembly Part Number' type: 'text' definition: @sql {{ #SOURCE.top_level_assembly_part_number }};; }
+  dimension line_of_business { label: 'Line Of Business' type: 'text' definition: @sql {{ #SOURCE.line_of_business }};; }
+  dimension dwh_created_at { label: 'Dwh Created At' type: 'datetime' definition: @sql {{ #SOURCE.dwh_created_at }};; }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_fact_production_inventory"'
+}

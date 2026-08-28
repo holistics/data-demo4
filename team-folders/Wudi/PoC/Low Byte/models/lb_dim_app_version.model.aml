@@ -1,0 +1,64 @@
+Model lb_dim_app_version {
+  type: 'table'
+  label: 'Dim App Version'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_app_version"'
+
+  dimension app_version_key {
+    label: 'App Version Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.app_version_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension version_name {
+    label: 'Version Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.version_name }};;
+  }
+  dimension build_number {
+    label: 'Build Number'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.build_number }};;
+  }
+  dimension release_channel {
+    label: 'Release Channel'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.release_channel }};;
+  }
+  dimension released_at {
+    label: 'Released At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.released_at }};;
+  }
+  dimension retired_at {
+    label: 'Retired At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.retired_at }};;
+  }
+  dimension is_current {
+    label: 'Is Current'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_current }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

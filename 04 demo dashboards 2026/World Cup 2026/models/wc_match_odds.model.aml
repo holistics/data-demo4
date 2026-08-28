@@ -1,0 +1,153 @@
+Model wc_match_odds {
+  type: 'query'
+  label: 'Match Odds (Latest)'
+  description: 'One row per MATCH (all 104, from wc_matches): the LATEST Elo→Poisson run probabilities plus the day-over-day delta vs the previous run. Matches with no prediction rows (M1–M2 finished before the first nightly run on 12 Jun 2026) keep their row with null probabilities and a status_note, so the odds board renders a styled empty state instead of the platform "no data" pill. Delta labels/colours are built in SQL — AQL has no signed to_char and cast() re-applies digit grouping.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_match_predictions, wc_matches]
+  query: @sql
+    with ranked as (
+      select
+        {{ #p.match_num }} as match_num,
+        {{ #p.run_date }} as run_date,
+        {{ #p.p_home }} as p_home,
+        {{ #p.p_draw }} as p_draw,
+        {{ #p.p_away }} as p_away,
+        {{ #p.exp_home_goals }} as exp_home_goals,
+        {{ #p.exp_away_goals }} as exp_away_goals,
+        row_number() over (partition by {{ #p.match_num }} order by {{ #p.run_date }} desc) as rn
+      from {{ #wc_match_predictions as p }}
+    )
+    select
+      {{ #m.match_num }} as match_num,
+      c.run_date,
+      c.p_home, c.p_draw, c.p_away,
+      c.exp_home_goals, c.exp_away_goals,
+      case when c.run_date is null then null
+           else to_char(c.exp_home_goals, 'FM990.0') || ' – ' || to_char(c.exp_away_goals, 'FM990.0') end as exp_score_label,
+      case when c.run_date is null then 'no run recorded'
+           else 'run ' || to_char(c.run_date, 'DD Mon') end as run_label,
+      case when c.run_date is not null then null
+           when {{ #m.status }} = 'FT' then 'Played before the model went live on 12 Jun — no pre-match odds were recorded for this fixture.'
+           else 'No sim run for this fixture yet — odds land with the next nightly run.' end as status_note,
+      pr.run_date as prev_run_date,
+      case when c.run_date is null then null
+           when pr.run_date is null then 'first run — deltas from tomorrow'
+           else 'vs run ' || to_char(pr.run_date, 'DD Mon') end as delta_note,
+      case when c.run_date is null or pr.run_date is null then ''
+           when c.p_home - pr.p_home > 0.0005 then '▲ ' || to_char((c.p_home - pr.p_home) * 100, 'FM990.0')
+           when pr.p_home - c.p_home > 0.0005 then '▼ ' || to_char((pr.p_home - c.p_home) * 100, 'FM990.0')
+           else '· 0.0' end as d_home_label,
+      case when c.run_date is null or pr.run_date is null then ''
+           when c.p_draw - pr.p_draw > 0.0005 then '▲ ' || to_char((c.p_draw - pr.p_draw) * 100, 'FM990.0')
+           when pr.p_draw - c.p_draw > 0.0005 then '▼ ' || to_char((pr.p_draw - c.p_draw) * 100, 'FM990.0')
+           else '· 0.0' end as d_draw_label,
+      case when c.run_date is null or pr.run_date is null then ''
+           when c.p_away - pr.p_away > 0.0005 then '▲ ' || to_char((c.p_away - pr.p_away) * 100, 'FM990.0')
+           when pr.p_away - c.p_away > 0.0005 then '▼ ' || to_char((pr.p_away - c.p_away) * 100, 'FM990.0')
+           else '· 0.0' end as d_away_label,
+      case when c.run_date is null or pr.run_date is null or abs(c.p_home - pr.p_home) <= 0.0005 then '#9AA4B2'
+           when c.p_home > pr.p_home then '#1FA36B' else '#E5362B' end as d_home_color,
+      case when c.run_date is null or pr.run_date is null or abs(c.p_draw - pr.p_draw) <= 0.0005 then '#9AA4B2'
+           when c.p_draw > pr.p_draw then '#1FA36B' else '#E5362B' end as d_draw_color,
+      case when c.run_date is null or pr.run_date is null or abs(c.p_away - pr.p_away) <= 0.0005 then '#9AA4B2'
+           when c.p_away > pr.p_away then '#1FA36B' else '#E5362B' end as d_away_color
+    from {{ #wc_matches as m }}
+    left join ranked c on c.match_num = {{ #m.match_num }} and c.rn = 1
+    left join ranked pr on pr.match_num = {{ #m.match_num }} and pr.rn = 2;;
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    primary_key: true
+  }
+  dimension run_date {
+    label: 'Run Date'
+    type: 'date'
+  }
+  dimension run_label {
+    label: 'Run Label'
+    type: 'text'
+    description: 'Header caption: "run 12 Jun", or "no run recorded" for matches without predictions.'
+  }
+  dimension p_home {
+    label: 'P Home Win'
+    type: 'number'
+  }
+  dimension p_draw {
+    label: 'P Draw'
+    type: 'number'
+  }
+  dimension p_away {
+    label: 'P Away Win'
+    type: 'number'
+  }
+  dimension p_home_pct {
+    label: 'P Home Win %'
+    type: 'number'
+    description: 'p_home × 100 — doubles as the probability-bar segment width.'
+    definition: @aql wc_match_odds.p_home * 100 ;;
+  }
+  dimension p_draw_pct {
+    label: 'P Draw %'
+    type: 'number'
+    definition: @aql wc_match_odds.p_draw * 100 ;;
+  }
+  dimension p_away_pct {
+    label: 'P Away Win %'
+    type: 'number'
+    definition: @aql wc_match_odds.p_away * 100 ;;
+  }
+  dimension exp_home_goals {
+    label: 'Expected Home Goals'
+    type: 'number'
+  }
+  dimension exp_away_goals {
+    label: 'Expected Away Goals'
+    type: 'number'
+  }
+  dimension exp_score_label {
+    label: 'Expected Score'
+    type: 'text'
+    description: 'Pre-formatted "2.1 – 0.8" from the Poisson means; null when no run exists.'
+  }
+  dimension status_note {
+    label: 'Status Note'
+    type: 'text'
+    description: 'Styled empty state: why this fixture has no odds (pre-model fixture vs awaiting nightly run); null when odds exist (hides via :empty).'
+  }
+  dimension prev_run_date {
+    label: 'Previous Run Date'
+    type: 'date'
+  }
+  dimension delta_note {
+    label: 'Delta Note'
+    type: 'text'
+    description: 'Footer caption: "vs run 11 Jun", or a first-run notice while only one run exists.'
+  }
+  dimension d_home_label {
+    label: 'Home Delta'
+    type: 'text'
+    description: 'Driver field: signed day-over-day move in percentage points, e.g. "▲ 2.4"; empty on the first run (hides via :empty).'
+  }
+  dimension d_draw_label {
+    label: 'Draw Delta'
+    type: 'text'
+  }
+  dimension d_away_label {
+    label: 'Away Delta'
+    type: 'text'
+  }
+  dimension d_home_color {
+    label: 'Home Delta Color'
+    type: 'text'
+    description: 'Driver field: rising green, falling red, flat/first-run grey.'
+  }
+  dimension d_draw_color {
+    label: 'Draw Delta Color'
+    type: 'text'
+  }
+  dimension d_away_color {
+    label: 'Away Delta Color'
+    type: 'text'
+  }
+  owner: 'hung.dd@holistics.io'
+}

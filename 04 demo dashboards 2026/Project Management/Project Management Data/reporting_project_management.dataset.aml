@@ -43,7 +43,7 @@ Dataset reporting_project_management {
     label: "%LM - Avg PR Review"
     type: "number"
     hidden: false
-    definition: @aql safe_divide(avg(reporting_issue_duration, reporting_issue_duration.duration_hours), avg(reporting_issue_duration, reporting_issue_duration.duration_hours) | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
+    definition: @aql safe_divide(avg(reporting_stage_duration, reporting_stage_duration.duration_hours), avg(reporting_stage_duration, reporting_stage_duration.duration_hours) | relative_period(reporting_issues.completed_at, interval(-1 month), strict: true)) - 1;;
   }
 
   metric percent_completion {

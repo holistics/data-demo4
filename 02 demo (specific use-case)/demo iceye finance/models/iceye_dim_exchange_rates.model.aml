@@ -1,0 +1,30 @@
+Model iceye_dim_exchange_rates {
+  type: 'table'
+  label: 'Exchange Rates'
+  description: 'Monthly consolidated FX rates to EUR (prod_reporting_finance_dim_excahnge_rates).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension consolidated_exchange_rate_id { label: 'Consolidated Exchange Rate Id' type: 'number' primary_key: true definition: @sql {{ #SOURCE.consolidated_exchange_rate_id }};; }
+  dimension posting_period_id { label: 'Posting Period Id' type: 'number' definition: @sql {{ #SOURCE.posting_period_id }};; }
+  dimension period_start_date { label: 'Period Start Date' type: 'datetime' definition: @sql {{ #SOURCE.period_start_date }};; }
+  dimension from_currency_id { label: 'From Currency Id' type: 'number' definition: @sql {{ #SOURCE.from_currency_id }};; }
+  dimension to_currency_id { label: 'To Currency Id' type: 'number' definition: @sql {{ #SOURCE.to_currency_id }};; }
+  dimension from_currency_symbol { label: 'From Currency Symbol' type: 'text' definition: @sql {{ #SOURCE.from_currency_symbol }};; }
+  dimension to_currency_symbol { label: 'To Currency Symbol' type: 'text' definition: @sql {{ #SOURCE.to_currency_symbol }};; }
+  dimension from_subsidiary_id { label: 'From Subsidiary Id' type: 'number' definition: @sql {{ #SOURCE.from_subsidiary_id }};; }
+  dimension to_subsidiary_id { label: 'To Subsidiary Id' type: 'number' definition: @sql {{ #SOURCE.to_subsidiary_id }};; }
+  dimension from_iceye_subsidiary_name { label: 'From ICEYE Subsidiary Name' type: 'text' definition: @sql {{ #SOURCE.from_iceye_subsidiary_name }};; }
+  dimension to_iceye_subsidiary_name { label: 'To ICEYE Subsidiary Name' type: 'text' definition: @sql {{ #SOURCE.to_iceye_subsidiary_name }};; }
+  dimension accounting_book_id { label: 'Accounting Book Id' type: 'number' definition: @sql {{ #SOURCE.accounting_book_id }};; }
+  dimension average_rate { label: 'Average Rate' type: 'number' definition: @sql {{ #SOURCE.average_rate }};; }
+  dimension current_rate { label: 'Current Rate' type: 'number' definition: @sql {{ #SOURCE.current_rate }};; }
+  dimension historical_rate { label: 'Historical Rate' type: 'number' definition: @sql {{ #SOURCE.historical_rate }};; }
+  dimension external_id { label: 'External Id' type: 'text' definition: @sql {{ #SOURCE.external_id }};; }
+  dimension is_derived { label: 'Is Derived' type: 'truefalse' definition: @sql {{ #SOURCE.is_derived }};; }
+  dimension is_eliminationsubsidiary { label: 'Is Elimination Subsidiary' type: 'truefalse' definition: @sql {{ #SOURCE.is_eliminationsubsidiary }};; }
+  dimension is_period_closed { label: 'Is Period Closed' type: 'truefalse' definition: @sql {{ #SOURCE.is_period_closed }};; }
+  dimension dwh_created_at { label: 'Dwh Created At' type: 'datetime' definition: @sql {{ #SOURCE.dwh_created_at }};; }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_dim_excahnge_rates"'
+}

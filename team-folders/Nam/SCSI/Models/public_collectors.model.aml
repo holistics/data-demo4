@@ -1,0 +1,42 @@
+Model public_collectors {
+  type: 'table'
+  label: 'Collectors'
+  description: 'Collection agents employed by the agency. One row per collector; accounts are assigned to a collector via collector_id.'
+  data_source_name: 'demo_scsi_nam'
+
+  dimension collector_id {
+    label: 'Collector Id'
+    type: 'number'
+    description: "The **Collector Id** uniquely identifies each collection agent.  \nIt is the primary key of this model and the target of the `accounts.collector_id` relationship.  \nExamples include `3`, `5`, `6`, `8`, and `15`."
+    hidden: false
+    definition: @sql {{ #SOURCE.collector_id }};;
+    primary_key: true
+  }
+
+  dimension collector_name {
+    label: 'Collector Name'
+    type: 'text'
+    description: "The **Collector Name** is the full name of the collection agent handling the account.  \nUse this for agent-level performance reporting instead of the numeric id."
+    hidden: false
+    definition: @sql {{ #SOURCE.collector_name }};;
+  }
+
+  dimension team {
+    label: 'Team'
+    type: 'text'
+    description: "The **Team** is the collections unit the agent belongs to.  \nUse it to roll agent performance up to team level, and as the usual grouping for staffing and workload comparisons."
+    hidden: false
+    definition: @sql {{ #SOURCE.team }};;
+  }
+
+  dimension hire_date {
+    label: 'Hire Date'
+    type: 'date'
+    description: "The **Hire Date** is the date the collector joined the agency.  \nUse it to derive agent tenure, which is a common explanatory variable when comparing recovery performance between agents."
+    hidden: false
+    definition: @sql {{ #SOURCE.hire_date }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."collectors"'
+}

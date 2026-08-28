@@ -54,7 +54,7 @@ Model cash_runway {
   query: @sql WITH monthly AS (
     SELECT
         cf_type,
-        SUM(amount) AS total_amount
+        SUM(CAST(amount AS numeric)) AS total_amount
     FROM {{ #fact_cashflow_entries as f }}
     WHERE {% filter(date_param) %} f.date {% end %}
     GROUP BY cf_type
@@ -75,7 +75,7 @@ computed AS (
         ROUND(CAST((operating + investing + financing) / 12.0 AS numeric), 0) AS monthly_net_cf,
         ROUND(
             CAST(
-                (SELECT MAX(cash_balance_eop) FROM {{ #fact_cashflow_entries }} WHERE cash_balance_eop IS NOT NULL)
+                (SELECT MAX(CAST(cash_balance_eop AS numeric)) FROM {{ #fact_cashflow_entries }} WHERE cash_balance_eop IS NOT NULL)
                 / NULLIF(ABS((operating + investing + financing) / 12.0), 0)
             AS numeric)
         , 0) AS runway_months

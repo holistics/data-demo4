@@ -1,0 +1,147 @@
+// Vega-Lite sport profitability quadrant.
+// Solves three things the built-in BubbleChart/ScatterChart cannot:
+//   1. Log turnover axis, so three racing codes 5-14x larger than every other sport
+//      no longer jam the remaining 21 into the leftmost sliver of a linear axis.
+//   2. Dashed mean rules on both axes, giving real quadrant boundaries. Reference
+//      lines are not supported on the built-in bubble/scatter charts.
+//   3. Every point carries its sport name, so the chart reads without hovering.
+// Bubble area encodes bet volume, which the built-in chart had no channel left for.
+CustomChartDef dabble_sport_quadrant {
+  label: 'Sport Profitability Quadrant'
+  description: 'Turnover (log scale) against realised margin, bubble area for bet volume, split into protect / price review / grow / deprioritise by dashed average lines.'
+
+  fields {
+    field sport {
+      label: 'Sport'
+      type: 'dimension'
+    }
+    field category {
+      label: 'Category'
+      type: 'dimension'
+    }
+    field stake {
+      label: 'Combined Stake'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field margin {
+      label: 'Gross Win %'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field bets {
+      label: 'Bets'
+      type: 'measure'
+      data_type: 'number'
+    }
+  }
+
+  template: @vgl {
+    "width": "container",
+    "height": "container",
+    "data": {"values": @{values}},
+    "layer": [
+      {
+        "mark": {"type": "rule", "strokeDash": [5, 4], "color": "#9A93B5", "strokeWidth": 1, "tooltip": true},
+        "encoding": {
+          "x": {"field": @{fields.stake.name}, "aggregate": "mean", "type": "quantitative"},
+          "tooltip": [
+            {"field": @{fields.stake.name}, "aggregate": "mean", "type": "quantitative", "title": "Average turnover per sport", "format": "$,.0f"}
+          ]
+        }
+      },
+      {
+        "mark": {"type": "rule", "strokeDash": [5, 4], "color": "#9A93B5", "strokeWidth": 1, "tooltip": true},
+        "encoding": {
+          "y": {"field": @{fields.margin.name}, "aggregate": "mean", "type": "quantitative"},
+          "tooltip": [
+            {"field": @{fields.margin.name}, "aggregate": "mean", "type": "quantitative", "title": "Average margin across sports", "format": ".1%"}
+          ]
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "PROTECT", "align": "right", "baseline": "top", "dx": -4, "dy": 4, "fontSize": 10, "fontWeight": "bold", "color": "#C0B6DE"},
+        "encoding": {
+          "x": {"field": @{fields.stake.name}, "aggregate": "max", "type": "quantitative"},
+          "y": {"field": @{fields.margin.name}, "aggregate": "max", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "GROW", "align": "left", "baseline": "top", "dx": 4, "dy": 4, "fontSize": 10, "fontWeight": "bold", "color": "#C0B6DE"},
+        "encoding": {
+          "x": {"field": @{fields.stake.name}, "aggregate": "min", "type": "quantitative"},
+          "y": {"field": @{fields.margin.name}, "aggregate": "max", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "PRICE REVIEW", "align": "right", "baseline": "bottom", "dx": -4, "dy": -4, "fontSize": 10, "fontWeight": "bold", "color": "#C0B6DE"},
+        "encoding": {
+          "x": {"field": @{fields.stake.name}, "aggregate": "max", "type": "quantitative"},
+          "y": {"field": @{fields.margin.name}, "aggregate": "min", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "DEPRIORITISE", "align": "left", "baseline": "bottom", "dx": 4, "dy": -4, "fontSize": 10, "fontWeight": "bold", "color": "#C0B6DE"},
+        "encoding": {
+          "x": {"field": @{fields.stake.name}, "aggregate": "min", "type": "quantitative"},
+          "y": {"field": @{fields.margin.name}, "aggregate": "min", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "opacity": 0.82, "stroke": "#FFFFFF", "strokeWidth": 0.5, "tooltip": true},
+        "encoding": {
+          "x": {
+            "field": @{fields.stake.name},
+            "type": "quantitative",
+            "scale": {"type": "log", "nice": false},
+            "axis": {"title": "Combined Stake (log scale)", "format": "$,.2s", "grid": true, "gridColor": "#EEE9FA", "labelFontSize": 10, "titleFontSize": 11, "titleColor": "#180666"}
+          },
+          "y": {
+            "field": @{fields.margin.name},
+            "type": "quantitative",
+            "scale": {"zero": false, "nice": true},
+            "axis": {"title": "Gross Win %", "format": ".0%", "grid": true, "gridColor": "#EEE9FA", "labelFontSize": 10, "titleFontSize": 11, "titleColor": "#180666"}
+          },
+          "size": {
+            "field": @{fields.bets.name},
+            "type": "quantitative",
+            "scale": {"range": [60, 900]},
+            "legend": {"title": "Bets", "orient": "bottom-right", "format": ",.0f", "labelFontSize": 9, "titleFontSize": 10}
+          },
+          "color": {
+            "field": @{fields.category.name},
+            "type": "nominal",
+            "scale": {"domain": ["Racing", "Sport"], "range": ["#5C3BC4", "#28AC26"]},
+            "legend": {"title": null, "orient": "top", "labelFontSize": 11}
+          },
+          "shape": {
+            "field": @{fields.category.name},
+            "type": "nominal",
+            "scale": {"domain": ["Racing", "Sport"], "range": ["circle", "square"]},
+            "legend": null
+          },
+          "tooltip": [
+            {"field": @{fields.sport.name}, "type": "nominal", "title": "Sport"},
+            {"field": @{fields.category.name}, "type": "nominal", "title": "Category"},
+            {"field": @{fields.stake.name}, "type": "quantitative", "title": "Combined Stake", "format": "$,.0f"},
+            {"field": @{fields.margin.name}, "type": "quantitative", "title": "Gross Win %", "format": ".1%"},
+            {"field": @{fields.bets.name}, "type": "quantitative", "title": "Bets", "format": ",.0f"}
+          ]
+        }
+      },
+      {
+        "mark": {"type": "text", "dy": -12, "fontSize": 9, "color": "#180666", "limit": 110},
+        "encoding": {
+          "x": {"field": @{fields.stake.name}, "type": "quantitative"},
+          "y": {"field": @{fields.margin.name}, "type": "quantitative"},
+          "text": {"field": @{fields.sport.name}, "type": "nominal"}
+        }
+      }
+    ],
+    "config": {
+      "view": {"stroke": null},
+      "axis": {"domainColor": "#DDD8EA", "tickColor": "#DDD8EA", "labelColor": "#21099B"},
+      "legend": {"labelColor": "#21099B", "titleColor": "#180666"}
+    }
+  };;
+}

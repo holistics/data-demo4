@@ -31,6 +31,16 @@ Model ecommerce_cities {
     );;
   }
 
+  // Action target for the '[Feature] Product Actions' dashboard's 'Experience
+  // Recommendation' action, which referenced this field before it existed.
+  dimension experience {
+    label: 'Experience Recommendation'
+    type: 'text'
+    definition: @aql concat(
+      'https://www.google.com/search?q=things+to+do+in+',ecommerce_cities.name
+    );;
+  }
+
   owner: 'ha.pham+demo4@holistics.io and vincent'
   table_name: '"ecommerce"."cities"'
 }

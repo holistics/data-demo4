@@ -1,0 +1,58 @@
+Model lb_source_system {
+  type: 'table'
+  label: 'Source System'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."source_system"'
+
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension source_code {
+    label: 'Source Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_code }};;
+  }
+  dimension source_name {
+    label: 'Source Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_name }};;
+  }
+  dimension source_category {
+    label: 'Source Category'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_category }};;
+  }
+  dimension description {
+    label: 'Description'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.description }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}

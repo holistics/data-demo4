@@ -70,6 +70,6 @@ Model dim_station_2 {
     label: 'Active Stations'
     type: 'number'
     description: "Count of stations with status = 'FullService'."
-    definition: @aql count(dim_station_2.station_id) | where(dim_station_2.status = 'FullService') ;;
+    definition: @aql count(dim_station_2.station_id) | where(dim_station_2.status == 'FullService') ;;
   }
 }

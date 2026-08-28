@@ -1,0 +1,42 @@
+Model public_clients {
+  type: 'table'
+  label: 'Clients'
+  description: 'Creditor organisations that place delinquent accounts with the agency for collection. One row per client; referenced by accounts via client_id.'
+  data_source_name: 'demo_scsi_nam'
+
+  dimension client_id {
+    label: 'Client Id'
+    type: 'number'
+    description: "The **Client Id** uniquely identifies each creditor client that places accounts with the agency.  \nIt is the primary key of this model and the target of the `accounts.client_id` relationship.  \nExamples include `1`, `2`, `3`, `4`, and `5`."
+    hidden: false
+    definition: @sql {{ #SOURCE.client_id }};;
+    primary_key: true
+  }
+
+  dimension client_name {
+    label: 'Client Name'
+    type: 'text'
+    description: "The **Client Name** is the display name of the creditor organisation that owns the placed debt.  \nUse this for client-level reporting and portfolio breakdowns rather than the numeric id."
+    hidden: false
+    definition: @sql {{ #SOURCE.client_name }};;
+  }
+
+  dimension industry {
+    label: 'Industry'
+    type: 'text'
+    description: "The **Industry** groups clients by the sector their receivables originate from, such as healthcare, retail or telecom.  \nUse it to compare recovery performance across portfolio types, since liquidation rates differ substantially by industry."
+    hidden: false
+    definition: @sql {{ #SOURCE.industry }};;
+  }
+
+  dimension contract_start {
+    label: 'Contract Start'
+    type: 'date'
+    description: "The **Contract Start** is the date the agency's agreement with this client began.  \nIt bounds the client tenure and should not be confused with `accounts.placement_date`, which is per-account."
+    hidden: false
+    definition: @sql {{ #SOURCE.contract_start }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."clients"'
+}

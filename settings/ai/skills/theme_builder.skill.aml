@@ -1,0 +1,321 @@
+Skill theme_builder {
+  label: 'Theme Builder'
+  description: "Strict orchestrator for generating and applying a Holistics dashboard theme through a mandatory pipeline: mood_designer -> palette_designer + page_theme_designer -> apply -> summarize. This skill is the only public entry point for theme generation. It must not skip stages, hand-write final ColorPalette/PageTheme AML, or claim success while any blocking diagnostic remains."
+  invocation: 'auto'
+  allow_switching_invocation: true
+  content: @md
+    # Theme Builder
+
+    Your goal is to produce a production-ready Holistics dashboard theme and apply it correctly.
+
+    Execute this pipeline in order — each stage builds on the last:
+    1. `mood_designer`
+    2. `palette_designer`
+    3. `page_theme_designer`
+    4. apply
+    5. summarize
+
+    Each stage must complete before the next begins. Skipping, merging, simulating, or reordering
+    stages produces unreliable output and breaks artifact dependencies downstream.
+
+    ---
+
+    ## Input handling
+
+    Accept any of the following:
+    - brand name
+    - website URL
+    - screenshot
+    - brand guideline doc
+    - explicit colors
+    - font request
+    - mood description
+    - open-ended request
+
+    `mood_designer` handles its own clarification logic — let it run fully before acting on its output.
+
+    Before invoking `mood_designer`, scan the user's input for explicit hex or named colors mapped
+    to named roles, in any phrasing — e.g., "Primary: #1A2156", "use #1A2156 as primary",
+    "make the primary #1A2156", or equivalent natural language. Record these as **locked anchors**
+    and pass them to `mood_designer` alongside the full prompt. The Stage 1 gate uses them to verify
+    fidelity.
+
+    ---
+
+    ## Execution rules
+
+    This skill is the **only public entry point** for theme generation. Invoking sub-skills
+    directly bypasses slug coordination and the per-stage gating that this orchestrator manages.
+    Always invoke `palette_designer` and `page_theme_designer` through this pipeline only.
+
+    Each designer is the **single source of truth** for its portion of the theme file — always
+    let each designer write its own output so its internal validation runs. Report completion
+    only when all required files exist and all blocking diagnostics are resolved.
+
+    ---
+
+    ## Blocking conditions
+
+    Halt the current stage immediately when any of these occur:
+    - AML syntax errors
+    - unknown properties
+    - unresolved names or symbols
+    - failed theme reference resolution
+    - missing required stage artifacts
+    - designer write or post-write verification failures
+
+    Warnings are non-blocking but must be mentioned in the final summary.
+
+    ### Escalation rule (applies to all blocking conditions)
+
+    Continuing to retry a broken stage without new information wastes cycles and never converges.
+    When a blocking condition persists after **2 recovery attempts at the same stage**:
+    - Halt the pipeline immediately.
+    - Surface the execution record.
+    - Report the specific blocking condition and which stage is producing it.
+    - Ask the user one targeted clarifying question.
+    - Resume only after the blocking condition is resolved — new user input that does not
+      resolve the condition is not sufficient to continue.
+
+    If the user declines to resolve the blocking condition:
+    - Explain clearly what cannot be produced without it.
+    - Tell the user what input would be needed to restart successfully.
+    - Stop the pipeline and record the stage and reason as `abandoned` in the execution record.
+    - Do not proceed further.
+
+    ---
+
+    ## Grounding rules
+
+    - Pick one slug matching `^[a-z][a-z0-9_]*$` and reuse it across all stages.
+    - Determine whether the task is in an AMQL project context or a standalone theme-generation request.
+    - Always ground `ColorPalette` structure, `PageTheme` application behavior, and reusable theme
+      reference behavior in actual project files — memory can be stale or wrong.
+    - When syntax or application behavior is uncertain, check project files and/or docs before continuing.
+
+    ---
+
+    ## Example — happy path
+
+    > User: "Build a theme based on Linear's design"
+
+    **Stage 1:** `mood_designer` fetches linear.app, infers dark mode, blue primary, comfortable
+    density. Writes 12 consts to `library/themes/linear_dark.theme.aml`. Gate passes.
+
+    **Stage 2:** `palette_designer` reads consts and appends a
+    `ColorPalette linear_dark_palette` block (8 slots) to the same file; post-write
+    verification passes. Gate passes.
+
+    **Stage 3:** `page_theme_designer` reads consts and appends a
+    `PageTheme linear_dark_theme` block (referencing `linear_dark_palette`) to the same
+    file; post-write verification passes. Gate passes.
+
+    **Stage 4:** Dashboard file updated to reference `linear_dark_theme`. Reference resolves. Gate passes.
+
+    **Stage 5:** Summary delivered. Pipeline complete.
+
+    ---
+
+    ## Stage 1 — Run `mood_designer`
+
+    Invoke `mood_designer` with:
+    - the user's prompt verbatim
+    - any uploaded artifacts
+    - the chosen slug
+
+    `mood_designer` writes the branding const bundle to `library/themes/<slug>.theme.aml`.
+    This file is the single source of truth consumed by all downstream stages.
+
+    ### Required artifact from Stage 1
+    Obtain and retain all of:
+    - `slug`
+    - `theme_file_path`
+    - confirmation that the const bundle was written
+    - list of key consts written, if available
+
+    ### Stage 1 gate
+    Proceed to Stage 2 only when all of the following are true:
+    - the slug is fixed
+    - the const bundle exists and its content is structurally valid
+    - the theme file path is known
+    - if the user's input contained explicit hex values mapped to named roles, each appears
+      in the corresponding const within OKLCH rounding tolerance (±0.01 L, ±0.005 C, ±1° H);
+      any drift beyond tolerance is a blocking error — re-run `mood_designer`
+
+    A malformed or incomplete const bundle will propagate errors into every downstream stage.
+    If the const bundle fails validation, treat Stage 1 as failed, re-run `mood_designer`,
+    and apply the escalation rule if it fails twice.
+
+    ---
+
+    ## Stage 2 — Run `palette_designer`
+
+    Invoke `palette_designer` with the slug from Stage 1. It reads
+    `library/themes/<slug>.theme.aml` (written by `mood_designer`), generates the
+    8-slot brand-anchored chart palette, and appends a `ColorPalette <slug>_palette`
+    block to the same file.
+
+    ### Required artifact from Stage 2
+    Obtain and retain:
+    - confirmation that the `ColorPalette <slug>_palette` block was written and verified
+
+    ### Stage 2 gate
+    Proceed to Stage 3 only when:
+    - the `ColorPalette <slug>_palette` block is present in the theme file
+    - `palette_designer`'s post-write verification passed
+
+    ### Stage 2 recovery
+    If `palette_designer` fails, re-run it. Apply the escalation rule if it fails twice.
+    Do not start Stage 3 (`page_theme_designer`) until Stage 2 has succeeded — the
+    PageTheme block's `color { data: <slug>_palette }` reference resolves against the
+    ColorPalette block that this stage writes.
+
+    ### Hard rule — let the designer own its output
+    `palette_designer`'s internal validation only runs when it writes the file itself.
+    Always source `ColorPalette` AML from `palette_designer` — never create or edit
+    this block manually.
+
+    ---
+
+    ## Stage 3 — Run `page_theme_designer`
+
+    Invoke `page_theme_designer` with the slug from Stage 1. It reads
+    `library/themes/<slug>.theme.aml` (now containing consts plus the ColorPalette block
+    written in Stage 2), generates the PageTheme block, and appends a
+    `PageTheme <slug>_theme` block to the same file.
+
+    ### Required artifact from Stage 3
+    Obtain and retain:
+    - confirmation that the `PageTheme <slug>_theme` block was written and verified
+
+    ### Stage 3 gate
+    Proceed to Stage 4 only when:
+    - the `PageTheme <slug>_theme` block is present in the theme file
+    - the block contains `color { data: <slug>_palette }`
+    - `page_theme_designer`'s post-write verification passed
+
+    ### Stage 3 recovery
+    If `page_theme_designer` fails, re-run only `page_theme_designer` — the ColorPalette
+    block from Stage 2 is already in place and should not be regenerated. Apply the
+    escalation rule if it fails twice.
+
+    ### Hard rule — let the designer own its output
+    `page_theme_designer`'s internal validation only runs when it writes the file itself.
+    Always source `PageTheme` AML from `page_theme_designer` — never create or edit
+    this block manually.
+
+    ---
+
+    ## Stage 4 — Apply
+
+    ### In an AMQL project context
+
+    Required actions:
+    - surface `theme_file_path` (`library/themes/<slug>.theme.aml`)
+    - update the dashboard file to reference the generated theme
+    - verify the reference resolves
+
+    ### Apply gate
+    Apply is successful only when all of the following are true:
+    - the dashboard file was updated
+    - the theme reference is present
+    - no unresolved-name diagnostic remains for the theme reference
+
+    ### Apply recovery rule
+    If the theme reference fails:
+    - Inspect whether the theme should be a reusable theme reference or an inline local theme.
+    - Fix the reference strategy and re-check diagnostics.
+    - Apply the escalation rule if it fails twice.
+
+    ### Outside an AMQL project
+    Surface the theme file path and tell the user where it was saved:
+    - `library/themes/<slug>.theme.aml`
+
+    In this mode the theme is ready to save but not yet applied to a dashboard.
+    Record `stage_4.status` as `not_applicable` in the execution record.
+
+    ---
+
+    ## Stage 5 — Summarize
+
+    All prior stages must complete successfully before writing the summary. A premature summary
+    misleads the user into thinking the theme is ready when it may still have unresolved issues.
+
+    ### Mandatory pre-summary checklist
+    All of the following must be true before writing the final answer:
+
+    - `mood_designer` ran and Stage 1 gate passed
+    - `palette_designer` ran and the ColorPalette block is present in the theme file
+    - `page_theme_designer` ran and the PageTheme block is present in the theme file
+    - `library/themes/<slug>.theme.aml` contains consts + ColorPalette + PageTheme
+    - apply step completed (or recorded as `not_applicable` for non-project mode)
+    - no unresolved theme reference remains
+    - `ColorPalette` AML came from `palette_designer`, not written manually
+    - `PageTheme` AML came from `page_theme_designer`, not written manually
+
+    If any item is false, continue fixing before summarizing.
+
+    ### Summary style
+    Share a brief, plain-language summary in two parts.
+
+    Note: jargon restrictions below apply to the final summary only.
+    Earlier pipeline stages may use technical terms internally.
+
+    **Part A — What I picked up**
+    - mood
+    - lead color
+    - font choice
+    - one assumption if relevant
+
+    **Part B — What I built**
+    - page/canvas/card feel
+    - chart palette character
+    - one note on spacing only if changed
+
+    Keep the summary free of technical jargon — the user should understand it without knowing
+    how the pipeline works. Avoid terms like: OKLCH, lint, fragment, token, block.
+
+    Mention warnings in plain language if any exist.
+
+    End with one concrete next refinement.
+
+    ---
+
+    ## Proof of execution
+
+    Internally maintain a structured execution record. Surface it automatically whenever a
+    blocking condition is hit, the pipeline halts for any reason, or the user asks about status.
+
+    ```yaml
+    theme_pipeline_execution:
+      slug: <slug>
+      stage_1:
+        skill: mood_designer
+        status: completed|failed
+        theme_file_path: ...
+        const_bundle_valid: true|false
+        locked_anchors_verified: true|false|not_applicable
+        attempts: 1
+      stage_2:
+        skill: palette_designer
+        status: completed|failed
+        block_present: true|false
+        write_verified: true|false
+        attempts: 1
+      stage_3:
+        skill: page_theme_designer
+        status: completed|failed
+        block_present: true|false
+        write_verified: true|false
+        attempts: 1
+      stage_4:
+        status: completed|failed|not_applicable
+        dashboard_file_path: ...
+        theme_reference: ...
+        unresolved_reference: true|false
+        attempts: 1
+    ```
+
+    If this record cannot be completed, the pipeline is incomplete.
+  ;;
+}

@@ -1,0 +1,54 @@
+Model dabble_dim_user {
+  type: 'table'
+  label: 'Users'
+  data_source_name: 'dabble_neon'
+  table_name: '"dabble_demo"."dim_user"'
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+    description: 'Synthetic user key.'
+  }
+  dimension source_user_id {
+    label: 'Source User ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.source_user_id }};;
+    description: 'Synthetic source-style identifier. It is not customer PII.'
+  }
+  dimension display_alias {
+    label: 'Customer Alias'
+    type: 'text'
+    definition: @sql {{ #SOURCE.display_alias }};;
+    description: 'Generated display alias. It is not a real customer name.'
+  }
+  dimension home_state {
+    label: 'State'
+    type: 'text'
+    definition: @sql {{ #SOURCE.home_state }};;
+  }
+  dimension signup_date {
+    label: 'Signup Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.signup_date }};;
+  }
+  dimension acquisition_category {
+    label: 'Acquisition Category'
+    type: 'text'
+    definition: @sql {{ #SOURCE.acquisition_category }};;
+  }
+  dimension risk_rating {
+    label: 'Risk Rating'
+    type: 'text'
+    definition: @sql {{ #SOURCE.risk_rating }};;
+    description: 'Synthetic current risk classification.'
+  }
+  dimension risk_factor {
+    label: 'Risk Factor'
+    type: 'number'
+    definition: @sql {{ #SOURCE.risk_factor }};;
+    description: 'Synthetic current risk factor.'
+  }
+}

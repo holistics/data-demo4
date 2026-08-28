@@ -1,0 +1,337 @@
+// =============================================================================
+// WORLD CUP 2026 — "ON THE PITCH" · DAY
+// Shared values = flat AML consts (wc_pd_*) feeding every native PageTheme prop
+// (object-dict accessors aren't supported in this AML version). custom_css holds
+// only the --wc tokens + helpers the MarkdownViz blocks read (no dict in @css).
+// Night mode = sibling file wc_pitch_night (no runtime toggle — swap page `theme:`).
+// =============================================================================
+
+// surfaces — turf-edge is the stadium SURROUND (page bg). The mown-stripe pitch itself
+// is the `pitch` block, not the canvas, so the jumbotron/header can sit on the surround
+// ABOVE it. Pitch turf reads the --grass-* / --line / --vignette vars in custom_css below.
+const wc_pd_turf_edge   = "#2d7d47"
+// page background = stadium-surround floodlight bloom from the top
+const wc_pd_sky_bloom   = "radial-gradient(120% 65% at 50% -10%, #cfeeff 0%, rgba(207,238,255,.18) 34%, transparent 60%)"
+// ink
+const wc_pd_ink         = "#0c2418"
+const wc_pd_ink_2       = "#1c3a2a"
+const wc_pd_muted       = "#2f5a42"
+// panels / tables
+const wc_pd_panel       = "#f4faf6"
+const wc_pd_panel_line  = "rgba(12,36,24,.14)"
+const wc_pd_panel_ink   = "#11241a"
+const wc_pd_table_header= "#e7f1ea"
+const wc_pd_table_hover = "rgba(12,36,24,.06)"
+const wc_pd_table_band  = "rgba(12,36,24,.035)"
+// type
+const wc_pd_font_disp   = "Saira Condensed, Sora, system-ui, sans-serif"
+const wc_pd_font_body   = "Sora, system-ui, sans-serif"
+
+ColorPalette wc_pitch_day_palette {
+  title: "WC Pitch — Day"
+  categorical {
+    colors: [
+      "#1f9d52", "#C8920A", "#1D3F8E", "#E61D25",
+      "#00853F", "#d99412", "#0c2418", "#2f5a42"
+    ]
+  }
+}
+
+PageTheme wc_pitch_day {
+  title: "World Cup — On the Pitch (Day)"
+
+  color {
+    data: wc_pitch_day_palette
+  }
+
+  // LAYER 1 — PAGE = the stadium surround: dark turf-edge + sky/floodlight bloom from above.
+  background {
+    bg_color: wc_pd_turf_edge
+    bg_image: wc_pd_sky_bloom
+    bg_repeat: false
+    bg_size: "cover"
+  }
+
+  // CANVAS = transparent, so the page surround shows through. The pitch is its own `pitch`
+  // block (lowest layer); jumbotron + header sit on the surround ABOVE it, content stacks on it.
+  canvas {
+    border { border_width: 0  border_style: "none"  border_radius: 0 }
+    background { bg_color: "transparent" }
+    shadow: "none"
+    opacity: 1
+  }
+
+  // Transparent blocks → each MarkdownViz/TextBlock owns its surface (no fighting).
+  block {
+    label {
+      font_family: wc_pd_font_disp
+      font_size: 12
+      font_color: wc_pd_ink
+      font_weight: "bold"
+      letter_spacing: "0.04em"
+      text_transform: "uppercase"
+    }
+    text {
+      font_family: wc_pd_font_body
+      font_size: 13
+      font_color: wc_pd_ink_2
+      font_weight: "normal"
+    }
+    border { border_width: 0  border_style: "none"  border_radius: 12 }
+    background { bg_color: "transparent" }
+    padding: 0
+    shadow: "none"
+    opacity: 1
+  }
+
+  viz {
+    table {
+      general {
+        bg_color:      wc_pd_panel
+        hover_color:   wc_pd_table_hover
+        banding_color: wc_pd_table_band
+        cell_padding:  DetailedSpacing { top: 8, right: 12, bottom: 8, left: 12 }
+        font_size: 12
+        font_color:    wc_pd_panel_ink
+        font_family:   wc_pd_font_body
+        border_color:  wc_pd_panel_line
+        grid_color:    wc_pd_panel_line
+        border_width: 1
+        borders { outer: true, vertical: false, horizontal: true, header: true, row_header: false }
+      }
+      header {
+        bg_color:    wc_pd_table_header
+        font_size: 12
+        font_color:  wc_pd_ink
+        font_weight: "bold"
+      }
+      sub_header {
+        bg_color:    wc_pd_table_band
+        font_size: 11
+        font_color:  wc_pd_muted
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_size: 11
+        font_color:  wc_pd_muted
+        font_weight: "semibold"
+      }
+    }
+  }
+
+  // custom_css = design tokens + helpers the MarkdownViz HTML reads (literal — no .dac-* overrides)
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Sora:wght@400;500;600;700&display=swap');
+
+    :root {
+      --grass-a:#3DA35D; --grass-b:#4FB069; --sky-ambient:#cfeeff; --turf-edge:#2d7d47;
+      --line:rgba(255,255,255,.88); --line-soft:rgba(255,255,255,.55);
+      --ink:#0c2418; --ink-2:#1c3a2a; --muted:#2f5a42;
+      --panel:rgba(255,255,255,.94); --panel-2:rgba(255,255,255,.86);
+      --panel-line:rgba(12,36,24,.14); --panel-ink:#11241a; --panel-muted:#5b7567;
+      --gold:#C8920A; --gold-2:#f2c84b; --live:#E61D25;
+      --board-bg:#07140d; --board-ink:#eafff2; --board-glow:rgba(120,255,180,.55);
+      --board-bezel-a:#cdd6da; --board-bezel-b:#8b979d;
+      --zone-q:rgba(38,166,91,.22); --zone-q-bar:#1f9d52;
+      --zone-p:rgba(232,168,30,.26); --zone-p-bar:#d99412;
+      --win:#1FA36B; --draw:#E0A23B; --loss:#E5362B;
+      --qual-adv:#1FA36B; --qual-po:#E0A23B; --qual-out:#E5362B;
+      --shadow-dir:rgba(7,30,18,.30); --flag-shadow:0 8px 18px rgba(8,28,18,.28);
+      --vignette:rgba(6,28,16,.30);
+      --font-disp:"Saira Condensed", Sora, sans-serif; --font-body:"Sora", system-ui, sans-serif;
+    }
+
+    .wc-num { font-variant-numeric: tabular-nums; font-feature-settings:"tnum" 1; }
+    .wc-disp { font-family: var(--font-disp); }
+    .wc-pulse { display:inline-block; width:8px; height:8px; border-radius:50%;
+      background: var(--live); animation: wc-pulse 1.8s infinite; vertical-align:middle; }
+    @keyframes wc-pulse { 0%{box-shadow:0 0 0 0 rgba(230,29,37,.5);} 70%{box-shadow:0 0 0 8px rgba(230,29,37,0);} 100%{box-shadow:0 0 0 0 rgba(230,29,37,0);} }
+
+    /* motion @keyframes live in the header_rail page <style> — theme @keyframes are inert
+       (a page rule referencing a theme keyframe animates nothing; static theme styles DO apply) */
+
+    /* ---- The pitch surface (shared, reusable on any tab): mown turf + frame. Size comes from the block's
+       layout position (height:100%), so the same block can be placed at different sizes per tab. The white
+       markings are an SVG inside the block (see the `pitch` block) drawn in REAL pitch units — 1 unit = 10cm
+       of a FIFA 68m x 105m pitch — so features are placed from published measurements, never recomputed. */
+    .wc-pitch { position:relative; width:100%; height:100%; border-radius:14px; overflow:hidden;
+      background:
+        radial-gradient(140% 34% at 50% -2%, transparent 57%, var(--vignette) 100%),
+        repeating-linear-gradient(90deg, var(--grass-a) 0, var(--grass-a) 66px, var(--grass-b) 66px, var(--grass-b) 132px);
+      box-shadow: inset 0 0 0 2px var(--turf-edge), 0 34px 64px -30px rgba(4,18,11,.6); }
+    /* Markings anchored by the BOX MODEL, not coordinates — boundary = inset border box, halfway line and
+       centre circle = 50% anchors, corner arcs = quarter-circles pinned to the corners. Resizing the pitch
+       block (any tab, any height) repositions everything automatically; nothing here is ever re-derived.
+       Only the penalty-box detail is an SVG with fixed internal coords, pinned to the top edge. */
+    .wc-pitch .pl { position:absolute; display:block; border:0 solid #e6f0ea; box-sizing:border-box; }
+    .wc-pitch .pl-bound { inset:32px; border-width:4px; }
+    .wc-pitch .pl-half { left:32px; right:32px; top:50%; height:4px; margin-top:-2px; background:#e6f0ea; }
+    .wc-pitch .pl-circle { left:50%; top:50%; width:280px; height:280px; margin:-140px 0 0 -140px;
+      border-width:4px; border-radius:50%; }
+    .wc-pitch .pl-spot { left:50%; top:50%; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%;
+      background:#e6f0ea; }
+    .wc-pitch .pl-corner { width:26px; height:26px; }
+    .wc-pitch .pl-corner.tl { left:32px; top:32px; border-radius:0 0 100% 0;
+      border-right:4px solid #e6f0ea; border-bottom:4px solid #e6f0ea; }
+    .wc-pitch .pl-corner.tr { right:32px; top:32px; border-radius:0 0 0 100%;
+      border-left:4px solid #e6f0ea; border-bottom:4px solid #e6f0ea; }
+    .wc-pitch .pl-corner.bl { left:32px; bottom:32px; border-radius:0 100% 0 0;
+      border-right:4px solid #e6f0ea; border-top:4px solid #e6f0ea; }
+    .wc-pitch .pl-corner.br { right:32px; bottom:32px; border-radius:100% 0 0 0;
+      border-left:4px solid #e6f0ea; border-top:4px solid #e6f0ea; }
+    .wc-pitch .pl-endtop { position:absolute; top:0; left:0; width:100%; display:block; }
+
+    /* ---- Standings clipboard: a coach's tactical board laid on the turf (shared by the per-group blocks) ----
+       Form chips = pre-built HTML from the worldcup.team_form_html metric (one .cb-chip <span> per finished
+       match, coloured by result), rendered via a field format of type html. Paired with the points measure so
+       the multi-fact join keeps every team; empty until a team plays, when :empty shows a dim placeholder. */
+    .cb-wrap { width:100%; height:100%; box-sizing:border-box; display:flex; align-items:flex-start;
+      justify-content:center; padding:20px 8px 12px; }
+    .clipboard { position:relative; width:100%; border-radius:11px 11px 13px 13px; color:var(--panel-ink);
+      background:linear-gradient(180deg,#fbfdfb,#ecf3ee); border:1px solid var(--panel-line); padding:24px 13px 11px;
+      box-shadow:0 18px 30px -16px var(--shadow-dir), 0 2px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.7); }
+    /* chrome spring-clip centred on the top edge */
+    .clipboard::before { content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+      width:72px; height:17px; border-radius:5px; background:linear-gradient(180deg,#e2e8ea,#9aa6ab 55%,#6f7a7f);
+      box-shadow:0 2px 4px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.85); }
+    .clipboard::after { content:""; position:absolute; top:-2px; left:50%; transform:translateX(-50%);
+      width:28px; height:6px; border-radius:3px; background:#586267; box-shadow:inset 0 1px 1px rgba(0,0,0,.55); }
+    .cb-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+      margin-bottom:8px; padding-bottom:7px; border-bottom:1px solid var(--panel-line); }
+    .cb-grp { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.07em;
+      font-size:16px; line-height:1; }
+    .cb-grp b { color:var(--gold); }
+    .cb-sub { font-size:9px; text-transform:uppercase; letter-spacing:.13em; color:var(--panel-muted); white-space:nowrap; }
+    .cb-colhead, .cb-row { display:grid; grid-template-columns:16px 26px 1fr 20px 26px 44px; align-items:center; gap:6px; }
+    .cb-colhead { padding:0 2px 4px; font-family:var(--font-disp); font-weight:700; font-size:8px;
+      text-transform:uppercase; letter-spacing:.07em; color:var(--panel-muted); }
+    .cb-colhead .c { text-align:center; }
+    .cb-colhead .e { text-align:right; }
+    .cb-row { padding:5px 2px 5px 7px; border-left:3px solid transparent; }
+    .cb-row + .cb-row { border-top:1px solid var(--panel-line); }
+    .cb-rank { font-family:var(--font-disp); font-weight:800; font-size:13px; text-align:center; }
+    .clipboard .cb-row img { width:24px !important; height:16px !important; border-radius:2px !important;
+      margin:0 !important; display:block !important; object-fit:cover; box-shadow:0 1px 2px rgba(0,0,0,.3); }
+    .cb-name { font-weight:600; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cb-p { font-family:var(--font-disp); font-size:12px; text-align:center; color:var(--panel-muted);
+      font-variant-numeric:tabular-nums; }
+    .cb-pts { font-family:var(--font-disp); font-size:15px; font-weight:800; text-align:center;
+      font-variant-numeric:tabular-nums; }
+    .cb-form { display:flex; gap:3px; justify-content:flex-end; align-items:center; min-height:12px; }
+    .cb-form:empty::after { content:"– – –"; font-size:9px; letter-spacing:1px; color:var(--panel-muted); opacity:.55; }
+    .cb-chip { width:11px; height:11px; border-radius:3px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), 0 1px 1px rgba(0,0,0,.12); }
+    .cb-foot { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-top:9px; padding-top:7px;
+      border-top:1px solid var(--panel-line); font-size:8px; text-transform:uppercase; letter-spacing:.05em;
+      color:var(--panel-muted); }
+    .cb-foot .lg { display:inline-flex; align-items:center; gap:4px; }
+    .cb-foot .dot { width:8px; height:8px; border-radius:2px; flex:none; }
+    .cb-foot .sp { margin-left:auto; text-transform:none; letter-spacing:.02em; font-style:italic; opacity:.85; }
+
+    /* ---- Groups tab: full-stat clipboard variant (.cb-x) — same chrome, wider ledger:
+       # · flag · team · P W D L GF GA GD · Pts. Number cells are condensed tabular figures;
+       Pts keeps the bold .cb-pts treatment so the ranking column stays the focal point. */
+    .clipboard.cb-x .cb-colhead, .clipboard.cb-x .cb-row {
+      grid-template-columns:16px 26px minmax(0,1fr) repeat(7, 21px) 28px; gap:5px; }
+    .cb-n { font-family:var(--font-disp); font-size:12px; text-align:center; color:var(--panel-muted);
+      font-variant-numeric:tabular-nums; }
+
+    /* ---- Best-thirds board (.cb-tp): one wide clipboard ranking the 12 third-placed teams.
+       2026 format: top 8 cross the line into the Round of 32 — the dashed amber rule under
+       row 8 IS the qualification line; row bands reuse the qual colours (green in, red out). */
+    .clipboard.cb-tp .cb-colhead, .clipboard.cb-tp .cb-row {
+      grid-template-columns:20px 32px 26px minmax(0,1fr) 26px 26px 28px 32px 104px; gap:6px; }
+    .cb-tp .tp-grp { font-family:var(--font-disp); font-weight:700; font-size:11px; text-align:center;
+      color:var(--panel-muted); text-transform:uppercase; letter-spacing:.04em; }
+    .cb-tp .tp-st { font-family:var(--font-disp); font-weight:700; font-size:9px; letter-spacing:.08em;
+      text-transform:uppercase; text-align:right; white-space:nowrap; }
+    .cb-tp .tp-body .cb-row:nth-child(8) { border-bottom:2px dashed var(--qual-po); padding-bottom:7px; }
+
+    /* ---- Knockout bracket: rounds funnel DOWN the pitch toward the goal (shared by the per-round blocks) ----
+       Each round is a full-width row of tie cards; the row narrows as rounds advance. TBD slots (teams not yet
+       decided) show "TBD" via :empty and hide their flag img (empty src) so no broken-image icon appears. */
+    .kbr { display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; }
+    .kbr-h { font-family:var(--font-disp); font-weight:700; text-transform:uppercase; letter-spacing:.14em;
+      font-size:10px; color:var(--line); text-shadow:0 1px 3px rgba(0,0,0,.5); }
+    .kbr-row { display:flex; flex-wrap:wrap; justify-content:center; gap:7px; width:100%; }
+    .tie { width:158px; background:linear-gradient(180deg,var(--panel),var(--panel-2)); border:1px solid var(--panel-line);
+      border-radius:8px; padding:4px 7px; color:var(--panel-ink); box-shadow:0 8px 18px -12px var(--shadow-dir);
+      display:flex; flex-direction:column; gap:2px; }
+    .tie-meta { display:flex; justify-content:space-between; align-items:baseline; gap:6px; width:100%; min-width:0;
+      font-size:8px; text-transform:uppercase; letter-spacing:.05em; color:var(--panel-muted); }
+    .tie-meta span:first-child { flex:none; white-space:nowrap; }
+    .tie-meta span:last-child { flex:1; min-width:0; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tie-row { display:flex; align-items:center; gap:6px; min-width:0; }
+    .tie .tie-row img { width:16px !important; height:11px !important; border-radius:1px !important; margin:0 !important;
+      display:block !important; object-fit:cover; flex:none; box-shadow:0 1px 2px rgba(0,0,0,.3); }
+    .tie .tie-row img[src=""], .tie .tie-row img:not([src]) { display:none !important; }
+    .tie-row .nm { font-weight:600; font-size:10px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      flex:1; min-width:0; }
+    .tie-row .nm:empty::after { content:"TBD"; color:var(--panel-muted); font-style:italic; font-weight:500; }
+    .tie-row .g { font-family:var(--font-disp); font-weight:800; font-size:11px; line-height:1.1; flex:none; min-width:9px; text-align:right; }
+    /* the Final reads as the prize: gold-foil face (with a soft sheen) + dark-gold ink, not white paper.
+       Glow kept tight (small blur, negative spread) so the block's overflow:hidden doesn't clip a hard edge. */
+    .tie-final { width:240px; color:#4a3608; border-color:rgba(163,121,32,.6);
+      background:linear-gradient(120deg, transparent 38%, rgba(255,255,255,.4) 47%, transparent 58%), linear-gradient(180deg,#f8ecc0,#ecd592);
+      box-shadow:0 9px 18px -10px rgba(120,85,15,.5), 0 0 9px -1px rgba(242,200,75,.45), inset 0 1px 0 rgba(255,255,255,.55); }
+    .tie-final .kt { display:inline-flex; align-items:center; gap:5px; color:#6e4a14; font-family:var(--font-disp);
+      font-weight:800; text-transform:uppercase; letter-spacing:.06em; font-size:11px; }
+    .tie-final .tie-meta, .tie-final .nm:empty::after { color:rgba(93,67,12,.72); }
+
+    /* THE GOAL — destination at the funnel's mouth: white frame + net mesh + trophy emblem */
+    /* flex-end pins the goal to the block's BOTTOM edge — the page positions that edge on the pitch goal line,
+       so the goal base aligns to the marking without depending on pixel-perfect heights. */
+    .goal-wrap { display:flex; flex-direction:column; align-items:center; width:100%; height:100%; justify-content:flex-end; gap:9px; }
+    .goal-funnel { font-family:var(--font-disp); font-weight:700; text-transform:uppercase; letter-spacing:.2em;
+      font-size:10px; color:var(--line); margin-bottom:10px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+    .goal-funnel::before, .goal-funnel::after { content:"▾"; margin:0 8px; opacity:.6; }
+    .goal { position:relative; width:min(380px,100%); height:210px; border:5px solid rgba(255,255,255,.94);
+      border-bottom:0; border-radius:6px 6px 0 0; display:flex; align-items:flex-end; justify-content:center;
+      padding-bottom:16px;
+      background:
+        radial-gradient(58% 46% at 50% 66%, rgba(242,200,75,.30), transparent 72%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.30) 0 1px, transparent 1px 12px),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,.30) 0 1px, transparent 1px 12px),
+        radial-gradient(120% 80% at 50% 100%, rgba(6,28,16,.28), transparent 70%);
+      box-shadow:0 0 40px -6px rgba(242,200,75,.45), inset 0 2px 0 rgba(255,255,255,.45); }
+    .goal img { width:76px !important; height:auto !important; margin:0 !important; display:block !important;
+      filter:drop-shadow(0 0 12px rgba(242,200,75,.65)) drop-shadow(0 0 24px rgba(242,200,75,.32)) drop-shadow(0 6px 12px rgba(0,0,0,.55)); }
+    .goal-line { width:min(420px,82%); height:4px; background:rgba(255,255,255,.88); border-radius:2px;
+      box-shadow:0 0 14px rgba(242,200,75,.35); }
+    .goal-plate { text-align:center; margin-top:11px; }
+    .goal-plate .big { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+      font-size:15px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.5); }
+    .goal-plate .sub { font-size:11px; color:rgba(234,255,242,.72); margin-top:4px; }
+
+    /* ---- Team HQ squad wall: panini-sticker player cards in four position rails. Stickers sit
+       straight on the turf (no clipboard chrome) with alternating tilt via :nth-child — the album
+       look. Number badge + bottom ribbon take the kit colour inline from wc_teams.color_hex. ---- */
+    .stk-band { display:flex; flex-direction:column; gap:14px; height:100%; padding:0 2px; }
+    .stk-head { display:flex; align-items:center; gap:10px; }
+    .stk-dot { width:10px; height:10px; border-radius:3px; flex:none; box-shadow:0 1px 2px rgba(0,0,0,.35); }
+    .stk-title { font-family:var(--font-disp); font-weight:800; text-transform:uppercase; letter-spacing:.16em;
+      font-size:12px; color:var(--line); text-shadow:0 1px 3px rgba(0,0,0,.5); }
+    .stk-rule { flex:1; height:2px; background:rgba(255,255,255,.26); border-radius:1px; }
+    .stk-rail { display:flex; flex-wrap:wrap; gap:18px 16px; align-items:flex-start; }
+    .stk { position:relative; width:122px; background:#fdfefd; border-radius:5px; padding:6px 6px 0;
+      box-shadow:0 16px 26px -14px var(--shadow-dir), 0 2px 0 rgba(0,0,0,.14), inset 0 1px 0 #fff;
+      --rest:translateY(0) rotate(-1deg) scale(1); transform:var(--rest); }
+    .stk:nth-child(even) { --rest:translateY(0) rotate(1.1deg) scale(1); }
+    .stk-num { position:absolute; top:-8px; right:-8px; z-index:2; min-width:26px; height:26px; padding:0 5px;
+      border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+      font-family:var(--font-disp); font-weight:800; font-size:12px; color:#fff;
+      box-shadow:0 2px 5px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 2px rgba(255,255,255,.5); }
+    /* photo frame carries a baked-in player silhouette: when picture_url is empty the img is
+       hidden and the silhouette sticker shows instead of a bare frame */
+    .stk-ph { position:relative; height:104px; border-radius:3px 3px 0 0; overflow:hidden;
+      background:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='xMidYMax meet'><g fill='%23a7bfae'><circle cx='50' cy='36' r='15'/><path d='M20 100c1-24 14-36 30-36s29 12 30 36z'/></g></svg>") center bottom / 64% no-repeat,
+        radial-gradient(120% 90% at 50% 0%, #e8f1ea, #c9d8cd); }
+    .stk-ph img { position:relative; z-index:1; width:100% !important; height:100% !important; object-fit:cover;
+      object-position:top center; display:block !important; margin:0 !important; }
+    .stk-ph img[src=""], .stk-ph img:not([src]) { display:none !important; }
+    .stk-kit { height:4px; }
+    .stk-name { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+      font-size:10.5px; letter-spacing:.02em; color:var(--panel-ink); padding:5px 2px 7px; line-height:1.15;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  ;;
+}

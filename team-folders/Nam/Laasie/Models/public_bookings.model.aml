@@ -1,0 +1,98 @@
+// The central fact of the Laasie demo — one row per stay.
+//
+// Every other fact (loyalty transactions, redemptions) hangs off this model, and every
+// booking reaches its owner group through `property_id > public_properties > public_owner_groups`.
+// That single path is deliberate: `owner_group_id` is also denormalised onto this table, but
+// declaring BOTH as active relationships would give the dataset two ways to reach owner group
+// and make join paths ambiguous. The denormalised column is kept as an inactive relationship
+// in the dataset so the redundancy is documented rather than silently dropped.
+Model public_bookings {
+  type: 'table'
+  label: 'Bookings'
+  description: 'Guest stays at properties running the Laasie programme. One row per booking, at the grain of a single stay: who stayed (guest), where (property), when (check-in to check-out), through which channel, at what rate, and how much they spent in total. This is the revenue fact of the dataset and the model every commercial question starts from.'
+  data_source_name: 'demo_laasie_nam'
+
+  dimension booking_id {
+    label: 'Booking Id'
+    type: 'number'
+    description: "The **Booking Id** uniquely identifies each stay.  \nIt is the primary key of this model and the correct field to count distinctly for booking volume — loyalty transactions and redemptions both fan out from it, so a plain row count after joining either one overstates bookings."
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_id }};;
+    primary_key: true
+  }
+
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    description: "The **Guest Id** identifies the loyalty member who stayed.  \nJoin to `public_guests` for tier, traveler segment and reward preference. May be unset for a stay by a non-enrolled guest, so do not assume every booking resolves to a member — see `is_member_booking`."
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+  }
+
+  dimension property_id {
+    label: 'Property Id'
+    type: 'number'
+    description: "The **Property Id** identifies the hotel that was stayed at.  \nThis is the ACTIVE path to owner group: bookings join to `public_properties`, which joins to `public_owner_groups`. Row-level client scoping reaches this model through that hop."
+    hidden: false
+    definition: @sql {{ #SOURCE.property_id }};;
+  }
+
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    description: "The **Owner Group Id** denormalised onto the booking.  \nIt duplicates what `property_id > public_properties.owner_group_id` already gives, so it is NOT the active join path — grouping by owner group should go through `public_owner_groups.group_name`. Keep this column for auditing that the denormalisation agrees with the property lineage; if the two ever disagree, the property lineage is authoritative."
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+
+  dimension check_in_date {
+    label: 'Check In Date'
+    type: 'date'
+    description: "The **Check In Date** is when the stay began.  \nThis is the revenue date lens of the dataset: booking volume, spend and ADR are reported by check-in, and it is the date dimension every period-over-period comparison in the dashboards shifts against. It is a STAY date, not a reservation date — the source carries no reservation timestamp, so lead time and booking-window analysis are not answerable here."
+    hidden: false
+    definition: @sql {{ #SOURCE.check_in_date }};;
+  }
+
+  dimension check_out_date {
+    label: 'Check Out Date'
+    type: 'date'
+    description: "The **Check Out Date** is when the stay ended.  \nUse it with `check_in_date` to reason about length of stay. Note there is no stored nights column: revenue is attributed wholly to the check-in date rather than spread across the nights of the stay, so a long stay spanning a month boundary sits entirely in its check-in month."
+    hidden: false
+    definition: @sql {{ #SOURCE.check_out_date }};;
+  }
+
+  dimension adr {
+    label: 'ADR'
+    type: 'number'
+    description: "The **ADR** (average daily rate) is the nightly room rate for this booking, in USD.  \nIt is already an average — a per-night rate for one stay — so it must be AVERAGED across bookings, never summed. A sum of ADR is not a meaningful number. Averaging it treats every booking equally regardless of length, which is the standard hospitality convention here."
+    hidden: false
+    definition: @sql {{ #SOURCE.adr }};;
+  }
+
+  dimension total_spend {
+    label: 'Total Spend'
+    type: 'number'
+    description: "The **Total Spend** is the full amount the guest spent on this stay in USD, including room and ancillary revenue.  \nThis is the additive revenue measure of the dataset — sum it freely across any dimension, unlike `adr`. It is the numerator for programme ROI: compare it against redemption value to see what the rewards cost against what the stay earned."
+    hidden: false
+    definition: @sql {{ #SOURCE.total_spend }};;
+  }
+
+  dimension booking_channel {
+    label: 'Booking Channel'
+    type: 'text'
+    description: "The **Booking Channel** is how the stay was booked — direct versus third-party intermediaries.  \nThis is the commercial lever the loyalty programme exists to move: direct bookings avoid distribution commission, so shifting channel mix toward direct is the clearest way Laasie pays for itself. Read it together with `is_member_booking`."
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_channel }};;
+  }
+
+  dimension is_member_booking {
+    label: 'Is Member Booking'
+    type: 'truefalse'
+    description: "**Is Member Booking** flags whether the stay was made by an enrolled loyalty member.  \nThis is the headline segmentation of the whole demo: member versus non-member spend, ADR and channel mix is the evidence that the programme is working. Because it is a boolean, count bookings where it is true rather than summing it."
+    hidden: false
+    definition: @sql {{ #SOURCE.is_member_booking }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."bookings"'
+}

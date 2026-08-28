@@ -1,43 +1,42 @@
-// AdventureWorks Sales dataset migrated from Power BI
+// AdventureWorks Sales dataset rebuilt on the working non-prefixed model family
 Dataset adventure_works_sales {
+  __engine__: 'aql'
   label: 'AdventureWorks Sales'
-  description: 'Migrated from Power BI AdventureWorksSales semantic model.'
+  description: '''Migrated from Power BI AdventureWorksSales semantic model. Rebuilt on the working non-prefixed model family.'''
   data_source_name: 'md_adventure_works_sales'
 
   models: [
-    aw_customer,
-    aw_date,
-    aw_product,
-    aw_reseller,
-    aw_sales,
-    aw_sales_order,
-    aw_sales_territory,
-    aw_table,
+    sales,
+    date,
+    customer,
+    product,
+    reseller,
+    sales_order,
+    sales_territory
   ]
 
   relationships: [
-    relationship(aw_sales.customer_key > aw_customer.customer_key, true),
-    relationship(aw_sales.product_key > aw_product.product_key, true),
-    relationship(aw_sales.reseller_key > aw_reseller.reseller_key, true),
-    relationship(aw_sales.sales_territory_key > aw_sales_territory.sales_territory_key, true),
-    relationship(aw_sales_order.sales_order_line_key - aw_sales.sales_order_line_key, true),
-    relationship(aw_sales.order_date_key > aw_date.date_key, true),
-    relationship(aw_sales.due_date_key > aw_date.date_key, false),
-    relationship(aw_sales.ship_date_key > aw_date.date_key, false),
-    relationship(aw_product.category > aw_table.category, true),
+    relationship(sales.customer_key > customer.customer_key, true),
+    relationship(sales.product_key > product.product_key, true),
+    relationship(sales.reseller_key > reseller.reseller_key, true),
+    relationship(sales.sales_territory_key > sales_territory.sales_territory_key, true),
+    relationship(sales.order_date_key > date.date_key, true),
+    relationship(sales.sales_order_line_key - sales_order.sales_order_line_key, true),
+    relationship(sales.due_date_key > date.date_key, false),
+    relationship(sales.ship_date_key > date.date_key, false)
   ]
 
   metric profit {
     label: 'Profit'
     type: 'number'
-    definition: @aql aw_sales.sales_amount - aw_sales.total_product_cost ;;
+    definition: @aql sum(sales.sales_amount - sales.total_product_cost) ;;
     description: 'DAX: SUM(Sales[Sales Amount]) - SUM(Sales[Total Product Cost])'
   }
 
   metric running_total_sales {
     label: 'Running Total Sales'
     type: 'number'
-    definition: @aql running_total(aw_sales.sales_amount, aw_date.date) ;;
+    definition: @aql running_total(sales.total_sales_amount, date.date) ;;
     description: 'Cumulative sales amount over time running across dates'
   }
 
@@ -45,9 +44,25 @@ Dataset adventure_works_sales {
     label: 'Sales Amount by Due Date'
     type: 'number'
     definition: @aql
-      aw_sales.sales_amount
-        | with_relationships(aw_sales.due_date_key > aw_date.date_key)
+      sum(sales.sales_amount)
+      | with_relationships(sales.due_date_key > date.date_key)
     ;;
     description: 'DAX: CALCULATE(SUM(Sales[Sales Amount]), USERELATIONSHIP(Sales[DueDateKey], Date[DateKey]))'
+  }
+
+  view {
+    group metrics {
+      metric profit
+      metric running_total_sales
+      metric sales_amount_by_due_date
+    }
+
+    model sales { }
+    model date { }
+    model customer { }
+    model product { }
+    model reseller { }
+    model sales_order { }
+    model sales_territory { }
   }
 }

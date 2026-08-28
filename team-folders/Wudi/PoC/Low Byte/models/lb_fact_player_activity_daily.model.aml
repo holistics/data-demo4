@@ -1,0 +1,165 @@
+Model lb_fact_player_activity_daily {
+  type: 'table'
+  label: 'Fact Player Activity Daily'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_player_activity_daily"'
+
+  dimension date_key {
+    label: 'Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.date_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension cohort_install_key {
+    label: 'Cohort Install Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.cohort_install_key }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension device_key {
+    label: 'Device Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.device_key }};;
+  }
+  dimension app_version_key {
+    label: 'App Version Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_version_key }};;
+  }
+  dimension days_since_install {
+    label: 'Days Since Install'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.days_since_install }};;
+  }
+  dimension weeks_since_install {
+    label: 'Weeks Since Install'
+    type: 'number'
+    hidden: false
+    definition: @sql floor({{ #SOURCE.days_since_install }} / 7.0) ;;
+  }
+  dimension weeks_since_install_capped {
+    label: 'Weeks Since Install (0-12+)'
+    type: 'number'
+    hidden: false
+    definition: @sql least(floor({{ #SOURCE.days_since_install }} / 7.0), 12) ;;
+  }
+  dimension is_new_player {
+    label: 'Is New Player'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_new_player }};;
+  }
+  dimension is_payer {
+    label: 'Is Payer'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_payer }};;
+  }
+  dimension session_count {
+    label: 'Session Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.session_count }};;
+  }
+  dimension playtime_seconds {
+    label: 'Playtime Seconds'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.playtime_seconds }};;
+  }
+  dimension event_count {
+    label: 'Event Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.event_count }};;
+  }
+  dimension level_starts {
+    label: 'Level Starts'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.level_starts }};;
+  }
+  dimension level_completions {
+    label: 'Level Completions'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.level_completions }};;
+  }
+  dimension max_level_reached {
+    label: 'Max Level Reached'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.max_level_reached }};;
+  }
+  dimension ad_impression_count {
+    label: 'Ad Impression Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_impression_count }};;
+  }
+  dimension rewarded_ad_completions {
+    label: 'Rewarded Ad Completions'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.rewarded_ad_completions }};;
+  }
+  dimension iap_transaction_count {
+    label: 'Iap Transaction Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iap_transaction_count }};;
+  }
+  dimension first_activity_at {
+    label: 'First Activity At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.first_activity_at }};;
+  }
+  dimension last_activity_at {
+    label: 'Last Activity At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.last_activity_at }};;
+  }
+  dimension activity_attributes {
+    label: 'Activity Attributes'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.activity_attributes }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

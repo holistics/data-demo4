@@ -82,6 +82,21 @@ Model fct_raw_inputs {
     hidden: false
     definition: @sql {{ #SOURCE.created_at }};;
   }
+  // Both referenced by the sales_pipeline dataset (open_issues,
+  // competitor_mentions) but never defined. Derived from the columns that do
+  // exist, following the same nullif() cleaning as the fields around them.
+  dimension is_open {
+    label: 'Is Open'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql nullif({{ #SOURCE.resolved_at }}, '')::timestamp is null;;
+  }
+  dimension is_competitor_mention {
+    label: 'Is Competitor Mention'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql nullif({{ #SOURCE.competitor_id }}, '') is not null;;
+  }
   dimension is_blocking {
     label: 'Is Blocking'
     type: 'truefalse'

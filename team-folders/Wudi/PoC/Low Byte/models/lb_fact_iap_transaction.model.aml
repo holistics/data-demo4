@@ -1,0 +1,184 @@
+Model lb_fact_iap_transaction {
+  type: 'table'
+  label: 'Fact Iap Transaction'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_iap_transaction"'
+
+  dimension transaction_key {
+    label: 'Transaction Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.transaction_key }};;
+  }
+  dimension external_transaction_id {
+    label: 'External Transaction Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.external_transaction_id }};;
+  }
+  dimension original_transaction_id {
+    label: 'Original Transaction Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.original_transaction_id }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension cohort_install_key {
+    label: 'Cohort Install Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.cohort_install_key }};;
+  }
+  dimension transaction_date_key {
+    label: 'Transaction Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_date_key }};;
+  }
+  dimension purchased_at {
+    label: 'Purchased At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.purchased_at }};;
+  }
+  dimension iap_product_key {
+    label: 'Iap Product Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iap_product_key }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension app_version_key {
+    label: 'App Version Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_version_key }};;
+  }
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.quantity }};;
+  }
+  dimension transaction_status {
+    label: 'Transaction Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.transaction_status }};;
+  }
+  dimension is_refund {
+    label: 'Is Refund'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_refund }};;
+  }
+  dimension is_sandbox {
+    label: 'Is Sandbox'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_sandbox }};;
+  }
+  dimension source_currency_code {
+    label: 'Source Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_currency_code }};;
+  }
+  dimension gross_revenue_source {
+    label: 'Gross Revenue Source'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.gross_revenue_source }};;
+  }
+  dimension tax_source {
+    label: 'Tax Source'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.tax_source }};;
+  }
+  dimension store_fee_source {
+    label: 'Store Fee Source'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_fee_source }};;
+  }
+  dimension refund_source {
+    label: 'Refund Source'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.refund_source }};;
+  }
+  dimension net_revenue_source {
+    label: 'Net Revenue Source'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.net_revenue_source }};;
+  }
+  dimension reporting_currency_code {
+    label: 'Reporting Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reporting_currency_code }};;
+  }
+  dimension fx_rate_to_reporting {
+    label: 'Fx Rate To Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.fx_rate_to_reporting }};;
+  }
+  dimension gross_revenue_reporting {
+    label: 'Gross Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.gross_revenue_reporting }};;
+  }
+  dimension net_revenue_reporting {
+    label: 'Net Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.net_revenue_reporting }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension source_payload {
+    label: 'Source Payload'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_payload }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

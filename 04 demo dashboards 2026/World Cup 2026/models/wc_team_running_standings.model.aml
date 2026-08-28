@@ -1,0 +1,93 @@
+Model wc_team_running_standings {
+  type: 'query'
+  label: 'Running Standings'
+  description: 'One row per (team, finished match) carrying the team\'s running totals AFTER that match — cumulative points, goals for/against, goal difference and games played — ordered by kickoff. This is the matchday-over-matchday movement series behind the current-only wc_group_standings: chart cum_points against matchday to show how a group table built up. Running totals are a window over ordered rows, not an AQL dimension, so they are materialised here.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_team_match_results, wc_matches]
+  query: @sql
+    with base as (
+      select {{ #t.team_code }} as team_code, {{ #t.match_num }} as match_num,
+        {{ #t.gf }} as gf, {{ #t.ga }} as ga, {{ #t.result }} as result, {{ #t.kickoff_utc }} as kickoff_utc,
+        case {{ #t.result }} when 'W' then 3 when 'D' then 1 else 0 end as pts,
+        {{ #m.group_code }} as group_code, {{ #m.matchday }} as matchday, {{ #m.stage }} as stage
+      from {{ #wc_team_match_results as t }}
+      join {{ #wc_matches as m }} on {{ #m.match_num }} = {{ #t.match_num }}
+    )
+    select
+      team_code || '-' || match_num as standing_key,
+      team_code, match_num, group_code, matchday, stage,
+      kickoff_utc::date as kickoff_date,
+      pts as match_points, gf as match_gf, ga as match_ga,
+      sum(pts) over w as cum_points,
+      sum(gf) over w as cum_gf,
+      sum(ga) over w as cum_ga,
+      sum(gf - ga) over w as cum_gd,
+      row_number() over w as games_played
+    from base
+    window w as (partition by team_code order by kickoff_utc, match_num rows between unbounded preceding and current row);;
+  dimension standing_key {
+    label: 'Standing Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+  }
+  dimension group_code {
+    label: 'Group'
+    type: 'text'
+  }
+  dimension matchday {
+    label: 'Matchday'
+    type: 'number'
+    description: 'Group-stage matchday 1–3 (null for knockouts) — the x-axis for the cumulative points line.'
+  }
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+  }
+  dimension kickoff_date {
+    label: 'Kickoff Date'
+    type: 'date'
+  }
+  dimension match_points {
+    label: 'Points (this match)'
+    type: 'number'
+  }
+  dimension match_gf {
+    label: 'Goals For (this match)'
+    type: 'number'
+  }
+  dimension match_ga {
+    label: 'Goals Against (this match)'
+    type: 'number'
+  }
+  dimension cum_points {
+    label: 'Cumulative Points'
+    type: 'number'
+    description: 'Running points after this match — the standings-movement line value.'
+  }
+  dimension cum_gf {
+    label: 'Cumulative Goals For'
+    type: 'number'
+  }
+  dimension cum_ga {
+    label: 'Cumulative Goals Against'
+    type: 'number'
+  }
+  dimension cum_gd {
+    label: 'Cumulative Goal Difference'
+    type: 'number'
+  }
+  dimension games_played {
+    label: 'Games Played'
+    type: 'number'
+  }
+  owner: 'hung.dd@holistics.io'
+}

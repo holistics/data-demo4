@@ -1,0 +1,101 @@
+Model dbt_finance_invoices_usd {
+  type: 'table'
+  label: 'Customer Invoices (USD, dbt)'
+  description: 'FX-normalised customer invoices from the dbt mart mart_finance__invoices_usd (as-of join to weekday-only fx_rates).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension invoice_id {
+    label: 'Invoice Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.invoice_id }};;
+  }
+  dimension order_id {
+    label: 'Order Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+  dimension customer_id {
+    label: 'Customer Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.customer_id }};;
+  }
+  dimension merchant_id {
+    label: 'Merchant Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.merchant_id }};;
+  }
+  dimension invoice_status {
+    label: 'Invoice Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.invoice_status }};;
+  }
+  dimension invoice_type {
+    label: 'Invoice Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.invoice_type }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension invoice_date {
+    label: 'Invoice Date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.invoice_date }};;
+  }
+  dimension invoice_month {
+    label: 'Invoice Month'
+    type: 'date'
+    definition: @sql {{ #SOURCE.invoice_month }};;
+  }
+  dimension due_date {
+    label: 'Due Date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.due_date }};;
+  }
+  dimension payment_terms_days {
+    label: 'Payment Terms Days'
+    type: 'number'
+    definition: @sql {{ #SOURCE.payment_terms_days }};;
+  }
+  dimension invoice_amount {
+    label: 'Invoice Amount (local)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.invoice_amount }};;
+  }
+  dimension paid_amount {
+    label: 'Paid Amount (local)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.paid_amount }};;
+  }
+  dimension remaining_amount {
+    label: 'Remaining Amount (local)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.remaining_amount }};;
+  }
+  dimension fx_rate_used {
+    label: 'FX Rate Used'
+    type: 'number'
+    definition: @sql {{ #SOURCE.fx_rate_used }};;
+  }
+  dimension invoice_amount_usd {
+    label: 'Invoice Amount (USD)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.invoice_amount_usd }};;
+  }
+  dimension paid_amount_usd {
+    label: 'Paid Amount (USD)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.paid_amount_usd }};;
+  }
+  dimension remaining_amount_usd {
+    label: 'Remaining Amount (USD)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.remaining_amount_usd }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_marts"."mart_finance__invoices_usd"'
+}

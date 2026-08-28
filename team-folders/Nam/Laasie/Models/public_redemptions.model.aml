@@ -1,0 +1,66 @@
+Model public_redemptions {
+  type: 'table'
+  label: 'Redemptions'
+  description: 'Rewards a member actually claimed. One row per redemption, linked to the reward taken and the stay it was taken on. Grain is FINER than bookings — a stay can carry several redemptions — so count `bookings.booking_id` distinctly whenever this model is in the query. This is the realised-cost side of programme economics: what the owner group genuinely paid out, as opposed to what was issued.'
+  data_source_name: 'demo_laasie_nam'
+
+  dimension redemption_id {
+    label: 'Redemption Id'
+    type: 'number'
+    description: "The **Redemption Id** uniquely identifies each claimed reward.  \nIt is the primary key of this model and the correct field to count distinctly for redemption volume."
+    hidden: false
+    definition: @sql {{ #SOURCE.redemption_id }};;
+    primary_key: true
+  }
+
+  dimension booking_id {
+    label: 'Booking Id'
+    type: 'number'
+    description: "The **Booking Id** links the redemption to the stay it happened on.  \nThis is the active join to `public_bookings` and the path by which redemptions inherit property, owner group and client scoping. Because one booking can have many redemptions, joining this model fans out booking rows — count bookings distinctly."
+    hidden: false
+    definition: @sql {{ #SOURCE.booking_id }};;
+  }
+
+  dimension reward_id {
+    label: 'Reward Id'
+    type: 'number'
+    description: "The **Reward Id** identifies which catalogue item was claimed.  \nJoin to `public_reward_catalog` for the reward's name, category and list value."
+    hidden: false
+    definition: @sql {{ #SOURCE.reward_id }};;
+  }
+
+  dimension guest_id {
+    label: 'Guest Id'
+    type: 'number'
+    description: "The **Guest Id** identifies the member who claimed the reward.  \nAs with loyalty transactions, guest attributes are reached through the booking so the dataset keeps one path to `public_guests`; use this column when you need the member on the redemption row itself."
+    hidden: false
+    definition: @sql {{ #SOURCE.guest_id }};;
+  }
+
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    description: "The **Owner Group Id** denormalised onto the redemption — the group that bore the cost.  \nNot the active join path; group by `public_owner_groups.group_name`, which resolves through the booking's property."
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+  }
+
+  dimension redeemed_date {
+    label: 'Redeemed Date'
+    type: 'date'
+    description: "The **Redeemed Date** is when the member claimed the reward.  \nThe redemption date lens, distinct from both the stay (`bookings.check_in_date`) and issuance (`loyalty_transactions.transaction_date`). Time-to-redemption is the gap between issuance and this date, and it is what makes rewards feel instant or not."
+    hidden: false
+    definition: @sql {{ #SOURCE.redeemed_date }};;
+  }
+
+  dimension value_redeemed {
+    label: 'Value Redeemed'
+    type: 'number'
+    description: "The **Value Redeemed** is the USD value the member actually took.  \nAdditive across every dimension, and the realised cost of the programme — this is the number to set against `bookings.total_spend` when judging whether the programme pays for itself. It can differ from the catalogue's `value_usd` for the same reward when the redemption was partial or promotionally adjusted, so use this column for cost and the catalogue value only for list price."
+    hidden: false
+    definition: @sql {{ #SOURCE.value_redeemed }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."redemptions"'
+}

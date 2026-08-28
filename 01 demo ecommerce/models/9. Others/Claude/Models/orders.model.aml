@@ -1,0 +1,157 @@
+Model ecommerce_orders_copy {
+  type: 'table'
+  label: 'Orders'
+  description: ''
+  data_source_name: "demodb"
+  owner: 'vincent+demo4@holistics.io'
+  table_name: '"ecommerce"."orders"'
+
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    description: ''
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    description: ""
+    hidden: false
+    definition: @sql {{ #SOURCE.status }};;
+    primary_key: false
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    description: "   "
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+    primary_key: false
+  }
+  dimension user_id {
+    label: 'User Id'
+    type: 'number'
+    description: '   '
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+    primary_key: false
+  }
+  dimension discount {
+    label: 'Discount'
+    type: 'number'
+    description: "   "
+    hidden: false
+    definition: @sql {{ #SOURCE.discount }};;
+    primary_key: false
+  }
+  dimension delivery_attempts {
+    label: 'Delivery Attempts'
+    type: 'number'
+    description: "   "
+    hidden: false
+    definition: @sql {{ #SOURCE.delivery_attempts }};;
+    primary_key: false
+  }
+  dimension created_date {
+    label: 'Created Date'
+    type: 'date'
+    description: ""
+    hidden: true
+    definition: @sql {{ #SOURCE.created_at }}::date;;
+    primary_key: false
+  }
+  dimension applied_promo_codes {
+    label: 'Applied Promo Codes'
+    type: 'text'
+    description: ""
+    hidden: false
+    definition: @sql {{ #SOURCE.applied_promo_codes }}::text;;
+    primary_key: false
+  }
+  dimension order_month {
+    label: "Order Month"
+    type: "text"
+    description: ""
+    hidden: false
+    definition: @sql LPAD((DATE_PART('month', {{ created_at }}))::text, 2, '0') || ' ' || TO_CHAR({{ created_at }}, 'Month');;
+    primary_key: false
+  }
+  measure cumm_orders {
+    label: 'Cumulative Orders'
+    type: 'number'
+    description: ""
+    hidden: true
+    definition: @aql running_total(ecommerce_orders_copy.total_order, ecommerce_orders_copy.order_month) ;;
+    aggregation_type: "custom"
+  }
+  measure delivered_orders_count {
+    label: "Delivered Orders Count"
+    type: "number"
+    description: ""
+    hidden: false
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.status == 'delivered');;
+    aggregation_type: "custom"
+  }
+  measure cancelled_orders_count {
+    label: 'Cancelled Orders Count'
+    type: 'number'
+    description: ""
+    hidden: false
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.status == 'cancelled');;
+    aggregation_type: "custom"
+  }
+  measure refunded_orders_count {
+    label: 'Refunded Orders Count'
+    type: 'number'
+    description: ""
+    hidden: false
+    definition: @aql count_distinct(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.status == 'refunded');;
+    aggregation_type: "custom"
+  }
+  measure total_order {
+    label: "Total Orders Count"
+    type: "number"
+    description: ""
+    hidden: false
+    definition: @aql count(ecommerce_orders_copy.id);;
+    aggregation_type: "custom"
+  }
+  measure total_orders_count {
+    label: "Total Orders Count"
+    type: "number"
+    description: ""
+    hidden: true
+    definition: @aql count(ecommerce_orders_copy.id);;
+    aggregation_type: "custom"
+  }
+
+  measure first_order_date {
+    label: "First Order Date"
+    type: "datetime"
+    description: ""
+    hidden: false
+    definition: @aql min(ecommerce_orders_copy.created_at) ;;
+    aggregation_type: "custom"
+  }
+
+  measure days_since_last_order {
+    label: "Days Since Last Order"
+    type: "number"
+    definition: @aql date_diff('day', max(ecommerce_orders_copy.created_at), @now);;
+  }
+
+  measure orders_2023 {
+    label: '2023'
+    type: "number"
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.created_at matches @2023) ;;
+  }
+
+  measure orders_2024 {
+    label: '2024'
+    type: "number"
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.created_at matches @2024) ;;
+  }
+}

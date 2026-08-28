@@ -1,0 +1,76 @@
+Model lb_dim_ad_placement {
+  type: 'table'
+  label: 'Dim Ad Placement'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_ad_placement"'
+
+  dimension ad_placement_key {
+    label: 'Ad Placement Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.ad_placement_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension ad_unit_id {
+    label: 'Ad Unit Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_unit_id }};;
+  }
+  dimension placement_name {
+    label: 'Placement Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_name }};;
+  }
+  dimension ad_format {
+    label: 'Ad Format'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_format }};;
+  }
+  dimension mediation_group_name {
+    label: 'Mediation Group Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.mediation_group_name }};;
+  }
+  dimension placement_context {
+    label: 'Placement Context'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.placement_context }};;
+  }
+  dimension is_rewarded {
+    label: 'Is Rewarded'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_rewarded }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}

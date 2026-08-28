@@ -1,0 +1,230 @@
+// History — edition comparison: how the tournament has changed, goals per match 1930 → 2026.
+// CRAFTED MarkdownViz (not a native chart): static surface → stays on the History wall's bronze-plaque
+// material. Vertical aged-bronze columns on an engraved plate (timeline left→right), the live 2026
+// edition in bright gold, a dashed line at the all-time average. Bar heights + average are window
+// measures computed INLINE (no dataset metric). Each column is a Popover-API trigger: tapping it opens
+// a detail card (goals/match + matches + goals) in the browser TOP LAYER — so it escapes the plate's
+// overflow:hidden clip and is anchored to its own column (the advance-board technique). Replaces the
+// native chart's built-in tooltip, which we gave up by going crafted.
+
+Func wc_hist_zone_editions() {
+  TextBlock {
+    content: @md
+<style>
+.grp-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="grp-zone-label">How the tournament has changed · goals per match, every edition</p>
+;;
+  }
+}
+
+Func wc_hist_editions() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      calculation gpm_val {
+        label: 'Goals per match'
+        formula: @aql max(wc_edition_compare.goals_per_match) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gpm_bar_pct {
+        label: 'Bar pct'
+        formula: @aql 100 * safe_divide(max(wc_edition_compare.goals_per_match), window_max(max(wc_edition_compare.goals_per_match))) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gpm_avg_pct {
+        label: 'Avg pct'
+        formula: @aql 100 * safe_divide(window_avg(max(wc_edition_compare.goals_per_match)), window_max(max(wc_edition_compare.goals_per_match))) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gpm_field_avg {
+        label: 'Field avg'
+        formula: @aql window_avg(max(wc_edition_compare.goals_per_match)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation ed_matches {
+        label: 'Matches'
+        formula: @aql max(wc_edition_compare.matches) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation ed_goals {
+        label: 'Goals'
+        formula: @aql max(wc_edition_compare.goals) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation cur_flag {
+        label: 'Current flag'
+        formula: @aql case(when: max(wc_edition_compare.edition) == 2026, then: 'cur', else: 'base') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'EdSort'
+          ref: r(wc_edition_compare.edition)
+          uname: 'edsort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Ed'
+          ref: r(wc_edition_compare.edition_label)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Gpm'
+          ref: 'gpm_val'
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'BarPct'
+          ref: 'gpm_bar_pct'
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'AvgPct'
+          ref: 'gpm_avg_pct'
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'FieldAvg'
+          ref: 'gpm_field_avg'
+          format {
+            type: 'number'
+            pattern: '#,##0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Matches'
+          ref: 'ed_matches'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: 'ed_goals'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'CurFlag'
+          ref: 'cur_flag'
+        }
+      ]
+      content: @md
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&display=swap');
+/* edition vitrine — same bronze-plaque material as the Hall / Roll / Pedigree plaques (walnut frame +
+   engraved bronze plate + Cinzel), hosting a column timeline. Base columns are dark aged-bronze so the
+   bright-gold current edition stands out; each column is a Popover-API trigger for its detail card. */
+.hed-wrap { width:100%; box-sizing:border-box; padding:2px; }
+.hed-frame { position:relative; border-radius:13px; padding:22px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.13) 0 1px, transparent 1px 7px, rgba(255,212,150,.045) 7px 8px, transparent 8px 14px),
+    linear-gradient(90deg, #3a2817, #4c3722 17%, #32220f 39%, #4a3320 61%, #2c1c0c 83%, #3f2c19),
+    linear-gradient(180deg,#43301d,#2a1b0c);
+  box-shadow:0 30px 48px -22px rgba(4,18,11,.72), 0 2px 0 rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,224,164,.24), inset 0 -5px 8px rgba(0,0,0,.6), inset 0 0 0 1px rgba(0,0,0,.45); }
+.hed-frame::before, .hed-frame::after { content:""; position:absolute; top:6px; width:10px; height:10px; border-radius:50%;
+  background:radial-gradient(120% 120% at 34% 28%, #e4cf94, #6e5526); box-shadow:0 1px 2px rgba(0,0,0,.55), inset 0 -1px 1px rgba(60,40,10,.6); }
+.hed-frame::before { left:6px; } .hed-frame::after { right:6px; }
+.hed-plate { position:relative; overflow:hidden; border-radius:7px; padding:18px 26px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,250,225,.05) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg,#cdaa6a,#b89252 44%,#9c7836);
+  box-shadow:inset 0 0 0 1px rgba(255,240,200,.3), inset 0 2px 7px rgba(255,245,215,.32),
+    inset 0 -12px 26px rgba(60,40,12,.38),
+    0 0 0 2px #241708, 0 0 0 4px rgba(214,176,108,.55), 0 0 0 5px rgba(0,0,0,.35), 0 4px 11px rgba(0,0,0,.55); }
+.hed-cap { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:6px; }
+.hed-cap .lr { flex:none; width:60px; height:1.5px; background:linear-gradient(90deg, transparent, rgba(74,52,16,.7)); }
+.hed-cap .lr.r { background:linear-gradient(90deg, rgba(74,52,16,.7), transparent); }
+.hed-title { font-family:'Cinzel',serif; font-weight:800; font-size:23px; letter-spacing:.18em; text-transform:uppercase;
+  color:#46330f; text-shadow:0 1px 0 rgba(255,247,218,.6); white-space:nowrap; }
+.hed-sub { text-align:center; font-family:var(--font-body); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(70,50,16,.66); margin:0; }
+.hed-plot { position:relative; display:flex; align-items:flex-end; gap:5px; height:200px; margin:16px 0 26px; }
+.hed-col { position:relative; flex:1; height:100%; display:flex; align-items:flex-end; justify-content:center; }
+/* the bar IS the popover trigger (a reset button) */
+.hed-bar { appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; font:inherit; cursor:pointer;
+  interest-delay-start:0.1s; interest-delay-end:0.25s;
+  display:block; width:62%; min-height:2px; border-radius:3px 3px 0 0;
+  background:linear-gradient(180deg,#8a7038,#5e4a23 55%,#43341a);
+  box-shadow:inset 0 1px 0 rgba(255,240,200,.22), inset 0 -3px 4px rgba(30,20,6,.45), 0 1px 2px rgba(40,26,8,.4);
+  transition:filter .15s; transform-origin:bottom; animation:hed-rise .6s cubic-bezier(.2,.7,.3,1) backwards; }
+.hed-bar:hover { filter:brightness(1.22); }
+.hed-col[data-cur="cur"] .hed-bar { background:linear-gradient(180deg,#ffe79a,#f2c84b 50%,#d8a72f);
+  box-shadow:inset 0 1px 0 rgba(255,255,235,.75), 0 0 15px rgba(242,200,75,.6), 0 1px 2px rgba(40,26,8,.4); }
+@keyframes hed-rise { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+/* readable year labels (Saira Condensed is narrow, so 12px fits the column width) */
+.hed-yr { position:absolute; top:100%; left:-3px; right:-3px; margin-top:6px; text-align:center;
+  font-family:var(--font-disp); font-weight:700; font-size:12px; letter-spacing:.01em; color:rgba(60,42,14,.78); }
+.hed-col[data-cur="cur"] .hed-yr { color:#6e4f14; font-weight:800; }
+/* dashed all-time-average rule across the plot */
+.hed-avg { position:absolute; left:0; right:0; z-index:4; height:0; border-top:2px dashed rgba(40,26,8,.55); }
+.hed-avg b { position:absolute; right:2px; top:-15px; font-family:'Cinzel',serif; font-weight:700; font-size:12px;
+  color:#43300d; background:rgba(205,170,106,.9); padding:0 5px; border-radius:3px; box-shadow:0 1px 2px rgba(40,26,8,.3); }
+/* Popover-API detail card — renders in the TOP LAYER (escapes the plate clip), anchored above its column.
+   Base rule is the un-anchored UA fallback (viewport-centred); the @supports block does the anchoring. */
+.hed-pop { margin:auto; border:1px solid rgba(214,176,108,.45); border-radius:8px; padding:8px 12px;
+  background:linear-gradient(180deg,#3a2817,#211506); color:#efdcae; text-align:center; white-space:nowrap;
+  font-family:var(--font-body); box-shadow:0 14px 30px -8px rgba(0,0,0,.72); }
+@supports (anchor-name:--a) {
+  .hed-pop { margin:0; inset:auto; position-area:top; position-try-fallbacks:flip-block; }
+}
+.hed-pop .yr { font-family:'Cinzel',serif; font-weight:700; font-size:14px; color:#ffe79a; margin-right:6px; }
+.hed-pop .big { font-family:var(--font-disp); font-weight:800; font-size:16px; color:#fff; }
+.hed-pop .mt { display:block; font-size:10px; letter-spacing:.04em; color:rgba(239,220,174,.8); margin-top:3px; }
+.hed-pop:popover-open { animation:hed-pop-in .16s ease-out; }
+@keyframes hed-pop-in { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+.hed-foot { margin-top:6px; padding-top:12px; border-top:1px solid rgba(74,52,16,.28);
+  display:flex; justify-content:space-between; gap:10px;
+  font-family:var(--font-body); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:rgba(70,50,16,.58); }
+.hed-foot b { color:#7a5a16; font-weight:700; }
+@media (prefers-reduced-motion: reduce) { .hed-bar { animation:none; } .hed-pop:popover-open { animation:none; } }
+</style>
+<div class="hed-wrap"><div class="hed-frame"><div class="hed-plate">
+<div class="hed-cap"><span class="lr"></span><span class="hed-title">Goals Per Match</span><span class="lr r"></span></div>
+<div class="hed-sub">Every edition · 1930 → 2026 · hover a column for detail</div>
+<div class="hed-plot"><span class="hed-avg" style="bottom:{{ rows[0].values.`AvgPct`.raw }}%;"><b class="wc-num">{{ rows[0].values.`FieldAvg`.formatted }}</b></span>
+{% map(rows) %}
+<div class="hed-col" data-cur="{{ values.`CurFlag`.formatted }}"><button class="hed-bar" type="button" interestfor="edp{{ `Ed`.raw }}" interesttarget="edp{{ `Ed`.raw }}" popovertarget="edp{{ `Ed`.raw }}" style="height:{{ values.`BarPct`.raw }}%;anchor-name:--ed{{ `Ed`.raw }};"></button><span class="hed-yr wc-num">{{ `Ed`.formatted }}</span><div id="edp{{ `Ed`.raw }}" popover class="hed-pop" style="position-anchor:--ed{{ `Ed`.raw }};"><span class="yr wc-num">{{ `Ed`.formatted }}</span><span class="big wc-num">{{ values.`Gpm`.formatted }}</span> goals/match<span class="mt wc-num">{{ values.`Matches`.formatted }} matches · {{ values.`Goals`.formatted }} goals</span></div></div>
+{% end %}
+</div>
+<div class="hed-foot"><span>Dashed line = all-time average, <b class="wc-num">{{ rows[0].values.`FieldAvg`.formatted }}</b> per match</span><span>This <b>2026</b> edition in gold · the 1950s were the high-water mark</span></div>
+</div></div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'edsort'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 30
+      }
+    }
+  }
+}

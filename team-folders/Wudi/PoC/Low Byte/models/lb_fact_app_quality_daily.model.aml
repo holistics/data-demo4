@@ -1,0 +1,130 @@
+Model lb_fact_app_quality_daily {
+  type: 'table'
+  label: 'Fact App Quality Daily'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_app_quality_daily"'
+
+  dimension app_quality_key {
+    label: 'App Quality Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.app_quality_key }};;
+  }
+  dimension app_quality_natural_key {
+    label: 'App Quality Natural Key'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_quality_natural_key }};;
+  }
+  dimension date_key {
+    label: 'Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.date_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension app_version_key {
+    label: 'App Version Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_version_key }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension device_key {
+    label: 'Device Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.device_key }};;
+  }
+  dimension observed_users {
+    label: 'Observed Users'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.observed_users }};;
+  }
+  dimension observed_sessions {
+    label: 'Observed Sessions'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.observed_sessions }};;
+  }
+  dimension crash_events {
+    label: 'Crash Events'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.crash_events }};;
+  }
+  dimension crash_affected_users {
+    label: 'Crash Affected Users'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.crash_affected_users }};;
+  }
+  dimension anr_events {
+    label: 'Anr Events'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.anr_events }};;
+  }
+  dimension anr_affected_users {
+    label: 'Anr Affected Users'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.anr_affected_users }};;
+  }
+  dimension crash_free_user_rate {
+    label: 'Crash Free User Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.crash_free_user_rate }};;
+  }
+  dimension anr_free_user_rate {
+    label: 'Anr Free User Rate'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.anr_free_user_rate }};;
+  }
+  dimension median_startup_ms {
+    label: 'Median Startup Ms'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.median_startup_ms }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension source_attributes {
+    label: 'Source Attributes'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_attributes }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

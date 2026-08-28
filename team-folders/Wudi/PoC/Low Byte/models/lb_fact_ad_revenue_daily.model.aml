@@ -1,0 +1,136 @@
+Model lb_fact_ad_revenue_daily {
+  type: 'table'
+  label: 'Fact Ad Revenue Daily'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_ad_revenue_daily"'
+
+  dimension ad_revenue_key {
+    label: 'Ad Revenue Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.ad_revenue_key }};;
+  }
+  dimension ad_revenue_natural_key {
+    label: 'Ad Revenue Natural Key'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_revenue_natural_key }};;
+  }
+  dimension date_key {
+    label: 'Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.date_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension ad_network_key {
+    label: 'Ad Network Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_network_key }};;
+  }
+  dimension ad_placement_key {
+    label: 'Ad Placement Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_placement_key }};;
+  }
+  dimension source_currency_code {
+    label: 'Source Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_currency_code }};;
+  }
+  dimension revenue_source {
+    label: 'Revenue Source'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.revenue_source }};;
+  }
+  dimension reporting_currency_code {
+    label: 'Reporting Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reporting_currency_code }};;
+  }
+  dimension fx_rate_to_reporting {
+    label: 'Fx Rate To Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.fx_rate_to_reporting }};;
+  }
+  dimension revenue_reporting {
+    label: 'Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.revenue_reporting }};;
+  }
+  dimension ad_requests {
+    label: 'Ad Requests'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_requests }};;
+  }
+  dimension matched_requests {
+    label: 'Matched Requests'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.matched_requests }};;
+  }
+  dimension impressions {
+    label: 'Impressions'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.impressions }};;
+  }
+  dimension clicks {
+    label: 'Clicks'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.clicks }};;
+  }
+  dimension observed_ecpm_reporting {
+    label: 'Observed Ecpm Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.observed_ecpm_reporting }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension source_attributes {
+    label: 'Source Attributes'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_attributes }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

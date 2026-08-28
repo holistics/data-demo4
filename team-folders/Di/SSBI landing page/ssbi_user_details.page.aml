@@ -1,0 +1,651 @@
+Dashboard ssbi_user_details {
+  title: 'User Details'
+  owner: 'di.hoang@holistics.io'
+  description: ''''''
+  block v37: VizBlock {
+    label: 'Users Sign Up Over Time'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      calculation cumulative_total_users {
+        label: 'Cumulative Users'
+        formula: @aql total_users | running_total();;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_cumulative_users {
+        label: 'Total Cumulative Users'
+        formula: @aql running_total(total_users, keep_filters: false);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_users.sign_up_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      y_axis {
+        settings {
+          axis_min: 0
+          show_data_label_by: 'value'
+          hidden: true
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_users)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#05264C'
+          }
+        }
+      }
+      y_axis {
+        settings {
+          alignment: 'right'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'cumulative_total_users'
+            format {
+              type: 'number'
+              pattern: '#,###"A"'
+              group_separator: ','
+              decimal_separator: '.'
+            }
+          }
+          settings {
+            color: '#23a672'
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block f1: FilterBlock {
+    label: 'Signup Date'
+    type: 'date'
+    default {
+      operator: 'matches'
+      value: '18 months ago till now'
+    }
+  }
+  block f2: FilterBlock {
+    label: 'From Countries'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo',
+              'ssbi_country_beakdown'
+            ]
+          }
+        ]
+      }
+    }
+  }
+  block v_mb64: VizBlock {
+    label: 'Total Users'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Users'
+        ref: r(demo_ecommerce_version_2.total_users)
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_users.sign_up_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'quarter'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        label {
+          font_size: 18
+          font_color: '#05264c'
+        }
+        alignment: 'left'
+        metric_value {
+          font_color: '#05264C'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark_2_2a24b81
+  }
+  block t_l38m: TextBlock {
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="#05264c" opacity="0.4"/><ellipse cx="16" cy="17" fill="#05264c" opacity="0.4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="#05264c"/><ellipse cx="9.001" cy="17.001" fill="#05264c" rx="7" ry="4"/></svg>;;
+  }
+  block t_kde2: block_ha_page_header('Users', 'Track user growth, demographics, retention, and buying behavior to understand customer engagement and loyalty.')
+  block t_elu8: block_ha_card()
+  block t_bet4: block_ha_page_header_bg()
+  block t_4e2c: TextBlock {
+    content: @md <div style="width: 100%; height: 100%; background: white; border: 2px solid #EDF1F5; border-radius: 8px"></div>;;
+  }
+  block v_xvgb: VizBlock {
+    label: 'Repeated buyers'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      calculation cumulative_total_users {
+        label: 'Cumulative of total users'
+        formula: @aql total_users | running_total();;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_cumulative_users {
+        label: 'Total Cumulative Users'
+        formula: @aql running_total(total_users, keep_filters: false);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation last_period {
+        label: 'Last Period'
+        formula: @aql relative_period(total_repeated_buyers, ecommerce_users.sign_up_date, -1, restrict: true);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_users.sign_up_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          axis_min: 0
+          axis_max: 1200
+          show_data_label_by: 'value'
+          hidden: true
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: 'last_period'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#5298b8'
+          }
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.total_repeated_buyers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#05264C'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        legend_label: 'hidden'
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_3dy9: VizBlock {
+    label: 'Total Users'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        ref: r(demo_ecommerce_version_2.total_repeated_buyers)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_users.sign_up_date)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'quarter'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        label {
+          font_size: 18
+          font_color: '#05264c'
+        }
+        alignment: 'left'
+        metric_value {
+          font_color: '#05264C'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark_2_2a24b81
+  }
+  block t_sxoz: TextBlock {
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="11" cy="6" r="4" fill="#05264c"/><path fill="#05264c" fill-rule="evenodd" d="M14.513 21.487C15.025 22 15.85 22 17.5 22s2.475 0 2.987-.513C21 20.975 21 20.15 21 18.5s0-2.475-.513-2.987C19.975 15 19.15 15 17.5 15s-2.475 0-2.987.513C14 16.025 14 16.85 14 18.5s0 2.475.513 2.987m2.014-1.51C15.824 19.474 15 18.883 15 17.86c0-1.13 1.375-1.931 2.5-.845c1.125-1.087 2.5-.285 2.5.845c0 1.023-.825 1.614-1.527 2.117l-.213.154c-.26.19-.51.369-.76.369s-.5-.18-.76-.37z" clip-rule="evenodd"/><path fill="#05264c" d="M14.594 21.563a1 1 0 0 1-.081-.076C14 20.975 14 20.15 14 18.5s0-2.475.513-2.987C15.025 15 15.85 15 17.5 15h.43c-1.383-1.345-3.969-2.25-6.93-2.25c-4.418 0-8 2.015-8 4.5s0 4.5 8 4.5c1.443 0 2.625-.066 3.594-.187" opacity="0.25"/></svg>;;
+  }
+  block t_wopf: TextBlock {
+    content: @md <div style="width: 100%; height: 100%; background: white; border-bottom
+: 2px solid #EDF1F5"></div>;;
+  }
+  block v_t552: VizBlock {
+    label: 'User Details'
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      calculation untitled_metric_316015f {
+        label: 'Untitled Metric'
+        formula: @aql total_repeated_buyers/total_buyers;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      rows: [
+        VizFieldFull {
+          ref: r(ecommerce_users.age_group)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(ecommerce_users.gender)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_repeated_buyers)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: true
+        show_column_total: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        value_labels_position {
+          placement: 'rows'
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block f_order_status: FilterBlock {
+    label: 'Order Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.status)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo'
+            ]
+          }
+        ]
+      }
+    }
+  }
+  block v_hjny: VizBlock {
+    label: 'Gender Distribution'
+    viz: PieChart {
+      dataset: demo_ecommerce_version_2
+      legend: VizFieldFull {
+        ref: r(ecommerce_users.gender)
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          label: ' '
+          ref: r(demo_ecommerce_version_2.total_users)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+        settings {
+          color_palette: 42883
+          point {
+            value: 'Male'
+            color: '#396385'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        row_limit: 5000
+        show_percentage: true
+        data_label_position: 'none'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_q6ek: block_ha_card()
+  block v_qnpo: VizBlock {
+    label: 'Age Demographic'
+    viz: AreaChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_users.sign_up_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(ecommerce_users.age_group)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'percentage'
+        }
+        series {
+          field: VizFieldFull {
+            label: ' '
+            ref: r(demo_ecommerce_version_2.total_users)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 42883
+            point {
+              value: '1. Under 20'
+              color: '#55c5c9'
+            }
+            point {
+              value: '3. 30 and above'
+              color: '#23a672'
+            }
+            point {
+              value: '2. From 20 to 29'
+              color: '#396385'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_6gym: block_ha_card()
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo',
+              'ssbi_country_breakdown'
+            ]
+          }
+        ]
+      }
+    }
+  }
+  view: CanvasLayout {
+    label: 'Users'
+    width: 1260
+    height: 1880
+    block f1 {
+      position: pos(40, 160, 290, 80)
+      layer: 4
+    }
+    block f2 {
+      position: pos(350, 160, 290, 80)
+      layer: 9
+    }
+    block v37 {
+      position: pos(50, 270, 570, 360)
+      layer: 2
+    }
+    block v_mb64 {
+      position: pos(50, 310, 210, 120)
+      layer: 3
+    }
+    block t_l38m {
+      position: pos(50, 280, 40, 40)
+      layer: 2
+    }
+    block t_kde2 {
+      position: pos(40, 30, 810, 100)
+      layer: 12
+    }
+    block t_elu8 {
+      position: pos(20, 250, 630, 410)
+      layer: 1
+    }
+    block t_bet4 {
+      position: pos(0, 0, 1260, 140)
+      layer: -2
+    }
+    block t_4e2c {
+      position: pos(20, 680, 630, 370)
+      layer: 1
+    }
+    block v_xvgb {
+      position: pos(50, 700, 570, 320)
+      layer: 1
+    }
+    block v_3dy9 {
+      position: pos(50, 740, 210, 120)
+      layer: 1
+    }
+    block t_sxoz {
+      position: pos(50, 700, 40, 40)
+      layer: 2
+    }
+    block t_wopf {
+      position: pos(-20, 120, 1300, 120)
+      layer: -3
+    }
+    block v_t552 {
+      position: pos(20, 1070, 1180, 760)
+      layer: 3
+    }
+    block f_order_status {
+      position: pos(650, 160, 280, 80)
+      layer: 2
+    }
+    block v_hjny {
+      position: pos(690, 700, 510, 330)
+      layer: 2
+    }
+    block t_q6ek {
+      position: pos(670, 680, 560, 370)
+      layer: 1
+    }
+    block v_qnpo {
+      position: pos(700, 270, 490, 370)
+      layer: 3
+    }
+    block t_6gym {
+      position: pos(670, 250, 560, 410)
+      layer: 2
+    }
+    block f_order_date {
+      position: pos(950, 160, 280, 80)
+      layer: 3
+    }
+    default_zoom: 0.9
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f2'
+      to: [
+        CustomMapping {
+          block: [
+            'f_order_status',
+            'f_order_date'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_order_status'
+      to: [
+        CustomMapping {
+          block: [
+            'f2',
+            'f_order_date'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        CustomMapping {
+          block: [
+            'f2',
+            'f_order_status'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f1'
+      to: [
+        CustomMapping {
+          block: [
+            'v37',
+            'v_xvgb'
+          ]
+          field: r(ecommerce_users.sign_up_at)
+        }
+      ]
+    }
+  ]
+  theme: holistics_ant
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}

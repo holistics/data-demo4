@@ -1,0 +1,40 @@
+Model slb_products {
+  type: 'table'
+  label: 'SLB Products'
+  description: 'Products listed on the platform (testdb.ecommerce via demo_public).'
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"ecommerce"."products"'
+
+  dimension id {
+    label: 'Product Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension category_id {
+    label: 'Category Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.category_id }};;
+  }
+  dimension merchant_id {
+    label: 'Merchant Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.merchant_id }};;
+  }
+  dimension name {
+    label: 'Product Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension price {
+    label: 'Price'
+    type: 'number'
+    definition: @sql {{ #SOURCE.price }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

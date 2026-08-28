@@ -1,0 +1,46 @@
+Model slb_users {
+  type: 'table'
+  label: 'SLB Users'
+  description: 'Users on the ecommerce platform (testdb.ecommerce via demo_public).'
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"ecommerce"."users"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension sign_up_date {
+    label: 'Sign Up Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.sign_up_date }};;
+  }
+  dimension sign_up_at {
+    label: 'Sign Up At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.sign_up_at }};;
+  }
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension gender {
+    label: 'Gender'
+    type: 'text'
+    definition: @sql {{ #SOURCE.gender }};;
+  }
+  dimension city_id {
+    label: 'City Id'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.city_id }};;
+  }
+}

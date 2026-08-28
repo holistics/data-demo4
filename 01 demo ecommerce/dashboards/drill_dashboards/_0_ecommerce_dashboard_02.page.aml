@@ -5,7 +5,7 @@ Dashboard _1_country_breakdown_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'created_at')
+      field: r(ecommerce_orders.created_at)
     }
     default {
       operator: 'last'
@@ -20,6 +20,9 @@ Dashboard _1_country_breakdown_demo {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -208,7 +211,7 @@ Dashboard _1_country_breakdown_demo {
     viz: ColumnChart {
       dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_cities', 'name')
+        ref: r(ecommerce_cities.name)
         format {
           type: 'text'
         }
@@ -216,37 +219,81 @@ Dashboard _1_country_breakdown_demo {
       y_axis {
         series {
           field: VizFieldFull {
-            ref: 'delivered_value'
+            ref: r(demo_ecommerce_version_2.delivered_value)
             format {
               type: 'number'
+              pattern: '[$$]#,###'
             }
           }
+          settings {
+            color: '#003A61'
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'yaxis'
+        }
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
   }
   block v3: VizBlock {
-    label: 'Sales Revenue by Year'
-    viz: LineChart {
+    label: 'Sales Revenue by Month'
+    viz: CombinationChart {
       dataset: demo_ecommerce_version_2
+      calculation delivered_value_prev_1_period {
+        label: 'Delivered Value (prev. 1 period)'
+        formula: @aql delivered_value | relative_period(ecommerce_products.created_at, -1, strict: true);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_products', 'created_at')
+        ref: r(ecommerce_products.created_at)
         transformation: 'datetrunc month'
         format {
           type: 'date'
+          pattern: 'LLL yyyy'
         }
       }
       y_axis {
         series {
+          mark_type: 'column'
           field: VizFieldFull {
-            ref: 'delivered_value'
+            ref: r(demo_ecommerce_version_2.delivered_value)
             format {
               type: 'number'
             }
           }
           settings {
-            color: '#479980'
+            color: '#05264C'
           }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'delivered_value_prev_1_period'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#259B6C'
+          }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
@@ -256,273 +303,491 @@ Dashboard _1_country_breakdown_demo {
     viz: ColumnChart {
       dataset: demo_ecommerce_version_2
       x_axis: VizFieldFull {
-        ref: ref('map_categories', 'category')
+        ref: r(map_categories.category)
         format {
           type: 'text'
         }
       }
       legend: VizFieldFull {
-        ref: ref('ecommerce_orders', 'created_at')
-        transformation: 'datetrunc month'
+        ref: r(ecommerce_countries.continent_name)
         format {
-          type: 'date'
+          type: 'text'
         }
       }
       y_axis {
         settings {
           group_values_into: 5
-          show_data_label_by: 'value'
           stack_series_by: 'value'
         }
         series {
           field: VizFieldFull {
-            ref: 'delivered_value'
+            ref: r(demo_ecommerce_version_2.delivered_value)
             format {
               type: 'number'
             }
           }
           settings {
+            color: '#05264C'
+            point {
+              value: 'Asia'
+              color: '#05264C'
+            }
+            point {
+              value: 'India'
+              color: '#003A61'
+            }
+            point {
+              value: 'Korea'
+              color: '#00627A'
+            }
+            point {
+              value: 'Europe'
+              color: '#004E71'
+            }
+            point {
+              value: 'France'
+              color: '#259B6C'
+            }
+            point {
+              value: 'Germany'
+              color: '#05264C'
+            }
+            point {
+              value: 'Oceania'
+              color: '#259B6C'
+            }
+            point {
+              value: 'Vietnam'
+              color: '#05264C'
+            }
+            point {
+              value: 'Australia'
+              color: '#008976'
+            }
+            point {
+              value: 'Indonesia'
+              color: '#004E71'
+            }
+            point {
+              value: 'Singapore'
+              color: '#00767B'
+            }
+            point {
+              value: 'undefined'
+              color: '#00767B'
+            }
             point {
               value: '2018-11-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2019-03-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2019-04-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2019-05-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2019-06-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2019-07-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2019-08-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2019-09-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2019-10-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2019-11-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2019-12-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2020-01-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2020-02-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2020-03-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2020-04-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2020-05-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2020-06-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2020-07-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2020-08-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2020-09-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2020-10-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2020-11-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2020-12-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2021-01-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2021-02-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2021-03-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2021-04-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2021-05-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2021-06-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2021-07-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2021-08-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2021-09-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2021-10-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2021-11-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2021-12-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2022-01-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2022-02-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2022-03-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2022-04-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2022-05-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2022-06-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2022-07-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2022-08-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2022-09-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2022-10-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2022-11-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2022-12-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2023-01-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2023-02-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2023-03-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2023-04-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2023-05-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2023-06-01'
-              color: '#AF7DED'
+              color: '#05264C'
             }
             point {
               value: '2023-07-01'
-              color: '#A50E43'
+              color: '#003A61'
             }
             point {
               value: '2023-08-01'
-              color: '#F2B602'
+              color: '#004E71'
             }
             point {
               value: '2023-09-01'
-              color: '#E27712'
+              color: '#00627A'
             }
             point {
               value: '2023-10-01'
-              color: '#255DD4'
+              color: '#00767B'
             }
             point {
               value: '2023-11-01'
-              color: '#18A59E'
+              color: '#008976'
             }
             point {
               value: '2023-12-01'
-              color: '#07326C'
+              color: '#259B6C'
             }
             point {
               value: '2024-01-01'
-              color: '#AF7DED'
+              color: '#05264C'
+            }
+            point {
+              value: 'North America'
+              color: '#00767B'
+            }
+            point {
+              value: 'United States'
+              color: '#259B6C'
+            }
+            point {
+              value: 'United Kingdom'
+              color: '#008976'
+            }
+            point {
+              value: '2023-05-01 00:00:00.000000'
+              color: '#003A61'
+            }
+            point {
+              value: '2023-06-01 00:00:00.000000'
+              color: '#004E71'
+            }
+            point {
+              value: '2023-07-01 00:00:00.000000'
+              color: '#00627A'
+            }
+            point {
+              value: '2023-08-01 00:00:00.000000'
+              color: '#00767B'
+            }
+            point {
+              value: '2023-09-01 00:00:00.000000'
+              color: '#008976'
+            }
+            point {
+              value: '2023-10-01 00:00:00.000000'
+              color: '#259B6C'
+            }
+            point {
+              value: '2023-11-01 00:00:00.000000'
+              color: '#05264C'
+            }
+            point {
+              value: '2023-12-01 00:00:00.000000'
+              color: '#003A61'
+            }
+            point {
+              value: '2024-01-01 00:00:00.000000'
+              color: '#004E71'
+            }
+            point {
+              value: '2024-02-01 00:00:00.000000'
+              color: '#00627A'
+            }
+            point {
+              value: '2024-03-01 00:00:00.000000'
+              color: '#00767B'
+            }
+            point {
+              value: '2024-04-01 00:00:00.000000'
+              color: '#008976'
+            }
+            point {
+              value: '2024-05-01 00:00:00.000000'
+              color: '#259B6C'
+            }
+            point {
+              value: '2024-06-01 00:00:00.000000'
+              color: '#05264C'
+            }
+            point {
+              value: '2024-07-01 00:00:00.000000'
+              color: '#003A61'
+            }
+            point {
+              value: '2024-08-01 00:00:00.000000'
+              color: '#004E71'
+            }
+            point {
+              value: '2024-09-01 00:00:00.000000'
+              color: '#00627A'
+            }
+            point {
+              value: '2024-10-01 00:00:00.000000'
+              color: '#00767B'
+            }
+            point {
+              value: '2024-11-01 00:00:00.000000'
+              color: '#008976'
+            }
+            point {
+              value: '2024-12-01 00:00:00.000000'
+              color: '#259B6C'
+            }
+            point {
+              value: '2025-01-01 00:00:00.000000'
+              color: '#05264C'
+            }
+            point {
+              value: '2025-02-01 00:00:00.000000'
+              color: '#003A61'
+            }
+            point {
+              value: '2025-03-01 00:00:00.000000'
+              color: '#004E71'
+            }
+            point {
+              value: '2025-04-01 00:00:00.000000'
+              color: '#00627A'
+            }
+            point {
+              value: '2025-05-01 00:00:00.000000'
+              color: '#00767B'
+            }
+            point {
+              value: '2025-06-01 00:00:00.000000'
+              color: '#008976'
+            }
+            point {
+              value: '2025-07-01 00:00:00.000000'
+              color: '#259B6C'
+            }
+            point {
+              value: '2025-08-01 00:00:00.000000'
+              color: '#05264C'
+            }
+            point {
+              value: '2025-09-01 00:00:00.000000'
+              color: '#003A61'
+            }
+            point {
+              value: '2025-10-01 00:00:00.000000'
+              color: '#004E71'
+            }
+            point {
+              value: '2025-11-01 00:00:00.000000'
+              color: '#00627A'
+            }
+            point {
+              value: '2025-12-01 00:00:00.000000'
+              color: '#00767B'
+            }
+            point {
+              value: '2026-01-01 00:00:00.000000'
+              color: '#008976'
+            }
+            point {
+              value: '2026-02-01 00:00:00.000000'
+              color: '#259B6C'
+            }
+            point {
+              value: '2026-03-01 00:00:00.000000'
+              color: '#05264C'
+            }
+            point {
+              value: '2026-04-01 00:00:00.000000'
+              color: '#003A61'
+            }
+            point {
+              value: '2026-05-01 00:00:00.000000'
+              color: '#004E71'
+            }
+            point {
+              value: '2026-06-01 00:00:00.000000'
+              color: '#00627A'
             }
           }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
@@ -595,7 +860,7 @@ Dashboard _1_country_breakdown_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'created_at')
+      field: r(ecommerce_orders.created_at)
     }
     default {
       operator: 'matches'
@@ -606,6 +871,9 @@ Dashboard _1_country_breakdown_demo {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -728,15 +996,15 @@ Dashboard _1_country_breakdown_demo {
       to: [
         CustomMapping {
           block: 'v3'
-          field: ref('ecommerce_products', 'created_at')
+          field: r(ecommerce_products.created_at)
         },
         CustomMapping {
           block: 'v4'
-          field: ref('ecommerce_orders', 'created_at')
+          field: r(ecommerce_orders.created_at)
         },
         CustomMapping {
           block: 'v5'
-          field: ref('ecommerce_orders', 'created_date')
+          field: r(ecommerce_orders.created_date)
         }
       ]
     }

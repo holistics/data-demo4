@@ -684,65 +684,116 @@ Dashboard sandbox_dashboard {
       }
     }
   }
-  view: CanvasLayout {
+  block v_xxz0: VizBlock {
+    label: 'Country Name and List of Cities'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation list_of_cities {
+        label: 'List of Cities'
+        formula: @aql ecommerce_cities
+| select(ecommerce_cities.name);;
+        calc_type: 'measure'
+        data_type: 'json'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_countries.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: 'list_of_cities'
+          format {
+            type: 'json'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  view: TabLayout {
     label: 'View 1'
-    width: 1300
-    height: 2930
-    grid_size: 20
-    auto_expand_vertically: true
-    block title {
-      position: pos(20, 20, 1260, 80)
+    tab view_1: CanvasLayout {
+      label: 'Tab 1'
+      width: 1300
+      height: 2930
+      grid_size: 20
+      auto_expand_vertically: true
+      block title {
+        position: pos(20, 20, 1260, 80)
+      }
+      block v_2uax {
+        position: pos(20, 1620, 620, 420)
+        layer: 4
+      }
+      block v_8i67 {
+        position: pos(0, 100, 620, 420)
+        layer: 1
+      }
+      block v_d1c8 {
+        position: pos(640, 100, 620, 420)
+        layer: 1
+      }
+      block v_f04y {
+        position: pos(660, 2050, 620, 420)
+        layer: 5
+      }
+      block v_f7an {
+        position: pos(20, 2060, 620, 420)
+        layer: 6
+      }
+      block v_i5ns {
+        position: pos(20, 740, 620, 420)
+        layer: 1
+      }
+      block v_id77 {
+        position: pos(20, 1180, 620, 420)
+        layer: 2
+      }
+      block v_owxh {
+        position: pos(660, 740, 620, 420)
+        layer: 1
+      }
+      block v_tk9v {
+        position: pos(660, 1170, 620, 420)
+        layer: 2
+      }
+      block v_vcfm {
+        position: pos(660, 2490, 620, 420)
+        layer: 7
+      }
+      block v_vyqy {
+        position: pos(660, 1610, 620, 420)
+        layer: 3
+      }
+      block v_xq6y {
+        position: pos(860, 540, 260, 180)
+        layer: 1
+      }
+      mobile {
+        mode: 'auto'
+      }
     }
-    block v_d1c8 {
-      position: pos(640, 100, 620, 420)
-      layer: 1
-    }
-    block v_owxh {
-      position: pos(660, 740, 620, 420)
-      layer: 1
-    }
-    block v_i5ns {
-      position: pos(20, 740, 620, 420)
-      layer: 1
-    }
-    block v_id77 {
-      position: pos(20, 1180, 620, 420)
-      layer: 2
-    }
-    block v_tk9v {
-      position: pos(660, 1170, 620, 420)
-      layer: 2
-    }
-    block v_xq6y {
-      position: pos(860, 540, 260, 180)
-      layer: 1
-    }
-    block v_vyqy {
-      position: pos(660, 1610, 620, 420)
-      layer: 3
-    }
-    block v_2uax {
-      position: pos(20, 1620, 620, 420)
-      layer: 4
-    }
-    block v_f04y {
-      position: pos(660, 2050, 620, 420)
-      layer: 5
-    }
-    block v_f7an {
-      position: pos(20, 2060, 620, 420)
-      layer: 6
-    }
-    block v_8i67 {
-      position: pos(0, 100, 620, 420)
-      layer: 1
-    }
-    block v_vcfm {
-      position: pos(660, 2490, 620, 420)
-      layer: 7
-    }
-    mobile {
-      mode: 'auto'
+    tab tab_wkw4: CanvasLayout {
+      label: 'Tab 2'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      block v_xxz0 {
+        position: pos(60, 40, 620, 420)
+      }
+      mobile {
+        mode: 'auto'
+      }
     }
   }
   theme: buyco_light

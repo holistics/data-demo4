@@ -1,0 +1,24 @@
+Model slb_order_items {
+  type: 'table'
+  label: 'SLB Order Items'
+  description: 'Line items within an order (testdb.ecommerce via demo_public).'
+  data_source_name: 'demo_public'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"ecommerce"."order_items"'
+
+  dimension order_id {
+    label: 'Order Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+  dimension product_id {
+    label: 'Product Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    definition: @sql {{ #SOURCE.quantity }};;
+  }
+}

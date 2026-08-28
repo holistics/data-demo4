@@ -96,13 +96,13 @@ Model fact_trips {
     label: 'User Trips'
     type: 'number'
     description: 'Trips by riders (excludes maintenance).'
-    definition: @aql count(fact_trips.trip_id) | where(fact_trips.user_role = 'rider') ;;
+    definition: @aql count(fact_trips.trip_id) | where(fact_trips.user_role == 'rider') ;;
   }
   measure balancing_trips {
     label: 'Balancing Trips'
     type: 'number'
     description: 'Maintenance trips moving bikes between stations.'
-    definition: @aql count(fact_trips.trip_id) | where(fact_trips.user_role = 'maintenance') ;;
+    definition: @aql count(fact_trips.trip_id) | where(fact_trips.user_role == 'maintenance') ;;
   }
   measure net_revenue {
     label: 'Net Revenue'

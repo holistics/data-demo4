@@ -1,0 +1,54 @@
+Model public_payments {
+  type: 'table'
+  label: 'Payments'
+  description: 'Individual payments received against placed accounts. One row per payment, so an account may have many payments (payment plans) or none. Grain is finer than accounts — always count accounts distinctly when querying across this model.'
+  data_source_name: 'demo_scsi_nam'
+
+  dimension payment_id {
+    label: 'Payment Id'
+    type: 'number'
+    description: "The **Payment Id** uniquely identifies each individual payment transaction.  \nIt is the primary key of this model and the correct field to count distinctly for payment volume."
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_id }};;
+    primary_key: true
+  }
+
+  dimension account_id {
+    label: 'Account Id'
+    type: 'number'
+    description: "The **Account Id** links this payment to the account it was received against.  \nJoin to `public_accounts`. Because one account can have many payments, joining this model fans out account rows — count `accounts.account_id` distinctly to avoid overstating account counts."
+    hidden: false
+    definition: @sql {{ #SOURCE.account_id }};;
+    primary_key: false
+  }
+
+  dimension payment_amount {
+    label: 'Payment Amount'
+    type: 'number'
+    description: "The **Payment Amount** is the value of this single payment.  \nSummed across payments it gives the amount recovered; divided by `accounts.original_balance` it gives the liquidation rate.  \nThis is a per-transaction amount, not the account's remaining balance."
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_amount }};;
+    primary_key: false
+  }
+
+  dimension payment_date {
+    label: 'Payment Date'
+    type: 'date'
+    description: "The **Payment Date** is the date the payment was received.  \nThis is the cash date lens — use it for recovery and collections-performance time series.  \nIt is distinct from `accounts.placement_date`; state which lens a figure uses when the two could be confused."
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_date }};;
+    primary_key: false
+  }
+
+  dimension payment_method {
+    label: 'Payment Method'
+    type: 'text'
+    description: "The **Payment Method** is the channel the debtor used to pay, such as card, ACH or cheque.  \nUse it to analyse cost-to-collect and payment friction by channel."
+    hidden: false
+    definition: @sql {{ #SOURCE.payment_method }};;
+    primary_key: false
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."payments"'
+}

@@ -1,0 +1,65 @@
+Model training_gantt_base {
+  type: 'query'
+  label: 'Training Gantt Base'
+  description: 'Per (training x day) explosion with an ongoing_training flag (1 = ongoing/blue, -1 = late/red, 0 = none) — mirrors a typical exploded gantt source table. Feeds an adaptive PIVOT gantt: pivot columns = full_date (by month/week) become the axis, so the time range follows the data / a date filter, with no hard-coded tick slots.'
+  data_source_name: 'demodb'
+
+  query: @sql
+    with t (full_name, training_name, trainer, dt_start, dt_end, dt_validated) as (
+      values
+        ('Chloe Constantin',     'Forklift Safety',        'Jennifer Bunaux', date '2026-01-06', date '2026-02-28', date '2026-02-25'),
+        ('Chloe Constantin',     'First Aid & CPR',        'Jennifer Bunaux', date '2026-02-02', date '2026-03-31', date '2026-05-15'),
+        ('Gregoire Blasquez',    'Fire Safety Drill',      'David Michel',    date '2026-05-04', date '2026-07-31', null::date),
+        ('Marco Bellouin',       'Data Protection (GDPR)', 'Solene Dupont',   date '2026-03-02', date '2026-05-29', null::date),
+        ('Orlane Beauval',       'Machine Operation',      'Nathalie Obinio', date '2026-01-12', date '2026-04-30', date '2026-04-28'),
+        ('Pascal Reaux',         'Quality Control ISO',    'David Michel',    date '2026-02-16', date '2026-04-30', date '2026-06-10'),
+        ('Prescillia Brunhes',   'Leadership Essentials',  'Olivier Riche',   date '2026-06-01', date '2026-08-31', null::date),
+        ('Thomas Linkes',        'Compliance Refresher',   'Colette Vasquez', date '2026-01-05', date '2026-03-31', null::date)
+    ),
+    spine as (
+      select generate_series(
+        (select min(dt_start) from t),
+        (select greatest(max(dt_end), current_date) from t),
+        interval '1 day'
+      )::date as full_date
+    ),
+    exploded as (
+      select
+        t.full_name,
+        t.training_name,
+        t.trainer,
+        to_char(t.dt_start, 'DD Mon') || ' - ' || to_char(t.dt_end, 'DD Mon') as training_dates,
+        s.full_date,
+        case
+          when s.full_date between t.dt_start and t.dt_end then 1
+          when s.full_date > t.dt_end
+               and s.full_date <= coalesce(t.dt_validated, current_date)
+               and (t.dt_validated is null or t.dt_validated > t.dt_end) then -1
+          else 0
+        end as ongoing_training
+      from t
+      cross join spine s
+    )
+    select
+      full_name,
+      training_name,
+      trainer,
+      training_dates,
+      full_date,
+      ongoing_training,
+      case when ongoing_training =  1 then 1 else 0 end as blue_flag,
+      case when ongoing_training = -1 then 1 else 0 end as red_flag
+    from exploded
+  ;;
+
+  dimension full_name       { label: 'Full Name'        type: 'text'   definition: @sql {{ #SOURCE.full_name }};; }
+  dimension training_name   { label: 'Training Name'    type: 'text'   definition: @sql {{ #SOURCE.training_name }};; }
+  dimension trainer         { label: 'Trainer'          type: 'text'   definition: @sql {{ #SOURCE.trainer }};; }
+  dimension training_dates  { label: 'Training Dates'   type: 'text'   definition: @sql {{ #SOURCE.training_dates }};; }
+  dimension full_date       { label: 'Full Date'        type: 'date'   definition: @sql {{ #SOURCE.full_date }};; }
+  dimension ongoing_training { label: 'Ongoing Training' type: 'number' definition: @sql {{ #SOURCE.ongoing_training }};; }
+  dimension blue_flag       { label: 'Blue Flag'        type: 'number' definition: @sql {{ #SOURCE.blue_flag }};; }
+  dimension red_flag        { label: 'Red Flag'         type: 'number' definition: @sql {{ #SOURCE.red_flag }};; }
+
+  models: []
+}

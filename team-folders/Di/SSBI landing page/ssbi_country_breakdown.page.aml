@@ -1,0 +1,388 @@
+Dashboard ssbi_country_breakdown {
+  title: 'Country Breakdown'
+  owner: 'di.hoang@holistics.io'
+  description: ''''''
+  block f1: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo',
+              'ssbi_user_details'
+            ]
+          }
+        ]
+      }
+    }
+  }
+  block f2: FilterBlock {
+    label: 'From countries'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo',
+              'ssbi_country_beakdown',
+              'ssbi_user_details'
+            ]
+          }
+        ]
+      }
+    }
+  }
+  block t_kde2: block_ha_page_header(
+    'Countries',
+    'Breakdown orders and users by countries and cities'
+  )
+  block t_bet4: block_ha_page_header_bg()
+  block t_wopf: TextBlock {
+    content: @md <div style="width: 100%; height: 100%; background: white; border-bottom
+: 2px solid #EDF1F5"></div>;;
+  }
+  block f_order_status: FilterBlock {
+    label: 'Order status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.status)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          CustomDrillthroughSource {
+            sources: [
+              'ssbi_demo'
+            ]
+          }
+        ]
+      }
+    }
+  }
+  block v_gp13: VizBlock {
+    label: 'GMV by Cities'
+    viz: BarChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_cities.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_total_in_tooltip: true
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: '#,###"A"'
+              group_separator: ','
+              decimal_separator: '.'
+            }
+          }
+          settings {
+            color: '#05264CFF'
+            point {
+              value: 'India'
+              color: '#AF7DED'
+            }
+            point {
+              value: 'Korea'
+              color: '#F2B602'
+            }
+            point {
+              value: 'France'
+              color: '#18A59E'
+            }
+            point {
+              value: 'Germany'
+              color: '#07326C'
+            }
+            point {
+              value: 'Vietnam'
+              color: '#07326C'
+            }
+            point {
+              value: 'Australia'
+              color: '#255DD4'
+            }
+            point {
+              value: 'Indonesia'
+              color: '#A50E43'
+            }
+            point {
+              value: 'Singapore'
+              color: '#E27712'
+            }
+            point {
+              value: 'United States'
+              color: '#18A59E'
+            }
+            point {
+              value: 'United Kingdom'
+              color: '#255DD4'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'series'
+        }
+        legend_label: 'hidden'
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block v_kc7e: VizBlock {
+    label: 'Location'
+    viz: FilledMap {
+      dataset: demo_ecommerce_version_2
+      location {
+        field: VizFieldFull {
+          ref: r(ecommerce_countries.name)
+          format {
+            type: 'text'
+          }
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        ref: r(demo_ecommerce_version_2.gmv)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        location_colors {
+          color: 'rgba(5,38,76,1)'
+          point {
+            value: 'Australia'
+            color: 'rgba(5,38,76,1)'
+          }
+          point {
+            value: 'France'
+            color: 'rgba(0,58,97,1)'
+          }
+          point {
+            value: 'Germany'
+            color: 'rgba(0,78,113,1)'
+          }
+          point {
+            value: 'India'
+            color: 'rgba(0,98,122,1)'
+          }
+          point {
+            value: 'Indonesia'
+            color: 'rgba(0,118,123,1)'
+          }
+          point {
+            value: 'Korea'
+            color: 'rgba(0,137,118,1)'
+          }
+          point {
+            value: 'Singapore'
+            color: 'rgba(37,155,108,1)'
+          }
+          point {
+            value: 'United Kingdom'
+            color: 'rgba(5,38,76,1)'
+          }
+          point {
+            value: 'United States'
+            color: 'rgba(0,58,97,1)'
+          }
+          point {
+            value: 'Vietnam'
+            color: 'rgba(0,78,113,1)'
+          }
+        }
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    theme: holistics_ant_card_blocktheme_2a24b81
+  }
+  block v_q0yr: VizBlock {
+    label: 'Orders by City, Gender, and Age Demographic'
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      rows: [
+        VizFieldFull {
+          ref: r(ecommerce_cities.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_users.gender)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(ecommerce_users.age_group)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: true
+        show_column_total: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        frozen_columns: 0
+      }
+    }
+  }
+  block t_2ylm: block_ha_card()
+  view: CanvasLayout {
+    label: 'Users'
+    width: 1260
+    height: 1140
+    block f1 {
+      position: pos(40, 160, 310, 80)
+      layer: 4
+    }
+    block f2 {
+      position: pos(670, 160, 310, 80)
+      layer: 9
+    }
+    block t_kde2 {
+      position: pos(40, 30, 810, 100)
+      layer: 12
+    }
+    block t_bet4 {
+      position: pos(0, 0, 1260, 140)
+      layer: -2
+    }
+    block t_wopf {
+      position: pos(-20, 120, 1300, 120)
+      layer: -3
+    }
+    block f_order_status {
+      position: pos(360, 160, 300, 80)
+      layer: 2
+    }
+    block v_gp13 {
+      position: pos(30, 260, 630, 370)
+      layer: 12
+    }
+    block v_kc7e {
+      position: pos(680, 260, 560, 370)
+      layer: 22
+    }
+    block v_q0yr {
+      position: pos(60, 680, 1150, 420)
+      layer: 23
+    }
+    block t_2ylm {
+      position: pos(30, 650, 1210, 480)
+      layer: 22
+    }
+    default_zoom: 0.9
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f1'
+      to: [
+        CustomMapping {
+          block: [
+            'f2',
+            'f_order_status'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f2'
+      to: [
+        CustomMapping {
+          block: [
+            'f1',
+            'f_order_status'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_order_status'
+      to: [
+        CustomMapping {
+          block: [
+            'f1',
+            'f2'
+          ]
+          disabled: true
+        }
+      ]
+    }
+  ]
+  theme: holistics_ant
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}

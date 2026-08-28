@@ -50,14 +50,14 @@ Model fact_gl_entries {
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.actual_amount }};;
+    definition: @sql CAST({{ #SOURCE.actual_amount }} AS numeric);;
   }
   dimension budget_amount {
     label: 'Budget amount'
     description: ''
     type: 'number'
     hidden: false
-    definition: @sql {{ #SOURCE.budget_amount }};;
+    definition: @sql CAST({{ #SOURCE.budget_amount }} AS numeric);;
   }
   dimension scenario {
     label: 'Scenario'
@@ -91,12 +91,12 @@ Model fact_gl_entries {
   dimension amount_dim {
     label: 'Amount'
     type: 'number'
-    definition: @aql case(
+    definition: @aql cast(case(
       when: 'Actual' in fact_gl_entries.filter_choice
       , then: fact_gl_entries.actual_amount
       , when: 'Budget' in fact_gl_entries.filter_choice
       , then: fact_gl_entries.budget_amount
-    ) ;;
+    ), 'number') ;;
   }
   // param metric_choice {
   //   label: 'Metric Choice'
@@ -133,5 +133,5 @@ Model fact_gl_entries {
     ]
   }
   owner: 'di.hoang+20166@holistics.io'
-  table_name: '"persisted"."holistics_fact_gl_entri_326bb_202602251508"'
+  table_name: '"demo_saas_finance"."difin_fact_gl_entries"'
 }

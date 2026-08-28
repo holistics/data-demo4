@@ -1,0 +1,113 @@
+// =====================================================================
+// Seed Company — Fiscal Year Demo dataset
+//
+// Oct-Sep fiscal year, done the plain way: the date dimension carries
+// fiscal columns, and everything else is ordinary filtering and
+// grouping on a real field.
+//
+// The fiscal logic lives in exactly one place, `seed_dim_dates`. No
+// parameter, no case() mapping, no per-metric date arithmetic. Metrics
+// here are just metrics.
+//
+// Built on the shared ecommerce models (read-only reference, nothing in
+// `01 demo ecommerce/` is modified). `ecommerce_orders.created_date`
+// stands in for Seed's close date — repoint the relationship below to
+// port this to their tenant.
+//
+// ---------------------------------------------------------------------
+// Why this shape and not the earlier ones
+// ---------------------------------------------------------------------
+// Two earlier attempts pushed the fiscal logic into the metrics: a
+// case() mapping each FY to a literal range, then a year-number
+// parameter resolved into date bounds. Both worked, both were clunky,
+// and both were filter-only — you could not put fiscal year on a chart
+// axis or let the AI group by it, because there was no field to group.
+//
+// A column on the date dimension gives all of that for free, and it is
+// also what Chukwudi already told the customer on the call: "we're just
+// going to route it through the date dimension model, which means it
+// can adapt to any field it needs to adapt".
+//
+// ---------------------------------------------------------------------
+// Multiple date fields
+// ---------------------------------------------------------------------
+// Lori noted the relevant date differs per dataset (forecast uses close
+// date). Only ONE relationship to the date dimension can be active. For
+// a second date role, either add an inactive relationship and reach it
+// with `with_relationships()`, or extend `seed_dim_dates` again into a
+// separate role model with its own active relationship.
+// =====================================================================
+Dataset seed_fiscal_year {
+  label: 'Seed Company - Fiscal Year Demo'
+  description: '''
+Oct-Sep fiscal year carried as columns on the date dimension.
+
+- `Fiscal Year` - 2026 means 1 Oct 2025 to 30 Sep 2026. Filter it, group by it, drill it.
+- `Fiscal Year Label` - 'FY26' for display.
+- `Fiscal Quarter` - Q1 = Oct-Dec.
+- `Fiscal Year Offset` - 0 = current fiscal year, -1 = prior. Resolves against today.
+
+Filter a card to `Fiscal Year Offset = 0` and it is permanently "current
+fiscal year" with no date written down anywhere.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+    ecommerce_users,
+    ecommerce_cities,
+    ecommerce_countries,
+    seed_dim_dates,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+    relationship(ecommerce_orders.user_id > ecommerce_users.id, true),
+    relationship(ecommerce_users.city_id > ecommerce_cities.id, true),
+    relationship(ecommerce_cities.country_code > ecommerce_countries.code, true),
+
+    // Seed's close date equivalent. Repoint this one line to port.
+    relationship(ecommerce_orders.created_date > seed_dim_dates.date_key, true),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════
+  // METRICS — no fiscal logic needed, the date dimension handles it
+  // ═══════════════════════════════════════════════════════════════════
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross value of items ordered, before discount, all statuses.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  metric total_orders {
+    label: 'Total Orders'
+    type: 'number'
+    description: 'Count of orders, all statuses.'
+    definition: @aql count(ecommerce_orders.id) ;;
+    format: '#,###0'
+  }
+
+  // The only fiscal-aware metrics needed: cards that must always show
+  // the live year regardless of what the dashboard filter is set to.
+  metric gmv_current_fy {
+    label: 'GMV (Current FY)'
+    type: 'number'
+    description: 'GMV for the fiscal year containing today. Never needs editing.'
+    definition: @aql gmv | where(seed_dim_dates.fiscal_year_offset == 0) ;;
+    format: '#,###0'
+  }
+
+  metric gmv_prior_fy {
+    label: 'GMV (Prior FY)'
+    type: 'number'
+    description: 'GMV for the fiscal year before the one containing today.'
+    definition: @aql gmv | where(seed_dim_dates.fiscal_year_offset == -1) ;;
+    format: '#,###0'
+  }
+}

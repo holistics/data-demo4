@@ -1,0 +1,54 @@
+// One row per ACTIVE DAY per training segment — the grain that lets a global date
+// filter behave correctly on a Gantt: filtering `active_date` keeps every training
+// that has any day inside the window (overlap works), and the chart rebuilds each
+// bar as min(active_date) -> max(active_date), so bars CLIP to the window and the
+// axis auto-fits (month view zooms to day view). No dropped-overlap bug, no tick math.
+Model training_gantt_days {
+  type: 'query'
+  label: 'Training Gantt Days'
+  data_source_name: 'demodb'
+
+  query: @sql
+    with t (training_name, trainer, dt_start, dt_end, dt_validated) as (
+      values
+        ('Forklift Safety',         'Marc Dubois',     date '2026-01-06', date '2026-02-28', date '2026-02-25'),
+        ('First Aid & CPR',         'Sophie Laurent',  date '2026-02-02', date '2026-03-31', date '2026-05-15'),
+        ('Fire Safety Drill',       'Marc Dubois',     date '2026-05-04', date '2026-07-31', null::date),
+        ('Data Protection (GDPR)',  'Elise Moreau',    date '2026-03-02', date '2026-05-29', null::date),
+        ('Machine Operation',       'Thomas Bernard',  date '2026-01-12', date '2026-04-30', date '2026-04-28'),
+        ('Quality Control ISO',     'Sophie Laurent',  date '2026-02-16', date '2026-04-30', date '2026-06-10'),
+        ('Leadership Essentials',   'Elise Moreau',    date '2026-06-01', date '2026-08-31', null::date),
+        ('Compliance Refresher',    'Thomas Bernard',  date '2026-01-05', date '2026-03-31', null::date)
+    ),
+    calc as (
+      select
+        training_name, trainer, dt_start, dt_end,
+        case
+          when dt_validated is not null and dt_validated > dt_end then dt_validated
+          when dt_validated is null     and current_date > dt_end then current_date
+          else null
+        end as red_end
+      from t
+    ),
+    segs as (
+      select training_name, trainer, dt_start as seg_start, dt_end as seg_end, 'Ongoing' as status from calc
+      union all
+      select training_name, trainer, dt_end as seg_start, red_end as seg_end, 'Late' as status
+      from calc where red_end is not null
+    )
+    select
+      s.training_name,
+      s.trainer,
+      s.status,
+      gs::date as active_date
+    from segs s
+    cross join lateral generate_series(s.seg_start, s.seg_end, interval '1 day') gs
+  ;;
+
+  dimension training_name { label: 'Training Name' type: 'text' definition: @sql {{ #SOURCE.training_name }};; }
+  dimension trainer       { label: 'Trainer'       type: 'text' definition: @sql {{ #SOURCE.trainer }};; }
+  dimension status        { label: 'Status'        type: 'text' definition: @sql {{ #SOURCE.status }};; }
+  dimension active_date   { label: 'Active Date'   type: 'date' definition: @sql {{ #SOURCE.active_date }};; }
+
+  models: []
+}

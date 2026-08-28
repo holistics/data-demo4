@@ -1,8 +1,8 @@
+@tag('Archived')
 Dashboard untitled_8_3 {
   title: 'Bug Listing Table'
   description: ''
   owner: 'vy.ht@holistics.io'
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1160

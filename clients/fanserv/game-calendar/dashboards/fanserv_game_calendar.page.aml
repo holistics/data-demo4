@@ -1,0 +1,992 @@
+Dashboard fanserv_game_calendar {
+  title: 'FanServ Game Calendar'
+  description: @md Development-only HTML Layout POC for a 42-day season board backed by imported FanServ CSV extracts.
+GamePulse is a directional score, not an impression forecast, and is shown as Not scored when absent.;;
+
+  block calendar_header: VizBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: fanserv_game_calendar_days
+      rows: [
+        VizFieldFull {
+          label: 'Board Month'
+          ref: r(fanserv_calendar_days.board_month_start)
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        }
+      ]
+      content: @md
+<style>
+.fs-gc-head { box-sizing:border-box; height:100%; display:grid; grid-template-columns:1.35fr .65fr; gap:32px;
+  padding:26px 30px; border-radius:20px; overflow:hidden; color:#f7fffa;
+  background:radial-gradient(75% 160% at 100% 0%,rgba(91,229,132,.24),transparent 62%),linear-gradient(125deg,#005249,#007b55 62%,#005249);
+  box-shadow:0 24px 54px -36px rgba(0,82,73,.8),inset 0 1px 0 rgba(255,255,255,.18); }
+.fs-gc-kicker { margin:0 0 8px; font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#c8facd; }
+.fs-gc-head h1 { margin:0; font-size:36px; line-height:1; letter-spacing:-.035em; }
+.fs-gc-head p { max-width:72ch; margin:12px 0 0; font-size:13px; line-height:1.5; color:rgba(247,255,250,.78); }
+.fs-gc-legend { align-self:center; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.fs-gc-key { padding:12px 13px; border:1px solid rgba(255,255,255,.16); border-radius:12px; background:rgba(0,0,0,.12); }
+.fs-gc-key i { display:block; width:22px; height:4px; margin-bottom:9px; border-radius:999px; background:var(--key); }
+.fs-gc-key b { display:block; font-size:12px; }
+.fs-gc-key span { display:block; margin-top:3px; font-size:10px; line-height:1.35; color:rgba(247,255,250,.68); }
+@media (prefers-reduced-motion:reduce) { .fs-gc-head * { scroll-behavior:auto !important; } }
+</style>
+{% map(rows) %}
+<header class="fs-gc-head">
+  <div>
+    <div class="fs-gc-kicker">FanServ · planning surface · imported schedule</div>
+    <h1>Game Calendar <span aria-hidden="true">/</span> {{ `Board Month`.formatted }}</h1>
+    <p>Scan the full 42-day board and narrow games with native filters. Use the Game filter to choose the persistent detail sheet. Source status is presented conservatively. GamePulse is directional, not an impression forecast, and remains Not scored when no evaluation was supplied.</p>
+  </div>
+  <div class="fs-gc-legend" aria-label="Calendar phase legend">
+    <div class="fs-gc-key" style="--key:#3366ff"><i></i><b>Past</b><span>Evidence context</span></div>
+    <div class="fs-gc-key" style="--key:#f7fffa"><i></i><b>Today</b><span>Planning focus</span></div>
+    <div class="fs-gc-key" style="--key:#5be584"><i></i><b>Future</b><span>Opportunity context</span></div>
+  </div>
+</header>
+{% end %}
+;;
+    }
+  }
+
+  block filter_month: FilterBlock {
+    label: 'View Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: fanserv_game_calendar_days
+      field: r(fanserv_calendar_days.board_month_start)
+    }
+    default {
+      operator: 'matches'
+      value: 'this month'
+    }
+  }
+
+  block filter_league: FilterBlock {
+    label: 'League'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: fanserv_game_calendar_mock
+      field: r(fanserv_mock_games.league_code)
+    }
+    settings {
+      input_type: 'nullable-single'
+    }
+  }
+
+  block filter_team: FilterBlock {
+    label: 'Team'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: fanserv_game_calendar_mock
+      field: r(fanserv_game_team_bridge.team_name)
+    }
+    settings {
+      input_type: 'nullable-single'
+    }
+  }
+
+  block filter_game: FilterBlock {
+    label: 'Game'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: fanserv_game_calendar_mock
+      field: r(fanserv_mock_games.game_selector_label)
+    }
+    settings {
+      input_type: 'nullable-single'
+    }
+  }
+
+  block calendar_scaffold: VizBlock {
+    label: '42-day calendar scaffold'
+    theme: BlockTheme {
+      background {
+        bg_color: '#ffffff'
+      }
+      border {
+        border_width: 1
+        border_radius: 18
+        border_color: '#dcebe3'
+        border_style: 'solid'
+      }
+      padding: 0
+      shadow: 'sm'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: fanserv_game_calendar_days
+      rows: [
+        VizFieldFull {
+          label: 'Board Month'
+          ref: r(fanserv_calendar_days.board_month_start)
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        },
+        VizFieldFull {
+          label: 'Calendar Date'
+          ref: r(fanserv_calendar_days.calendar_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'gc_scaffold_date'
+        },
+        VizFieldFull {
+          label: 'Day'
+          ref: r(fanserv_calendar_days.calendar_day_number)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cell State'
+          ref: r(fanserv_calendar_days.cell_state_class)
+        },
+        VizFieldFull {
+          label: 'Day Index'
+          ref: r(fanserv_calendar_days.calendar_day_index)
+          uname: 'gc_scaffold_day_index'
+          hidden: true
+        }
+      ]
+      content: @md
+<style>
+.fs-cal-frame { box-sizing:border-box; height:100%; padding:12px; color:#12332e; font-family:Inter,Manrope,system-ui,sans-serif; }
+.fs-cal-weekdays { height:38px; display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; }
+.fs-cal-weekdays span { display:flex; align-items:center; padding:0 10px; font-size:10px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:#516a65; }
+.fs-cal-days { height:calc(100% - 38px); display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); grid-template-rows:repeat(6,minmax(0,1fr)); gap:8px; }
+.fs-cal-day { position:relative; min-width:0; overflow:hidden; padding:10px; border:1px solid #dcebe3; border-radius:12px; background:#fbfdfc; }
+.fs-cal-day::after { content:""; position:absolute; left:0; right:0; bottom:0; height:3px; background:#5be584; opacity:.72; }
+.fs-cal-day.is-past { background:#f6f8ff; border-color:#d6e4ff; }
+.fs-cal-day.is-past::after { background:#3366ff; }
+.fs-cal-day.is-padding { background:#f4f7f5; border-color:#e6ede9; color:#82938e; }
+.fs-cal-day.is-padding::after { background:#b9c7c1; opacity:.42; }
+.fs-cal-day.is-today { border:2px solid #005249; background:#f1fff5; box-shadow:inset 0 0 0 3px #c8facd; }
+.fs-cal-date { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+.fs-cal-date b { font-size:16px; line-height:1; }
+.fs-cal-date time { font-size:9px; color:#6c7f74; }
+.fs-cal-day.is-today .fs-cal-date::after { content:"Today"; padding:2px 6px; border-radius:999px; color:#fff; background:#005249; font-size:8px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+</style>
+<div class="fs-cal-frame" aria-label="Selected month, Monday-start 42-day calendar">
+  <div class="fs-cal-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+  <div class="fs-cal-days">
+  {% map(rows) %}
+  <div class="fs-cal-day {{ `Cell State`.raw }}" aria-label="{{ `Calendar Date`.formatted }}">
+    <div class="fs-cal-date"><b>{{ `Day`.formatted }}</b><time datetime="{{ `Calendar Date`.raw }}">{{ `Calendar Date`.formatted }}</time></div>
+  </div>
+  {% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'gc_scaffold_day_index'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 42
+        row_limit: 42
+      }
+    }
+  }
+
+  block calendar_games: VizBlock {
+    label: 'Calendar game cards'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: fanserv_game_calendar_mock
+      filter {
+        field: r(fanserv_game_calendar_mock.day_game_order)
+        operator: 'less_than'
+        value: 3
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Game ID'
+          ref: r(fanserv_mock_games.game_id)
+          uname: 'gc_board_game_id'
+        },
+        VizFieldFull {
+          label: 'Game Date'
+          ref: r(fanserv_mock_games.game_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'gc_board_game_date'
+        },
+        VizFieldFull {
+          label: 'Grid Column'
+          ref: r(fanserv_mock_games.board_grid_column)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Grid Row'
+          ref: r(fanserv_mock_games.board_grid_row)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Sort Key'
+          ref: r(fanserv_mock_games.deterministic_sort_key)
+          uname: 'gc_board_sort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Start'
+          ref: r(fanserv_mock_games.scheduled_start_display)
+        },
+        VizFieldFull {
+          label: 'League'
+          ref: r(fanserv_mock_games.league_code)
+        },
+        VizFieldFull {
+          label: 'Away Code'
+          ref: r(fanserv_mock_games.away_team_code)
+        },
+        VizFieldFull {
+          label: 'Away Logo'
+          ref: r(fanserv_mock_games.away_team_logo_url)
+        },
+        VizFieldFull {
+          label: 'Home Code'
+          ref: r(fanserv_mock_games.home_team_code)
+        },
+        VizFieldFull {
+          label: 'Home Logo'
+          ref: r(fanserv_mock_games.home_team_logo_url)
+        },
+        VizFieldFull {
+          label: 'Matchup'
+          ref: r(fanserv_mock_games.matchup_label)
+        },
+        VizFieldFull {
+          label: 'Phase'
+          ref: r(fanserv_mock_games.planning_phase)
+        },
+        VizFieldFull {
+          label: 'Phase Label'
+          ref: r(fanserv_mock_games.planning_phase_label)
+        },
+        VizFieldFull {
+          label: 'GamePulse'
+          ref: r(fanserv_mock_games.gamepulse_band)
+        },
+        VizFieldFull {
+          label: 'Network'
+          ref: r(fanserv_mock_games.primary_network)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Day Order'
+          ref: r(fanserv_game_calendar_mock.day_game_order)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Day Count'
+          ref: r(fanserv_game_calendar_mock.day_game_count)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Overflow'
+          ref: r(fanserv_game_calendar_mock.day_game_overflow_count)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      content: @md
+<style>
+.fs-cal-overlay { box-sizing:border-box; height:100%; padding:50px 12px 12px; display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); grid-template-rows:repeat(6,minmax(0,1fr)); gap:8px; pointer-events:none; font-family:Inter,Manrope,system-ui,sans-serif; }
+.fs-cal-overlay h-drill { display:block; min-width:0; margin:34px 8px 7px; pointer-events:auto; }
+.fs-cal-overlay h-drill:nth-child(-n+6) { animation:fs-board-deal .42s cubic-bezier(.2,.7,.3,1) backwards; }
+.fs-cal-overlay h-drill:nth-child(2) { animation-delay:40ms; }
+.fs-cal-overlay h-drill:nth-child(3) { animation-delay:80ms; }
+.fs-cal-overlay h-drill:nth-child(4) { animation-delay:120ms; }
+.fs-cal-overlay h-drill:nth-child(5) { animation-delay:160ms; }
+.fs-cal-overlay h-drill:nth-child(6) { animation-delay:200ms; }
+.fs-board-card { width:100%; min-width:0; height:72px; display:flex; flex-direction:column; justify-content:space-between; padding:8px 9px; border:1px solid #c6d8d0; border-left:4px solid #5be584; border-radius:9px; color:#12332e; background:#fff; box-shadow:0 8px 16px -14px rgba(0,82,73,.8); cursor:pointer; text-align:left; font:inherit; transform:translateY(0) scale(1); transition:transform .16s cubic-bezier(.25,1,.5,1),border-color .16s ease,box-shadow .16s ease; }
+.fs-board-card.past { border-left-color:#3366ff; }
+.fs-board-card.today { border-left-color:#005249; background:#f5fff8; }
+.fs-board-card:hover,.fs-board-card:focus-visible { transform:translateY(-2px); border-color:#00ab55; box-shadow:0 12px 22px -15px rgba(0,82,73,.9); }
+.fs-board-card:focus-visible { outline:3px solid #c8facd; outline-offset:2px; }
+.fs-board-card:active { transform:translateY(0) scale(.985); }
+.h-drill-selected.fs-board-card { border-color:#005249; box-shadow:inset 0 0 0 2px #005249,0 10px 20px -16px rgba(0,82,73,.9); }
+.fs-board-top,.fs-board-match,.fs-board-foot { display:flex; align-items:center; justify-content:space-between; gap:6px; min-width:0; }
+.fs-board-top { font-size:9px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#516a65; }
+.fs-board-match { justify-content:center; font-size:12px; font-weight:800; }
+.fs-board-team { display:inline-flex; align-items:center; gap:4px; min-width:0; }
+.fs-board-team span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fs-board-logo { flex:none; width:18px; height:18px; object-fit:contain; }
+.fs-board-logo[src=""] { display:none; }
+.fs-board-vs { flex:none; color:#6c7f74; }
+.fs-board-foot { font-size:9px; color:#516a65; }
+.fs-board-pulse { color:#005249; font-weight:800; }
+.fs-overflow { display:none; width:100%; min-height:30px; align-items:center; justify-content:center; border:1px dashed #84a9ff; border-radius:8px; color:#1939b7; background:#f2f6ff; font-size:10px; font-weight:800; cursor:pointer; transform:translateY(0) scale(1); }
+.fs-cal-overlay h-drill.rank-2 { align-self:end; margin-top:0; }
+.fs-cal-overlay h-drill.rank-2 .fs-board-card { display:none; }
+.fs-cal-overlay h-drill.rank-2 .fs-overflow { display:flex; transition:transform .16s cubic-bezier(.25,1,.5,1),border-color .16s ease,background-color .16s ease; }
+.fs-overflow:hover,.fs-overflow:focus-visible { transform:translateY(-2px); border-color:#3366ff; background:#eaf0ff; }
+.fs-overflow:focus-visible { outline:3px solid #d6e4ff; outline-offset:2px; }
+.fs-overflow:active { transform:translateY(0) scale(.985); }
+.fs-cal-overlay h-drill:not(.rank-1):not(.rank-2) { display:none; }
+@keyframes fs-board-deal { from { opacity:.82; transform:translateY(12px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce) { .fs-cal-overlay h-drill,.fs-board-card,.fs-overflow { animation:none !important; transition:none !important; opacity:1 !important; transform:none !important; } }
+</style>
+<div class="fs-cal-overlay" aria-label="Filtered games in the selected month">
+{% map(rows) %}
+  <h-drill row="0" value="{{ `Game ID`.raw }}" class="rank-{{ values.`Day Order`.formatted }} week-{{ `Grid Row`.formatted }}" style="grid-column:{{ `Grid Column`.formatted }};grid-row:{{ `Grid Row`.formatted }};">
+    <button type="button" class="fs-board-card {{ `Phase`.raw }}" aria-label="Select {{ `Matchup`.raw }} on {{ `Game Date`.formatted }} at {{ `Start`.formatted }}. {{ `Phase Label`.raw }}. GamePulse {{ `GamePulse`.formatted }}.">
+      <span class="fs-board-top"><span>{{ `League`.formatted }} · {{ `Start`.formatted }}</span><span>{{ `Network`.formatted }}</span></span>
+      <span class="fs-board-match">
+        <span class="fs-board-team"><img class="fs-board-logo" src="{{ `Away Logo`.raw }}" alt="" width="18" height="18" loading="lazy" decoding="async"><span>{{ `Away Code`.formatted }}</span></span>
+        <span class="fs-board-vs" aria-hidden="true">@</span>
+        <span class="fs-board-team"><img class="fs-board-logo" src="{{ `Home Logo`.raw }}" alt="" width="18" height="18" loading="lazy" decoding="async"><span>{{ `Home Code`.formatted }}</span></span>
+      </span>
+      <span class="fs-board-foot"><span class="fs-board-pulse">GamePulse · {{ `GamePulse`.formatted }}</span><span>{{ `Phase`.formatted }}</span></span>
+    </button>
+    <button type="button" class="fs-overflow" aria-label="Select another game on {{ `Game Date`.formatted }}">+{{ values.`Overflow`.formatted }} more · select</button>
+  </h-drill>
+{% end %}
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'gc_board_game_date'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'gc_board_sort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'gc_board_game_id'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 100
+        row_limit: 100
+      }
+    }
+  }
+
+  block focus_games: VizBlock {
+    label: 'Selected-month games'
+    theme: BlockTheme {
+      background {
+        bg_color: '#ffffff'
+      }
+      border {
+        border_width: 1
+        border_radius: 18
+        border_color: '#dcebe3'
+        border_style: 'solid'
+      }
+      padding: 0
+      shadow: 'sm'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: fanserv_game_calendar_mock
+      rows: [
+        VizFieldFull {
+          label: 'Game ID'
+          ref: r(fanserv_mock_games.game_id)
+          uname: 'gc_focus_game_id'
+        },
+        VizFieldFull {
+          label: 'Game Date'
+          ref: r(fanserv_mock_games.game_date)
+          format {
+            type: 'date'
+            pattern: 'EEE, dd LLL'
+          }
+          uname: 'gc_focus_date'
+        },
+        VizFieldFull {
+          label: 'Sort Key'
+          ref: r(fanserv_mock_games.deterministic_sort_key)
+          uname: 'gc_focus_sort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Start'
+          ref: r(fanserv_mock_games.scheduled_start_display)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(fanserv_mock_games.away_team_name)
+        },
+        VizFieldFull {
+          label: 'Away Code'
+          ref: r(fanserv_mock_games.away_team_code)
+        },
+        VizFieldFull {
+          label: 'Away Logo'
+          ref: r(fanserv_mock_games.away_team_logo_url)
+        },
+        VizFieldFull {
+          label: 'Away Score'
+          ref: r(fanserv_mock_games.away_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Home'
+          ref: r(fanserv_mock_games.home_team_name)
+        },
+        VizFieldFull {
+          label: 'Home Code'
+          ref: r(fanserv_mock_games.home_team_code)
+        },
+        VizFieldFull {
+          label: 'Home Logo'
+          ref: r(fanserv_mock_games.home_team_logo_url)
+        },
+        VizFieldFull {
+          label: 'Home Score'
+          ref: r(fanserv_mock_games.home_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Status'
+          ref: r(fanserv_mock_games.status)
+        },
+        VizFieldFull {
+          label: 'Phase Label'
+          ref: r(fanserv_mock_games.planning_phase_label)
+        },
+        VizFieldFull {
+          label: 'GamePulse'
+          ref: r(fanserv_mock_games.gamepulse_band)
+        },
+        VizFieldFull {
+          label: 'Network'
+          ref: r(fanserv_mock_games.primary_network)
+        }
+      ]
+      content: @md
+<style>
+.fs-focus { box-sizing:border-box; height:100%; padding:20px; color:#12332e; font-family:Inter,Manrope,system-ui,sans-serif; }
+.fs-focus-head { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding-bottom:14px; border-bottom:1px solid #dcebe3; }
+.fs-focus-head h2 { margin:0; font-size:22px; letter-spacing:-.02em; }
+.fs-focus-head p { margin:4px 0 0; font-size:11px; color:#516a65; }
+.fs-focus-head b { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#007b55; }
+.fs-focus-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding-top:14px; max-height:340px; overflow:auto; }
+.fs-focus-list h-drill { display:block; }
+.fs-focus-list h-drill:nth-child(-n+6) { animation:fs-focus-arrive .42s cubic-bezier(.2,.7,.3,1) backwards; }
+.fs-focus-list h-drill:nth-child(2) { animation-delay:40ms; }
+.fs-focus-list h-drill:nth-child(3) { animation-delay:80ms; }
+.fs-focus-list h-drill:nth-child(4) { animation-delay:120ms; }
+.fs-focus-list h-drill:nth-child(5) { animation-delay:160ms; }
+.fs-focus-list h-drill:nth-child(6) { animation-delay:200ms; }
+.fs-focus-card { width:100%; min-height:124px; padding:14px; border:1px solid #dcebe3; border-radius:12px; color:#12332e; background:#fbfdfc; text-align:left; cursor:pointer; font:inherit; transform:translateY(0) scale(1); transition:border-color .16s ease,transform .16s cubic-bezier(.25,1,.5,1),box-shadow .16s ease; }
+.fs-focus-card:hover,.fs-focus-card:focus-visible { transform:translateY(-2px); border-color:#00ab55; box-shadow:0 12px 24px -20px rgba(0,82,73,.9); }
+.fs-focus-card:focus-visible { outline:3px solid #c8facd; outline-offset:2px; }
+.fs-focus-card:active { transform:translateY(0) scale(.99); }
+.h-drill-selected.fs-focus-card { border-color:#005249; box-shadow:inset 0 0 0 2px #005249,0 10px 20px -18px rgba(0,82,73,.9); }
+.fs-focus-meta,.fs-focus-team,.fs-focus-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.fs-focus-meta { font-size:10px; color:#516a65; }
+.fs-focus-state { padding:3px 7px; border-radius:999px; background:#eef4f1; font-size:9px; font-weight:800; text-transform:uppercase; }
+.fs-focus-team { margin-top:10px; font-size:13px; font-weight:750; }
+.fs-focus-team-id { display:inline-flex; align-items:center; gap:8px; min-width:0; }
+.fs-focus-team-id span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fs-focus-logo { flex:none; width:24px; height:24px; object-fit:contain; }
+.fs-focus-logo[src=""] { display:none; }
+.fs-focus-team .score { min-width:22px; text-align:right; font-size:18px; }
+.fs-focus-team .score:empty::after { content:"—"; color:#8ba099; }
+.fs-focus-foot { margin-top:11px; padding-top:9px; border-top:1px solid #e4ece8; font-size:10px; color:#516a65; }
+.fs-focus-pulse { font-weight:800; color:#005249; }
+@keyframes fs-focus-arrive { from { opacity:.82; transform:translateY(12px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce) { .fs-focus-list h-drill,.fs-focus-card { animation:none !important; transition:none !important; opacity:1 !important; transform:none !important; } }
+</style>
+<div class="fs-focus" role="region" aria-labelledby="fs-focus-title">
+  <header class="fs-focus-head"><div><h2 id="fs-focus-title">Selected-month games</h2><p>The View Month, league, team, and game filters apply here.</p></div><b>Game filter controls detail</b></header>
+  <div class="fs-focus-list">
+  {% map(rows) %}
+  <h-drill row="0" value="{{ `Game ID`.raw }}">
+    <button type="button" class="fs-focus-card" aria-label="Select {{ `Away`.raw }} at {{ `Home`.raw }} on {{ `Game Date`.formatted }} at {{ `Start`.formatted }}">
+      <span class="fs-focus-meta"><span>{{ `Game Date`.formatted }} · {{ `Start`.formatted }}</span><span class="fs-focus-state">Source state · {{ `Status`.formatted }}</span></span>
+      <span class="fs-focus-team"><span class="fs-focus-team-id"><img class="fs-focus-logo" src="{{ `Away Logo`.raw }}" alt="" width="24" height="24" loading="lazy" decoding="async"><span>{{ `Away Code`.formatted }} · {{ `Away`.formatted }}</span></span><span class="score">{{ `Away Score`.formatted }}</span></span>
+      <span class="fs-focus-team"><span class="fs-focus-team-id"><img class="fs-focus-logo" src="{{ `Home Logo`.raw }}" alt="" width="24" height="24" loading="lazy" decoding="async"><span>{{ `Home Code`.formatted }} · {{ `Home`.formatted }}</span></span><span class="score">{{ `Home Score`.formatted }}</span></span>
+      <span class="fs-focus-foot"><span class="fs-focus-pulse">GamePulse · {{ `GamePulse`.formatted }}</span><span>{{ `Network`.formatted }}</span></span>
+    </button>
+  </h-drill>
+  {% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'gc_focus_date'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'gc_focus_sort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'gc_focus_game_id'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 100
+        row_limit: 100
+      }
+    }
+  }
+
+  block game_detail: VizBlock {
+    label: 'Persistent game detail'
+    theme: BlockTheme {
+      background {
+        bg_color: '#ffffff'
+      }
+      border {
+        border_width: 1
+        border_radius: 18
+        border_color: '#dcebe3'
+        border_style: 'solid'
+      }
+      padding: 0
+      shadow: 'sm'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: fanserv_game_calendar_mock
+      rows: [
+        VizFieldFull {
+          label: 'Game ID'
+          ref: r(fanserv_mock_games.game_id)
+          uname: 'gc_detail_game_id'
+        },
+        VizFieldFull {
+          label: 'Priority'
+          ref: r(fanserv_mock_games.detail_priority)
+          uname: 'gc_detail_priority'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Sort Key'
+          ref: r(fanserv_mock_games.deterministic_sort_key)
+          uname: 'gc_detail_sort'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Game Date'
+          ref: r(fanserv_mock_games.game_date)
+          format {
+            type: 'date'
+            pattern: 'EEEE, dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          label: 'Start'
+          ref: r(fanserv_mock_games.scheduled_start_display)
+        },
+        VizFieldFull {
+          label: 'Original Start'
+          ref: r(fanserv_mock_games.original_start_display)
+        },
+        VizFieldFull {
+          label: 'Timezone'
+          ref: r(fanserv_mock_games.timezone)
+        },
+        VizFieldFull {
+          label: 'League'
+          ref: r(fanserv_mock_games.league_name)
+        },
+        VizFieldFull {
+          label: 'Away'
+          ref: r(fanserv_mock_games.away_team_name)
+        },
+        VizFieldFull {
+          label: 'Away Code'
+          ref: r(fanserv_mock_games.away_team_code)
+        },
+        VizFieldFull {
+          label: 'Away Logo'
+          ref: r(fanserv_mock_games.away_team_logo_url)
+        },
+        VizFieldFull {
+          label: 'Away Score'
+          ref: r(fanserv_mock_games.away_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Home'
+          ref: r(fanserv_mock_games.home_team_name)
+        },
+        VizFieldFull {
+          label: 'Home Code'
+          ref: r(fanserv_mock_games.home_team_code)
+        },
+        VizFieldFull {
+          label: 'Home Logo'
+          ref: r(fanserv_mock_games.home_team_logo_url)
+        },
+        VizFieldFull {
+          label: 'Home Score'
+          ref: r(fanserv_mock_games.home_score)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Status'
+          ref: r(fanserv_mock_games.status)
+        },
+        VizFieldFull {
+          label: 'Phase Label'
+          ref: r(fanserv_mock_games.planning_phase_label)
+        },
+        VizFieldFull {
+          label: 'GamePulse'
+          ref: r(fanserv_mock_games.gamepulse_band)
+        },
+        VizFieldFull {
+          label: 'Primary Network'
+          ref: r(fanserv_mock_games.primary_network)
+        },
+        VizFieldFull {
+          label: 'Secondary Network'
+          ref: r(fanserv_mock_games.secondary_network)
+        }
+      ]
+      content: @md
+<style>
+.fs-detail-wrap { height:100%; color:#12332e; font-family:Inter,Manrope,system-ui,sans-serif; }
+.fs-detail-card { box-sizing:border-box; min-height:100%; display:grid; grid-template-columns:minmax(15rem,.9fr) minmax(15rem,.8fr) minmax(19rem,1fr); align-items:start; gap:18px; padding:22px; animation:fs-detail-settle .22s cubic-bezier(.25,1,.5,1) both; }
+.fs-detail-card:not(:first-child) { display:none; }
+.fs-detail-intro { min-width:0; }
+.fs-detail-kicker { font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#007b55; }
+.fs-detail-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-top:7px; }
+.fs-detail-head h2 { margin:0; font-size:21px; line-height:1.12; letter-spacing:-.02em; }
+.fs-detail-state { flex:none; padding:5px 8px; border-radius:999px; color:#1939b7; background:#eef3ff; font-size:9px; font-weight:800; text-transform:uppercase; }
+.fs-detail-time { margin-top:8px; font-size:11px; color:#516a65; }
+.fs-detail-score { display:grid; grid-template-columns:1fr auto; gap:8px 16px; margin-top:20px; padding:16px; border-radius:13px; background:#f5f9f7; }
+.fs-detail-team { display:flex; align-items:center; gap:10px; min-width:0; font-size:14px; font-weight:750; }
+.fs-detail-team span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fs-detail-logo { flex:none; width:32px; height:32px; object-fit:contain; }
+.fs-detail-logo[src=""] { display:none; }
+.fs-detail-score b { min-width:28px; text-align:right; font-size:22px; }
+.fs-detail-score b:empty::after { content:"—"; color:#8ba099; }
+.fs-detail-pulse { min-height:100%; padding:15px; border:1px solid #c8facd; border-radius:13px; background:#f1fff5; }
+.fs-detail-pulse strong { display:block; font-size:25px; color:#005249; }
+.fs-detail-pulse span { display:block; margin-top:4px; font-size:10px; color:#365b54; }
+.fs-detail-context { min-width:0; }
+.fs-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.fs-detail-item { padding:10px 11px; border:1px solid #e4ece8; border-radius:10px; }
+.fs-detail-item small { display:block; font-size:8px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#6c7f74; }
+.fs-detail-item span { display:block; margin-top:4px; font-size:11px; }
+.fs-detail-item:has(span:empty) { display:none; }
+.fs-detail-note { margin:14px 0 0; font-size:10px; line-height:1.45; color:#516a65; }
+@keyframes fs-detail-settle { from { opacity:.72; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce) { .fs-detail-card { animation:none; opacity:1; transform:none; } }
+</style>
+<div class="fs-detail-wrap" role="complementary" aria-label="Persistent game detail sheet">
+{% map(rows) %}
+  <article class="fs-detail-card">
+    <div class="fs-detail-intro">
+      <div class="fs-detail-kicker">Persistent game detail</div>
+      <div class="fs-detail-head"><h2>{{ `Away Code`.formatted }} at {{ `Home Code`.formatted }}</h2><span class="fs-detail-state">Source state · {{ `Status`.formatted }}</span></div>
+      <div class="fs-detail-time">{{ `Game Date`.formatted }} · {{ `Start`.formatted }} · display zone {{ `Timezone`.formatted }}</div>
+      <div class="fs-detail-score"><span class="fs-detail-team"><img class="fs-detail-logo" src="{{ `Away Logo`.raw }}" alt="" width="32" height="32" loading="lazy" decoding="async"><span>{{ `Away`.formatted }}</span></span><b>{{ `Away Score`.formatted }}</b><span class="fs-detail-team"><img class="fs-detail-logo" src="{{ `Home Logo`.raw }}" alt="" width="32" height="32" loading="lazy" decoding="async"><span>{{ `Home`.formatted }}</span></span><b>{{ `Home Score`.formatted }}</b></div>
+    </div>
+    <div class="fs-detail-pulse"><strong>GamePulse · {{ `GamePulse`.formatted }}</strong><span>Directional score only; not an impression forecast.</span></div>
+    <div class="fs-detail-context">
+      <div class="fs-detail-grid">
+        <div class="fs-detail-item"><small>Planning context</small><span>{{ `Phase Label`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>League</small><span>{{ `League`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>First listed broadcast</small><span>{{ `Primary Network`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>Additional broadcast</small><span>{{ `Secondary Network`.formatted }}</span></div>
+        <div class="fs-detail-item"><small>Original schedule</small><span>{{ `Original Start`.formatted }}</span></div>
+      </div>
+      <p class="fs-detail-note">No inventory availability, pricing, affordability, or forecast-impression claim is made in this POC.</p>
+    </div>
+  </article>
+{% end %}
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'gc_detail_priority'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'gc_detail_sort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'gc_detail_game_id'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+<div class="fs-game-calendar-layout">
+  <style>
+    .fs-game-calendar-layout,
+    .fs-game-calendar-layout * {
+      box-sizing: border-box;
+    }
+
+    .fs-game-calendar-layout {
+      --fs-layout-paper: #ffffff;
+      --fs-layout-surface: #f4f6f8;
+      --fs-layout-divider: rgb(145 158 171 / 24%);
+      --fs-layout-ink: #212b36;
+      inline-size: min(100%, 90rem);
+      min-inline-size: 74rem;
+      margin-inline: auto;
+      padding: 1.5rem;
+      color: var(--fs-layout-ink);
+      background: var(--fs-layout-surface);
+      font-family: Inter, Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .fs-game-calendar-layout h-block {
+      display: block;
+      min-inline-size: 0;
+    }
+
+    .fs-layout-header {
+      min-block-size: 11.25rem;
+    }
+
+    .fs-layout-filters {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-block-start: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--fs-layout-divider);
+      border-radius: .75rem;
+      background: var(--fs-layout-paper);
+    }
+
+    .fs-layout-filter {
+      min-block-size: 5rem;
+    }
+
+    .fs-layout-calendar {
+      position: relative;
+      min-block-size: 60rem;
+      margin-block-start: 1rem;
+      overflow: hidden;
+      border-radius: 1.125rem;
+    }
+
+    .fs-layout-calendar > div {
+      position: absolute;
+      inset: 0;
+      block-size: 100%;
+      min-inline-size: 0;
+      min-block-size: 0;
+    }
+
+    .fs-layout-calendar > div:last-child {
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .fs-layout-calendar > div:last-child h-drill,
+    .fs-layout-calendar > div:last-child button {
+      pointer-events: auto;
+    }
+
+    .fs-layout-detail {
+      margin-block-start: 1rem;
+    }
+
+    .fs-layout-detail > div.dac-html-layout-block {
+      min-block-size: 24rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fs-game-calendar-layout * {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+
+  <header class="fs-layout-header">
+    <h-block name="calendar_header" />
+  </header>
+
+  <section class="fs-layout-filters" aria-label="Game Calendar filters">
+    <div class="fs-layout-filter"><h-block name="filter_month" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_league" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_team" /></div>
+    <div class="fs-layout-filter"><h-block name="filter_game" /></div>
+  </section>
+
+  <section class="fs-layout-calendar" aria-label="Selected month game calendar">
+    <h-block name="calendar_scaffold" />
+    <h-block name="calendar_games" />
+  </section>
+
+  <section class="fs-layout-detail" aria-label="Selected game detail">
+    <h-block name="game_detail" />
+  </section>
+</div>
+;;
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'filter_month'
+      to: [
+        CustomMapping {
+          block: [
+            'calendar_games',
+            'focus_games',
+            'game_detail'
+          ]
+          field: r(fanserv_mock_games.board_month_start)
+        },
+        CustomMapping {
+          block: [
+            'calendar_header',
+            'calendar_scaffold'
+          ]
+          field: r(fanserv_calendar_days.board_month_start)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'filter_league'
+      to: [
+        CustomMapping {
+          block: [
+            'calendar_games',
+            'focus_games',
+            'game_detail'
+          ]
+          field: r(fanserv_mock_games.league_code)
+        },
+        CustomMapping {
+          block: 'calendar_scaffold'
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'filter_team'
+      to: [
+        CustomMapping {
+          block: [
+            'calendar_games',
+            'focus_games',
+            'game_detail'
+          ]
+          field: r(fanserv_game_team_bridge.team_name)
+        },
+        CustomMapping {
+          block: 'calendar_scaffold'
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'filter_game'
+      to: [
+        CustomMapping {
+          block: [
+            'calendar_games',
+            'focus_games',
+            'game_detail'
+          ]
+          field: r(fanserv_mock_games.game_selector_label)
+        },
+        CustomMapping {
+          block: 'calendar_scaffold'
+          disabled: true
+        }
+      ]
+    }
+  ]
+  settings {
+    timezone: 'America/Los_Angeles'
+    cache_duration: 10
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}

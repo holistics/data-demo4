@@ -394,7 +394,7 @@ Dashboard edupulse_content_performance_analytics {
       }
       calculation metric_91ab1ac {
         label: 'Concat field'
-        formula: @aql concat(cast(metric_b4d6dbe, 'text'), " ", "/10");;
+        formula: @aql concat(cast(avg_quiz_result, 'text'), " ", "/10");;
         calc_type: 'measure'
         data_type: 'text'
       }
