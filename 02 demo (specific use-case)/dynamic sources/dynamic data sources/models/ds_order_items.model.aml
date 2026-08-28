@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-Model ecommerce_order_items_copy {
-=======
 Model ds_order_items {
->>>>>>> origin/master
   type: 'table'
   label: 'Order Items'
   description: ''
@@ -22,17 +18,6 @@ Model ds_order_items {
   dimension quantity {
     label: 'Quantity'
     type: 'number'
-<<<<<<< HEAD
-    description: "   "
-    hidden: false
-    definition: @sql {{ #SOURCE.quantity }};;
-    primary_key: false
-  }
-
-  owner: 'vincent+demo4@holistics.io'
-  table_name: '"ecommerce"."order_items"'
-}
-=======
     hidden: false
     definition: @sql {{ #SOURCE.quantity }};;
   }
@@ -40,4 +25,3 @@ Model ds_order_items {
   owner: 'khai.to@holistics.io'
   table_name: '"ecommerce"."order_items"'
 }
->>>>>>> origin/master

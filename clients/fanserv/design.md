@@ -228,7 +228,7 @@ The dashboard layout should feel like a stadium control panel: a strong hero ban
 - Use paired 50/50 analysis panels for comparable chart groups, such as revenue playbook and cost control.
 - Prefer center alignment for KPI cards and live-status chips.
 
-The current Holistics implementation is standalone AML content in `clients/fanserv/fanserv_demo_dashboard.page.aml`: hero/header blocks, date filter, KPI cards, trend charts, expense mix chart, monthly detail table, layout, interactions, and settings. It uses `theme: fanserv_stadium_light`.
+The current Holistics implementation is standalone AML content in `clients/fanserv/stadium/dashboards/fanserv_demo_dashboard.page.aml`: hero/header blocks, date filter, KPI cards, trend charts, expense mix chart, monthly detail table, layout, interactions, and settings. It uses `theme: fanserv_stadium_light`.
 
 ## Elevation & Depth
 
@@ -254,11 +254,11 @@ Shapes should be simple and modern.
 
 ### Holistics theme assets
 
-- Reusable AML theme file: `clients/fanserv/fanserv.theme.aml`
+- Reusable AML theme file: `clients/fanserv/stadium/themes/fanserv.theme.aml`
 - Dark theme identifier: `fanserv_stadium`
 - Light theme identifier: `fanserv_stadium_light`
 - AML chart palette identifier: `fanserv_categorical_palette`
-- Applied dashboard: `clients/fanserv/fanserv_demo_dashboard.page.aml`
+- Applied dashboard: `clients/fanserv/stadium/dashboards/fanserv_demo_dashboard.page.aml`
 
 ### KPI cards
 
