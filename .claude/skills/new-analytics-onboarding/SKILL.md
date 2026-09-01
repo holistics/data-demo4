@@ -6,25 +6,29 @@ description: Orchestrate the end-to-end onboarding of a new Holistics customer o
 # New analytics onboarding — orchestrator
 
 > **Start here.** This is the entry point for the whole engagement — it owns Phases 0 and 7
-> directly and delegates 1–6. If a user asks for onboarding, context setup, or "the AI isn't
-> trusted", invoke *this* skill, not a phase skill.
+> directly and routes 1–6. If a user asks for onboarding, context setup, or "the AI isn't
+> trusted", invoke *this* skill.
 >
 > **This file is the single source of truth for phase order, data flow, gates, and the customer's
-> project layout.** The phase
-> skills deliberately do not restate them. Each phase skill is independently useful — a
-> data-readiness review, a metrics glossary, a context restructure, a regression suite — and is
-> invoked directly about as often as it runs in sequence, so it carries only its own local
-> method. When sequence changes, it changes here and nowhere else.
+> project layout.** Each phase's method lives in `references/phase-N-*.md` and deliberately does
+> not restate any of them. You route: read the phase table, then read the matching reference file
+> and follow it. When sequence changes, it changes here and nowhere else.
 >
-> Skill names are **not numbered**, for the same reason: skills are selected by description
-> matching and typed by name, and each one stands alone. Chronology lives in the numbered
-> **artifacts** (`00-` … `07-`) and in the phase table below — files accumulate and need
-> ordering; entry points don't.
+> **Each phase reference also has a thin stub skill of the same name** (`profile-warehouse`,
+> `verify-ai-context`, …) carrying only a description and a pointer back to its reference file.
+> Those exist so a standalone ask — a data-readiness review, a metrics glossary, a context
+> restructure, a regression suite — still matches without loading this whole orchestrator. They
+> hold no method, so the sequenced path and the standalone path cannot drift. **Never write method
+> into a stub.**
+>
+> Chronology lives in the numbered **reference files** (`phase-1-` … `phase-6-`) and the numbered
+> **artifacts** (`00-` … `07-`). Stub skill names stay unnumbered: they are matched by description
+> and typed by name, and each stands alone.
 
 You are running a structured engagement that turns a customer's undocumented business
 knowledge into **enforced** context that Holistics AI reasons against. This skill is the
 entry point and the traffic controller. It owns phase order, gating, and state. The actual
-work happens in the sub-skills.
+method for each phase lives in `references/phase-N-*.md`, which you read and follow in turn.
 
 ## The problem you are solving
 
@@ -51,8 +55,7 @@ routing each statement to the layer that actually enforces it.**
 
 1. **Never put a formula in `context.aml`.** If a statement contains or implies arithmetic
    ("net of refunds", "revenue ÷ spend", "excluding tax", "expanded to underlying units"),
-   it is a metric definition. Encode it. `route-context-artifacts` enforces this
-   mechanically — do not bypass it.
+   it is a metric definition. Encode it. Phase 5 enforces this mechanically — do not bypass it.
 2. **Model before you profile; profile before you interview.** There is nothing to profile
    until a semantic layer exists — `list_datasets` returns an empty list on a new tenant, and
    `execute_aql` and `fetch_sample_data` read through the layer, so Phase 1 is a hard
@@ -83,23 +86,23 @@ Run in order. Each phase writes its artifact into the engagement workspace and u
 `00-onboarding-state.md`. Phases are resumable across sessions — always read the state file
 first and resume, never restart.
 
-**You own this table.** Pass each phase skill its inputs and check its gate before advancing;
-the skills themselves do not know their position in the sequence.
+**You own this table.** Read the phase's reference file, pass it its inputs, and check its gate
+before advancing; the reference files do not know their position in the sequence.
 
-| # | Phase | Skill | Reads | Writes | Gate to proceed |
+| # | Phase | Method | Reads | Writes | Gate to proceed |
 | --- | --- | --- | --- | --- | --- |
 | 0 | Scope & access | *(this skill)* | customer's existing context doc, if any | `00-onboarding-state.md` | Warehouse reachable or schema supplied |
-| 1 | Scaffold the semantic layer | `scaffold-semantic-layer` | `00-` | `01-semantic-layer.md` + models/relationships/datasets and `docs/` in the customer's project | `holistics aml validate` passes · `list_datasets` returns the dataset · a query crossing a relationship executes · every relationship has a confirmed cardinality and a volatility flag · every fact has a recorded canonical date |
-| 2 | Profile the warehouse | `profile-warehouse` | `00-`, `01-` | `02-data-inventory.md` + `docs/data-quality/` register | Answerability ledger exists · every non-clean data-quality verdict has a `dq-NNN` entry with a named owner |
-| 3 | Interview stakeholders | `interview-business-context` | `02-` | `03-business-context-raw.md` | Core unit + ≥1 segment defined |
-| 4 | Define the metric tree | `define-metric-tree` | `02-`, `03-` | `04-metric-tree.md`, `04-metric-specs/` | Every T0 metric has numerator + denominator + exclusions |
-| 5 | Route & emit | `route-context-artifacts` | `03-`, `04-`, existing context doc | `05-routing-map.md`, `emit/` | Formula gate passes on `context.aml` |
-| 6 | Verify | `verify-ai-context` | `04-`, `05-`, verification seeds in `03-` | `06-question-bank.md`, `06-verification-report.md` | T0 pass rate ≥ 80%, zero traps committed on the customer's own questions |
+| 1 | Scaffold the semantic layer | `references/phase-1-scaffold-semantic-layer.md` | `00-` | `01-semantic-layer.md` + models/relationships/datasets and `docs/` in the customer's project | `holistics aml validate` passes · `list_datasets` returns the dataset · a query crossing a relationship executes · every relationship has a confirmed cardinality and a volatility flag · every fact has a recorded canonical date |
+| 2 | Profile the warehouse | `references/phase-2-profile-warehouse.md` | `00-`, `01-` | `02-data-inventory.md` + `docs/data-quality/` register | Answerability ledger exists · every non-clean data-quality verdict has a `dq-NNN` entry with a named owner |
+| 3 | Interview stakeholders | `references/phase-3-interview-business-context.md` | `02-` | `03-business-context-raw.md` | Core unit + ≥1 segment defined |
+| 4 | Define the metric tree | `references/phase-4-define-metric-tree.md` | `02-`, `03-` | `04-metric-tree.md`, `04-metric-specs/` | Every T0 metric has numerator + denominator + exclusions |
+| 5 | Route & emit | `references/phase-5-route-context-artifacts.md` | `03-`, `04-`, existing context doc | `05-routing-map.md`, `emit/` | Formula gate passes on `context.aml` |
+| 6 | Verify | `references/phase-6-verify-ai-context.md` | `04-`, `05-`, verification seeds in `03-` | `06-question-bank.md`, `06-verification-report.md` | T0 pass rate ≥ 80%, zero traps committed on the customer's own questions |
 | 7 | Handoff | *(this skill)* | all | `07-handoff.md` | Owners named for every open item |
 
 Phase 1 is a **build** phase on a new tenant and an **audit and gap-fill** phase on an existing
-one; `scaffold-semantic-layer` handles both. Do not skip it because a customer says they "already
-have datasets" — a dataset with no relationships, or a model with no description, breaks Phase 6 in
+one; `phase-1-scaffold-semantic-layer.md` handles both. Do not skip it because a customer says
+they "already have datasets" — a dataset with no relationships, or a model with no description, breaks Phase 6 in
 ways that are very hard to diagnose from the other end.
 
 ### Phase 0 — Scope & access
@@ -134,7 +137,8 @@ they *believe*; the layer and the profile tell you what is *true*.
 
 ### Phases 1–6
 
-Invoke the matching skill. Read its output artifact before advancing. After each phase:
+Read the matching `references/phase-N-*.md` in full and follow it. Read its output artifact
+before advancing. After each phase:
 
 - Update `00-onboarding-state.md` (phase status, artifact path, open questions, decisions).
 - Check the gate in the table above. If the gate fails, say so plainly and either loop within
@@ -331,6 +335,17 @@ decision in `docs/decisions/` with their name against it and move on.
   is usually the most valuable finding in the whole engagement.
 
 ## References
+
+The six phase files are the method you route to; the rest are shared assets the phases fill in.
+
+| Phase | File |
+| --- | --- |
+| 1 | `references/phase-1-scaffold-semantic-layer.md` |
+| 2 | `references/phase-2-profile-warehouse.md` |
+| 3 | `references/phase-3-interview-business-context.md` |
+| 4 | `references/phase-4-define-metric-tree.md` |
+| 5 | `references/phase-5-route-context-artifacts.md` |
+| 6 | `references/phase-6-verify-ai-context.md` |
 
 - `references/routing-table.md` — the destination classifier. The core IP of this plugin.
 - `references/context-template.md` — fill-in-the-blank business context template.
