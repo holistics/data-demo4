@@ -1,0 +1,249 @@
+// =====================================================================
+// Solution B - fiscal Year / Quarter / Month as text labels
+//
+// Huy's answer from the Slack thread: run the same +3 month shift as
+// Solution A, but never show the shifted date. Expose 'FY2026',
+// 'FY2026-Q1 (Oct-Dec)' and 'Oct FY2026' instead, so nobody has to
+// mentally translate a fake calendar date back to a real close date.
+//
+// Self-contained. This folder shares no AML object with Solutions A, C
+// or D - only the untouchable core-demo base models (`ecommerce_orders`,
+// `ecommerce_order_items`, `ecommerce_products`), which every solution
+// extends and none of them edits.
+//
+// `created_at` stands in for Seed's HubSpot `closedate`.
+// =====================================================================
+Model seed_b_orders = ecommerce_orders.extend({
+  label: 'Seed Orders (Solution B)'
+  description: 'Ecommerce orders extended with Seed Company fiscal-period fields. FY runs 1 Oct - 30 Sep, named by the calendar year it ends in: FY2026 = Oct 2025 - Sep 2026.'
+
+  // -------------------------------------------------------------------
+  // The +3 month shift, kept internal.
+  //
+  // Solution B does exactly the same arithmetic as Solution A - it just
+  // never shows the result. The labels below are read off this field, and
+  // it is hidden so a shifted date cannot reach a chart by accident.
+  // -------------------------------------------------------------------
+  dimension fiscal_date_month_start {
+    label: 'Fiscal Month Start (internal)'
+    type: 'datetime'
+    hidden: true
+    description: 'Close date truncated to month, then shifted +3 months. Internal only - the fiscal Year / Quarter / Month labels below are derived from it.'
+    definition: @aql date_trunc(seed_b_orders.created_at, 'month') + interval(3 month) ;;
+  }
+
+  // -------------------------------------------------------------------
+  // Solution B (Huy): the same +3 month shift, but never shown as a date.
+  // The shifted date's calendar year IS the fiscal year and its calendar
+  // quarter IS the fiscal quarter, so the labels below are just readouts
+  // of it. The real (unshifted) month name is used for the month label,
+  // so "Oct FY2026" says what actually happened and when it counts.
+  // -------------------------------------------------------------------
+  dimension fiscal_year {
+    label: 'Fiscal Year'
+    type: 'text'
+    description: "Fiscal year label, e.g. 'FY2026' = 1 Oct 2025 - 30 Sep 2026."
+    definition: @aql concat('FY', date_format(seed_b_orders.fiscal_date_month_start, '%Y')) ;;
+  }
+
+  dimension fiscal_quarter {
+    label: 'Fiscal Quarter'
+    type: 'text'
+    description: "Fiscal quarter label, e.g. 'FY2026-Q1 (Oct-Dec)' = Oct-Dec 2025. The calendar months are spelled out in the label on purpose, so nobody has to remember that Q1 is Oct-Dec. The 'FY####-Q#' prefix is unchanged, so alphabetical order is still chronological order."
+    definition: @aql concat(
+        'FY'
+        , date_format(seed_b_orders.fiscal_date_month_start, '%Y')
+        , '-Q'
+        , date_format(seed_b_orders.fiscal_date_month_start, '%q')
+        , ' ('
+        , case(
+            when: cast(date_part('month', seed_b_orders.fiscal_date_month_start), 'int') <= 3, then: 'Oct-Dec'
+            , when: cast(date_part('month', seed_b_orders.fiscal_date_month_start), 'int') <= 6, then: 'Jan-Mar'
+            , when: cast(date_part('month', seed_b_orders.fiscal_date_month_start), 'int') <= 9, then: 'Apr-Jun'
+            , else: 'Jul-Sep'
+          )
+        , ')'
+      ) ;;
+  }
+
+  dimension fiscal_month {
+    label: 'Fiscal Month'
+    type: 'text'
+    description: "Fiscal month label, e.g. 'Oct FY2026'. The month name is the REAL close month; the FY suffix is the fiscal year it falls in."
+    definition: @aql concat(
+        date_format(seed_b_orders.created_at, '%b')
+        , ' FY'
+        , date_format(seed_b_orders.fiscal_date_month_start, '%Y')
+      ) ;;
+  }
+
+  // -------------------------------------------------------------------
+  // Sort keys.
+  //
+  // 'FY2026' and 'FY2026-Q1' happen to sort correctly on their own -
+  // alphabetical order and chronological order agree. 'Oct FY2026' does
+  // not: alphabetically Apr comes before Oct.
+  //
+  // AML has no `order_by_field` for a text dimension, and chart sorting
+  // addresses fields by their POSITION IN THE VIZ, so a sort cannot point
+  // at a field that is not on the chart. These three are therefore left
+  // visible on purpose: to sort by fiscal month you put the number in the
+  // table and sort on that column.
+  // -------------------------------------------------------------------
+  dimension fiscal_year_num {
+    label: 'Fiscal Year Number'
+    type: 'number'
+    description: 'Fiscal year as a number, e.g. 2026. Sort key for Fiscal Year.'
+    definition: @aql cast(date_part('year', seed_b_orders.fiscal_date_month_start), 'int') ;;
+  }
+
+  dimension fiscal_quarter_num {
+    label: 'Fiscal Quarter Number'
+    type: 'number'
+    description: '1 = Oct-Dec, 2 = Jan-Mar, 3 = Apr-Jun, 4 = Jul-Sep. Sort key for Fiscal Quarter.'
+    definition: @aql case(
+        when: cast(date_part('month', seed_b_orders.created_at), 'int') >= 10, then: 1
+        , when: cast(date_part('month', seed_b_orders.created_at), 'int') >= 7, then: 4
+        , when: cast(date_part('month', seed_b_orders.created_at), 'int') >= 4, then: 3
+        , else: 2
+      ) ;;
+  }
+
+  dimension fiscal_month_num {
+    label: 'Fiscal Month Number'
+    type: 'number'
+    description: '1 = October ... 12 = September. Sort key for Fiscal Month.'
+    definition: @aql cast(date_part('month', seed_b_orders.fiscal_date_month_start), 'int') ;;
+  }
+
+  // -------------------------------------------------------------------
+  // Relative fiscal year. Deliberately built from max(), not from @now:
+  // `@now` inlines a full timestamp, so the generated SQL changes on every
+  // execution and the query cache never hits. Seed is cost-sensitive about
+  // warehouse spend, so no `@now` anywhere in the Seed folders.
+  //
+  // max(fiscal_year_num) is the latest fiscal year IN THE CURRENT QUERY
+  // SCOPE - not in the whole table. Verified by reading the generated SQL:
+  // a dashboard filter lands in the first CTE and every later CTE, the
+  // max() included, selects FROM that CTE. So this offset re-bases as soon
+  // as a fiscal filter narrows the query, and a metric built on it CANNOT
+  // be made to ignore that filter from AQL. There is no filter-bypass
+  // construct; unmapping a filter from a block is a dashboard UI setting.
+  //
+  // What it does buy is still real: with the fiscal filter left open, 0 is
+  // the latest FY in the data and -1 the one before it, and neither ever
+  // needs editing on 1 October. On this demo data the newest order is
+  // today, so offset 0 is the current fiscal year. On Seed's real pipeline
+  // it is the latest FY with a deal in it - close enough for a demo, worth
+  // calling out on the call.
+  // -------------------------------------------------------------------
+  dimension fiscal_year_offset {
+    label: 'Fiscal Year Offset'
+    type: 'number'
+    description: '0 = latest fiscal year in the CURRENT QUERY SCOPE, -1 = the one before it. Never needs editing on 1 October. Narrowing a fiscal-period filter re-bases it - see the comment above.'
+    definition: @aql seed_b_orders.fiscal_year_num - max(seed_b_orders.fiscal_year_num) ;;
+  }
+
+  // -------------------------------------------------------------------
+  // Inherited fields, re-pointed at this model.
+  //
+  // `extend()` clones the base model but does NOT rewrite the field
+  // definitions it copies: every inherited field that spelled out
+  // `ecommerce_orders.<field>` still says `ecommerce_orders`, which is not
+  // in scope in a dataset that only includes `seed_b_orders`. Each one
+  // has to be re-declared here, and `extend()` cannot delete a field -
+  // the most you can do is override and hide it.
+  //
+  // Eleven fields for one fact table - the same eleven Solution A has to
+  // re-declare in its own folder. That is the concrete cost of putting a
+  // fiscal calendar on fact tables instead of on the date dimension: it
+  // is per-model work, and it is per-model work forever. Solutions C and
+  // D pay zero, because they extend the date dimension instead.
+  // -------------------------------------------------------------------
+  dimension created_at_fy {
+    label: 'Created At FY (base)'
+    type: 'datetime'
+    hidden: true
+    description: 'Inherited from the base orders model - same +3 month shift as Fiscal Date. Hidden here so the demo has one obvious Solution A field instead of two identical ones.'
+    definition: @aql seed_b_orders.created_at + interval(3 month) ;;
+  }
+
+  measure cumm_orders {
+    label: 'Cumulative Orders'
+    type: 'number'
+    hidden: true
+    description: 'The cumulative total of orders.'
+    definition: @aql running_total(seed_b_orders.total_order, seed_b_orders.order_month) ;;
+    aggregation_type: "custom"
+  }
+
+  measure delivered_orders_count {
+    label: 'Delivered Orders Count'
+    type: 'number'
+    description: 'The total number of orders we delivered this period.'
+    definition: @aql count(seed_b_orders.id) | where(seed_b_orders.status == 'delivered') ;;
+  }
+
+  measure cancelled_orders_count {
+    label: 'Cancelled Orders Count'
+    type: 'number'
+    description: 'The total number of orders we canceled this period.'
+    definition: @aql count(seed_b_orders.id) | where(seed_b_orders.status == 'cancelled') ;;
+  }
+
+  measure refunded_orders_count {
+    label: 'Refunded Orders Count'
+    type: 'number'
+    description: 'The total number of orders we refunded this period.'
+    definition: @aql count_distinct(seed_b_orders.id) | where(seed_b_orders.status == 'refunded') ;;
+  }
+
+  measure total_order {
+    label: 'Total Orders Count'
+    type: 'number'
+    description: 'The total number of orders.'
+    definition: @aql count(seed_b_orders.id) ;;
+  }
+
+  measure total_orders_count {
+    label: 'Total Orders Count'
+    type: 'number'
+    hidden: true
+    description: 'Duplicate of Total Orders Count, inherited from the base model.'
+    definition: @aql count(seed_b_orders.id) ;;
+  }
+
+  measure first_order_date {
+    label: 'First Order Date'
+    type: 'datetime'
+    description: 'The date and time of the earliest order in scope.'
+    definition: @aql min(seed_b_orders.created_at) ;;
+  }
+
+  // The only `@now` in the Seed folders, and it is not on the fiscal path.
+  // It comes from the base orders model, which has to be re-declared to
+  // compile. Hidden, because `@now` inlines a live timestamp: the SQL text
+  // changes on every run and the query cache never hits. The fiscal fields
+  // above use max() instead, on purpose.
+  measure days_since_last_order {
+    label: 'Days Since Last Order'
+    type: 'number'
+    hidden: true
+    description: 'Inherited from the base orders model. Not used by the fiscal demo.'
+    definition: @aql date_diff('day', max(seed_b_orders.created_at), @now) ;;
+  }
+
+  measure orders_2023 {
+    label: '2023'
+    type: 'number'
+    hidden: true
+    definition: @aql count(seed_b_orders.id) | where(seed_b_orders.created_at matches @2023) ;;
+  }
+
+  measure orders_2024 {
+    label: '2024'
+    type: 'number'
+    hidden: true
+    definition: @aql count(seed_b_orders.id) | where(seed_b_orders.created_at matches @2024) ;;
+  }
+})

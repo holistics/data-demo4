@@ -1,0 +1,35 @@
+// =====================================================================
+// Solution C - date dimension, second role
+//
+// Lori's point on the call: the relevant date differs per dataset (the
+// forecast uses close date, not created date). Holistics allows only ONE
+// ACTIVE relationship between any given pair of models, so a second date
+// field needs a second model to point at.
+//
+// This is that model. It is the whole thing — a label and an extend.
+// Every fiscal column is inherited from `seed_c_dates` and re-binds
+// automatically, because none of them names a model: they are @sql over
+// `{{ #SOURCE.col }}` and bare `{{ fiscal_year }}`. Nothing to
+// re-declare, nothing to keep in sync. Change the fiscal calendar in
+// `seed_c_dates` and every role model follows.
+//
+// The alternative Holistics documents for this — an inactive
+// relationship reached with `with_relationships()` inside each metric —
+// costs one clause per metric per role. That scales with metrics x
+// roles. This scales with roles alone, which is the right shape for a
+// customer who wants fiscal year applied across a lot of metrics.
+//
+// Here the second role is demonstrated on `ecommerce_users.sign_up_date`
+// because the demo orders table only carries one date. For Seed it is
+// the same three lines pointed at a second date on the same fact — two
+// active relationships from one model to two different date models is
+// fine, the one-active rule is per model PAIR.
+//
+// Naming: give each role a label that says which date it describes, not
+// which table it came from. Users see 'Signup Date' and 'Order Date',
+// never two things both called 'Fiscal Year'.
+// =====================================================================
+Model seed_c_dates_signup = seed_c_dates.extend({
+  label: 'Signup Date'
+  description: 'Date dimension in its signup-date role. Same Oct-Sep fiscal calendar as Seed Dates (Solution C), joined on user signup instead of order date.'
+})

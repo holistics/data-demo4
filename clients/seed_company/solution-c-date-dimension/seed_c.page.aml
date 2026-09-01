@@ -1,0 +1,409 @@
+// =====================================================================
+// Seed Company - Solution C: the fiscal calendar on the DATE DIMENSION.
+//
+// A and B both put fiscal fields on the fact table. C puts them in one
+// place - `seed_c_dates` - and lets every fact reach them through the
+// join it already has. Same Oct-Sep calendar, same labels, none of the
+// per-fact-table cost.
+//
+// Everything this page needs is in this folder: `seed_c_dates`,
+// `seed_c_dates_signup` and `seed_c`. Solutions A and B have their own
+// fact-table datasets in their own folders, so the three can be clicked
+// through side by side and the cost difference is visible rather than
+// asserted.
+//
+// Three things on this page are structurally impossible in A and B:
+//   1. `Orders by Signup FY` and `Users Signed Up (Current FY)` while the
+//      dropdowns filter on ORDER date - two independent fiscal calendars
+//      reached from one definition. A and B would need a second full set
+//      of fiscal columns per extra timestamp field.
+//   2. Three KPIs that genuinely ignore the Fiscal Year filter (`of_all`),
+//      so they can be labelled *current* rather than *in view*. B's
+//      equivalents re-base onto whatever year you pick, because B's offset
+//      is an aggregate.
+//   3. The fiscal-alignment line chart, which needs a sort key that is
+//      not tied to any one fact table.
+//
+// Same UI caveat as B: parent-child filter narrowing is a dashboard
+// setting, not AML. Enable Fiscal Quarter as a child of Fiscal Year
+// after deploying.
+// =====================================================================
+Dashboard seed_fy_solution_c {
+  title: 'Seed Company - Solution C (Fiscal Calendar on the Date Dimension)'
+  description: 'Oct-Sep fiscal year defined once on the shared date dimension. Facts carry nothing. Two date roles, genuinely pinned current-FY cards, and a fiscal-aligned month axis in real calendar months.'
+
+  block t_intro: TextBlock {
+    content: @md
+### Solution C - define the fiscal year once, on the date dimension
+
+Every fiscal field on this page comes from **one file**, `seed_c_dates.model.aml`.
+No fact table has a fiscal column. `ecommerce_orders` was not modified at all.
+
+**What a new thing costs from here:** a new metric, nothing. A new fact entity,
+one relationship line - provided it exposes a date-typed column. A second
+timestamp field on the same fact, a three-line role model plus one relationship
+line. Compare with Solution B, where extending one orders model meant
+re-declaring **eleven** inherited fields before it would even compile, and that
+cost repeats per fact table forever.
+
+**The two right-hand cards really do ignore the Fiscal Year dropdown.** Set the
+filter to `FY24` and watch: the left two cards move to FY24, the right two stay
+on the current fiscal year and the one before it - as does `Users Signed Up
+(Current FY)` in the corner, which is pinned the same way but on the *signup*
+calendar rather than the order one. They are written as
+`gmv | where(fiscal_year_offset == 0) | of_all(seed_c_dates)` - the `where`
+picks the year against `CURRENT_DATE` row by row, the `of_all` drops the
+dashboard's date filter. Verified live: under a `FY24` filter the in-scope card
+returned 965,201 while the pinned card returned FY26's 7,365,785.
+
+B cannot do this cleanly. Its offset is an aggregate
+(`fiscal_year - max(fiscal_year)`), which re-bases the moment a filter narrows the
+query - so a card filtered to FY24 reports FY24 as "current". `of_all` will unblock
+it, but then `max()` re-bases onto the newest fiscal year *present in the data*
+rather than the one containing today, and those agree only while the warehouse is
+neither lagging into a new fiscal year nor running ahead of one. Here the offset is
+row-level against `CURRENT_DATE`, so "current" means the calendar, and `of_all` is
+left with nothing to do but drop the filter.
+
+**Nothing on this page is a shifted date.** `01 Oct` is October. Fiscal year is
+a filter and a grouping, never a date three months ahead of itself.
+    ;;
+  }
+
+  block f_fiscal_year: FilterBlock {
+    label: 'Fiscal Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_dates.fiscal_year_label)
+    }
+    // No literal default. 'FY26' would be correct today and wrong on
+    // 1 October - which is the exact bug this whole engagement started
+    // from. The roll-forward lives in the metrics instead.
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_fiscal_quarter: FilterBlock {
+    label: 'Fiscal Quarter'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_dates.fiscal_quarter)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  // Counts USERS, not orders, and is pinned with of_all. Both choices are
+  // deliberate: an orders-based version of this card returns the identical
+  // number to `Total Orders` under FY23, FY24 and FY25 in this warehouse,
+  // because the synthetic signup dates are not chronologically consistent
+  // with the order dates. See the metric comments in the dataset.
+  block kpi_signup: VizBlock {
+    label: 'Users Signed Up (Current FY)'
+    viz: MetricKpi {
+      dataset: seed_c
+      value: VizFieldFull {
+        ref: r(seed_c.users_signed_up_current_fy)
+        label: 'Users signed up - current FY'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block kpi_gmv: VizBlock {
+    label: 'GMV (Selected FY)'
+    viz: MetricKpi {
+      dataset: seed_c
+      value: VizFieldFull {
+        ref: r(seed_c.gmv)
+        label: 'GMV (Selected)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders (Selected FY)'
+    viz: MetricKpi {
+      dataset: seed_c
+      value: VizFieldFull {
+        ref: r(seed_c.total_orders)
+        label: 'Orders (Selected)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block kpi_current: VizBlock {
+    label: 'GMV (Current FY - ignores the filter)'
+    viz: MetricKpi {
+      dataset: seed_c
+      value: VizFieldFull {
+        ref: r(seed_c.gmv_current_fy)
+        label: 'GMV (Current FY)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block kpi_prior: VizBlock {
+    label: 'GMV (Prior FY - ignores the filter)'
+    viz: MetricKpi {
+      dataset: seed_c
+      value: VizFieldFull {
+        ref: r(seed_c.gmv_prior_fy)
+        label: 'GMV (Prior FY)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  // Fiscal years overlaid on a shared month axis.
+  //
+  // The x-axis is `fiscal_period_label` - '01 Oct', '02 Nov', ... '12 Sep'.
+  // Holistics chart sorting addresses fields by their position in the viz
+  // (`sort { field_index }`); there is no "sort this text axis by that
+  // other numeric field". So the sort key is carried inside the label
+  // string, which is why the axis both reads in real calendar months and
+  // runs in fiscal order. Solution B had to show a numeric Month # column
+  // next to the label to get the same ordering.
+  block v_fy_alignment: VizBlock {
+    label: 'GMV by Fiscal Period, Fiscal Years Overlaid'
+    viz: LineChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        ref: r(seed_c_dates.fiscal_period_label)
+        label: 'Fiscal Period'
+        format {
+          type: 'text'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(seed_c_dates.fiscal_year_label)
+        label: 'Fiscal Year'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+      }
+    }
+  }
+
+  // Two fiscal calendars on one fact, from one definition.
+  //
+  // The Fiscal Year and Fiscal Quarter dropdowns above filter on the
+  // ORDER date. This chart groups by the SIGNUP date's fiscal year. Both
+  // calendars are the same Oct-Sep definition, written once in
+  // `seed_c_dates`; `seed_c_dates_signup` is a role model that extends it
+  // with an empty body and re-declares nothing, because every fiscal
+  // dimension is @sql against {{ #SOURCE }} rather than AQL with a model
+  // prefix. Solutions A and B cannot do this without a second full set of
+  // fiscal columns bolted onto the fact table.
+  //
+  // Deliberately one-dimensional rather than a signup-FY x order-FY
+  // pivot: the demo warehouse's synthetic `sign_up_date` values are not
+  // chronologically consistent with `created_at`, so a 2-D cross-tab puts
+  // orders-before-signup cells on screen. Noted in the limits block.
+  block v_by_signup_fy: VizBlock {
+    label: 'Orders by Signup FY (filters above apply to ORDER date)'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        ref: r(seed_c_dates_signup.fiscal_year_label)
+        label: 'Signup Fiscal Year'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.total_orders)
+            label: 'Orders'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 1
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+      }
+    }
+  }
+
+  block t_limits: TextBlock {
+    content: @md
+### What Solution C still does not give you
+
+- **Period-to-date is still work.** `Fiscal MTD / QTD / YTD` and
+  `same fiscal period last year` are not free just because the calendar lives on
+  the date dimension. They are ordinary metrics written against
+  `fiscal_year` / `fiscal_period_number`, and they still have to be written -
+  the difference is they get written once, not once per fact table.
+- **The filter cascade is still a UI toggle.** Fiscal Year narrowing the Fiscal
+  Quarter dropdown is set on the dashboard after deploy, not in this file. Same
+  as Solution B.
+- **A fact needs a date-typed join column.** Seed's `closedate` is a timestamp;
+  it has to be cast to a date in the warehouse before it can join a date
+  dimension, and that cast must not shift across the 30 Sep / 1 Oct boundary.
+  The tenant timezone matters here and is worth confirming before porting.
+- **Open question for Seed.** If their Snowflake warehouse already has a
+  `dim_date` carrying fiscal columns, none of this AML logic is needed at all -
+  it becomes a column mapping. Worth asking before building anything.
+- **Demo-data caveat, not a modelling one.** In this warehouse the synthetic
+  `ecommerce_users.sign_up_date` values do not line up chronologically with
+  `ecommerce_orders.created_at` - pre-FY26 orders all resolve to FY26 signups.
+  The join and the role model are correct; the generated data is not. It is why
+  the signup chart is a single breakdown rather than a signup-FY x order-FY
+  cross-tab, which would show orders placed before the customer existed, and why
+  the signup KPI counts *users* rather than orders - the orders version returns
+  the identical number to `Total Orders` under FY23, FY24 and FY25 here. Read the
+  signup chart as shape rather than as counts: the synthetic signup dates skew it
+  hard onto FY26 (unfiltered: FY23 12, FY24 298, FY25 1,896, FY26 30,804), and
+  because the breakdown is on the signup side of the join the bars sum to more
+  than `Total Orders`. On Seed's real data both the chart and the orders metric
+  would separate; the definitions are in the dataset either way.
+    ;;
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1440
+    height: 1380
+    grid_size: 20
+    block t_intro {
+      position: pos(20, 20, 920, 360)
+    }
+    block f_fiscal_year {
+      position: pos(980, 20, 440, 80)
+    }
+    block f_fiscal_quarter {
+      position: pos(980, 100, 440, 80)
+    }
+    block kpi_signup {
+      position: pos(980, 200, 440, 180)
+    }
+    block kpi_gmv {
+      position: pos(20, 400, 340, 120)
+    }
+    block kpi_orders {
+      position: pos(380, 400, 340, 120)
+    }
+    block kpi_current {
+      position: pos(740, 400, 340, 120)
+    }
+    block kpi_prior {
+      position: pos(1100, 400, 320, 120)
+    }
+    block v_fy_alignment {
+      position: pos(20, 540, 1400, 380)
+    }
+    block v_by_signup_fy {
+      position: pos(20, 940, 700, 400)
+    }
+    block t_limits {
+      position: pos(740, 940, 700, 400)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}
