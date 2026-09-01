@@ -1,18 +1,40 @@
 EmbedPortal ecommerce_portal {
   objects: [
-    // dashboards
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Dashboards
+    // ═══════════════════════════════════════════════════════════════════════════
     embedded_ecommerce_dashboard,
-    _0_ecommerce_dashboard_30_demo,
-    _1_country_breakdown_demo,
-    _2_category_breakdown_demo,
-    _3_customer_demographics_demo,
-    _4_product_x_merchant_drill_down_demo,
-    merchant_information_dashboard,
-    // datasets
+    _1_country_breakdown, // used to demo drill-through
+    merchant_information_dashboard, // general merchant information
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Datasets
+    // ═══════════════════════════════════════════════════════════════════════════
     demo_ecommerce_version_2,
   ],
   initial_object: 'ai',
-  default_user_attributes: {
-    // pii_access: '__ALL__',
+  ai {
+    customization {
+      global {
+        icon: 'https://media.holistics.io/f870558c-hooli-smart-cart.svg'
+        assistant_name: 'Hooli Smart Agent'
+      }
+      chat_page {
+        intro {
+          header: 'Hi, I\'m Hooli Smart Agent. What would you like to know?'
+          body: @md
+            ## 🛍️ Ask about sales, orders, customers, or inventory 
+            ## 💬 Refine with follow-ups to drill deeper into your data 
+            ## 📌 Save any insight to your personal dashboard          
+					;;
+        }
+        prompt_placeholder: 'Ask me anything, eg: Top 5 products by revenue this year'
+      }
+			toolbar {
+        icon: 'https://media.holistics.io/650518b4-super-smart-ai-D-bot-antenna.svg'
+      }
+      left_panel {
+        icon: 'https://media.holistics.io/650518b4-super-smart-ai-D-bot-antenna.svg'
+      }
+    }
   }
 }

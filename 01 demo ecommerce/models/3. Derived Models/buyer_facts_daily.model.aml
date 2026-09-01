@@ -1,4 +1,4 @@
-@tag('2️⃣ Status/Archived')
+@tag('Archived')
 Model buyer_facts_daily {
   type: 'query'
   label: 'Buyer Facts Daily'
@@ -99,38 +99,38 @@ Model buyer_facts_daily {
     label: 'Avg Days Between Orders'
     description: 'Calculate average days between orders'
     type: 'number'
-    definition: @SQL avg({{#SOURCE.next_order_date}} - {{#SOURCE.order_created_date}});;
+    definition: @sql avg({{#SOURCE.next_order_date}} - {{#SOURCE.order_created_date}});;
   }
   measure days_from_last_order {
     label: 'days_from_last_order'
     description: 'Number of days from last order to current date'
     type: 'number'
-    definition: @SQL current_date - max( {{#SOURCE.order_created_date}});;
+    definition: @sql current_date - max( {{#SOURCE.order_created_date}});;
   }
   measure first_order_date {
     label: 'First Order Date'
     type: 'date'
-    definition: @SQL min( {{#SOURCE.order_created_date}});;
+    definition: @sql min( {{#SOURCE.order_created_date}});;
   }
   measure last_order_date {
     label: 'Last Order Date'
     type: 'date'
-    definition: @SQL max( {{#SOURCE.order_created_date}});;
+    definition: @sql max( {{#SOURCE.order_created_date}});;
   }
   measure orders_count {
     label: 'Orders Count'
     type: 'number'
-    definition: @SQL sum( {{#SOURCE.total_orders_count}});;
+    definition: @sql sum( {{#SOURCE.total_orders_count}});;
   }
   measure total_gmv {
     label: 'Total GMV'
     type: 'number'
-    definition: @SQL sum( {{#SOURCE.gmv}});;
+    definition: @sql sum( {{#SOURCE.gmv}});;
   }
   measure total_nmv {
     label: 'Total NMV'
     type: 'number'
-    definition: @SQL sum( {{#SOURCE.nmv}});;
+    definition: @sql sum( {{#SOURCE.nmv}});;
   }
   owner: 'hien.nguyen+demo4@holistics.io'
 }

@@ -1,0 +1,35 @@
+Dataset demo_ecommerce_version_2_extended_with_time_period = demo_ecommerce_version_2.extend({
+  label: 'Ecommerce Dataset (Thong Extended Time Period)'
+  models: [
+    ecommerce_products,
+    ecommerce_merchants,
+    ecommerce_countries,
+    ecommerce_orders,
+    ecommerce_users,
+    ecommerce_order_items,
+    ecommerce_cities,
+    map_categories,
+    param_model_demo,
+    dim_dates,
+    ecommerce_employees,
+    ecommerce_product_images,
+    date_period
+  ]
+
+  // Moved here from the base demo_ecommerce_version_2 dataset: it needs the
+  // date_period param model, which only this extended dataset carries. Its old
+  // `thong_test.period` reference pointed at a model that no longer exists —
+  // date_period is that model under its current name (same owner, same 'period'
+  // field, 'Week' is one of its values).
+  metric metric_a1cdc7b {
+    label: "Classification of Total Users"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql case(
+      when: date_period.period == 'Week',
+      then: total_buyers,
+      else: total_users
+    );;
+  }
+})

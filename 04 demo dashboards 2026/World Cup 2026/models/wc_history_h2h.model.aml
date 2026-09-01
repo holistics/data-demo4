@@ -1,0 +1,170 @@
+Model wc_history_h2h {
+  type: 'query'
+  label: 'All-time Head-to-Head'
+  description: 'One row per (team, opponent) ordered pair: their all-time World Cup record 1930–2022 from that team\'s perspective (played / W-D-L / goals). Both teams use canonical codes (defunct nations folded into the modern successor) so a 2026 team resolves its full lineage. Built by UNIONing home and away perspectives of wc_history_matches — a cross-row aggregation that is not a single AQL measure. Shootouts count as draws (the 90/120-min score decides W/D/L), matching wc_history_team_editions.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_history_matches, wc_teams, wc_team_aliases]
+  query: @sql
+    with persp as (
+      select {{ #h.home_canonical }} as team_code, {{ #h.away_canonical }} as opp_code, {{ #h.year }} as year,
+        case when {{ #h.home_score }} > {{ #h.away_score }} then 1 else 0 end as w,
+        case when {{ #h.home_score }} = {{ #h.away_score }} then 1 else 0 end as d,
+        case when {{ #h.home_score }} < {{ #h.away_score }} then 1 else 0 end as l,
+        {{ #h.home_score }} as gf, {{ #h.away_score }} as ga
+      from {{ #wc_history_matches as h }}
+      where {{ #h.home_score }} is not null and {{ #h.away_score }} is not null
+      union all
+      select {{ #h2.away_canonical }}, {{ #h2.home_canonical }}, {{ #h2.year }},
+        case when {{ #h2.away_score }} > {{ #h2.home_score }} then 1 else 0 end,
+        case when {{ #h2.away_score }} = {{ #h2.home_score }} then 1 else 0 end,
+        case when {{ #h2.away_score }} < {{ #h2.home_score }} then 1 else 0 end,
+        {{ #h2.away_score }}, {{ #h2.home_score }}
+      from {{ #wc_history_matches as h2 }}
+      where {{ #h2.home_score }} is not null and {{ #h2.away_score }} is not null
+    ),
+    agg as (
+      select
+        team_code, opp_code,
+        count(*) as played,
+        sum(w) as wins, sum(d) as draws, sum(l) as losses,
+        sum(gf) as gf, sum(ga) as ga,
+        sum(gf) - sum(ga) as gd,
+        min(year) as first_year, max(year) as last_year,
+        sum(w)::text || '-' || sum(d)::text || '-' || sum(l)::text as record_label,
+        round(sum(w)::numeric / nullif(count(*), 0) * 100, 0) as win_pct
+      from persp
+      group by team_code, opp_code
+    )
+    select
+      agg.team_code || '-' || agg.opp_code as h2h_key,
+      agg.team_code, agg.opp_code,
+      agg.played, agg.wins, agg.draws, agg.losses,
+      agg.gf, agg.ga, agg.gd,
+      agg.first_year, agg.last_year,
+      agg.record_label, agg.win_pct,
+      -- Opponent display name resolved for EVERY historical nation (wc_opponent_teams covers only the 48
+      -- nations in the 2026 field, so non-qualifiers like Italy/Poland/Serbia would render blank). Precedence
+      -- mirrors wc_team_aliases.entity_name: official 2026 name → curated marquee nations the dataset has only
+      -- a code for → the alias's real historical name → the bare code.
+      coalesce(
+        {{ #ot.name }},
+        case agg.opp_code
+          when 'ITA' then 'Italy' when 'RUS' then 'Russia' when 'SRB' then 'Serbia'
+          when 'HUN' then 'Hungary' when 'POL' then 'Poland' when 'CHI' then 'Chile'
+          when 'BUL' then 'Bulgaria' when 'PER' then 'Peru' when 'DEN' then 'Denmark'
+          when 'GRE' then 'Greece' when 'CMR' then 'Cameroon' when 'CRC' then 'Costa Rica'
+          when 'IRL' then 'Rep. of Ireland' when 'CHN' then 'China PR' when 'CUB' then 'Cuba'
+          when 'HON' then 'Honduras' when 'BOL' then 'Bolivia' when 'ANG' then 'Angola'
+          when 'JAM' then 'Jamaica' when 'ISR' then 'Israel'
+          -- frequent WC rivals missing from 2026 (so absent from wc_teams) and from the aliases name map;
+          -- the H2H ledger surfaces these as top rivals where the History tab's prestige rollups never did.
+          when 'NGA' then 'Nigeria' when 'ROU' then 'Romania' when 'UKR' then 'Ukraine'
+          when 'WAL' then 'Wales' when 'NIR' then 'Northern Ireland' when 'SVN' then 'Slovenia'
+          when 'SVK' then 'Slovakia' when 'PRK' then 'Korea DPR' when 'IDN' then 'Indonesia'
+          when 'KUW' then 'Kuwait' when 'SLV' then 'El Salvador' when 'TOG' then 'Togo'
+          when 'TRI' then 'Trinidad and Tobago' when 'UAE' then 'United Arab Emirates'
+          else nullif({{ #oa.display_name }}, {{ #oa.alias_code }})
+        end,
+        agg.opp_code
+      ) as opp_name,
+      -- Official crest (2026 sides) → FIFA flag CDN templated on the canonical code (resolves for any current
+      -- federation; truly defunct codes 404 → the img hides). opp_code is already canonical.
+      coalesce({{ #ot.flag_url }}, 'https://api.fifa.com/api/v3/picture/flags-sq-4/' || agg.opp_code) as opp_flag,
+      -- pre-built display strings: number dims re-apply digit grouping in MarkdownViz ("1,950.00"),
+      -- so the year span and the signed GD are cast to text here (same reason wc_history_finals has year_text).
+      agg.first_year::text || '–' || agg.last_year::text as span_label,
+      case when agg.gd > 0 then '+' || agg.gd::text else agg.gd::text end as gd_label,
+      case when agg.gd > 0 then '#1f9a64' when agg.gd < 0 then '#d83a2e' else '#9c8a68' end as gd_color
+    from agg
+    left join {{ #wc_teams as ot }} on {{ #ot.code }} = agg.opp_code
+    left join {{ #wc_team_aliases as oa }} on {{ #oa.alias_code }} = agg.opp_code;;
+  dimension h2h_key {
+    label: 'H2H Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    description: 'Canonical (modern-successor) code of the team whose perspective this row takes — join to a wc_teams role.'
+  }
+  dimension opp_code {
+    label: 'Opponent Code'
+    type: 'text'
+    description: 'Canonical code of the opponent — join to wc_opponent_teams for the opponent name/flag.'
+  }
+  dimension played {
+    label: 'Meetings'
+    type: 'number'
+    description: 'All-time World Cup meetings between the pair.'
+  }
+  dimension wins {
+    label: 'Wins'
+    type: 'number'
+  }
+  dimension draws {
+    label: 'Draws'
+    type: 'number'
+  }
+  dimension losses {
+    label: 'Losses'
+    type: 'number'
+  }
+  dimension gf {
+    label: 'Goals For'
+    type: 'number'
+  }
+  dimension ga {
+    label: 'Goals Against'
+    type: 'number'
+  }
+  dimension gd {
+    label: 'Goal Difference'
+    type: 'number'
+  }
+  dimension first_year {
+    label: 'First Meeting'
+    type: 'number'
+  }
+  dimension last_year {
+    label: 'Last Meeting'
+    type: 'number'
+  }
+  dimension record_label {
+    label: 'Record (W-D-L)'
+    type: 'text'
+    description: 'Pre-built "W-D-L" string from this team\'s perspective, e.g. "3-1-2".'
+  }
+  dimension win_pct {
+    label: 'Win %'
+    type: 'number'
+    description: 'Wins as a percentage of meetings (shootouts count as draws).'
+  }
+  dimension opp_name {
+    label: 'Opponent'
+    type: 'text'
+    description: 'Display name of the opponent, resolved for every historical nation (official 2026 name, else a curated marquee-nation map, else the alias name, else the bare code). Use this for display — wc_opponent_teams names only the 48 nations in the 2026 field.'
+  }
+  dimension opp_flag {
+    label: 'Opponent Flag'
+    type: 'text'
+    description: 'Opponent crest URL: official 2026 flag where available, else the FIFA flag CDN on the canonical code.'
+  }
+  dimension span_label {
+    label: 'Years'
+    type: 'text'
+    description: 'First–last meeting years as display text ("1950–2018") — cast in SQL because number formatting re-applies digit grouping in MarkdownViz.'
+  }
+  dimension gd_label {
+    label: 'Goal Difference'
+    type: 'text'
+    description: 'Signed all-time goal difference as text ("+13", "-6", "0").'
+  }
+  dimension gd_color {
+    label: 'GD Color'
+    type: 'text'
+    description: 'Driver: green when GD is positive, red when negative, muted at zero — for conditional formatting of the GD column.'
+  }
+  owner: 'hung.dd@holistics.io'
+}

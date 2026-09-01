@@ -1,4 +1,4 @@
-@tag('1️⃣ Trust/Endorsed')
+@tag('Endorsed')
 Model ecommerce_cities {
   type: 'table'
   label: 'Cities'
@@ -28,6 +28,16 @@ Model ecommerce_cities {
     type: 'text'
     definition: @aql concat(
       'https://www.google.com/maps/search/',ecommerce_cities.name
+    );;
+  }
+
+  // Action target for the '[Feature] Product Actions' dashboard's 'Experience
+  // Recommendation' action, which referenced this field before it existed.
+  dimension experience {
+    label: 'Experience Recommendation'
+    type: 'text'
+    definition: @aql concat(
+      'https://www.google.com/search?q=things+to+do+in+',ecommerce_cities.name
     );;
   }
 

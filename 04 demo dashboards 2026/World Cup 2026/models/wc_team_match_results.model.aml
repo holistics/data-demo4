@@ -1,0 +1,100 @@
+Model wc_team_match_results {
+  type: 'table'
+  label: 'Team Match Results'
+  description: 'Canonical per-team grain: one row per team per finished match. Source for per-team metrics.'
+  data_source_name: 'demo_worldcup'
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+  }
+  dimension opponent_code {
+    label: 'Opponent Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.opponent_code }};;
+  }
+  dimension gf {
+    label: 'Goals For'
+    type: 'number'
+    definition: @sql {{ #SOURCE.gf }};;
+  }
+  dimension ga {
+    label: 'Goals Against'
+    type: 'number'
+    definition: @sql {{ #SOURCE.ga }};;
+  }
+  dimension result {
+    label: 'Result'
+    type: 'text'
+    definition: @sql {{ #SOURCE.result }};;
+  }
+  dimension clean_sheet {
+    label: 'Clean Sheet'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.clean_sheet }};;
+  }
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+    definition: @sql {{ #SOURCE.stage }};;
+  }
+  dimension kickoff_utc {
+    label: 'Kickoff (UTC)'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.kickoff_utc }};;
+  }
+  dimension result_label {
+    label: 'Result Label'
+    type: 'text'
+    definition: @aql case(
+      when: wc_team_match_results.result == 'W', then: 'Win',
+      when: wc_team_match_results.result == 'D', then: 'Draw',
+      when: wc_team_match_results.result == 'L', then: 'Loss',
+      else: '—'
+    ) ;;
+  }
+  dimension result_color {
+    label: 'Result Color'
+    type: 'text'
+    description: 'Driver field: form-chip color (win=green, draw=amber, loss=red).'
+    definition: @aql case(
+      when: wc_team_match_results.result == 'W', then: '#1FA36B',
+      when: wc_team_match_results.result == 'D', then: '#E0A23B',
+      when: wc_team_match_results.result == 'L', then: '#E5362B',
+      else: '#9AA4B2'
+    ) ;;
+  }
+  dimension points_earned {
+    label: 'Points Earned'
+    type: 'number'
+    definition: @aql case(
+      when: wc_team_match_results.result == 'W', then: 3,
+      when: wc_team_match_results.result == 'D', then: 1,
+      else: 0
+    ) ;;
+  }
+  // ---- Time / period drill (mirrors wc_matches): filter kickoff_date <= D for an "as of date D"
+  //      standings/form view; group on phase to split group-stage vs knockout per-team measures. ----
+  dimension kickoff_date {
+    label: 'Kickoff Date'
+    type: 'date'
+    description: 'Calendar day of kickoff (UTC). Filter to kickoff_date <= D and the per-team measures (points, goals, win rate, form) become cumulative "as of date D".'
+    definition: @aql date_trunc(wc_team_match_results.kickoff_utc, 'day') ;;
+  }
+  dimension phase {
+    label: 'Phase'
+    type: 'text'
+    description: 'Group stage vs Knockout — group on this to split per-team measures by phase.'
+    definition: @aql case(
+      when: wc_team_match_results.stage == 'group', then: 'Group stage',
+      else: 'Knockout'
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_team_match_results"'
+}

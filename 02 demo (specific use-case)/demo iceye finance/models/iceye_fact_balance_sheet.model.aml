@@ -1,0 +1,68 @@
+Model iceye_fact_balance_sheet {
+  type: 'table'
+  label: 'Fact Balance Sheet'
+  description: 'Balance-sheet lines with EUR-converted amounts (prod_reporting_finance_fact_balance_sheet).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension transaction_id { label: 'Transaction Id' type: 'number' definition: @sql {{ #SOURCE.transaction_id }};; }
+  dimension transaction_line_id { label: 'Transaction Line Id' type: 'number' primary_key: true definition: @sql {{ #SOURCE.transaction_line_id }};; }
+  dimension accounting_book_id { label: 'Accounting Book Id' type: 'number' definition: @sql {{ #SOURCE.accounting_book_id }};; }
+  dimension posting_date { label: 'Posting Date' type: 'datetime' definition: @sql {{ #SOURCE.posting_date }};; }
+  dimension transaction_type { label: 'Transaction Type' type: 'text' definition: @sql {{ #SOURCE.transaction_type }};; }
+  dimension document_id { label: 'Document Id' type: 'text' definition: @sql {{ #SOURCE.document_id }};; }
+  dimension transaction_display_name { label: 'Transaction Display Name' type: 'text' definition: @sql {{ #SOURCE.transaction_display_name }};; }
+  dimension subsidiary_name { label: 'Subsidiary Name' type: 'text' definition: @sql {{ #SOURCE.subsidiary_name }};; }
+  dimension transaction_entity_name { label: 'Transaction Entity Name' type: 'text' definition: @sql {{ #SOURCE.transaction_entity_name }};; }
+  dimension vendor { label: 'Vendor' type: 'text' description: 'Vendor name — ICEYE confirmed Transaction Entity Name represents the vendor.' definition: @sql {{ #SOURCE.transaction_entity_name }};; }
+  dimension entity_project { label: 'Entity Project' type: 'text' definition: @sql {{ #SOURCE.entity_project }};; }
+  dimension project_contract_type { label: 'Project Contract Type' type: 'text' definition: @sql {{ #SOURCE.project_contract_type }};; }
+  dimension department_number { label: 'Department Number' type: 'text' definition: @sql {{ #SOURCE.department_number }};; }
+  dimension department_name { label: 'Department Name' type: 'text' definition: @sql {{ #SOURCE.department_name }};; }
+  dimension account_name { label: 'Account Name' type: 'text' definition: @sql {{ #SOURCE.account_name }};; }
+  dimension account_number { label: 'Account Number' type: 'text' definition: @sql {{ #SOURCE.account_number }};; }
+  dimension accounting_line_credit_amount { label: 'Accounting Line Credit Amount' type: 'number' definition: @sql {{ #SOURCE.accounting_line_credit_amount }};; }
+  dimension accounting_line_debit_amount { label: 'Accounting Line Debit Amount' type: 'number' definition: @sql {{ #SOURCE.accounting_line_debit_amount }};; }
+  dimension accounting_line_credit_amount_eur { label: 'Accounting Line Credit Amount EUR' type: 'number' definition: @sql {{ #SOURCE.accounting_line_credit_amount_eur }};; }
+  dimension accounting_line_debit_amount_eur { label: 'Accounting Line Debit Amount EUR' type: 'number' definition: @sql {{ #SOURCE.accounting_line_debit_amount_eur }};; }
+  dimension from_currency_symbol { label: 'From Currency Symbol' type: 'text' definition: @sql {{ #SOURCE.from_currency_symbol }};; }
+  dimension from_subsidiary_name { label: 'From Subsidiary Name' type: 'text' definition: @sql {{ #SOURCE.from_subsidiary_name }};; }
+  dimension account_type { label: 'Account Type' type: 'text' definition: @sql {{ #SOURCE.account_type }};; }
+  dimension transaction_memo { label: 'Transaction Memo' type: 'text' definition: @sql {{ #SOURCE.transaction_memo }};; }
+  dimension transaction_line_memo { label: 'Transaction Line Memo' type: 'text' definition: @sql {{ #SOURCE.transaction_line_memo }};; }
+  dimension line_of_business { label: 'Line Of Business' type: 'text' definition: @sql {{ #SOURCE.line_of_business }};; }
+  dimension dwh_created_at { label: 'Dwh Created At' type: 'datetime' definition: @sql {{ #SOURCE.dwh_created_at }};; }
+
+  dimension net_amount_eur_line_level {
+    label: 'Net Amount EUR'
+    type: 'number'
+    description: 'Credit EUR − Debit EUR at line level.'
+    definition: @aql coalesce(iceye_fact_balance_sheet.accounting_line_credit_amount_eur, 0) - coalesce(iceye_fact_balance_sheet.accounting_line_debit_amount_eur, 0);;
+    format: '[€]#,###0.00'
+  }
+  dimension net_amount_local_currency_line_level {
+    label: 'Net Amount Local Currency'
+    type: 'number'
+    description: 'Credit (local) − Debit (local) at line level.'
+    definition: @aql coalesce(iceye_fact_balance_sheet.accounting_line_credit_amount, 0) - coalesce(iceye_fact_balance_sheet.accounting_line_debit_amount, 0);;
+    format: '[€]#,###0.00'
+  }
+  measure net_amount_eur_agg {
+    label: 'Net Amount EUR'
+    type: 'number'
+    description: 'Aggregatable net = sum(credit EUR) − sum(debit EUR).'
+    definition: @aql sum(iceye_fact_balance_sheet.accounting_line_credit_amount_eur) - sum(iceye_fact_balance_sheet.accounting_line_debit_amount_eur);;
+    aggregation_type: 'custom'
+    format: '[€]#,###0.00'
+  }
+  measure balance_eur_agg {
+    label: 'Balance (EUR)'
+    type: 'number'
+    description: 'Natural balance-sheet presentation (always positive): assets shown as debit − credit, liabilities & equity as credit − debit.'
+    definition: @aql coalesce((iceye_fact_balance_sheet.net_amount_eur_agg | where(iceye_fact_balance_sheet.account_type in ['Bank', 'AcctRec', 'Inventory', 'FixedAsset', 'OthAsset'])) * -1, 0) + coalesce((iceye_fact_balance_sheet.net_amount_eur_agg | where(iceye_fact_balance_sheet.account_type in ['AcctPay', 'OthCurrLiab', 'LongTermLiab', 'Equity'])), 0);;
+    aggregation_type: 'custom'
+    format: '[€]#,###0.00'
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_fact_balance_sheet"'
+}

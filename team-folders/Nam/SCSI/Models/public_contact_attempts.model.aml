@@ -1,0 +1,54 @@
+Model public_contact_attempts {
+  type: 'table'
+  label: 'Contact Attempts'
+  description: 'Every attempt made to reach a debtor about a placed account. One row per attempt, so an account may have many attempts across several channels. Grain is finer than accounts — count accounts distinctly when querying across this model.'
+  data_source_name: 'demo_scsi_nam'
+
+  dimension attempt_id {
+    label: 'Attempt Id'
+    type: 'number'
+    description: "The **Attempt Id** uniquely identifies each individual contact attempt.  \nIt is the primary key of this model and the correct field to count distinctly for attempt volume."
+    hidden: false
+    definition: @sql {{ #SOURCE.attempt_id }};;
+    primary_key: true
+  }
+
+  dimension account_id {
+    label: 'Account Id'
+    type: 'number'
+    description: "The **Account Id** links this attempt to the account being worked.  \nJoin to `public_accounts`. Because one account can have many attempts, joining this model fans out account rows — count `accounts.account_id` distinctly to avoid overstating account counts."
+    hidden: false
+    definition: @sql {{ #SOURCE.account_id }};;
+    primary_key: false
+  }
+
+  dimension attempt_date {
+    label: 'Attempt Date'
+    type: 'date'
+    description: "The **Attempt Date** is the date the agency tried to reach the debtor.  \nThis is the collections-activity date lens, distinct from `payments.payment_date` (cash) and `accounts.placement_date` (vintage)."
+    hidden: false
+    definition: @sql {{ #SOURCE.attempt_date }};;
+    primary_key: false
+  }
+
+  dimension channel {
+    label: 'Channel'
+    type: 'text'
+    description: "The **Channel** is the medium used for the attempt, such as phone, email, SMS or letter.  \nUse it to compare contact effectiveness and cost per channel."
+    hidden: false
+    definition: @sql {{ #SOURCE.channel }};;
+    primary_key: false
+  }
+
+  dimension outcome {
+    label: 'Outcome'
+    type: 'text'
+    description: "The **Outcome** is the result of the attempt — for example whether the debtor was reached, a promise to pay was obtained, or the attempt failed.  \nRight-party contact rate is the share of attempts whose outcome indicates the debtor was actually reached; define which outcome values count as contact before quoting that rate."
+    hidden: false
+    definition: @sql {{ #SOURCE.outcome }};;
+    primary_key: false
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."contact_attempts"'
+}

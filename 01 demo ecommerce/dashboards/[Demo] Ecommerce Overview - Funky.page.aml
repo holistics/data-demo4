@@ -1,4 +1,4 @@
-@tag('2️⃣ Status/Stale')
+@tag('Issue/Stale')
 Dashboard demo_ecommerce_overview_funky {
   title: '[Demo] Ecommerce Overview - Funky'
   block user_country: FilterBlock {
@@ -750,7 +750,7 @@ display: block;
       layer: 1
     }
     block t3 {
-      position: pos(15, 20, 295, 185)
+      position: pos(25, 20, 295, 185)
       layer: 1
     }
     block t5 {
@@ -865,5 +865,4 @@ display: block;
     timezone: 'Etc/GMT+12'
     cache_duration: 1440
   }
-  theme: travel_theme
 }

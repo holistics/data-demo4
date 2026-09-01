@@ -1,0 +1,88 @@
+Model lb_etl_batch {
+  type: 'table'
+  label: 'Etl Batch'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."etl_batch"'
+
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension pipeline_name {
+    label: 'Pipeline Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.pipeline_name }};;
+  }
+  dimension batch_status {
+    label: 'Batch Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.batch_status }};;
+  }
+  dimension watermark_from {
+    label: 'Watermark From'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.watermark_from }};;
+  }
+  dimension watermark_to {
+    label: 'Watermark To'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.watermark_to }};;
+  }
+  dimension started_at {
+    label: 'Started At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.started_at }};;
+  }
+  dimension finished_at {
+    label: 'Finished At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.finished_at }};;
+  }
+  dimension records_read {
+    label: 'Records Read'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.records_read }};;
+  }
+  dimension records_inserted {
+    label: 'Records Inserted'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.records_inserted }};;
+  }
+  dimension records_updated {
+    label: 'Records Updated'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.records_updated }};;
+  }
+  dimension records_rejected {
+    label: 'Records Rejected'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.records_rejected }};;
+  }
+  dimension metadata {
+    label: 'Metadata'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.metadata }};;
+  }
+}
