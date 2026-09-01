@@ -111,16 +111,6 @@ Dataset demo_ecommerce_version_2 {
   // DIMENSIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // Shift order dates forward three months: Oct–Dec 2026 becomes fiscal Q1 2027.
-  // This date dimension supports fiscal-year, fiscal-quarter, and fiscal-period filters.
-  dimension fy {
-    model: ecommerce_orders
-    label: 'FY'
-    type: 'datetime'
-    description: 'Fiscal calendar date, shifted forward three months from the order date. For example, Q4 2026 maps to fiscal Q1 2027.'
-    definition: @aql ecommerce_orders.created_at + interval(3 month);;
-  }
-
   dimension cohort_month {
     model: ecommerce_users
     label: "Cohort Month"
