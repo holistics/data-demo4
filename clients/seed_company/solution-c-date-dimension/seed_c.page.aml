@@ -63,24 +63,31 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
     }
   }
   block kpi_gmv: VizBlock {
-    label: 'Total GMV (Selected Period)'
+    label: 'GMV (Selected Period)'
     viz: MetricKpi {
       dataset: seed_c
+      theme {
+        metric_kpi {
+          label {
+            font_size: 12
+          }
+          value {
+            font_size: 30
+          }
+        }
+      }
       value: VizFieldFull {
+        label: 'GMV'
         ref: r(seed_c.gmv_period)
-        label: 'Total GMV'
         format {
           type: 'number'
           pattern: '#,##0'
         }
       }
       settings {
-        alignment: 'left'
-        metric_value {
-          font_size: 30
-        }
-        label {
-          font_size: 12
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
@@ -201,22 +208,25 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
   block t_erd: TextBlock {
     content: @md <iframe src="https://dbdiagram.io/e/6a9704bfaed2f4f6be847270/6a97a81d5450bea1bec68418" width="100%" height="460" frameborder="0" allowtransparency="true" style="border:1px solid #e5e7eb;border-radius:6px;"></iframe>;;
   }
+  block t_wz3d: TextBlock {
+    content: @md ### or;;
+  }
   view: CanvasLayout {
     label: 'View 1'
     width: 1360
     height: 1380
     grid_size: 20
     block t_intro {
-      position: pos(40, 20, 560, 460)
+      position: pos(40, 20, 560, 400)
     }
     block f_fiscal_year {
-      position: pos(20, 520, 240, 80)
+      position: pos(40, 460, 300, 80)
     }
     block f_fiscal_quarter {
-      position: pos(280, 520, 240, 80)
+      position: pos(40, 520, 300, 80)
     }
     block f_period {
-      position: pos(540, 520, 160, 80)
+      position: pos(420, 500, 200, 80)
     }
     block kpi_gmv {
       position: pos(920, 540, 180, 80)
@@ -232,6 +242,9 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
     }
     block t_erd {
       position: pos(620, 20, 680, 480)
+    }
+    block t_wz3d {
+      position: pos(360, 520, 40, 40)
     }
     mobile {
       mode: 'auto'
