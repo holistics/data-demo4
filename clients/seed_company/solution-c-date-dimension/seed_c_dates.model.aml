@@ -83,6 +83,30 @@ Model seed_c_dates = dim_dates.extend({
   label: 'Seed Dates (Solution C)'
   description: 'Shared date dimension plus Seed Company fiscal year columns (FY runs Oct 1 - Sep 30, named by ending year).'
 
+  // The calendar side of the mapping, as one groupable text value:
+  // '2025-10 (Oct)'. Built from the same to_char() source columns as
+  // everything else here rather than a datetrunc on `date_key`, for the
+  // timezone reason in the header - a truncated `date_key` rolls month
+  // starts back into the previous month, which on a table whose entire
+  // job is to show which month is which would be the worst possible
+  // place for that bug.
+  //
+  // Zero-padded 'YYYY-MM' in front means alphabetical order is
+  // chronological order, so it sorts as a plain text column. No LPAD:
+  // `month_number` is to_char(date_key, 'MM'), already padded.
+  //
+  // Nothing about this is fiscal. It exists so the fiscal columns have
+  // something to be mapped against, and like the rest of the file it is
+  // inherited by every date role and every fact entity for free.
+  dimension calendar_month {
+    label: 'Calendar Month'
+    type: 'text'
+    description: "Plain calendar month, e.g. '2025-10 (Oct)'. Sorts chronologically as text. Unshifted and unaffected by the fiscal calendar - a fiscal year changes how months are grouped, not what a month is."
+    definition: @sql
+      {{ #SOURCE.year }} || '-' || {{ #SOURCE.month_number }}
+        || ' (' || {{ #SOURCE.month_name_abbr }} || ')' ;;
+  }
+
   dimension fiscal_year {
     label: 'Fiscal Year'
     type: 'number'

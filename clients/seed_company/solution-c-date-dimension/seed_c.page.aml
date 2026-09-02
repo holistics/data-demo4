@@ -206,35 +206,35 @@ calendar changes how months are *grouped*, not what a month is.;;
   }
   view: CanvasLayout {
     label: 'View 1'
-    width: 1340
-    height: 1400
+    width: 1360
+    height: 1380
     grid_size: 20
     block t_intro {
-      position: pos(40, 40, 560, 460)
+      position: pos(40, 20, 560, 460)
     }
     block f_fiscal_year {
-      position: pos(20, 540, 240, 80)
+      position: pos(20, 520, 240, 80)
     }
     block f_fiscal_quarter {
-      position: pos(280, 540, 240, 80)
+      position: pos(280, 520, 240, 80)
     }
     block f_period {
-      position: pos(540, 540, 160, 80)
+      position: pos(540, 520, 160, 80)
     }
     block kpi_gmv {
-      position: pos(920, 560, 180, 80)
+      position: pos(920, 540, 180, 80)
     }
     block v_gmv_by_fy {
-      position: pos(60, 1020, 640, 340)
+      position: pos(20, 640, 640, 340)
     }
     block v_gmv_by_fq {
-      position: pos(680, 660, 640, 340)
+      position: pos(680, 640, 640, 340)
     }
     block v_gmv_by_month {
-      position: pos(20, 1380, 1300, 360)
+      position: pos(20, 1000, 1300, 360)
     }
     block t_erd {
-      position: pos(620, 40, 680, 480)
+      position: pos(620, 20, 680, 480)
     }
     mobile {
       mode: 'auto'
