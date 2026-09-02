@@ -135,14 +135,20 @@ synthetic signup dates make it collide with `Total Orders` — see the comment o
   metric gmv_period {
     label: 'GMV'
     type: 'number'
-    description: 'GMV narrowed by the Period dropdown. Full history, the fiscal year to date, or the fiscal quarter to date. Both to-date windows resolve against CURRENT_DATE row by row, so they roll forward on their own.'
+    description: 'GMV narrowed by the Period dropdown: full history, the whole current fiscal year or quarter, or either of those to date. Every window resolves against CURRENT_DATE row by row, so they roll forward on their own.'
     definition: @aql
       case(
         when: 'Full history' in seed_c_period.window
         , then: gmv
 
+        , when: 'This fiscal year' in seed_c_period.window
+        , then: gmv | where(seed_c_dates.fiscal_year_offset == 0)
+
         , when: 'Fiscal YTD' in seed_c_period.window
         , then: gmv | where(seed_c_dates.is_fiscal_ytd == true)
+
+        , when: 'This fiscal quarter' in seed_c_period.window
+        , then: gmv | where(seed_c_dates.is_current_fiscal_quarter == true)
 
         , when: 'Fiscal QTD' in seed_c_period.window
         , then: gmv | where(seed_c_dates.is_fiscal_qtd == true)

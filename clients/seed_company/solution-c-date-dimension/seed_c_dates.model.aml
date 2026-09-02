@@ -240,6 +240,34 @@ Model seed_c_dates = dim_dates.extend({
       AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
   }
 
+  // The whole of the current fiscal quarter, not just up to today.
+  //
+  // The complement of `is_fiscal_qtd`: same quarter, no CURRENT_DATE
+  // ceiling, so it includes the rest of the quarter. On this warehouse
+  // that makes no visible difference (there is no future data), but on
+  // Seed's tenant it will - forecast and booked-ahead rows land in it.
+  //
+  // Same one-quarter-shift shortcut as `is_fiscal_qtd`: fiscal quarter
+  // boundaries and calendar quarter boundaries are the same dates here,
+  // so a plain DATE_TRUNC is already the start of the fiscal quarter.
+  // Rewrite both together if Seed ever moves to a non-quarter-boundary
+  // year end.
+  //
+  // Reads {{ #SOURCE.date_key }}, the raw warehouse DATE column, so the
+  // trunc happens in the warehouse and the tenant timezone never touches
+  // the 30 Sep / 1 Oct boundary.
+  //
+  // DATE_TRUNC('quarter', x) is valid on Postgres, Snowflake and
+  // Redshift. BigQuery spells it DATE_TRUNC(x, QUARTER).
+  dimension is_current_fiscal_quarter {
+    label: 'This Fiscal Quarter'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal quarter containing today, including dates after today. The uncapped counterpart of Fiscal QTD.'
+    definition: @sql
+      DATE_TRUNC('quarter', {{ #SOURCE.date_key }})
+        = DATE_TRUNC('quarter', CURRENT_DATE) ;;
+  }
+
   dimension fiscal_year_offset {
     label: 'Fiscal Year Offset'
     type: 'number'

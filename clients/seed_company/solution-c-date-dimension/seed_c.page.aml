@@ -16,7 +16,7 @@ year it ends in - so **FY 2026 runs 1 Oct 2025 to 30 Sep 2026**.
 
 **Try it:**
 * Filter by fiscal year or quarter,
-* Switch **Period** between full history, fiscal year-to-date and fiscal quarter-to-date.
+* Switch **Period** between full history, this fiscal year or quarter, and either of those to date.
 
 The year and quarter axes are fiscal; the month axis is a real calendar month, because a fiscal calendar changes how months are *grouped*, not what a month is.;;
   }

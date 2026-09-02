@@ -11,17 +11,24 @@
 //   - A PARAM filter carries a value into AQL. Only metrics that
 //     explicitly read it are affected.
 //
-// A single-select "Period" dropdown has to be a param, because Fiscal
-// YTD and Fiscal QTD are overlapping windows - every QTD date is also a
-// YTD date - and one field can only hold one value per row. So the
-// choice lives here and `gmv_period` in the dataset reads it.
+// A single-select "Period" dropdown has to be a param, because the
+// windows overlap - every QTD date is also a YTD date, and every YTD
+// date is also in this fiscal year - and one field can only hold one
+// value per row. So the choice lives here and `gmv_period` in the
+// dataset reads it.
+//
+// The five values pair up. "This fiscal year" / "This fiscal quarter"
+// are the whole period; "Fiscal YTD" / "Fiscal QTD" stop at today. On a
+// warehouse whose data ends today the two halves of a pair return the
+// same number - the difference only shows where rows are dated in the
+// future, which is exactly Seed's HubSpot close-date pipeline case.
 //
 // The cost of that choice: a new chart written against plain `gmv`
 // will silently ignore this dropdown. Point new charts at `gmv_period`.
 Model seed_c_period {
   type: 'query'
   label: 'Period Selector'
-  description: 'Parameter model carrying the Period dropdown (Full history / Fiscal YTD / Fiscal QTD) into AQL. Not joined to anything.'
+  description: 'Parameter model carrying the Period dropdown (Full history / This fiscal year / Fiscal YTD / This fiscal quarter / Fiscal QTD) into AQL. Not joined to anything.'
   data_source_name: 'demodb'
   query: @sql select 1 as dummy ;;
   models: [
@@ -32,7 +39,9 @@ Model seed_c_period {
     type: 'text'
     allowed_values: [
       'Full history',
+      'This fiscal year',
       'Fiscal YTD',
+      'This fiscal quarter',
       'Fiscal QTD'
     ]
   }
