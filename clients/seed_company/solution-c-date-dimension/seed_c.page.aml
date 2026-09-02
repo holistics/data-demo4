@@ -1,0 +1,307 @@
+// =====================================================================
+// Seed Company - Solution C: the fiscal calendar on the DATE DIMENSION.
+//
+// A and B both put fiscal fields on the fact table. C puts them in one
+// place - `seed_c_dates` - and lets every fact reach them through the
+// join it already has. Same Oct-Sep calendar, same labels, none of the
+// per-fact-table cost.
+//
+// Everything this page needs is in this folder: `seed_c_dates` and
+// `seed_c`. Solutions A and B have their own fact-table datasets in
+// their own folders, so the three can be clicked through side by side
+// and the cost difference is visible rather than asserted.
+//
+// Deliberately kept to four blocks: one KPI and three cuts of GMV. The
+// dataset still carries the pinned current/prior-FY metrics, the signup
+// date role and its metrics - they are just not on this page, so the
+// first thing a customer sees is the fiscal calendar working, not a
+// wall of cards.
+//
+// Same UI caveat as B: parent-child filter narrowing is a dashboard
+// setting, not AML. Enable Fiscal Quarter as a child of Fiscal Year
+// after deploying.
+// =====================================================================
+Dashboard seed_fy_solution_c {
+  title: 'Seed Company - Solution C (Fiscal Calendar on the Date Dimension)'
+  description: 'Oct-Sep fiscal year defined once on the shared date dimension. Facts carry nothing. GMV cut by fiscal year, fiscal quarter and month, in real calendar months.'
+
+  block t_intro: TextBlock {
+    content: @md
+### Solution C - define the fiscal year once, on the date dimension
+
+Every fiscal field on this page comes from **one file**, `seed_c_dates.model.aml`.
+No fact table has a fiscal column. `ecommerce_orders` was not modified at all.
+
+**What a new thing costs from here:** a new metric, nothing. A new fact entity,
+one relationship line - provided it exposes a date-typed column. A second
+timestamp field on the same fact, a three-line role model plus one relationship
+line. Compare with Solution B, where extending one orders model meant
+re-declaring **eleven** inherited fields before it would even compile, and that
+cost repeats per fact table forever.
+
+**Nothing on this page is a shifted date.** The fiscal calendar changes how months
+are *grouped* into quarters and years - it does not change what a month is. So the
+year and quarter axes are fiscal (`FY 2026`, `FY 2026-Q1 (Oct-Dec)`) while the month
+axis is a plain calendar `2025-10`. There is no such thing as a fiscal month, and
+nothing here is a date three months ahead of itself.
+    ;;
+  }
+
+  block f_fiscal_year: FilterBlock {
+    label: 'Fiscal Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_dates.fiscal_year_label)
+    }
+    // No literal default. 'FY 2026' would be correct today and wrong on
+    // 1 October - which is the exact bug this whole engagement started
+    // from.
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_fiscal_quarter: FilterBlock {
+    label: 'Fiscal Quarter'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_dates.fiscal_year_quarter)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  // One dropdown, three windows.
+  //
+  // This is a PARAM filter, not a field filter - the source is
+  // `seed_c_period.window`, a parameter model with no join. It has to be,
+  // because Fiscal YTD and Fiscal QTD overlap: every QTD date is also a
+  // YTD date, and one field cannot hold two values for the same row. So
+  // the choice comes in as a value and `gmv_period` reads it with a
+  // case().
+  //
+  // Consequence worth knowing: a param filter does NOT filter the query
+  // by itself. Only metrics that reference it respond. Every block here
+  // uses `gmv_period`; a new chart written against plain `gmv` would
+  // silently ignore this dropdown.
+  //
+  // Stacks with the Fiscal Year and Fiscal Quarter dropdowns rather than
+  // replacing them, and they can contradict each other - Fiscal Year =
+  // FY 2025 with Period = Fiscal YTD returns nothing, because YTD is
+  // pinned to the year containing today.
+  block f_period: FilterBlock {
+    label: 'Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_period.window)
+    }
+    default {
+      operator: 'is'
+      value: 'Full history'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block kpi_gmv: VizBlock {
+    label: 'Total GMV (Selected Period)'
+    viz: MetricKpi {
+      dataset: seed_c
+      value: VizFieldFull {
+        ref: r(seed_c.gmv_period)
+        label: 'Total GMV'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block v_gmv_by_fy: VizBlock {
+    label: 'GMV by Fiscal Year'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        ref: r(seed_c_dates.fiscal_year_label)
+        label: 'Fiscal Year'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv_period)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+      }
+    }
+  }
+
+  // Axis is `fiscal_year_quarter`, not `fiscal_quarter`: the truncated
+  // form, so FY 2025-Q4 and FY 2026-Q1 are separate points. Grouping by
+  // the bare quarter would collapse every Q1 in the warehouse into one
+  // bar - a seasonality view, not a time series.
+  //
+  // Q1 is Oct-Dec and the label says so rather than making anyone
+  // remember it. Sorts correctly on its own: the year sorts first, and
+  // 'Q1 (Oct-Dec)' ... 'Q4 (Jul-Sep)' is already fiscal order
+  // alphabetically within a year.
+  block v_gmv_by_fq: VizBlock {
+    label: 'GMV by Fiscal Quarter'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        ref: r(seed_c_dates.fiscal_year_quarter)
+        label: 'Fiscal Quarter'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv_period)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 1
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+      }
+    }
+  }
+  block v_gmv_by_month: VizBlock {
+    label: 'GMV by Month (calendar year-month)'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'GMV'
+            ref: r(seed_c.gmv_period)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 2
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1440
+    height: 1140
+    grid_size: 20
+    block t_intro {
+      position: pos(20, 20, 720, 300)
+    }
+    block f_fiscal_year {
+      position: pos(760, 20, 440, 80)
+    }
+    block f_fiscal_quarter {
+      position: pos(760, 100, 440, 80)
+    }
+    block f_period {
+      position: pos(760, 180, 440, 80)
+    }
+    block kpi_gmv {
+      position: pos(760, 260, 440, 120)
+    }
+    block v_gmv_by_fy {
+      position: pos(20, 400, 700, 340)
+    }
+    block v_gmv_by_fq {
+      position: pos(740, 400, 700, 340)
+    }
+    block v_gmv_by_month {
+      position: pos(20, 760, 1420, 360)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f_fiscal_quarter'
+      to: [
+        CustomMapping {
+          block: 'f_fiscal_year'
+          disabled: true
+        }
+      ]
+    }
+  ]
+}

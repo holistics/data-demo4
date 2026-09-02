@@ -1,0 +1,67 @@
+// =====================================================================
+// Solution B - fiscal Year / Quarter / Month as text labels.
+//
+// Self-contained: this dataset, the model beside it and the page beside
+// it are used by no other solution folder, and this folder uses nothing
+// from theirs. The only shared objects are the core-demo base models
+// (`ecommerce_orders`, `ecommerce_order_items`, `ecommerce_products`),
+// which every solution extends and none of them edits.
+// =====================================================================
+Dataset seed_b {
+  label: 'Seed Company - Solution B (Fiscal Labels)'
+  description: '''
+Fiscal year on the fact table, as text labels. FY runs 1 Oct - 30 Sep and is named by the calendar year it ends in, so FY2026 = 1 Oct 2025 - 30 Sep 2026.
+
+`Fiscal Year`, `Fiscal Quarter` and `Fiscal Month` on `seed_b_orders` are labels - 'FY2026', 'FY2026-Q1 (Oct-Dec)', 'Oct FY2026'. They are computed from the same +3 month shift Solution A exposes, but the shift itself is hidden: the labels read correctly everywhere and can drive plain dropdowns.
+
+The catch: they are text. No date maths, no MTD/QTD/YTD, no date drill, and sorting has to be driven by the numeric sort keys (`Fiscal Year Number`, `Fiscal Month Number`) because Holistics chart sorting addresses fields by position, not by name.
+
+`Fiscal Year Offset` is 0 for the latest fiscal year *in the current query scope* and -1 for the one before it, so relative-year metrics never need editing on 1 October. It is scope-bound, not filter-proof: `max()` is evaluated inside the filter scope, so narrowing a fiscal filter to a single year re-bases offset 0 onto that year and leaves offset -1 empty. Leave the fiscal filter open on any dashboard that pins these. Solution C fixes this properly by comparing against `CURRENT_DATE` row-by-row instead.
+
+Ecommerce order data stands in for Seed's HubSpot pipeline; `created_at` stands in for `closedate`.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    seed_b_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > seed_b_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+  ]
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross merchandise value. Stands in for Seed s Expected Amount.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  metric total_orders {
+    label: 'Orders'
+    type: 'number'
+    description: 'Order count. Stands in for Seed s deal count.'
+    definition: @aql count(seed_b_orders.id) ;;
+    format: '#,###0'
+  }
+
+  metric gmv_current_fy {
+    label: 'GMV (Latest FY in view)'
+    type: 'number'
+    description: 'GMV in the latest fiscal year in the current query scope. With no fiscal filter applied that is the current FY, and it rolls over on 1 October by itself. Not filter-proof: a fiscal filter re-bases it.'
+    definition: @aql gmv | where(seed_b_orders.fiscal_year_offset == 0) ;;
+    format: '#,###0'
+  }
+
+  metric gmv_prior_fy {
+    label: 'GMV (Prior FY in view)'
+    type: 'number'
+    description: 'GMV in the fiscal year before the latest one in scope. Returns blank when the query scope holds only one fiscal year - which is what a single-year fiscal filter does.'
+    definition: @aql gmv | where(seed_b_orders.fiscal_year_offset == -1) ;;
+    format: '#,###0'
+  }
+}

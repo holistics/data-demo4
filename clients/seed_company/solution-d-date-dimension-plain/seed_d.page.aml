@@ -1,19 +1,28 @@
 // =====================================================================
-// Seed Company — Fiscal Year Demo
+// Solution D — fiscal year on the date dimension, plain version
 //
 // Answers the Oct-Sep fiscal year question from the onboarding call:
 // "we need that to be something that we can just apply, like current
 // fiscal year, and the cards would know the timeframe".
 //
-// Fiscal year is a column on the date dimension (`seed_dim_dates`), so
+// Fiscal year is a column on the date dimension (`seed_d_dates`), so
 // everything here is ordinary Holistics: a normal field filter, fiscal
 // year on a chart axis, fiscal quarters in a table.
 //
+// This is the minimal version and the one to open first. Solution C is
+// the same architecture taken further; A and B put the fiscal calendar
+// on the fact table instead.
+//
+// Self-contained: everything this page needs is in this folder
+// (`seed_d_dates`, `seed_d`).
+//
 // What to check:
 //  1. The Fiscal Year filter is a plain dropdown of real values.
-//  2. The two right-hand KPIs ignore it — they are pinned to
-//     `Fiscal Year Offset = 0 / -1`, so they always show the live year
-//     and the one before it, with no date written down anywhere.
+//  2. The two right-hand KPIs ignore it. `Fiscal Year Offset` is a
+//     row-level comparison against `CURRENT_DATE`, so 0 is the fiscal
+//     year containing today no matter how the dashboard is filtered,
+//     and `of_all(seed_d_dates)` drops the filter off the card. No date
+//     is written down anywhere.
 //  3. Bottom-left charts fiscal year as an AXIS, which the earlier
 //     parameter-only versions could not do.
 //  4. The quarter table proves Q1 = Oct-Dec.
@@ -26,8 +35,8 @@ Dashboard seed_fiscal_year_demo {
     label: 'Fiscal Year'
     type: 'field'
     source: FieldFilterSource {
-      dataset: seed_fiscal_year
-      field: ref('seed_dim_dates', 'fiscal_year_label')
+      dataset: seed_d
+      field: ref('seed_d_dates', 'fiscal_year_label')
     }
     settings {
       input_type: 'single'
@@ -42,17 +51,20 @@ FY26 = 1 Oct 2025 to 30 Sep 2026. Fiscal year is a **column on the date
 dimension**, so it behaves like any other field: filter on it, put it on an
 axis, drill into it, and let the AI group by it.
 
-The two KPIs on the right are pinned to `Fiscal Year Offset = 0` and `-1`, so
-they always show the current and prior fiscal year. Nothing to edit on 1 October.
+The two KPIs on the right are pinned to `Fiscal Year Offset = 0` and `-1`. The
+offset is resolved against today's date row by row, not against the newest year
+in view, so they show the real current and prior fiscal year even while the
+filter is set to something else — and they roll over on 1 October with nothing
+to edit.
     ;;
   }
 
   block kpi_gmv: VizBlock {
     label: 'GMV (Selected FY)'
     viz: MetricKpi {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       value: VizFieldFull {
-        ref: r(seed_fiscal_year.gmv)
+        ref: r(seed_d.gmv)
         label: 'GMV (Selected FY)'
         format {
           type: 'number'
@@ -74,9 +86,9 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
   block kpi_orders: VizBlock {
     label: 'Orders (Selected FY)'
     viz: MetricKpi {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       value: VizFieldFull {
-        ref: r(seed_fiscal_year.total_orders)
+        ref: r(seed_d.total_orders)
         label: 'Orders (Selected FY)'
         format {
           type: 'number'
@@ -98,9 +110,9 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
   block kpi_current: VizBlock {
     label: 'GMV (Current FY, ignores filter)'
     viz: MetricKpi {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       value: VizFieldFull {
-        ref: r(seed_fiscal_year.gmv_current_fy)
+        ref: r(seed_d.gmv_current_fy)
         label: 'GMV (Current FY)'
         format {
           type: 'number'
@@ -122,9 +134,9 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
   block kpi_prior: VizBlock {
     label: 'GMV (Prior FY, ignores filter)'
     viz: MetricKpi {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       value: VizFieldFull {
-        ref: r(seed_fiscal_year.gmv_prior_fy)
+        ref: r(seed_d.gmv_prior_fy)
         label: 'GMV (Prior FY)'
         format {
           type: 'number'
@@ -146,9 +158,9 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
   block v_trend: VizBlock {
     label: 'GMV by Month'
     viz: ColumnChart {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       x_axis: VizFieldFull {
-        ref: r(seed_dim_dates.date_key)
+        ref: r(seed_d_dates.date_key)
         transformation: 'datetrunc month'
         label: 'Month'
         format {
@@ -159,7 +171,7 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
       y_axis {
         series {
           field: VizFieldFull {
-            ref: r(seed_fiscal_year.gmv)
+            ref: r(seed_d.gmv)
             label: 'GMV'
             format {
               type: 'number'
@@ -181,15 +193,15 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
   block v_by_fy: VizBlock {
     label: 'GMV by Fiscal Year'
     viz: ColumnChart {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       x_axis: VizFieldFull {
-        ref: ref('seed_dim_dates', 'fiscal_year_label')
+        ref: ref('seed_d_dates', 'fiscal_year_label')
         label: 'Fiscal Year'
       }
       y_axis {
         series {
           field: VizFieldFull {
-            ref: r(seed_fiscal_year.gmv)
+            ref: r(seed_d.gmv)
             label: 'GMV'
             format {
               type: 'number'
@@ -215,31 +227,31 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
   block v_quarters: VizBlock {
     label: 'Fiscal Quarter Check (Q1 = Oct-Dec)'
     viz: DataTable {
-      dataset: seed_fiscal_year
+      dataset: seed_d
       fields: [
         VizFieldFull {
-          ref: ref('seed_dim_dates', 'fiscal_year_label')
+          ref: ref('seed_d_dates', 'fiscal_year_label')
           label: 'Fiscal Year'
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('seed_dim_dates', 'fiscal_quarter')
+          ref: ref('seed_d_dates', 'fiscal_quarter')
           label: 'Fiscal Quarter'
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: r(seed_dim_dates.month_name_abbr)
+          ref: r(seed_d_dates.month_name_abbr)
           label: 'Month'
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: r(seed_fiscal_year.gmv)
+          ref: r(seed_d.gmv)
           label: 'GMV'
           format {
             type: 'number'
@@ -256,35 +268,35 @@ they always show the current and prior fiscal year. Nothing to edit on 1 October
 
   view: CanvasLayout {
     label: 'View 1'
-    width: 1400
+    width: 1440
     height: 1160
     grid_size: 20
     block t_intro {
-      position: pos(0, 0, 1000, 150)
+      position: pos(20, 20, 1000, 160)
     }
     block f_fy {
-      position: pos(1020, 0, 380, 150)
+      position: pos(1040, 20, 380, 160)
     }
     block kpi_gmv {
-      position: pos(0, 170, 340, 120)
+      position: pos(20, 200, 340, 120)
     }
     block kpi_orders {
-      position: pos(360, 170, 340, 120)
+      position: pos(380, 200, 340, 120)
     }
     block kpi_current {
-      position: pos(720, 170, 340, 120)
+      position: pos(740, 200, 340, 120)
     }
     block kpi_prior {
-      position: pos(1080, 170, 320, 120)
+      position: pos(1100, 200, 320, 120)
     }
     block v_trend {
-      position: pos(0, 310, 1400, 340)
+      position: pos(20, 340, 1400, 340)
     }
     block v_by_fy {
-      position: pos(0, 670, 690, 360)
+      position: pos(20, 700, 700, 360)
     }
     block v_quarters {
-      position: pos(710, 670, 690, 360)
+      position: pos(720, 700, 700, 360)
     }
     mobile {
       mode: 'auto'

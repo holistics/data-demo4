@@ -1,0 +1,39 @@
+// Period selector for Solution C.
+//
+// A parameter model: a one-row query whose only job is to carry a
+// dashboard dropdown value into AQL. Nothing joins to it.
+//
+// This exists because the two things are different in Holistics:
+//
+//   - A FIELD filter (Fiscal Year, Fiscal Quarter) filters the query
+//     automatically. Every block on the page obeys it, including blocks
+//     added later, and nothing has to reference it.
+//   - A PARAM filter carries a value into AQL. Only metrics that
+//     explicitly read it are affected.
+//
+// A single-select "Period" dropdown has to be a param, because Fiscal
+// YTD and Fiscal QTD are overlapping windows - every QTD date is also a
+// YTD date - and one field can only hold one value per row. So the
+// choice lives here and `gmv_period` in the dataset reads it.
+//
+// The cost of that choice: a new chart written against plain `gmv`
+// will silently ignore this dropdown. Point new charts at `gmv_period`.
+Model seed_c_period {
+  type: 'query'
+  label: 'Period Selector'
+  description: 'Parameter model carrying the Period dropdown (Full history / Fiscal YTD / Fiscal QTD) into AQL. Not joined to anything.'
+  data_source_name: 'demodb'
+  query: @sql select 1 as dummy ;;
+  models: [
+  ]
+
+  param window {
+    label: 'Period'
+    type: 'text'
+    allowed_values: [
+      'Full history',
+      'Fiscal YTD',
+      'Fiscal QTD'
+    ]
+  }
+}

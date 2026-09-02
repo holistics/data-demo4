@@ -1,0 +1,155 @@
+// =====================================================================
+// Solution D - fiscal year on the date dimension, plain version.
+//
+// The original walkthrough (Dong Le, Aug 2026) and the ancestor of
+// Solution C. Oct-Sep fiscal year, done the plain way: the date
+// dimension carries fiscal columns, and everything else is ordinary
+// filtering and grouping on a real field.
+//
+// This is the deliberately minimal one - one date model, one date
+// relationship, four metrics. Solution C is the same idea taken further
+// (a second date role, a sortable fiscal-period label, pinned KPIs).
+// Show D first if the room needs the concept; show C if they need to
+// see how far it goes.
+//
+// Self-contained: this dataset, the model beside it and the page beside
+// it are used by no other solution folder, and this folder uses nothing
+// from theirs. The only shared objects are the core-demo base models
+// (`dim_dates`, `ecommerce_orders`, `ecommerce_order_items`,
+// `ecommerce_products`), which every solution extends and none of them
+// edits.
+//
+// `ecommerce_orders.created_date` stands in for Seed's close date -
+// repoint the relationship below to port this to their tenant.
+//
+// ---------------------------------------------------------------------
+// What it costs to extend this to more of Seed's data
+// ---------------------------------------------------------------------
+//   a new metric            nothing. Any metric on a joined fact is
+//                           fiscal-aware the moment the join exists.
+//   a new fact entity       one relationship line here, IF the fact
+//                           already exposes a date-typed column.
+//                           Otherwise one date dimension on the fact
+//                           plus the line - and see the boundary note.
+//   a new timestamp field   one role model (three lines) plus one line
+//                           here. Solution C demos this.
+//
+// ---------------------------------------------------------------------
+// The join key is the one place a boundary bug can hide
+// ---------------------------------------------------------------------
+// `date_key` is a DATE, so the fact side has to join on a date too.
+// `created_date` is already `{{ #SOURCE.created_at }}::date`, cast in
+// the warehouse, which is correct. Seed's HubSpot `closedate` is a
+// timestamp, so porting means adding an equivalent cast - and it must be
+// a warehouse-side cast, not a Holistics date truncation, or the
+// tenant-timezone conversion will move deals across the 30 Sep / 1 Oct
+// line into the wrong fiscal year. Test those two days explicitly when
+// porting.
+//
+// ---------------------------------------------------------------------
+// Why this shape and not the earlier ones
+// ---------------------------------------------------------------------
+// Two earlier attempts pushed the fiscal logic into the metrics: a
+// case() mapping each FY to a literal range, then a year-number
+// parameter resolved into date bounds. Both worked, both were clunky,
+// and both were filter-only - you could not put fiscal year on a chart
+// axis or let the AI group by it, because there was no field to group.
+//
+// A column on the date dimension gives all of that for free, and it is
+// also what Chukwudi already told the customer on the call: "we're just
+// going to route it through the date dimension model, which means it
+// can adapt to any field it needs to adapt".
+// =====================================================================
+Dataset seed_d {
+  label: 'Seed Company - Solution D (Date Dimension, Plain)'
+  description: '''
+Oct-Sep fiscal year carried as columns on the date dimension. Nothing on the fact tables.
+
+- `Fiscal Year` - 2026 means 1 Oct 2025 to 30 Sep 2026. Filter it, group by it, drill it.
+- `Fiscal Year Label` - 'FY26' for display.
+- `Fiscal Quarter` - 'Q1 (Oct-Dec)'.
+- `Fiscal Period Number` - Oct = 1, Sep = 12. Sort key for lining two fiscal years up on one axis.
+- `Fiscal Period` - '01 Oct' ... '12 Sep'. Real calendar months, but sorts in fiscal order, so it works directly as a chart axis.
+- `Fiscal Year Offset` - 0 = the fiscal year containing today, -1 = the one before.
+
+Chart axes stay on the real calendar date, so month labels are the real months and no
+mental translation is needed. Fiscal year is a filter or a grouping, not a shifted date.
+
+`Fiscal Year Offset` resolves against CURRENT_DATE row by row and rolls over on 1 October
+with nothing to edit. Two separate things have to be true for a "current FY" card to hold
+when the dashboard is filtered to another year: the offset must not re-base (it does not),
+and the metric must opt out of the dashboard's date filter. `GMV (Current FY)` does both -
+see its definition.
+
+This is the plain version. For the second date role (a fiscal calendar on signup date as
+well as order date) and the fiscal-period axis, see Solution C.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+    seed_d_dates,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+
+    // Seed's close date equivalent. Repoint this one line to port.
+    relationship(ecommerce_orders.created_date > seed_d_dates.date_key, true),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════
+  // METRICS — no fiscal logic needed, the date dimension handles it
+  // ═══════════════════════════════════════════════════════════════════
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross value of items ordered, before discount, all statuses.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  metric total_orders {
+    label: 'Total Orders'
+    type: 'number'
+    description: 'Count of orders, all statuses.'
+    definition: @aql count(ecommerce_orders.id) ;;
+    format: '#,###0'
+  }
+
+  // The only fiscal-aware metrics needed: cards that must always show
+  // the live year regardless of what the dashboard filter is set to.
+  //
+  // Two parts, and both are load-bearing:
+  //   where(...offset == 0)   picks the fiscal year containing today.
+  //   of_all(seed_d_dates)    drops any filter the dashboard put on the
+  //                           date dimension, so the card does not get
+  //                           intersected down to nothing.
+  //
+  // ORDER MATTERS. `where(...) | of_all(...)` is correct. The reverse,
+  // `of_all(...) | where(...)`, silently returns the grand total across
+  // every fiscal year — measured under a FY2024 filter: correct form
+  // 7,365,785 (= FY2026), reversed form 11,581,542 (= all years).
+  //
+  // This makes the pinned card work in pure AML. Unmapping the filter
+  // from the block in the dashboard UI is no longer required.
+  metric gmv_current_fy {
+    label: 'GMV (Current FY)'
+    type: 'number'
+    description: 'GMV for the fiscal year containing today. Holds even when the dashboard is filtered to another fiscal year. Never needs editing.'
+    definition: @aql gmv | where(seed_d_dates.fiscal_year_offset == 0) | of_all(seed_d_dates) ;;
+    format: '#,###0'
+  }
+
+  metric gmv_prior_fy {
+    label: 'GMV (Prior FY)'
+    type: 'number'
+    description: 'GMV for the fiscal year before the one containing today. Pinned the same way as GMV (Current FY).'
+    definition: @aql gmv | where(seed_d_dates.fiscal_year_offset == -1) | of_all(seed_d_dates) ;;
+    format: '#,###0'
+  }
+}

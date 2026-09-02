@@ -1,0 +1,232 @@
+// =====================================================================
+// Solution C - date dimension with fiscal year columns (full version)
+//
+// Self-contained. This folder shares no AML object with Solutions A, B
+// or D - only the untouchable core-demo base models, which every
+// solution extends and none of them edits. Solution D has its own,
+// plainer copy of this file; the two are deliberately independent so
+// either can be demoed on its own.
+//
+// Extends the shared `dim_dates` rather than copying it, so the base
+// calendar (one row per day, 2013 to today) stays owned by
+// `01 demo ecommerce/` and is not modified here.
+//
+// Seed Company's fiscal year runs 1 Oct to 30 Sep, named by the ENDING
+// calendar year: 2026 = 1 Oct 2025 -> 30 Sep 2026.
+//
+// This is the ONLY file in this solution that knows what a fiscal
+// year is. Fact tables carry no fiscal fields, metrics carry no fiscal
+// logic. Adding a new fact entity costs one relationship line in the
+// dataset; adding a new metric costs nothing at all.
+//
+// ---------------------------------------------------------------------
+// Everything here is @sql, and that is deliberate
+// ---------------------------------------------------------------------
+// An earlier version of this file wrote these columns in AQL as
+// `case(when: cast(seed_c_dates.month_number, 'number') >= 10, ...)`.
+// That works, but it does not survive `extend()`: the inherited copy
+// still points at `seed_c_dates`, so every role model built on top of
+// this one has to re-declare all of them. Measured: extending this
+// model with an empty body produced 9 x E102 "Model, metric, or field
+// `seed_c_dates` is not defined".
+//
+// Written as @sql against `{{ #SOURCE.col }}` and bare sibling
+// references like `{{ fiscal_year }}`, there is no model name to go
+// stale, and a role model costs zero re-declared fields. That is what
+// makes the second-date-field case cheap — see `seed_c_dates_signup`.
+//
+// ---------------------------------------------------------------------
+// Built on `month_number` / `year`, NOT on date arithmetic
+// ---------------------------------------------------------------------
+// The obvious derivation counts months from an anchor Oct 1 with
+// date_diff. It is off by a whole month. `date_key` is a DATE, and
+// Holistics casts it to timestamptz then applies the tenant timezone,
+// which rolls every month-start back into the previous month, while the
+// anchor literal carries its own offset and does not shift. Verified:
+// it produced fiscal years running 1 Nov to 31 Oct.
+//
+// `month_number` and `year` are `to_char()` output from the base query,
+// evaluated in the warehouse on the raw date, so they carry no timezone
+// distortion. The same reasoning applies to the join key on the fact
+// side — see the note in `seed_c.dataset.aml`.
+//
+// SQL portability: CAST(... AS INT), CASE, `||`, LPAD and EXTRACT are valid on
+// Postgres, Snowflake and Redshift, which covers Seed either way
+// (Snowflake per Lori, Redshift per Chukwudi). On BigQuery, INT becomes
+// INT64.
+//
+// ---------------------------------------------------------------------
+// Current fiscal year, with no date written down
+// ---------------------------------------------------------------------
+// `fiscal_year_offset` compares each row's fiscal year against the
+// fiscal year containing CURRENT_DATE. It is a row-level expression, not
+// an aggregate, which is the whole point: an aggregate like
+// `fiscal_year - max(fiscal_year)` re-bases whenever a filter narrows
+// the query, so a card filtered to FY2024 would report FY2024 as
+// "current". Verified by reading the generated SQL — a filter on the
+// FACT side also reaches the dimension-side aggregate, via a semi-join
+// CTE the MAX() is then INNER JOINed against. The row-level form has no
+// such scope to be narrowed.
+//
+// That fixes the offset reporting the wrong year. It does not by itself
+// make a pinned card survive a dashboard filter — a filter still
+// intersects with the metric's own where(). `of_all()` handles that half,
+// in the metric rather than here; see `seed_c.dataset.aml`.
+//
+// CURRENT_DATE is a keyword, not an inlined value, so the SQL text is
+// stable and the query cache still hits — unlike @now, which inlines a
+// full timestamp and changes the SQL on every execution. That matters
+// for a cost-sensitive customer. The one caveat is that a result cached
+// before 1 October is stale after it; the base `dim_dates` query already
+// has this property, since its generate_series ends at current_date.
+// =====================================================================
+Model seed_c_dates = dim_dates.extend({
+  label: 'Seed Dates (Solution C)'
+  description: 'Shared date dimension plus Seed Company fiscal year columns (FY runs Oct 1 - Sep 30, named by ending year).'
+
+  dimension fiscal_year {
+    label: 'Fiscal Year'
+    type: 'number'
+    description: 'Fiscal year number, named by the ending calendar year. Oct 2025 - Sep 2026 = 2026.'
+    definition: @sql
+      CASE WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 10
+           THEN CAST({{ #SOURCE.year }} AS INT) + 1
+           ELSE CAST({{ #SOURCE.year }} AS INT)
+      END ;;
+  }
+
+  dimension fiscal_year_label {
+    label: 'Fiscal Year Label'
+    type: 'text'
+    description: "Display form of the fiscal year, e.g. 'FY 2026' = 1 Oct 2025 - 30 Sep 2026. Written out in full rather than 'FY26' so nobody has to decode it on a shared screen. Alphabetical order is still chronological order."
+    definition: @sql 'FY ' || CAST({{ fiscal_year }} AS VARCHAR) ;;
+  }
+
+  // The date_part form: which quarter of the fiscal year, with the year
+  // thrown away. 'Q1 (Oct-Dec)' means Q1 of every year at once. Right
+  // for a filter dropdown, wrong for a time-series axis - use
+  // `fiscal_year_quarter` below for that.
+  dimension fiscal_quarter {
+    label: 'Fiscal Quarter'
+    type: 'text'
+    description: "Which quarter of the fiscal year, with the year dropped - the date_part form. 'Q1 (Oct-Dec)' covers Q1 of every year. Use as a filter; use Fiscal Year & Quarter to plot a quarterly series. The calendar months are spelled out so nobody has to remember that Q1 is Oct-Dec."
+    definition: @sql
+      CASE WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 10 THEN 'Q1 (Oct-Dec)'
+           WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 7  THEN 'Q4 (Jul-Sep)'
+           WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 4  THEN 'Q3 (Apr-Jun)'
+           ELSE 'Q2 (Jan-Mar)'
+      END ;;
+  }
+
+  // The date_trunc form: one value per quarter per year, so a quarterly
+  // series has 'FY 2025-Q4' and 'FY 2026-Q1' as separate points instead
+  // of collapsing every Q1 in the warehouse into one bar.
+  //
+  // Built from the two dimensions above rather than from the source
+  // columns again, so the fiscal calendar is still defined exactly once.
+  // Zero-padding is unnecessary here: 'FY 2025-Q4 (Jul-Sep)' sorts before
+  // 'FY 2026-Q1 (Oct-Dec)' on its own, and Q1..Q4 are already in fiscal
+  // order alphabetically within a year.
+  dimension fiscal_year_quarter {
+    label: 'Fiscal Year & Quarter'
+    type: 'text'
+    description: "Fiscal quarter including its year, e.g. 'FY 2026-Q1 (Oct-Dec)' = Oct-Dec 2025 - the date_trunc form. Alphabetical order is chronological order, so it works directly as a chart axis."
+    definition: @sql {{ fiscal_year_label }} || '-' || {{ fiscal_quarter }} ;;
+  }
+
+  // Position of the month within the fiscal year: Oct = 1, Sep = 12.
+  // Only needed to line two fiscal years up on a shared axis. Pair it
+  // with the base model's `month_name_abbr` for the label, so the axis
+  // reads 'Oct, Nov, Dec, ...' in real calendar months while sorting in
+  // fiscal order. No shifted dates anywhere, so nothing to mentally
+  // translate.
+  dimension fiscal_period_number {
+    label: 'Month Position in FY'
+    type: 'number'
+    description: "Position of the calendar month within the fiscal year: Oct = 1, Sep = 12. This is a sort key for overlaying fiscal years on one shared axis, not a 'fiscal month' - months are not shifted. For a plain monthly series use Month."
+    definition: @sql
+      CASE WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 10
+           THEN CAST({{ #SOURCE.month_number }} AS INT) - 9
+           ELSE CAST({{ #SOURCE.month_number }} AS INT) + 3
+      END ;;
+  }
+
+  // The label form of the above. Zero-padded period number in front of
+  // the real calendar month abbreviation: '01 Oct', '02 Nov', ... '12 Sep'.
+  //
+  // This exists because Holistics chart sorting addresses fields by
+  // their POSITION IN THE VIZ (`sort { field_index: N }`) — there is no
+  // "sort this text axis by that other numeric field". So an axis
+  // labelled with bare month names sorts alphabetically: Apr, Aug, Dec.
+  // Putting the sort key inside the label string is the only way to get
+  // a chart axis that reads in real calendar months AND runs in fiscal
+  // order, without also having to show a numeric column next to it.
+  //
+  // Costs one dimension in one file, and every fact entity and every
+  // date role inherits it — including `seed_c_dates_signup`, which
+  // re-declares nothing.
+  dimension fiscal_period_label {
+    label: 'Month Position in FY (label)'
+    type: 'text'
+    description: "Real calendar months labelled '01 Oct' ... '12 Sep' so they sort in fiscal order. Only for overlaying several fiscal years on one shared Oct-Sep axis; the leading number is a sort key, not a fiscal month number. For a plain monthly series use Month."
+    definition: @sql
+      LPAD(CAST({{ fiscal_period_number }} AS VARCHAR), 2, '0')
+        || ' ' || {{ #SOURCE.month_name_abbr }} ;;
+  }
+
+  // Fiscal year to date.
+  //
+  // Row-level against CURRENT_DATE, like `fiscal_year_offset` - so it
+  // means "the fiscal year containing today, up to today", regardless of
+  // what the dashboard filters are set to or what the newest data in the
+  // warehouse happens to be. Rolls forward every day and rolls over on
+  // 1 October with nothing to edit.
+  //
+  // Reads {{ #SOURCE.date_key }} directly, which is the raw warehouse
+  // column, so no timezone cast is involved.
+  dimension is_fiscal_ytd {
+    label: 'Fiscal YTD'
+    type: 'truefalse'
+    description: 'True for dates in the fiscal year containing today, up to and including today. Resolves against CURRENT_DATE, so it rolls forward on its own.'
+    definition: @sql
+      {{ fiscal_year_offset }} = 0
+      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+  }
+
+  // Fiscal quarter to date.
+  //
+  // Seed's fiscal year is shifted by exactly one quarter, so the fiscal
+  // quarter boundaries and the calendar quarter boundaries are the same
+  // dates - FY Q1 (Oct-Dec) IS calendar Q4, FY Q2 (Jan-Mar) IS calendar
+  // Q1, and so on. Only the names differ. That means QTD needs no fiscal
+  // arithmetic at all: a plain DATE_TRUNC on the quarter is already the
+  // start of the current fiscal quarter.
+  //
+  // This would NOT hold for a fiscal year shifted by a non-multiple of
+  // three months (a 1 Feb start, say). If Seed ever moves their year end,
+  // this dimension is the one that has to be rewritten.
+  //
+  // DATE_TRUNC('quarter', ...) is valid on Postgres, Snowflake and
+  // Redshift. BigQuery spells it DATE_TRUNC(CURRENT_DATE(), QUARTER).
+  dimension is_fiscal_qtd {
+    label: 'Fiscal QTD'
+    type: 'truefalse'
+    description: 'True for dates in the fiscal quarter containing today, up to and including today. Fiscal quarters coincide with calendar quarters here, because the fiscal year is shifted by exactly one quarter.'
+    definition: @sql
+      {{ #SOURCE.date_key }} >= DATE_TRUNC('quarter', CURRENT_DATE)
+      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+  }
+
+  dimension fiscal_year_offset {
+    label: 'Fiscal Year Offset'
+    type: 'number'
+    description: '0 = the fiscal year containing today, -1 = the one before it. Resolves against CURRENT_DATE and is not affected by dashboard filters.'
+    definition: @sql
+      {{ fiscal_year }} - (
+        CASE WHEN CAST(EXTRACT(MONTH FROM CURRENT_DATE) AS INT) >= 10
+             THEN CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INT) + 1
+             ELSE CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INT)
+        END
+      ) ;;
+  }
+})
