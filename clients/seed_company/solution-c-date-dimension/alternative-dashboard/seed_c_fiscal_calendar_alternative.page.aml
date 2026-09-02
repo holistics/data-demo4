@@ -4,157 +4,55 @@ Dashboard seed_c_fiscal_calendar_alternative {
   description: @md
 An isolated PoC showing safe Oct–Sep fiscal windows and native fiscal rollups without a shifted-date calendar control.
   ;;
-  theme: H.themes.classic
+  theme: seed_company
 
   block t_windows_intro: TextBlock {
     content: @md
-# Fiscal windows
+# Fiscal windows that read like the business
 
-Seed's fiscal year runs **1 October–30 September** and is named by the year in which it ends. **FY 2026 is 1 Oct 2025–30 Sep 2026.** These controls resolve automatically and never ask users to translate a shifted date.
+Seed's fiscal year runs **1 October–30 September** and is named by the year in which it ends. Pick a familiar business period below—the date dimension resolves every start date from today and keeps today as the end date.
     ;;
   }
 
-  block t_choose_period: TextBlock {
-    content: @md
-### Choose a period
-
-Pick **Previous** or **Current** in one group. There is intentionally no preselected value; click a selected button again to clear it before switching period types.
-    ;;
-  }
-
-  block v_select_fiscal_year: VizBlock {
-    label: 'Fiscal year'
+  block v_window_selector: VizBlock {
+    label: 'Choose a date-relative window'
     viz: MarkdownViz {
-      dataset: seed_c
+      dataset: seed_c_fiscal_windows
       rows: [
-        VizFieldFull {
-          ref: r(seed_c_dates.fiscal_year_offset)
-          label: 'Fiscal Year Offset'
-          hidden: true
-          format { type: 'number' pattern: '#,###0.00' }
-        },
-        VizFieldFull {
-          ref: r(seed_c_dates.fiscal_year_label)
-          label: 'Fiscal Year Label'
-          format { type: 'text' }
-        }
-      ]
-      conditions: [
-        'seed_c_dates.fiscal_year_offset > -2',
-        'seed_c_dates.fiscal_year_offset < 1',
+        VizFieldFull { ref: r(seed_c_dates_alternative.in_previous_fy_to_today) label: 'Previous FY Start to Today' },
+        VizFieldFull { ref: r(seed_c_dates_alternative.in_current_fy_to_today) label: 'Current FY to Today' },
+        VizFieldFull { ref: r(seed_c_dates_alternative.in_previous_fq_to_today) label: 'Previous FQ Start to Today' },
+        VizFieldFull { ref: r(seed_c_dates_alternative.in_current_fq_to_today) label: 'Current FQ to Today' },
+        VizFieldFull { ref: r(seed_c_dates_alternative.in_previous_month_to_today) label: 'Previous Month Start to Today' },
+        VizFieldFull { ref: r(seed_c_dates_alternative.in_current_month_to_today) label: 'Current Month Start to Today' },
+        VizFieldFull { ref: r(seed_c_dates_alternative.previous_fy_start) label: 'Previous FY Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_c_dates_alternative.current_fy_start) label: 'Current FY Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_c_dates_alternative.previous_fq_start) label: 'Previous FQ Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_c_dates_alternative.current_fq_start) label: 'Current FQ Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_c_dates_alternative.previous_month_start) label: 'Previous Month Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_c_dates_alternative.current_month_start) label: 'Current Month Start' format { type: 'date' pattern: 'LLL dd, yyyy' } }
       ]
       content: @md
 <style>
-  .period-control { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; width:100%; }
-  .period-control h-drill { display:block; min-width:0; }
-  .period-button { display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; width:100%; min-height:84px; padding:16px 18px; border:1px solid #D7DEE8; border-radius:12px; background:#FFFFFF; color:#172033; cursor:pointer; transition:border-color 160ms ease,background-color 160ms ease,box-shadow 160ms ease,transform 160ms ease; }
-  .period-button:hover { border-color:#4779C7; background:#F6F9FE; box-shadow:0 5px 16px rgba(30,64,105,.12); transform:translateY(-1px); }
-  .h-drill-selected.period-button { border-color:#245EAD; background:#EAF2FD; color:#173E73; box-shadow:inset 0 0 0 1px #245EAD; }
-  .eyebrow { min-height:16px; margin-bottom:5px; color:#68758A; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
-  .period-control h-drill:first-of-type .eyebrow::after { content:'Previous'; }
-  .period-control h-drill:last-of-type .eyebrow::after { content:'Current'; }
-  .period-button strong { font-size:17px; line-height:1.3; }
+  .fiscal-presets { display:flex; flex-wrap:nowrap; gap:12px; width:100%; overflow:hidden; }
+  .fiscal-preset { display:flex; flex:1 1 0; min-width:0; min-height:92px; box-sizing:border-box; flex-direction:column; justify-content:center; padding:14px 16px; border:2px solid #CDC3B0; border-radius:12px; background:#FFFFFF; color:#323232; text-decoration:none; cursor:pointer; transition:all 160ms ease; }
+  .fiscal-preset:hover { border-color:#E35C2A; background:#FBF8F2; transform:translateY(-2px); box-shadow:0 6px 16px rgba(65,69,43,.12); }
+  .fiscal-preset.h-drill-selected, .h-drill-selected.fiscal-preset, .fiscal-preset:has(.h-drill-selected) { border-color:#41452B; background:#41452B; color:#FFFFFF; transform:translateY(-1px); box-shadow:0 6px 18px rgba(65,69,43,.20); }
+  .fiscal-preset-title { font-size:14px; font-weight:700; line-height:1.25; white-space:nowrap; }
+  .fiscal-preset-date { margin-top:7px; font-family:'Red Hat Mono',ui-monospace,monospace; font-size:10px; line-height:1.35; white-space:normal; color:#636466; }
+  .fiscal-preset.h-drill-selected .fiscal-preset-date, .h-drill-selected.fiscal-preset .fiscal-preset-date, .fiscal-preset:has(.h-drill-selected) .fiscal-preset-date { color:#F7F1E7; }
+  .fiscal-preset:has(.h-drill-selected) .fiscal-preset-title { color:#FFFFFF; }
 </style>
-<div class="period-control">
-{% map(rows) %}
-  <h-drill row="1" value="{{ `Fiscal Year Label`.raw }}"><div class="period-button"><span class="eyebrow"></span><strong>{{ `Fiscal Year Label`.formatted }}</strong></div></h-drill>
-{% end %}
+<div class="fiscal-presets">
+  <h-drill row="0" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last FY</div><div class="fiscal-preset-date">{{ rows[0].`Previous FY Start` }} to today</div></h-drill>
+  <h-drill row="1" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This FY</div><div class="fiscal-preset-date">{{ rows[0].`Current FY Start` }} to today</div></h-drill>
+  <h-drill row="2" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last FQ</div><div class="fiscal-preset-date">{{ rows[0].`Previous FQ Start` }} to today</div></h-drill>
+  <h-drill row="3" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This FQ</div><div class="fiscal-preset-date">{{ rows[0].`Current FQ Start` }} to today</div></h-drill>
+  <h-drill row="4" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last month</div><div class="fiscal-preset-date">{{ rows[0].`Previous Month Start` }} to today</div></h-drill>
+  <h-drill row="5" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This month</div><div class="fiscal-preset-date">{{ rows[0].`Current Month Start` }} to today</div></h-drill>
 </div>
       ;;
-      settings {
-        sorts: [
-          KeyBasedSortSetting { key: 'seed_c_dates.fiscal_year_offset' direction: 'asc' }
-        ]
-      }
-    }
-    settings { hide_controls: true }
-  }
-
-  block v_select_fiscal_quarter: VizBlock {
-    label: 'Fiscal quarter'
-    viz: MarkdownViz {
-      dataset: seed_c
-      rows: [
-        VizFieldFull {
-          ref: r(seed_c_dates.fiscal_year_quarter)
-          label: 'Fiscal Year & Quarter'
-          format { type: 'text' }
-        }
-      ]
-      conditions: [
-        'seed_c_dates.date_key matches @(last 1 quarter) or seed_c_dates.date_key matches @(this quarter)'
-      ]
-      content: @md
-<style>
-  .period-control { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; width:100%; }
-  .period-control h-drill { display:block; min-width:0; }
-  .period-button { display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; width:100%; min-height:84px; padding:16px 18px; border:1px solid #D7DEE8; border-radius:12px; background:#FFFFFF; color:#172033; cursor:pointer; transition:border-color 160ms ease,background-color 160ms ease,box-shadow 160ms ease,transform 160ms ease; }
-  .period-button:hover { border-color:#4779C7; background:#F6F9FE; box-shadow:0 5px 16px rgba(30,64,105,.12); transform:translateY(-1px); }
-  .h-drill-selected.period-button { border-color:#245EAD; background:#EAF2FD; color:#173E73; box-shadow:inset 0 0 0 1px #245EAD; }
-  .eyebrow { min-height:16px; margin-bottom:5px; color:#68758A; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
-  .period-control h-drill:first-of-type .eyebrow::after { content:'Previous'; }
-  .period-control h-drill:last-of-type .eyebrow::after { content:'Current'; }
-  .period-button strong { font-size:14px; line-height:1.3; }
-</style>
-<div class="period-control">
-{% map(rows) %}
-  <h-drill row="0" value="{{ `Fiscal Year & Quarter`.raw }}"><div class="period-button"><span class="eyebrow"></span><strong>{{ `Fiscal Year & Quarter`.formatted }}</strong></div></h-drill>
-{% end %}
-</div>
-      ;;
-      settings {
-        sorts: [
-          KeyBasedSortSetting { key: 'seed_c_dates.fiscal_year_quarter' direction: 'asc' }
-        ]
-      }
-    }
-    settings { hide_controls: true }
-  }
-
-  block v_select_month: VizBlock {
-    label: 'Month'
-    viz: MarkdownViz {
-      dataset: seed_c
-      rows: [
-        VizFieldFull {
-          ref: r(seed_c_dates.calendar_month)
-          label: 'Calendar Month'
-          format { type: 'text' }
-        },
-        VizFieldFull {
-          ref: r(seed_c_dates.date_key)
-          label: 'Month'
-          transformation: 'datetrunc month'
-          format { type: 'date' pattern: 'LLL yyyy' }
-        }
-      ]
-      conditions: [
-        'seed_c_dates.date_key matches @(last 1 month) or seed_c_dates.date_key matches @(this month)'
-      ]
-      content: @md
-<style>
-  .period-control { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; width:100%; }
-  .period-control h-drill { display:block; min-width:0; }
-  .period-button { display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; width:100%; min-height:84px; padding:16px 18px; border:1px solid #D7DEE8; border-radius:12px; background:#FFFFFF; color:#172033; cursor:pointer; transition:border-color 160ms ease,background-color 160ms ease,box-shadow 160ms ease,transform 160ms ease; }
-  .period-button:hover { border-color:#4779C7; background:#F6F9FE; box-shadow:0 5px 16px rgba(30,64,105,.12); transform:translateY(-1px); }
-  .h-drill-selected.period-button { border-color:#245EAD; background:#EAF2FD; color:#173E73; box-shadow:inset 0 0 0 1px #245EAD; }
-  .eyebrow { min-height:16px; margin-bottom:5px; color:#68758A; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
-  .period-control h-drill:first-of-type .eyebrow::after { content:'Previous'; }
-  .period-control h-drill:last-of-type .eyebrow::after { content:'Current'; }
-  .period-button strong { font-size:15px; line-height:1.3; }
-</style>
-<div class="period-control">
-{% map(rows) %}
-  <h-drill row="0" value="{{ `Calendar Month`.raw }}"><div class="period-button"><span class="eyebrow"></span><strong>{{ `Month`.formatted }}</strong></div></h-drill>
-{% end %}
-</div>
-      ;;
-      settings {
-        row_limit: 2
-        sorts: [
-          KeyBasedSortSetting { key: 'seed_c_dates.calendar_month' direction: 'asc' }
-        ]
-      }
+      settings { row_limit: 1 }
     }
     settings { hide_controls: true }
   }
@@ -163,36 +61,37 @@ Pick **Previous** or **Current** in one group. There is intentionally no presele
     label: 'Selected-period GMV'
     settings { hide_label: true }
     viz: MetricKpi {
-      dataset: seed_c
+      dataset: seed_c_fiscal_windows
       value: VizFieldFull {
-        ref: r(seed_c.gmv)
-        label: 'Selected-period GMV'
+        ref: r(seed_c_fiscal_windows.gmv)
+        label: 'GMV'
         format { type: 'number' pattern: '[$$]#,###0' }
       }
+      settings { display_mode: 'single' alignment: 'center' }
     }
   }
 
   block v_window_monthly: VizBlock {
-    label: 'Monthly GMV for selected period'
+    label: 'Daily GMV through today'
     viz: CombinationChart {
-      dataset: seed_c
+      dataset: seed_c_fiscal_windows
       x_axis: VizFieldFull {
-        ref: r(seed_c_dates.calendar_month)
-        label: 'Calendar Month'
-        format { type: 'text' }
+        ref: r(seed_c_dates_alternative.date_key)
+        label: 'Date'
+        format { type: 'date' pattern: 'LLL dd, yyyy' }
       }
       y_axis {
+        label: 'GMV'
         series {
           mark_type: 'line'
           field: VizFieldFull {
-            ref: r(seed_c.gmv)
+            ref: r(seed_c_fiscal_windows.gmv)
             label: 'GMV'
-            format { type: 'number' pattern: '#,###0' }
+            format { type: 'number' pattern: '[$$]#,###0' }
           }
         }
       }
       settings {
-        x_axis_label: 'Month'
         show_data_points: true
         sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
       }
@@ -209,82 +108,48 @@ Pick **Previous** or **Current** in one group. There is intentionally no presele
     content: @md
 # Fiscal rollups
 
-**One date dimension, three native fiscal views.** Each chart uses a fixed, semantically correct grain so labels and boundaries stay trustworthy.
+**One fiscal definition, three trustworthy reporting grains.** Use the dropdown to switch the same GMV trend between real calendar months, Seed fiscal quarters, and Seed fiscal years.
     ;;
   }
 
-  block v_rollup_month: VizBlock {
-    label: 'GMV by Month'
+  block f_rollup_grain: FilterBlock {
+    label: 'Reporting grain'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c_fiscal_rollups
+      field: r(seed_c_fiscal_rollup_series.grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block v_rollup_trend: VizBlock {
+    label: 'GMV by selected reporting grain'
     viz: CombinationChart {
-      dataset: seed_c
+      dataset: seed_c_fiscal_rollups
       x_axis: VizFieldFull {
-        ref: r(seed_c_dates.calendar_month)
-        label: 'Calendar Month'
+        ref: r(seed_c_fiscal_rollup_series.period_label)
+        label: 'Period'
         format { type: 'text' }
       }
       y_axis {
+        label: 'GMV'
         series {
           mark_type: 'line'
           field: VizFieldFull {
-            ref: r(seed_c.gmv)
+            ref: r(seed_c_fiscal_rollup_series.gmv)
             label: 'GMV'
-            format { type: 'number' pattern: '#,###0' }
+            format { type: 'number' pattern: '[$$]#,###0' }
           }
         }
       }
       settings {
-        x_axis_label: 'Month'
-        show_data_points: true
-        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
-      }
-    }
-  }
-
-  block v_rollup_quarter: VizBlock {
-    label: 'GMV by Fiscal Quarter'
-    viz: CombinationChart {
-      dataset: seed_c
-      x_axis: VizFieldFull {
-        ref: r(seed_c_dates.fiscal_year_quarter)
-        label: 'Fiscal Year & Quarter'
-      }
-      y_axis {
-        series {
-          mark_type: 'line'
-          field: VizFieldFull {
-            ref: r(seed_c.gmv)
-            label: 'GMV'
-            format { type: 'number' pattern: '#,###0' }
-          }
-        }
-      }
-      settings {
-        show_data_points: true
-        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
-      }
-    }
-  }
-
-  block v_rollup_year: VizBlock {
-    label: 'GMV by Fiscal Year'
-    viz: CombinationChart {
-      dataset: seed_c
-      x_axis: VizFieldFull {
-        ref: r(seed_c_dates.fiscal_year_label)
-        label: 'Fiscal Year Label'
-      }
-      y_axis {
-        series {
-          mark_type: 'line'
-          field: VizFieldFull {
-            ref: r(seed_c.gmv)
-            label: 'GMV'
-            format { type: 'number' pattern: '#,###0' }
-          }
-        }
-      }
-      settings {
-        x_axis_label: 'Fiscal Year'
+        x_axis_label: 'Period'
         show_data_points: true
         sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
       }
@@ -293,54 +158,34 @@ Pick **Previous** or **Current** in one group. There is intentionally no presele
 
   interactions: [
     FilterInteraction {
-      from: 'v_select_fiscal_year'
+      from: 'v_window_selector'
       to: [
-        CustomMapping { block: ['k_selected_gmv', 'v_window_monthly'] field: r(seed_c_dates.fiscal_year_label) },
-        CustomMapping { block: ['v_select_fiscal_quarter', 'v_select_month', 'v_rollup_month', 'v_rollup_quarter', 'v_rollup_year'] disabled: true }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_select_fiscal_quarter'
-      to: [
-        CustomMapping { block: ['k_selected_gmv', 'v_window_monthly'] field: r(seed_c_dates.fiscal_year_quarter) },
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_month', 'v_rollup_month', 'v_rollup_quarter', 'v_rollup_year'] disabled: true }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_select_month'
-      to: [
-        CustomMapping { block: ['k_selected_gmv', 'v_window_monthly'] field: r(seed_c_dates.calendar_month) },
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_fiscal_quarter', 'v_rollup_month', 'v_rollup_quarter', 'v_rollup_year'] disabled: true }
+        CustomMapping { block: ['f_rollup_grain', 'v_rollup_trend'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'k_selected_gmv'
       to: [
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_fiscal_quarter', 'v_select_month', 'v_rollup_month', 'v_rollup_quarter', 'v_rollup_year'] disabled: true }
+        CustomMapping { block: ['v_window_selector', 'f_rollup_grain', 'v_rollup_trend'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'v_window_monthly'
       to: [
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_fiscal_quarter', 'v_select_month', 'v_rollup_month', 'v_rollup_quarter', 'v_rollup_year'] disabled: true }
+        CustomMapping { block: ['v_window_selector', 'f_rollup_grain', 'v_rollup_trend'] disabled: true }
       ]
     },
     FilterInteraction {
-      from: 'v_rollup_month'
+      from: 'f_rollup_grain'
       to: [
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_fiscal_quarter', 'v_select_month', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
+        CustomMapping { block: 'v_rollup_trend' field: r(seed_c_fiscal_rollup_series.grain) },
+        CustomMapping { block: ['v_window_selector', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
       ]
     },
     FilterInteraction {
-      from: 'v_rollup_quarter'
+      from: 'v_rollup_trend'
       to: [
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_fiscal_quarter', 'v_select_month', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_rollup_year'
-      to: [
-        CustomMapping { block: ['v_select_fiscal_year', 'v_select_fiscal_quarter', 'v_select_month', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
+        CustomMapping { block: ['f_rollup_grain', 'v_window_selector', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
       ]
     }
   ]
@@ -348,31 +193,27 @@ Pick **Previous** or **Current** in one group. There is intentionally no presele
   view: TabLayout {
     tab fiscal_windows: CanvasLayout {
       label: 'Fiscal Windows'
-      width: 1220
-      height: 1040
+      width: 1060
+      height: 940
       grid_size: 20
       auto_expand_vertically: true
-      block t_windows_intro { position: pos(20, 20, 1180, 120) layer: 1 }
-      block t_choose_period { position: pos(20, 160, 1180, 100) layer: 1 }
-      block v_select_fiscal_year { position: pos(20, 280, 380, 180) layer: 1 }
-      block v_select_fiscal_quarter { position: pos(420, 280, 380, 180) layer: 1 }
-      block v_select_month { position: pos(820, 280, 380, 180) layer: 1 }
-      block k_selected_gmv { position: pos(20, 480, 280, 140) layer: 1 }
-      block v_window_monthly { position: pos(320, 480, 880, 400) layer: 1 }
-      block t_month_note { position: pos(20, 900, 1180, 100) layer: 1 }
+      block t_windows_intro { position: pos(20, 20, 1020, 140) layer: 1 }
+      block v_window_selector { position: pos(20, 180, 1020, 160) layer: 1 }
+      block k_selected_gmv { position: pos(20, 360, 320, 160) layer: 1 }
+      block v_window_monthly { position: pos(360, 360, 680, 440) layer: 1 }
+      block t_month_note { position: pos(20, 820, 1020, 100) layer: 1 }
       mobile { mode: 'auto' }
     }
 
     tab fiscal_rollups: CanvasLayout {
       label: 'Fiscal Rollups'
-      width: 1220
-      height: 980
+      width: 1060
+      height: 860
       grid_size: 20
       auto_expand_vertically: true
-      block t_rollups_intro { position: pos(20, 20, 1180, 120) layer: 1 }
-      block v_rollup_month { position: pos(20, 160, 1180, 400) layer: 1 }
-      block v_rollup_quarter { position: pos(20, 580, 580, 360) layer: 1 }
-      block v_rollup_year { position: pos(620, 580, 580, 360) layer: 1 }
+      block t_rollups_intro { position: pos(20, 20, 1020, 120) layer: 1 }
+      block f_rollup_grain { position: pos(20, 160, 360, 100) layer: 1 }
+      block v_rollup_trend { position: pos(20, 280, 1020, 540) layer: 1 }
       mobile { mode: 'auto' }
     }
   }

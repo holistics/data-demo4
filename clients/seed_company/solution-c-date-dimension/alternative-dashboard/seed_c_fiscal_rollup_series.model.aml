@@ -1,0 +1,98 @@
+// Isolated semantic series for the alternative dashboard's dropdown-driven rollup.
+//
+// Each fact is materialized at three safe reporting grains. The dashboard filters
+// `grain`, so changing the dropdown swaps the series without asking a calendar date
+// drill to reinterpret Seed's Oct-Sep fiscal boundaries.
+Model seed_c_fiscal_rollup_series {
+  type: 'query'
+  label: 'Seed Fiscal Rollup Series (Alternative)'
+  description: 'GMV pre-aggregated at calendar month, Seed fiscal quarter, and Seed fiscal year for the alternative dashboard grain dropdown.'
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+  ]
+
+  query: @sql
+    WITH order_items AS (
+      SELECT
+        CAST({{ #o.created_at }} AS DATE) AS order_date,
+        {{ #oi.quantity }} * {{ #p.price }} AS gmv
+      FROM {{ #ecommerce_order_items AS oi }}
+      LEFT JOIN {{ #ecommerce_orders AS o }}
+        ON {{ #oi.order_id }} = {{ #o.id }}
+      LEFT JOIN {{ #ecommerce_products AS p }}
+        ON {{ #oi.product_id }} = {{ #p.id }}
+    )
+
+    SELECT
+      'Month' AS grain,
+      1 AS grain_order,
+      TO_CHAR(order_date, 'YYYY-MM') || ' (' || TO_CHAR(order_date, 'Mon') || ')' AS period_label,
+      SUM(gmv) AS gmv
+    FROM order_items
+    GROUP BY 1, 2, 3
+
+    UNION ALL
+
+    SELECT
+      'Fiscal quarter' AS grain,
+      2 AS grain_order,
+      'FY ' || CAST(EXTRACT(YEAR FROM order_date + INTERVAL '3 months') AS INT)
+        || '-Q' || CAST(EXTRACT(QUARTER FROM order_date + INTERVAL '3 months') AS INT)
+        || CASE CAST(EXTRACT(QUARTER FROM order_date + INTERVAL '3 months') AS INT)
+             WHEN 1 THEN ' (Oct-Dec)'
+             WHEN 2 THEN ' (Jan-Mar)'
+             WHEN 3 THEN ' (Apr-Jun)'
+             ELSE ' (Jul-Sep)'
+           END AS period_label,
+      SUM(gmv) AS gmv
+    FROM order_items
+    GROUP BY 1, 2, 3
+
+    UNION ALL
+
+    SELECT
+      'Fiscal year' AS grain,
+      3 AS grain_order,
+      'FY ' || CAST(EXTRACT(YEAR FROM order_date + INTERVAL '3 months') AS INT) AS period_label,
+      SUM(gmv) AS gmv
+    FROM order_items
+    GROUP BY 1, 2, 3
+  ;;
+
+  dimension grain {
+    label: 'Reporting Grain'
+    type: 'text'
+    definition: @sql {{ #SOURCE.grain }} ;;
+  }
+
+  dimension grain_order {
+    label: 'Reporting Grain Order'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.grain_order }} ;;
+  }
+
+  dimension period_label {
+    label: 'Period'
+    type: 'text'
+    description: 'Chronologically sortable display label at the selected calendar-month or Seed fiscal grain.'
+    definition: @sql {{ #SOURCE.period_label }} ;;
+  }
+
+  dimension gmv_value {
+    label: 'GMV Value'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.gmv }} ;;
+  }
+
+  measure gmv {
+    label: 'GMV'
+    type: 'number'
+    definition: @sql SUM({{ #SOURCE.gmv }}) ;;
+  }
+}

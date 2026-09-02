@@ -1,0 +1,11 @@
+Dataset seed_c_fiscal_rollups {
+  label: 'Seed Company Fiscal Rollups (Alternative)'
+  description: 'Isolated dataset for the alternative dashboard reporting-grain dropdown. Uses synthetic ecommerce GMV as stand-in data.'
+  data_source_name: 'demodb'
+
+  models: [
+    seed_c_fiscal_rollup_series,
+  ]
+
+  relationships: []
+}

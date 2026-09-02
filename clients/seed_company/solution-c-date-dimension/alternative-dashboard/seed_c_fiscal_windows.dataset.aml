@@ -1,0 +1,17 @@
+Dataset seed_c_fiscal_windows {
+  label: 'Seed Company Fiscal Windows (Alternative)'
+  description: 'Isolated dataset for six button-driven, date-relative Seed fiscal/calendar windows. Uses synthetic ecommerce GMV.'
+  data_source_name: 'demodb'
+
+  models: [seed_c_dates_alternative]
+
+  relationships: []
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Synthetic gross merchandise value used as stand-in data for the fiscal-window PoC.'
+    definition: @aql seed_c_dates_alternative | sum(seed_c_dates_alternative.gmv_value) ;;
+    format: '#,###0'
+  }
+}
