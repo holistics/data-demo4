@@ -3,25 +3,22 @@ Dashboard seed_fy_solution_c {
   title: 'Fiscal Year Reporting on a Non-Calendar Year (Oct-Sep)'
   description: 'An Oct-Sep fiscal calendar defined once on the shared date dimension - no shifted dates, and no fiscal columns on any fact table. GMV by fiscal year, fiscal quarter and calendar month, with fiscal YTD and QTD.'
   block t_intro: TextBlock {
-    content: @md ### When the financial year isn't the calendar year
+    content: @md ### Reporting wit fiscal year
 
 This business closes its books on **30 September**, and names each year for the
 year it ends in - so **FY 2026 runs 1 Oct 2025 to 30 Sep 2026**.
 
-Reporting on that usually forces one of two compromises: shift every date forward
-three months, and live with charts whose months aren't the real months - or
-hard-code the year boundaries into each metric and re-edit them every October.
+**Solution overview:**
+* A dedicated date dimension table is created with `fiscal_*` fields populated (shifted by 3 months)
+* Fiscal reporting is done off these fiscal fields
+* No fact table/metrics are modified
+* Filters are created specifically for fiscal filtering
 
-**Neither happens here.** The fiscal calendar is defined once, as columns on the
-shared date dimension. No fact table was modified. Anything with a date joins to
-it and inherits the whole calendar: filter on it, group by it, put it on a chart
-axis, ask the AI about it. Supporting a second date - order date *and* close date
-- is three more lines.
+**Try it:**
+* Filter by fiscal year or quarter,
+* Switch **Period** between full history, fiscal year-to-date and fiscal quarter-to-date.
 
-**Try it:** filter by fiscal year or quarter, and switch **Period** between full
-history, fiscal year-to-date and fiscal quarter-to-date. The year and quarter
-axes are fiscal; the month axis is a real calendar month, because a fiscal
-calendar changes how months are *grouped*, not what a month is.;;
+The year and quarter axes are fiscal; the month axis is a real calendar month, because a fiscal calendar changes how months are *grouped*, not what a month is.;;
   }
   block f_fiscal_year: FilterBlock {
     label: 'Fiscal Year'
