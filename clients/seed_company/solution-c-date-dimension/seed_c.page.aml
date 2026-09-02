@@ -1,50 +1,47 @@
 // =====================================================================
-// Seed Company - Solution C: the fiscal calendar on the DATE DIMENSION.
+// Fiscal year on the DATE DIMENSION - the reusable, prospect-facing
+// version of this demo.
 //
-// A and B both put fiscal fields on the fact table. C puts them in one
-// place - `seed_c_dates` - and lets every fact reach them through the
-// join it already has. Same Oct-Sep calendar, same labels, none of the
-// per-fact-table cost.
+// Deliberately generic. No customer name, no A/B/C framing, no file
+// names in the on-screen copy: this page is meant to be shown to any
+// prospect with a non-calendar financial year. The internal comparison
+// against the fact-table approaches lives in the sibling solution-a and
+// solution-b folders and in AGENTS.md, not here.
 //
-// Everything this page needs is in this folder: `seed_c_dates` and
-// `seed_c`. Solutions A and B have their own fact-table datasets in
-// their own folders, so the three can be clicked through side by side
-// and the cost difference is visible rather than asserted.
+// Keep it that way. If you add a block, ask whether someone who has
+// never heard of this account would understand it.
 //
-// Deliberately kept to four blocks: one KPI and three cuts of GMV. The
-// dataset still carries the pinned current/prior-FY metrics, the signup
-// date role and its metrics - they are just not on this page, so the
-// first thing a customer sees is the fiscal calendar working, not a
-// wall of cards.
+// Four content blocks on purpose: one KPI and three cuts of GMV, plus
+// the model diagram. The dataset also carries the pinned current/prior
+// FY metrics and the signup date role - kept off the page so the first
+// thing a prospect sees is the calendar working, not a wall of cards.
 //
-// Same UI caveat as B: parent-child filter narrowing is a dashboard
-// setting, not AML. Enable Fiscal Quarter as a child of Fiscal Year
-// after deploying.
+// Post-deploy UI step: parent-child filter narrowing is a dashboard
+// setting, not AML. Enable Fiscal Quarter as a child of Fiscal Year.
 // =====================================================================
 Dashboard seed_fy_solution_c {
-  title: 'Seed Company - Solution C (Fiscal Calendar on the Date Dimension)'
-  description: 'Oct-Sep fiscal year defined once on the shared date dimension. Facts carry nothing. GMV cut by fiscal year, fiscal quarter and month, in real calendar months.'
-
+  title: 'Fiscal Year Reporting on a Non-Calendar Year (Oct-Sep)'
+  description: 'An Oct-Sep fiscal calendar defined once on the shared date dimension - no shifted dates, and no fiscal columns on any fact table. GMV by fiscal year, fiscal quarter and calendar month, with fiscal YTD and QTD.'
   block t_intro: TextBlock {
-    content: @md
-### Solution C - define the fiscal year once, on the date dimension
+    content: @md ### When the financial year isn't the calendar year
 
-Every fiscal field on this page comes from **one file**, `seed_c_dates.model.aml`.
-No fact table has a fiscal column. `ecommerce_orders` was not modified at all.
+This business closes its books on **30 September**, and names each year for the
+year it ends in - so **FY 2026 runs 1 Oct 2025 to 30 Sep 2026**.
 
-**What a new thing costs from here:** a new metric, nothing. A new fact entity,
-one relationship line - provided it exposes a date-typed column. A second
-timestamp field on the same fact, a three-line role model plus one relationship
-line. Compare with Solution B, where extending one orders model meant
-re-declaring **eleven** inherited fields before it would even compile, and that
-cost repeats per fact table forever.
+Reporting on that usually forces one of two compromises: shift every date forward
+three months, and live with charts whose months aren't the real months - or
+hard-code the year boundaries into each metric and re-edit them every October.
 
-**Nothing on this page is a shifted date.** The fiscal calendar changes how months
-are *grouped* into quarters and years - it does not change what a month is. So the
-year and quarter axes are fiscal (`FY 2026`, `FY 2026-Q1 (Oct-Dec)`) while the month
-axis is a plain calendar `2025-10`. There is no such thing as a fiscal month, and
-nothing here is a date three months ahead of itself.
-    ;;
+**Neither happens here.** The fiscal calendar is defined once, as columns on the
+shared date dimension. No fact table was modified. Anything with a date joins to
+it and inherits the whole calendar: filter on it, group by it, put it on a chart
+axis, ask the AI about it. Supporting a second date - order date *and* close date
+- is three more lines.
+
+**Try it:** filter by fiscal year or quarter, and switch **Period** between full
+history, fiscal year-to-date and fiscal quarter-to-date. The year and quarter
+axes are fiscal; the month axis is a real calendar month, because a fiscal
+calendar changes how months are *grouped*, not what a month is.;;
   }
 
   block f_fiscal_year: FilterBlock {
@@ -259,35 +256,41 @@ nothing here is a date three months ahead of itself.
       }
     }
   }
+  block t_erd: TextBlock {
+    content: @md <iframe src="https://dbdiagram.io/e/6a9704bfaed2f4f6be847270/6a97a81d5450bea1bec68418" width="100%" height="460" frameborder="0" allowtransparency="true" style="border:1px solid #e5e7eb;border-radius:6px;"></iframe>;;
+  }
 
   view: CanvasLayout {
     label: 'View 1'
-    width: 1440
-    height: 1140
+    width: 1340
+    height: 1400
     grid_size: 20
     block t_intro {
-      position: pos(20, 20, 720, 300)
+      position: pos(40, 40, 560, 460)
     }
     block f_fiscal_year {
-      position: pos(760, 20, 440, 80)
+      position: pos(20, 540, 240, 80)
     }
     block f_fiscal_quarter {
-      position: pos(760, 100, 440, 80)
+      position: pos(280, 540, 240, 80)
     }
     block f_period {
-      position: pos(760, 180, 440, 80)
+      position: pos(540, 540, 160, 80)
     }
     block kpi_gmv {
-      position: pos(760, 260, 440, 120)
+      position: pos(920, 560, 180, 80)
     }
     block v_gmv_by_fy {
-      position: pos(20, 400, 700, 340)
+      position: pos(60, 1020, 640, 340)
     }
     block v_gmv_by_fq {
-      position: pos(740, 400, 700, 340)
+      position: pos(680, 660, 640, 340)
     }
     block v_gmv_by_month {
-      position: pos(20, 760, 1420, 360)
+      position: pos(20, 1380, 1300, 360)
+    }
+    block t_erd {
+      position: pos(620, 40, 680, 480)
     }
     mobile {
       mode: 'auto'

@@ -1,11 +1,10 @@
 // =====================================================================
-// Solution C - date dimension with fiscal year columns (full version)
+// Solution C - date dimension with fiscal year columns
 //
-// Self-contained. This folder shares no AML object with Solutions A, B
-// or D - only the untouchable core-demo base models, which every
-// solution extends and none of them edits. Solution D has its own,
-// plainer copy of this file; the two are deliberately independent so
-// either can be demoed on its own.
+// Self-contained. This folder shares no AML object with Solutions A or
+// B - only the untouchable core-demo base models, which every solution
+// extends and none of them edits. A and B keep their fiscal fields on
+// the fact table instead; this is the file that argument is about.
 //
 // Extends the shared `dim_dates` rather than copying it, so the base
 // calendar (one row per day, 2013 to today) stays owned by

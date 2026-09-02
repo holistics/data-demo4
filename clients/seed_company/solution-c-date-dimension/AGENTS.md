@@ -1,6 +1,6 @@
-# Solution C — fiscal year on the date dimension, full version
+# Solution C — fiscal year on the date dimension
 
-The recommended answer, taken as far as it goes. Fiscal columns live on the date dimension; fact tables carry nothing.
+The recommended answer. Fiscal columns live on the date dimension; fact tables carry nothing.
 
 ## Files
 
@@ -8,12 +8,15 @@ The recommended answer, taken as far as it goes. Fiscal columns live on the date
 |---|---|
 | `seed_c_dates.model.aml` | `dim_dates` extended with the fiscal columns. The only file that knows what a fiscal year is |
 | `seed_c_dates_signup.model.aml` | The same dimension in a second role, joined on signup date. Three lines |
-| `seed_c.dataset.aml` | `Dataset seed_c` — both date roles, orders, users, geography |
+| `seed_c_period.model.aml` | Parameter model behind the Period dropdown. Joined to nothing |
+| `seed_c.dataset.aml` | `Dataset seed_c` — both date roles plus orders, order items, products, users |
 | `seed_c.page.aml` | `Dashboard seed_fy_solution_c` |
+
+**Seven models, and that is on purpose.** `ecommerce_cities` and `ecommerce_countries` were dropped on 2 Sep 2026 — they were declared and joined to each other but no metric, dimension or block referenced them. `ecommerce_users` stays only because `sign_up_date` is the one second date field this warehouse has; without it there is nothing to demo the signup role on.
 
 ## Self-contained
 
-Nothing here is used by Solutions A, B or D, and nothing here comes from them. Solution D has its own, plainer copy of the date model — the two are independent on purpose so either can be demoed alone. The only shared objects are the core-demo base models (`dim_dates`, `ecommerce_*`), extended and **never edited**; `dim_dates` carries `@tag('Endorsed')`.
+Nothing here is used by Solutions A or B, and nothing here comes from them. The only shared objects are the core-demo base models (`dim_dates`, `ecommerce_*`), extended and **never edited**; `dim_dates` carries `@tag('Endorsed')`.
 
 Namespace everything in this folder `seed_c_`.
 
@@ -35,15 +38,19 @@ A dimension defined in `@sql` against `{{ #SOURCE.col }}` extends for free, and 
 
 **Two active date relationships is legal.** The one-active rule is per model *pair*, and `seed_c_dates` and `seed_c_dates_signup` are two different models.
 
-## The signup metrics and this warehouse's synthetic data
+**The model diagram is an embedded iframe.** Block `t_erd` on the page is a `TextBlock` whose `@md` body contains raw HTML — Holistics passes HTML through, so no dedicated embed block type is needed. It points at dbdiagram.io. The DBML source lives *outside this repo*, in the mgmt repo at `presales/seed-company-solution-c.dbml`; the two can drift, so update the DBML and re-publish to the same URL when the model changes. The block goes blank rather than degrading if dbdiagram.io is unreachable or the diagram is unpublished — check before showing this page in a customer-facing embed context with a restrictive CSP.
 
-`orders_from_users_signed_up_this_fy` is defined but deliberately **not on the dashboard**. This demo warehouse's `sign_up_date` values are not chronologically consistent with order dates, so it collides with `Total Orders`: FY23 120/120, FY24 2,776/2,776, FY25 9,172/9,172 identical; only FY26 (20,942 vs 18,736) and unfiltered (33,010 vs 30,804) differ. It reads as a broken card rather than a second calendar. The definition is right and will separate on Seed's real data.
+## The signup metric and this warehouse's synthetic data
 
-`users_signed_up_current_fy` is the demo-safe one — FY23 321, FY24 1,188, FY25 2,336, FY26 6,419, a sane ramp. Read the signup chart as shape, not counts.
+`users_signed_up_current_fy` counts users by their own signup fiscal year — FY23 321, FY24 1,188, FY25 2,336, FY26 6,419, a sane ramp. Read it as shape, not counts.
 
-## Verified
+There was also an `orders_from_users_signed_up_this_fy`, removed on 2 Sep 2026. The definition was right, but this warehouse's synthetic `sign_up_date` values are not chronologically consistent with order dates, so it collided with `total_orders` (FY23 120/120, FY24 2,776/2,776, FY25 9,172/9,172 identical) and read as a broken card. It would separate cleanly on Seed's real data — recover it from git history if the second-role point ever needs an orders-grain example.
 
-Numbers above were measured before the four-folder split. The dev MCP has been down since, so nothing in this folder has been re-queried after the rename.
+## Verification status
+
+**Nothing in this folder has been verified by live query since the four-folder split.** Every number quoted above was measured before it. The dev MCP has been down since — `execute_aql` on `seed_c` returns "Dataset `seed_c` not found" while `aml validate` passes, so it is MCP scope, not AML. Restart `holistics mcp --dev` and re-check the FY labels, the quarter axis and the YTD/QTD windows before demoing.
+
+`holistics sync-code` runs as a live watcher against Project 7, so edits here reach the Holistics `tsco` dev branch as they hit disk — including deletions. They still need a separate commit and merge in the Holistics UI to reach master.
 
 Validate: `holistics aml validate clients/seed_company/solution-c-date-dimension/`
 
