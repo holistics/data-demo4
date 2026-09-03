@@ -1,8 +1,11 @@
 // Alternative-dashboard-only daily spine with relative fiscal presets and a grain series.
 //
 // The left join deliberately retains one row for every date through CURRENT_DATE.
-// That makes a selected chart begin on the resolved preset boundary and visibly
-// end today, even when the synthetic order data has no facts on either endpoint.
+// That makes a selected chart span the full resolved preset window, and visibly
+// reach its last day, even when the synthetic order data has no facts on either
+// endpoint. Every window resolves both edges from CURRENT_DATE: the three
+// "previous" presets are complete closed periods (a finished FY ends 30 September),
+// while the three "current" presets run to today.
 //
 // The spine is then CROSS JOINed onto five reporting grains so one chart can serve
 // both controls on the single tab: the preset window filters `date_key`, and the
@@ -160,6 +163,13 @@ Model seed_c_dates_alternative {
       ) ;;
   }
 
+  dimension previous_fy_end {
+    label: 'Previous FY Ends'
+    type: 'date'
+    description: '30 September — the day before the current fiscal year opens. The completed previous FY, not a start-to-today window.'
+    definition: @sql CAST({{ current_fy_start }} - INTERVAL '1 day' AS DATE) ;;
+  }
+
   dimension previous_fq_start {
     label: 'Previous FQ Starts'
     type: 'date'
@@ -170,6 +180,13 @@ Model seed_c_dates_alternative {
     label: 'Current FQ Starts'
     type: 'date'
     definition: @sql CAST(DATE_TRUNC('quarter', CURRENT_DATE) AS DATE) ;;
+  }
+
+  dimension previous_fq_end {
+    label: 'Previous FQ Ends'
+    type: 'date'
+    description: 'Last day of the completed previous fiscal quarter. Seed ends its FY on a calendar quarter boundary, so fiscal and calendar quarter edges coincide.'
+    definition: @sql CAST({{ current_fq_start }} - INTERVAL '1 day' AS DATE) ;;
   }
 
   dimension previous_month_start {
@@ -184,12 +201,22 @@ Model seed_c_dates_alternative {
     definition: @sql CAST(DATE_TRUNC('month', CURRENT_DATE) AS DATE) ;;
   }
 
-  dimension in_previous_fy_to_today {
-    label: 'Previous FY Start to Today'
+  dimension previous_month_end {
+    label: 'Previous Month Ends'
+    type: 'date'
+    description: 'Last day of the completed previous calendar month.'
+    definition: @sql CAST({{ current_month_start }} - INTERVAL '1 day' AS DATE) ;;
+  }
+
+  // The three "previous" windows are complete, closed periods — a finished FY ends on
+  // 30 September, not today. Only the three "current" windows run to CURRENT_DATE.
+
+  dimension in_previous_fy {
+    label: 'Previous FY (Complete)'
     type: 'truefalse'
     definition: @sql
       {{ #SOURCE.date_key }} >= {{ previous_fy_start }}
-      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+      AND {{ #SOURCE.date_key }} <= {{ previous_fy_end }} ;;
   }
 
   dimension in_current_fy_to_today {
@@ -200,12 +227,12 @@ Model seed_c_dates_alternative {
       AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
   }
 
-  dimension in_previous_fq_to_today {
-    label: 'Previous FQ Start to Today'
+  dimension in_previous_fq {
+    label: 'Previous FQ (Complete)'
     type: 'truefalse'
     definition: @sql
       {{ #SOURCE.date_key }} >= {{ previous_fq_start }}
-      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+      AND {{ #SOURCE.date_key }} <= {{ previous_fq_end }} ;;
   }
 
   dimension in_current_fq_to_today {
@@ -216,12 +243,12 @@ Model seed_c_dates_alternative {
       AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
   }
 
-  dimension in_previous_month_to_today {
-    label: 'Previous Month Start to Today'
+  dimension in_previous_month {
+    label: 'Previous Month (Complete)'
     type: 'truefalse'
     definition: @sql
       {{ #SOURCE.date_key }} >= {{ previous_month_start }}
-      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+      AND {{ #SOURCE.date_key }} <= {{ previous_month_end }} ;;
   }
 
   dimension in_current_month_to_today {
