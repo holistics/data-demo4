@@ -58,7 +58,7 @@ Func block_dictionary_ecommerce_metrics() {
       <tr>
         <td class="metric-key">aov</td>
         <td class="metric-name">${demo_ecommerce_version_2.metric.aov.__meta__.name}</td>
-        <td class="metric-description">${demo_ecommerce_version_2.metric.aov.description}</td>
+        <td class="metric-description">${demo_ecommerce_version_2.metric.aov.__meta__.description}</td>
       </tr>
       <tr>
         <td class="metric-key">cancelled_order_ratio</td>

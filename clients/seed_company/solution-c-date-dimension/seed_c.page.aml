@@ -1,0 +1,264 @@
+@tag('Endorsed')
+Dashboard seed_fy_solution_c {
+  title: 'Fiscal Year Reporting on a Non-Calendar Year (Oct-Sep)'
+  description: 'An Oct-Sep fiscal calendar defined once on the shared date dimension - no shifted dates, and no fiscal columns on any fact table. GMV by fiscal year, fiscal quarter and calendar month, with fiscal YTD and QTD.'
+  block t_intro: TextBlock {
+    content: @md ### Reporting wit fiscal year
+
+This business closes its books on **30 September**, and names each year for the
+year it ends in - so **FY 2026 runs 1 Oct 2025 to 30 Sep 2026**.
+
+**Solution overview:**
+* A dedicated date dimension table is created with `fiscal_*` fields populated (shifted by 3 months)
+* Fiscal reporting is done off these fiscal fields
+* No fact table/metrics are modified
+* Filters are created specifically for fiscal filtering
+
+**Try it:**
+* Filter by fiscal year or quarter,
+* Switch **Period** between full history, this fiscal year or quarter, and either of those to date.
+
+The year and quarter axes are fiscal; the month axis is a real calendar month, because a fiscal calendar changes how months are *grouped*, not what a month is.;;
+  }
+  block f_fiscal_year: FilterBlock {
+    label: 'Fiscal Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_dates.fiscal_year_label)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_fiscal_quarter: FilterBlock {
+    label: 'Fiscal Quarter'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_dates.fiscal_year_quarter)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_period: FilterBlock {
+    label: 'Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c
+      field: r(seed_c_period.window)
+    }
+    default {
+      operator: 'is'
+      value: 'Full history'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block kpi_gmv: VizBlock {
+    label: 'GMV (Selected Period)'
+    viz: MetricKpi {
+      dataset: seed_c
+      theme {
+        metric_kpi {
+          label {
+            font_size: 12
+          }
+          value {
+            font_size: 30
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: 'GMV'
+        ref: r(seed_c.gmv_period)
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_gmv_by_fy: VizBlock {
+    label: 'GMV by Fiscal Year'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        ref: r(seed_c_dates.fiscal_year_label)
+        label: 'Fiscal Year'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv_period)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+      }
+    }
+  }
+  block v_gmv_by_fq: VizBlock {
+    label: 'GMV by Fiscal Quarter'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        ref: r(seed_c_dates.fiscal_year_quarter)
+        label: 'Fiscal Quarter'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv_period)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 1
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+      }
+    }
+  }
+  block v_gmv_by_month: VizBlock {
+    label: 'GMV by Month (calendar year-month)'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'GMV'
+            ref: r(seed_c.gmv_period)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 2
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_erd: TextBlock {
+    content: @md <iframe src="https://dbdiagram.io/e/6a9704bfaed2f4f6be847270/6a97a81d5450bea1bec68418" width="100%" height="460" frameborder="0" allowtransparency="true" style="border:1px solid #e5e7eb;border-radius:6px;"></iframe>;;
+  }
+  block t_wz3d: TextBlock {
+    content: @md ### or;;
+  }
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1360
+    height: 1380
+    grid_size: 20
+    block t_intro {
+      position: pos(40, 20, 560, 400)
+    }
+    block f_fiscal_year {
+      position: pos(40, 460, 300, 80)
+    }
+    block f_fiscal_quarter {
+      position: pos(40, 520, 300, 80)
+    }
+    block f_period {
+      position: pos(420, 500, 200, 80)
+    }
+    block kpi_gmv {
+      position: pos(920, 540, 180, 80)
+    }
+    block v_gmv_by_fy {
+      position: pos(20, 640, 640, 340)
+    }
+    block v_gmv_by_fq {
+      position: pos(680, 640, 640, 340)
+    }
+    block v_gmv_by_month {
+      position: pos(20, 1000, 1300, 360)
+    }
+    block t_erd {
+      position: pos(620, 20, 680, 480)
+    }
+    block t_wz3d {
+      position: pos(360, 520, 40, 40)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f_fiscal_quarter'
+      to: [
+        CustomMapping {
+          block: 'f_fiscal_year'
+          disabled: true
+        }
+      ]
+    }
+  ]
+}
