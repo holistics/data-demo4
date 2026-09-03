@@ -402,7 +402,6 @@ Dashboard myDashboard {
     }
   }
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 360
   }
 }

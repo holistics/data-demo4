@@ -1286,7 +1286,6 @@ text-align: right;
     }
   ]
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 10
   }
 }

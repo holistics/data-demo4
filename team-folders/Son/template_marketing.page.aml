@@ -393,7 +393,6 @@ Dashboard template_marketing {
   block t11: shadowLight
   block t12: shadowLight
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 10
   }
 }
