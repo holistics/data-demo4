@@ -1,0 +1,406 @@
+@tag('Endorsed')
+Dashboard seed_fy_poc_fiscal_calendar {
+  title: 'Seed Company Fiscal Calendar — PoC'
+  description: @md
+An isolated PoC showing safe Oct–Sep fiscal windows and a switchable reporting grain, built twice: once on a hand-written SQL query model, once entirely in AQL.
+  ;;
+  theme: seed_company
+
+  block t_windows_intro: TextBlock {
+    content: @md
+# Fiscal windows that read like the business
+
+Seed's fiscal year runs **1 October–30 September** and is named by the year in which it ends. Pick a familiar business period below—the date dimension resolves both edges from today, so a finished period closes on its own boundary and a period in flight runs to today. Then choose how coarsely to roll it up.
+    ;;
+  }
+
+  block v_window_selector: VizBlock {
+    label: 'Choose a date-relative window'
+    viz: MarkdownViz {
+      dataset: seed_fy_poc_windows_sql
+      rows: [
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.in_previous_fy) label: 'Previous FY Complete' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.in_current_fy_to_today) label: 'Current FY to Today' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.in_previous_fq) label: 'Previous FQ Complete' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.in_current_fq_to_today) label: 'Current FQ to Today' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.in_previous_month) label: 'Previous Month Complete' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.in_current_month_to_today) label: 'Current Month to Today' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.previous_fy_start) label: 'Previous FY Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.previous_fy_end) label: 'Previous FY End' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.current_fy_start) label: 'Current FY Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.previous_fq_start) label: 'Previous FQ Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.previous_fq_end) label: 'Previous FQ End' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.current_fq_start) label: 'Current FQ Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.previous_month_start) label: 'Previous Month Start' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.previous_month_end) label: 'Previous Month End' format { type: 'date' pattern: 'LLL dd, yyyy' } },
+        VizFieldFull { ref: r(seed_fy_poc_dates_sql.current_month_start) label: 'Current Month Start' format { type: 'date' pattern: 'LLL dd, yyyy' } }
+      ]
+      content: @md
+<style>
+  .fiscal-presets { display:flex; flex-wrap:nowrap; gap:12px; width:100%; overflow:hidden; }
+  .fiscal-preset { display:flex; flex:1 1 0; min-width:0; min-height:106px; box-sizing:border-box; flex-direction:column; justify-content:center; padding:14px 16px; border:2px solid #CDC3B0; border-radius:12px; background:#FFFFFF; color:#323232; text-decoration:none; cursor:pointer; transition:all 160ms ease; }
+  .fiscal-preset:hover { border-color:#E35C2A; background:#FBF8F2; transform:translateY(-2px); box-shadow:0 6px 16px rgba(65,69,43,.12); }
+  .fiscal-preset.h-drill-selected, .h-drill-selected.fiscal-preset, .fiscal-preset:has(.h-drill-selected) { border-color:#41452B; background:#41452B; color:#FFFFFF; transform:translateY(-1px); box-shadow:0 6px 18px rgba(65,69,43,.20); }
+  .fiscal-preset-title { font-size:14px; font-weight:700; line-height:1.25; white-space:nowrap; }
+  .fiscal-preset-date { margin-top:7px; font-family:'Red Hat Mono',ui-monospace,monospace; font-size:10px; line-height:1.35; white-space:normal; color:#636466; }
+  .fiscal-preset.h-drill-selected .fiscal-preset-date, .h-drill-selected.fiscal-preset .fiscal-preset-date, .fiscal-preset:has(.h-drill-selected) .fiscal-preset-date { color:#F7F1E7; }
+  .fiscal-preset:has(.h-drill-selected) .fiscal-preset-title { color:#FFFFFF; }
+</style>
+<div class="fiscal-presets">
+  <h-drill row="0" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last FY</div><div class="fiscal-preset-date">{{ rows[0].`Previous FY Start` }}<br>&rarr; {{ rows[0].`Previous FY End` }}</div></h-drill>
+  <h-drill row="1" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This FY</div><div class="fiscal-preset-date">{{ rows[0].`Current FY Start` }}<br>&rarr; today</div></h-drill>
+  <h-drill row="2" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last FQ</div><div class="fiscal-preset-date">{{ rows[0].`Previous FQ Start` }}<br>&rarr; {{ rows[0].`Previous FQ End` }}</div></h-drill>
+  <h-drill row="3" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This FQ</div><div class="fiscal-preset-date">{{ rows[0].`Current FQ Start` }}<br>&rarr; today</div></h-drill>
+  <h-drill row="4" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last month</div><div class="fiscal-preset-date">{{ rows[0].`Previous Month Start` }}<br>&rarr; {{ rows[0].`Previous Month End` }}</div></h-drill>
+  <h-drill row="5" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This month</div><div class="fiscal-preset-date">{{ rows[0].`Current Month Start` }}<br>&rarr; today</div></h-drill>
+</div>
+      ;;
+      settings { row_limit: 1 }
+    }
+    settings { hide_controls: true }
+  }
+
+  block f_grain: FilterBlock {
+    label: 'Aggregate by'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_fy_poc_windows_sql
+      field: r(seed_fy_poc_dates_sql.grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block k_selected_gmv: VizBlock {
+    label: 'Selected-period GMV'
+    viz: MetricKpi {
+      dataset: seed_fy_poc_windows_sql
+      value: VizFieldFull {
+        ref: r(seed_fy_poc_windows_sql.gmv_window)
+        label: ' '
+        format { type: 'number' pattern: '[$$]#,###0' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block v_window_series: VizBlock {
+    label: 'GMV across the selected window, at the selected grain'
+    viz: CombinationChart {
+      dataset: seed_fy_poc_windows_sql
+      x_axis: VizFieldFull {
+        ref: r(seed_fy_poc_dates_sql.period_label)
+        label: 'Period'
+        format { type: 'text' }
+      }
+      y_axis {
+        label: 'GMV'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(seed_fy_poc_windows_sql.gmv)
+            label: 'GMV'
+            format { type: 'number' pattern: '[$$]#,###0' }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Period'
+        show_data_points: true
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+      }
+    }
+  }
+
+  block t_grain_note: TextBlock {
+    content: @md
+### One definition, five grains
+
+**Day** and **Week** are plain calendar cuts.
+
+**Month** keeps its calendar name—fiscal logic never renames October.
+
+**Fiscal quarter** and **Fiscal year** are cut on Seed's Oct–Sep boundary and named by the year the fiscal year ends in.
+    ;;
+  }
+
+  block t_month_note: TextBlock {
+    content: @md
+**How to read the calendar:** fiscal logic changes which **year** and **quarter** a date belongs to. It does not rename months—October remains October. Every window above resolves from today, so nothing breaks when the demo is shown on a different date: **Last FY** always closes on 30 September, **Last FQ** and **Last month** on their own final day, and the three current periods always run to today.
+    ;;
+  }
+
+
+  // ═══════════════════════════════════════════════════════════════════
+  // TAB 2 — the same dashboard, defined in AQL
+  // ═══════════════════════════════════════════════════════════════════
+
+  block t_aql_intro: TextBlock {
+    content: @md
+# The same thing, without a hand-written query
+
+Identical behaviour to the first tab. The difference is underneath: no fiscal SQL. The Oct–Sep calendar, all six relative windows and the grain switch are **AQL over a plain date spine**, and the grain is a *dynamic dimension* — one `case()` on a param — so each fact stays on a single row.
+    ;;
+  }
+
+  block v_aql_selector: VizBlock {
+    label: 'Choose a date-relative window'
+    viz: MarkdownViz {
+      dataset: seed_fy_poc_windows_aql
+      rows: [
+        VizFieldFull { ref: r(seed_fy_poc_dates_aql.in_previous_fy) label: 'Previous FY Complete' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_aql.in_current_fy_to_today) label: 'Current FY to Today' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_aql.in_previous_fq) label: 'Previous FQ Complete' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_aql.in_current_fq_to_today) label: 'Current FQ to Today' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_aql.in_previous_month) label: 'Previous Month Complete' },
+        VizFieldFull { ref: r(seed_fy_poc_dates_aql.in_current_month_to_today) label: 'Current Month to Today' }
+      ]
+      content: @md
+<style>
+  .fiscal-presets { display:flex; flex-wrap:nowrap; gap:12px; width:100%; overflow:hidden; }
+  .fiscal-preset { display:flex; flex:1 1 0; min-width:0; min-height:106px; box-sizing:border-box; flex-direction:column; justify-content:center; padding:14px 16px; border:2px solid #CDC3B0; border-radius:12px; background:#FFFFFF; color:#323232; text-decoration:none; cursor:pointer; transition:all 160ms ease; }
+  .fiscal-preset:hover { border-color:#E35C2A; background:#FBF8F2; transform:translateY(-2px); box-shadow:0 6px 16px rgba(65,69,43,.12); }
+  .fiscal-preset.h-drill-selected, .h-drill-selected.fiscal-preset, .fiscal-preset:has(.h-drill-selected) { border-color:#41452B; background:#41452B; color:#FFFFFF; transform:translateY(-1px); box-shadow:0 6px 18px rgba(65,69,43,.20); }
+  .fiscal-preset-title { font-size:14px; font-weight:700; line-height:1.25; white-space:nowrap; }
+  .fiscal-preset-date { margin-top:7px; font-family:'Red Hat Mono',ui-monospace,monospace; font-size:10px; line-height:1.35; white-space:normal; color:#636466; }
+  .fiscal-preset.h-drill-selected .fiscal-preset-date, .h-drill-selected.fiscal-preset .fiscal-preset-date, .fiscal-preset:has(.h-drill-selected) .fiscal-preset-date { color:#F7F1E7; }
+  .fiscal-preset:has(.h-drill-selected) .fiscal-preset-title { color:#FFFFFF; }
+</style>
+<div class="fiscal-presets">
+  <h-drill row="0" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last FY</div><div class="fiscal-preset-date">complete prior FY</div></h-drill>
+  <h-drill row="1" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This FY</div><div class="fiscal-preset-date">1 Oct &rarr; today</div></h-drill>
+  <h-drill row="2" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last FQ</div><div class="fiscal-preset-date">complete prior FQ</div></h-drill>
+  <h-drill row="3" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This FQ</div><div class="fiscal-preset-date">FQ start &rarr; today</div></h-drill>
+  <h-drill row="4" value="true" class="fiscal-preset"><div class="fiscal-preset-title">Last month</div><div class="fiscal-preset-date">complete prior month</div></h-drill>
+  <h-drill row="5" value="true" class="fiscal-preset"><div class="fiscal-preset-title">This month</div><div class="fiscal-preset-date">month start &rarr; today</div></h-drill>
+</div>
+      ;;
+      settings { row_limit: 1 }
+    }
+    settings { hide_controls: true }
+  }
+
+  // The resolved edges, read back live from the selection instead of
+  // printed on each card. AQL cannot build a boundary date from @today,
+  // so min/max over the current filter does the job — and it proves the
+  // window rather than restating it.
+  block k_aql_window_start: VizBlock {
+    label: 'Window starts'
+    viz: MetricKpi {
+      dataset: seed_fy_poc_windows_aql
+      value: VizFieldFull {
+        ref: r(seed_fy_poc_windows_aql.window_start)
+        label: ' '
+        format { type: 'date' pattern: 'LLL dd, yyyy' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block k_aql_window_end: VizBlock {
+    label: 'Window ends'
+    viz: MetricKpi {
+      dataset: seed_fy_poc_windows_aql
+      value: VizFieldFull {
+        ref: r(seed_fy_poc_windows_aql.window_end)
+        label: ' '
+        format { type: 'date' pattern: 'LLL dd, yyyy' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  // A param filter, not a field filter. `allowed_values` on the param
+  // fixes the dropdown order the @sql tab cannot control — coarsest last,
+  // instead of alphabetical.
+  block f_aql_grain: FilterBlock {
+    label: 'Aggregate by'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_fy_poc_windows_aql
+      field: r(seed_fy_poc_dates_aql.grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  // Reads plain `gmv`. No de-duplicated twin is needed: the dynamic
+  // dimension keeps one row per date, so there is no fan-out to undo.
+  block k_aql_gmv: VizBlock {
+    label: 'Selected-period GMV'
+    viz: MetricKpi {
+      dataset: seed_fy_poc_windows_aql
+      value: VizFieldFull {
+        ref: r(seed_fy_poc_windows_aql.gmv)
+        label: ' '
+        format { type: 'number' pattern: '[$$]#,###0' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block v_aql_series: VizBlock {
+    label: 'GMV across the selected window, at the selected grain'
+    viz: CombinationChart {
+      dataset: seed_fy_poc_windows_aql
+      x_axis: VizFieldFull {
+        ref: r(seed_fy_poc_dates_aql.period_label)
+        label: 'Period'
+        format { type: 'text' }
+      }
+      y_axis {
+        label: 'GMV'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(seed_fy_poc_windows_aql.gmv)
+            label: 'GMV'
+            format { type: 'number' pattern: '[$$]#,###0' }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Period'
+        show_data_points: true
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+      }
+    }
+  }
+
+  block t_aql_note: TextBlock {
+    content: @md
+### What AQL replaced
+
+**The fiscal calendar.** `fiscal_year` is a `case()` on the month number, not SQL.
+
+**The windows.** A finished period is an equality on a period index—`fiscal_year == this FY - 1`—so it needs no end date at all.
+
+**The grain.** A `param` plus one `case()`. No `UNION`, no `CROSS JOIN`, one row per date.
+    ;;
+  }
+
+  block t_aql_limits: TextBlock {
+    content: @md
+**Where AQL stops.** Three honest limits, all measured rather than assumed. **Rows cannot be manufactured**—a calendar needs a row per day whether or not a fact lands on it, so `seed_fy_poc_date_spine` is the one `@sql` file: a `generate_series` and seven `to_char()` columns, with no fiscal logic in it. Most customers already own that model. **There is no `CURRENT_DATE`**, so today is the `@today` literal; it resolves to a date, so the SQL text stays stable for the day and the cache still hits, unlike the `@now` this folder's siblings ban. **Boundary dates cannot be built**—`date_trunc` takes a dimension but not `@today`, and there is no `date_add`, so "first day of the previous quarter" has no AQL form. Hence the two KPIs above: the window is read back from the selection instead of printed on each card.
+    ;;
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_grain'
+      to: [
+        CustomMapping { block: 'v_window_series' field: r(seed_fy_poc_dates_sql.grain) },
+        CustomMapping { block: ['v_window_selector', 'k_selected_gmv'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_window_selector'
+      to: [
+        CustomMapping { block: 'f_grain' disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'k_selected_gmv'
+      to: [
+        CustomMapping { block: ['v_window_selector', 'f_grain', 'v_window_series'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_window_series'
+      to: [
+        CustomMapping { block: ['v_window_selector', 'f_grain', 'k_selected_gmv'] disabled: true }
+      ]
+    },
+
+    // Tab 2. The grain param reaches only the series: `gmv` does not read
+    // the param, so pointing it at the KPI would be a no-op either way.
+    FilterInteraction {
+      from: 'f_aql_grain'
+      to: [
+        CustomMapping { block: 'v_aql_series' field: r(seed_fy_poc_dates_aql.grain) },
+        CustomMapping { block: ['v_aql_selector', 'k_aql_gmv', 'k_aql_window_start', 'k_aql_window_end'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_aql_selector'
+      to: [
+        CustomMapping { block: 'f_aql_grain' disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'k_aql_gmv'
+      to: [
+        CustomMapping { block: ['v_aql_selector', 'f_aql_grain', 'v_aql_series', 'k_aql_window_start', 'k_aql_window_end'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_aql_series'
+      to: [
+        CustomMapping { block: ['v_aql_selector', 'f_aql_grain', 'k_aql_gmv', 'k_aql_window_start', 'k_aql_window_end'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'k_aql_window_start'
+      to: [
+        CustomMapping { block: ['v_aql_selector', 'f_aql_grain', 'k_aql_gmv', 'v_aql_series', 'k_aql_window_end'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'k_aql_window_end'
+      to: [
+        CustomMapping { block: ['v_aql_selector', 'f_aql_grain', 'k_aql_gmv', 'v_aql_series', 'k_aql_window_start'] disabled: true }
+      ]
+    }
+  ]
+
+  view: TabLayout {
+    tab sql_version: CanvasLayout {
+      label: 'Built in SQL'
+      width: 1060
+      height: 1180
+      grid_size: 20
+      auto_expand_vertically: true
+      block t_windows_intro { position: pos(20, 20, 1020, 160) layer: 1 }
+      block v_window_selector { position: pos(20, 200, 1020, 180) layer: 1 }
+      block f_grain { position: pos(20, 400, 340, 100) layer: 1 }
+      block k_selected_gmv { position: pos(20, 520, 320, 200) layer: 1 }
+      block t_grain_note { position: pos(20, 740, 320, 240) layer: 1 }
+      block v_window_series { position: pos(360, 520, 680, 460) layer: 1 }
+      block t_month_note { position: pos(20, 1000, 1020, 140) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab aql_version: CanvasLayout {
+      label: 'Built in AQL'
+      width: 1060
+      height: 1320
+      grid_size: 20
+      auto_expand_vertically: true
+      block t_aql_intro { position: pos(20, 20, 1020, 180) layer: 1 }
+      block v_aql_selector { position: pos(20, 220, 1020, 180) layer: 1 }
+      block f_aql_grain { position: pos(20, 420, 340, 160) layer: 1 }
+      block k_aql_window_start { position: pos(380, 420, 320, 160) layer: 1 }
+      block k_aql_window_end { position: pos(720, 420, 320, 160) layer: 1 }
+      block k_aql_gmv { position: pos(20, 600, 320, 200) layer: 1 }
+      block t_aql_note { position: pos(20, 820, 320, 240) layer: 1 }
+      block v_aql_series { position: pos(360, 600, 680, 460) layer: 1 }
+      block t_aql_limits { position: pos(20, 1080, 1020, 220) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}

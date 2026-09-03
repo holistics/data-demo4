@@ -6,7 +6,7 @@ Seed Company is a US non-profit (tsco.org) in onboarding, running a PoC on Holis
 
 Seed's own data is **not** in this tenant. Everything here runs on the shared ecommerce demo data (`demodb`) as a stand-in, so these are proofs of concept for mechanics and design, not real Seed numbers. Nothing under `01 demo ecommerce/` is modified; `dim_dates` and `ecommerce_orders` are extended, not edited.
 
-## Layout: three independent solutions
+## Layout: three independent solutions, plus a PoC
 
 Three ways to give Seed an Oct-Sep fiscal year, each in its own folder. **The folders share no AML object with each other.** Every model, dataset and dashboard is prefixed by its letter, so any one folder can be opened, deployed and demoed on its own without the other two.
 
@@ -15,6 +15,9 @@ Three ways to give Seed an Oct-Sep fiscal year, each in its own folder. **The fo
 | `solution-a-shifted-date/` | `seed_a_orders`, `seed_a`, page `seed_fy_solution_a` | Marcus's: close date **+ 3 months**, kept a date field |
 | `solution-b-fiscal-labels/` | `seed_b_orders`, `seed_b`, page `seed_fy_solution_b` | Huy's: same shift, exposed only as text labels |
 | `solution-c-date-dimension/` | `seed_c_dates`, `seed_c_dates_signup`, `seed_c_period`, `seed_c`, page `seed_fy_solution_c` | **The recommendation.** Fiscal columns on the **date dimension** |
+| `fiscal-year-poc/` | `seed_fy_poc_*`, page `seed_fy_poc_fiscal_calendar` | Relative FY/FQ/month windows + switchable grain, built twice: **SQL vs AQL** |
+
+`fiscal-year-poc/` is a later addition and not one of the three solutions; it demonstrates relative fiscal windows and how much of the modelling AQL can carry without hand-written SQL.
 
 Each folder has its own `AGENTS.md` with that solution's gotchas. Read the folder you are working in; do not assume the others apply.
 
