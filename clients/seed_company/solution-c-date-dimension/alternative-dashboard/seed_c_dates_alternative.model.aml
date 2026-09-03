@@ -42,7 +42,18 @@ Model seed_c_dates_alternative {
         CAST(date_spine.date_key AS DATE) AS date_key,
         COALESCE(daily_gmv.gmv, 0) AS gmv
       FROM generate_series(
-        '2013-01-01'::date,
+        -- Start the spine at the previous fiscal year's opening day. That is the
+        -- earliest date any preset can reach, so nothing older is ever selectable
+        -- and the unclicked chart opens on two fiscal years instead of all history.
+        MAKE_DATE(
+          CASE
+            WHEN EXTRACT(MONTH FROM CURRENT_DATE) >= 10
+              THEN CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INT) - 1
+            ELSE CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INT) - 2
+          END,
+          10,
+          1
+        ),
         CURRENT_DATE,
         '1 day'::interval
       ) AS date_spine(date_key)

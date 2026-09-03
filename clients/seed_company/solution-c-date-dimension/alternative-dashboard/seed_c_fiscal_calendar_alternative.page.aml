@@ -177,4 +177,9 @@ Seed's fiscal year runs **1 October–30 September** and is named by the year in
     block t_month_note { position: pos(20, 1000, 1020, 140) layer: 1 }
     mobile { mode: 'auto' }
   }
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
 }
