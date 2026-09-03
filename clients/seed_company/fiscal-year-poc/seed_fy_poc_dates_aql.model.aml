@@ -1,0 +1,303 @@
+// =====================================================================
+// AQL replica of the alternative dashboard's date logic.
+//
+// Same behaviour as `seed_fy_poc_dates_sql`, written WITHOUT a
+// hand-rolled SQL query. Two things make that possible:
+//
+//   1. The date spine is inherited from `seed_fy_poc_date_spine`, this
+//      folder's own dumb calendar. AQL cannot manufacture rows, so that
+//      one model is @sql — and it is the ONLY @sql on this path. It
+//      knows no fiscal logic; see its header.
+//   2. The grain switch is a documented Dynamic Dimension — a `param`
+//      plus one `case()` — instead of a five-way UNION/CROSS JOIN. So
+//      every fact stays on exactly one row and the five-fold fan-out
+//      that the SQL version has to defend against never exists.
+//
+// Everything below is @aql. Nothing is @sql.
+//
+// ---------------------------------------------------------------------
+// Built on `year` / `month_number` / `day_of_month`, NOT on date maths
+// ---------------------------------------------------------------------
+// The parent folder's AGENTS.md documents that Holistics date functions
+// applied to `date_key` are off by a whole month: `date_key` is a DATE,
+// it gets cast to timestamptz and shifted by the tenant timezone, which
+// rolls month starts back into the previous month. `year`,
+// `month_number` and `day_of_month` are warehouse-side to_char() output
+// on the raw date and carry no such distortion, so all period maths
+// here is integer arithmetic over those, never date_trunc/date_diff on
+// `date_key`.
+//
+// `date_key <= @today` is the one date comparison used, and it is a
+// plain inequality on the raw date rather than a truncation.
+//
+// ---------------------------------------------------------------------
+// Why a complete previous period needs no end date here
+// ---------------------------------------------------------------------
+// The SQL version bounds "Last FY" with an explicit start AND end date.
+// Expressed as a period index, a finished period is just an equality:
+// `fiscal_year == <this fiscal year> - 1` is already the whole closed
+// year. Only the three in-flight windows need a `<= @today` edge.
+//
+// ---------------------------------------------------------------------
+// @today, and the folder's @now ban
+// ---------------------------------------------------------------------
+// The parent AGENTS.md bans `@now` in the Seed folders: it carries a
+// timestamp, so the generated SQL text differs on every run and the
+// query cache never hits. `@today` resolves to a date, so the SQL text
+// is stable for the whole day and the cache behaves. AQL has no
+// CURRENT_DATE keyword, so `@today` is the only option on this path —
+// see the dashboard note for the trade-off against the @sql version.
+// =====================================================================
+Model seed_fy_poc_dates_aql = seed_fy_poc_date_spine.extend({
+  label: 'Seed Dates — AQL Replica (Alternative)'
+  description: 'Oct-Sep fiscal calendar, relative windows and a dynamic reporting grain, defined entirely in AQL on top of the dedicated date spine in this folder.'
+
+  // The grain dropdown. A param, not a field: it selects which field
+  // `period_label` resolves to rather than filtering rows. Declared
+  // here rather than in a separate parameter model, so this path needs
+  // no `select 1 as dummy` scaffold query at all.
+  //
+  // allowed_values also fixes what a field filter cannot: the dropdown
+  // renders in THIS order, coarsest-last, instead of alphabetically.
+  param grain {
+    label: 'Aggregate By'
+    type: 'text'
+    allowed_values: [
+      'Day',
+      'Week',
+      'Month',
+      'Fiscal quarter',
+      'Fiscal year'
+    ]
+  }
+
+  // ── period indices: integer arithmetic over timezone-safe text ──
+
+  dimension month_index {
+    label: 'Month Index'
+    type: 'number'
+    hidden: true
+    description: 'Months since year 0. Lets "the previous month" be an equality instead of date arithmetic.'
+    definition: @aql
+      cast(seed_fy_poc_dates_aql.year, 'number') * 12
+      + cast(seed_fy_poc_dates_aql.month_number, 'number')
+    ;;
+  }
+
+  dimension calendar_quarter_number {
+    label: 'Calendar Quarter Number'
+    type: 'number'
+    hidden: true
+    definition: @aql
+      case(
+        when: cast(seed_fy_poc_dates_aql.month_number, 'number') <= 3, then: 1,
+        when: cast(seed_fy_poc_dates_aql.month_number, 'number') <= 6, then: 2,
+        when: cast(seed_fy_poc_dates_aql.month_number, 'number') <= 9, then: 3,
+        when: cast(seed_fy_poc_dates_aql.month_number, 'number') <= 12, then: 4
+      )
+    ;;
+  }
+
+  dimension quarter_index {
+    label: 'Quarter Index'
+    type: 'number'
+    hidden: true
+    definition: @aql
+      cast(seed_fy_poc_dates_aql.year, 'number') * 4
+      + seed_fy_poc_dates_aql.calendar_quarter_number
+    ;;
+  }
+
+  // ── the fiscal calendar ──
+
+  dimension fiscal_year {
+    label: 'Fiscal Year'
+    type: 'number'
+    description: 'Seed fiscal year, named by the calendar year it ends in. FY2026 = 1 Oct 2025 to 30 Sep 2026.'
+    definition: @aql
+      case(
+        when: cast(seed_fy_poc_dates_aql.month_number, 'number') >= 10,
+        then: cast(seed_fy_poc_dates_aql.year, 'number') + 1,
+        when: cast(seed_fy_poc_dates_aql.month_number, 'number') <= 9,
+        then: cast(seed_fy_poc_dates_aql.year, 'number')
+      )
+    ;;
+  }
+
+  dimension fiscal_quarter_number {
+    label: 'Fiscal Quarter Number'
+    type: 'number'
+    hidden: true
+    description: 'Oct-Dec is fiscal Q1. Seed ends its FY on a calendar quarter boundary, so this is the calendar quarter rotated by one.'
+    definition: @aql
+      case(
+        when: seed_fy_poc_dates_aql.calendar_quarter_number == 4, then: 1,
+        when: seed_fy_poc_dates_aql.calendar_quarter_number == 1, then: 2,
+        when: seed_fy_poc_dates_aql.calendar_quarter_number == 2, then: 3,
+        when: seed_fy_poc_dates_aql.calendar_quarter_number == 3, then: 4
+      )
+    ;;
+  }
+
+  dimension fiscal_year_label {
+    label: 'Fiscal Year Label'
+    type: 'text'
+    definition: @aql concat('FY ', cast(seed_fy_poc_dates_aql.fiscal_year, 'text')) ;;
+  }
+
+  dimension fiscal_year_quarter_label {
+    label: 'Fiscal Year & Quarter'
+    type: 'text'
+    description: 'One sortable point per fiscal quarter, e.g. FY 2026-Q1 (Oct-Dec).'
+    definition: @aql
+      concat(
+        seed_fy_poc_dates_aql.fiscal_year_label,
+        '-Q',
+        cast(seed_fy_poc_dates_aql.fiscal_quarter_number, 'text'),
+        case(
+          when: seed_fy_poc_dates_aql.fiscal_quarter_number == 1, then: ' (Oct-Dec)',
+          when: seed_fy_poc_dates_aql.fiscal_quarter_number == 2, then: ' (Jan-Mar)',
+          when: seed_fy_poc_dates_aql.fiscal_quarter_number == 3, then: ' (Apr-Jun)',
+          when: seed_fy_poc_dates_aql.fiscal_quarter_number == 4, then: ' (Jul-Sep)'
+        )
+      )
+    ;;
+  }
+
+  dimension day_label {
+    label: 'Day Label'
+    type: 'text'
+    hidden: true
+    description: 'YYYY-MM-DD assembled from the to_char() source columns, so it cannot drift a day the way a truncated date_key can.'
+    definition: @aql
+      concat(
+        seed_fy_poc_dates_aql.year, '-',
+        seed_fy_poc_dates_aql.month_number, '-',
+        seed_fy_poc_dates_aql.day_of_month
+      )
+    ;;
+  }
+
+  dimension month_label {
+    label: 'Month Label'
+    type: 'text'
+    hidden: true
+    definition: @aql
+      concat(
+        seed_fy_poc_dates_aql.year_month,
+        ' (', seed_fy_poc_dates_aql.month_name_abbr, ')'
+      )
+    ;;
+  }
+
+  // ── the dynamic grain: one case(), no row fan-out ──
+
+  dimension period_label {
+    label: 'Period'
+    type: 'text'
+    description: 'Chronologically sortable label at whichever grain the Aggregate By param holds. This is the whole grain switch — no UNION, no CROSS JOIN, one row per date.'
+    definition: @aql
+      case(
+        when: 'Day' in seed_fy_poc_dates_aql.grain,
+        then: seed_fy_poc_dates_aql.day_label,
+
+        when: 'Week' in seed_fy_poc_dates_aql.grain,
+        then: seed_fy_poc_dates_aql.year_week_iso,
+
+        when: 'Month' in seed_fy_poc_dates_aql.grain,
+        then: seed_fy_poc_dates_aql.month_label,
+
+        when: 'Fiscal quarter' in seed_fy_poc_dates_aql.grain,
+        then: seed_fy_poc_dates_aql.fiscal_year_quarter_label,
+
+        when: 'Fiscal year' in seed_fy_poc_dates_aql.grain,
+        then: seed_fy_poc_dates_aql.fiscal_year_label
+      )
+    ;;
+  }
+
+  // ── today, as period indices ──
+
+  dimension today_fiscal_year {
+    label: 'Today Fiscal Year'
+    type: 'number'
+    hidden: true
+    definition: @aql
+      case(
+        when: month_num(@today) >= 10, then: year_num(@today) + 1,
+        when: month_num(@today) <= 9, then: year_num(@today)
+      )
+    ;;
+  }
+
+  dimension today_month_index {
+    label: 'Today Month Index'
+    type: 'number'
+    hidden: true
+    definition: @aql year_num(@today) * 12 + month_num(@today) ;;
+  }
+
+  dimension today_quarter_index {
+    label: 'Today Quarter Index'
+    type: 'number'
+    hidden: true
+    definition: @aql year_num(@today) * 4 + quarter_num(@today) ;;
+  }
+
+  // ── the six windows ──
+  //
+  // The three "previous" ones are complete closed periods, so they are a
+  // single equality with no end date. The three "current" ones stop at
+  // today.
+
+  dimension in_previous_fy {
+    label: 'Previous FY (Complete)'
+    type: 'truefalse'
+    definition: @aql
+      seed_fy_poc_dates_aql.fiscal_year == seed_fy_poc_dates_aql.today_fiscal_year - 1
+    ;;
+  }
+
+  dimension in_current_fy_to_today {
+    label: 'Current FY to Today'
+    type: 'truefalse'
+    definition: @aql
+      seed_fy_poc_dates_aql.fiscal_year == seed_fy_poc_dates_aql.today_fiscal_year
+      and seed_fy_poc_dates_aql.date_key <= @today
+    ;;
+  }
+
+  dimension in_previous_fq {
+    label: 'Previous FQ (Complete)'
+    type: 'truefalse'
+    definition: @aql
+      seed_fy_poc_dates_aql.quarter_index == seed_fy_poc_dates_aql.today_quarter_index - 1
+    ;;
+  }
+
+  dimension in_current_fq_to_today {
+    label: 'Current FQ to Today'
+    type: 'truefalse'
+    definition: @aql
+      seed_fy_poc_dates_aql.quarter_index == seed_fy_poc_dates_aql.today_quarter_index
+      and seed_fy_poc_dates_aql.date_key <= @today
+    ;;
+  }
+
+  dimension in_previous_month {
+    label: 'Previous Month (Complete)'
+    type: 'truefalse'
+    definition: @aql
+      seed_fy_poc_dates_aql.month_index == seed_fy_poc_dates_aql.today_month_index - 1
+    ;;
+  }
+
+  dimension in_current_month_to_today {
+    label: 'Current Month to Today'
+    type: 'truefalse'
+    definition: @aql
+      seed_fy_poc_dates_aql.month_index == seed_fy_poc_dates_aql.today_month_index
+      and seed_fy_poc_dates_aql.date_key <= @today
+    ;;
+  }
+})
