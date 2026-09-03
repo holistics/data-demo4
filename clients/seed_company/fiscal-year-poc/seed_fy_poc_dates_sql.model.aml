@@ -12,7 +12,7 @@
 // "Aggregate by" dropdown filters `grain`. Because every fact is repeated once per
 // grain, `grain` MUST be filtered on any block that reads a measure — the dashboard's
 // grain filter carries an explicit default of 'Month' so the opening state is correct.
-Model seed_c_dates_alternative {
+Model seed_fy_poc_dates_sql {
   type: 'query'
   label: 'Seed Dates — Relative Windows (Alternative)'
   description: 'Daily GMV spine through today, repeated across five reporting grains, with six CURRENT_DATE-relative Seed fiscal and calendar windows.'
