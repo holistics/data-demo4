@@ -10,7 +10,7 @@ An isolated PoC showing safe Oct–Sep fiscal windows and native fiscal rollups 
     content: @md
 # Fiscal windows that read like the business
 
-Seed's fiscal year runs **1 October–30 September** and is named by the year in which it ends. Pick a familiar business period below—the date dimension resolves every start date from today and keeps today as the end date.
+Seed's fiscal year runs **1 October–30 September** and is named by the year in which it ends. Pick a familiar business period below—the date dimension resolves every start date from today and keeps today as the end date. Then choose how coarsely to roll it up.
     ;;
   }
 
@@ -57,28 +57,43 @@ Seed's fiscal year runs **1 October–30 September** and is named by the year in
     settings { hide_controls: true }
   }
 
+  block f_grain: FilterBlock {
+    label: 'Aggregate by'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_c_fiscal_windows
+      field: r(seed_c_dates_alternative.grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
   block k_selected_gmv: VizBlock {
     label: 'Selected-period GMV'
-    settings { hide_label: true }
     viz: MetricKpi {
       dataset: seed_c_fiscal_windows
       value: VizFieldFull {
-        ref: r(seed_c_fiscal_windows.gmv)
-        label: 'GMV'
+        ref: r(seed_c_fiscal_windows.gmv_window)
+        label: ' '
         format { type: 'number' pattern: '[$$]#,###0' }
       }
       settings { display_mode: 'single' alignment: 'center' }
     }
   }
 
-  block v_window_monthly: VizBlock {
-    label: 'Daily GMV through today'
+  block v_window_series: VizBlock {
+    label: 'GMV through today, at the selected grain'
     viz: CombinationChart {
       dataset: seed_c_fiscal_windows
       x_axis: VizFieldFull {
-        ref: r(seed_c_dates_alternative.date_key)
-        label: 'Date'
-        format { type: 'date' pattern: 'LLL dd, yyyy' }
+        ref: r(seed_c_dates_alternative.period_label)
+        label: 'Period'
+        format { type: 'text' }
       }
       y_axis {
         label: 'GMV'
@@ -92,63 +107,6 @@ Seed's fiscal year runs **1 October–30 September** and is named by the year in
         }
       }
       settings {
-        show_data_points: true
-        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
-      }
-    }
-  }
-
-  block t_month_note: TextBlock {
-    content: @md
-**How to read the calendar:** fiscal logic changes which **year** and **quarter** a date belongs to. It does not rename months—October remains October.
-    ;;
-  }
-
-  block t_rollups_intro: TextBlock {
-    content: @md
-# Fiscal rollups
-
-**One fiscal definition, three trustworthy reporting grains.** Use the dropdown to switch the same GMV trend between real calendar months, Seed fiscal quarters, and Seed fiscal years.
-    ;;
-  }
-
-  block f_rollup_grain: FilterBlock {
-    label: 'Reporting grain'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: seed_c_fiscal_rollups
-      field: r(seed_c_fiscal_rollup_series.grain)
-    }
-    default {
-      operator: 'is'
-      value: 'Month'
-    }
-    settings {
-      input_type: 'single'
-    }
-  }
-
-  block v_rollup_trend: VizBlock {
-    label: 'GMV by selected reporting grain'
-    viz: CombinationChart {
-      dataset: seed_c_fiscal_rollups
-      x_axis: VizFieldFull {
-        ref: r(seed_c_fiscal_rollup_series.period_label)
-        label: 'Period'
-        format { type: 'text' }
-      }
-      y_axis {
-        label: 'GMV'
-        series {
-          mark_type: 'line'
-          field: VizFieldFull {
-            ref: r(seed_c_fiscal_rollup_series.gmv)
-            label: 'GMV'
-            format { type: 'number' pattern: '[$$]#,###0' }
-          }
-        }
-      }
-      settings {
         x_axis_label: 'Period'
         show_data_points: true
         sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
@@ -156,65 +114,64 @@ Seed's fiscal year runs **1 October–30 September** and is named by the year in
     }
   }
 
+  block t_grain_note: TextBlock {
+    content: @md
+### One definition, five grains
+
+**Day** and **Week** are plain calendar cuts.
+
+**Month** keeps its calendar name—fiscal logic never renames October.
+
+**Fiscal quarter** and **Fiscal year** are cut on Seed's Oct–Sep boundary and named by the year the fiscal year ends in.
+    ;;
+  }
+
+  block t_month_note: TextBlock {
+    content: @md
+**How to read the calendar:** fiscal logic changes which **year** and **quarter** a date belongs to. It does not rename months—October remains October. Every window above resolves from today, so nothing breaks when the demo is shown on a different date.
+    ;;
+  }
+
   interactions: [
+    FilterInteraction {
+      from: 'f_grain'
+      to: [
+        CustomMapping { block: 'v_window_series' field: r(seed_c_dates_alternative.grain) },
+        CustomMapping { block: ['v_window_selector', 'k_selected_gmv'] disabled: true }
+      ]
+    },
     FilterInteraction {
       from: 'v_window_selector'
       to: [
-        CustomMapping { block: ['f_rollup_grain', 'v_rollup_trend'] disabled: true }
+        CustomMapping { block: 'f_grain' disabled: true }
       ]
     },
     FilterInteraction {
       from: 'k_selected_gmv'
       to: [
-        CustomMapping { block: ['v_window_selector', 'f_rollup_grain', 'v_rollup_trend'] disabled: true }
+        CustomMapping { block: ['v_window_selector', 'f_grain', 'v_window_series'] disabled: true }
       ]
     },
     FilterInteraction {
-      from: 'v_window_monthly'
+      from: 'v_window_series'
       to: [
-        CustomMapping { block: ['v_window_selector', 'f_rollup_grain', 'v_rollup_trend'] disabled: true }
-      ]
-    },
-    FilterInteraction {
-      from: 'f_rollup_grain'
-      to: [
-        CustomMapping { block: 'v_rollup_trend' field: r(seed_c_fiscal_rollup_series.grain) },
-        CustomMapping { block: ['v_window_selector', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_rollup_trend'
-      to: [
-        CustomMapping { block: ['f_rollup_grain', 'v_window_selector', 'k_selected_gmv', 'v_window_monthly'] disabled: true }
+        CustomMapping { block: ['v_window_selector', 'f_grain', 'k_selected_gmv'] disabled: true }
       ]
     }
   ]
 
-  view: TabLayout {
-    tab fiscal_windows: CanvasLayout {
-      label: 'Fiscal Windows'
-      width: 1060
-      height: 940
-      grid_size: 20
-      auto_expand_vertically: true
-      block t_windows_intro { position: pos(20, 20, 1020, 140) layer: 1 }
-      block v_window_selector { position: pos(20, 180, 1020, 160) layer: 1 }
-      block k_selected_gmv { position: pos(20, 360, 320, 160) layer: 1 }
-      block v_window_monthly { position: pos(360, 360, 680, 440) layer: 1 }
-      block t_month_note { position: pos(20, 820, 1020, 100) layer: 1 }
-      mobile { mode: 'auto' }
-    }
-
-    tab fiscal_rollups: CanvasLayout {
-      label: 'Fiscal Rollups'
-      width: 1060
-      height: 860
-      grid_size: 20
-      auto_expand_vertically: true
-      block t_rollups_intro { position: pos(20, 20, 1020, 120) layer: 1 }
-      block f_rollup_grain { position: pos(20, 160, 360, 100) layer: 1 }
-      block v_rollup_trend { position: pos(20, 280, 1020, 540) layer: 1 }
-      mobile { mode: 'auto' }
-    }
+  view: CanvasLayout {
+    width: 1060
+    height: 1140
+    grid_size: 20
+    auto_expand_vertically: true
+    block t_windows_intro { position: pos(20, 20, 1020, 160) layer: 1 }
+    block v_window_selector { position: pos(20, 200, 1020, 160) layer: 1 }
+    block f_grain { position: pos(20, 380, 340, 100) layer: 1 }
+    block k_selected_gmv { position: pos(20, 500, 320, 200) layer: 1 }
+    block t_grain_note { position: pos(20, 720, 320, 240) layer: 1 }
+    block v_window_series { position: pos(360, 500, 680, 460) layer: 1 }
+    block t_month_note { position: pos(20, 980, 1020, 120) layer: 1 }
+    mobile { mode: 'auto' }
   }
 }

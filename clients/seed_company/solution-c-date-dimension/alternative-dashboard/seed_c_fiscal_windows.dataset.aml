@@ -10,8 +10,16 @@ Dataset seed_c_fiscal_windows {
   metric gmv {
     label: 'GMV'
     type: 'number'
-    description: 'Synthetic gross merchandise value used as stand-in data for the fiscal-window PoC.'
+    description: 'Period GMV for the trend chart. The model fans every fact out across five reporting grains, so any block reading this metric must also be filtered on `grain` — grouping by `period_label` does that implicitly, a bare total does not.'
     definition: @aql seed_c_dates_alternative | sum(seed_c_dates_alternative.gmv_value) ;;
+    format: '#,###0'
+  }
+
+  metric gmv_window {
+    label: 'GMV'
+    type: 'number'
+    description: 'Window GMV for the KPI. Reads the Day copy only, so it stays correct no matter which reporting grain the dropdown holds — never wire the grain filter to a block using this metric.'
+    definition: @aql seed_c_dates_alternative | sum(seed_c_dates_alternative.gmv_value_once) ;;
     format: '#,###0'
   }
 }

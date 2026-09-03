@@ -1,12 +1,18 @@
-// Alternative-dashboard-only daily spine with relative fiscal presets.
+// Alternative-dashboard-only daily spine with relative fiscal presets and a grain series.
 //
 // The left join deliberately retains one row for every date through CURRENT_DATE.
 // That makes a selected chart begin on the resolved preset boundary and visibly
 // end today, even when the synthetic order data has no facts on either endpoint.
+//
+// The spine is then CROSS JOINed onto five reporting grains so one chart can serve
+// both controls on the single tab: the preset window filters `date_key`, and the
+// "Aggregate by" dropdown filters `grain`. Because every fact is repeated once per
+// grain, `grain` MUST be filtered on any block that reads a measure — the dashboard's
+// grain filter carries an explicit default of 'Month' so the opening state is correct.
 Model seed_c_dates_alternative {
   type: 'query'
   label: 'Seed Dates — Relative Windows (Alternative)'
-  description: 'Daily GMV spine through today with six CURRENT_DATE-relative Seed fiscal and calendar windows.'
+  description: 'Daily GMV spine through today, repeated across five reporting grains, with six CURRENT_DATE-relative Seed fiscal and calendar windows.'
   data_source_name: 'demodb'
 
   models: [
@@ -26,18 +32,59 @@ Model seed_c_dates_alternative {
       LEFT JOIN {{ #ecommerce_products AS p }}
         ON {{ #oi.product_id }} = {{ #p.id }}
       GROUP BY 1
+    ),
+
+    spine AS (
+      SELECT
+        CAST(date_spine.date_key AS DATE) AS date_key,
+        COALESCE(daily_gmv.gmv, 0) AS gmv
+      FROM generate_series(
+        '2013-01-01'::date,
+        CURRENT_DATE,
+        '1 day'::interval
+      ) AS date_spine(date_key)
+      LEFT JOIN daily_gmv
+        ON CAST(date_spine.date_key AS DATE) = daily_gmv.order_date
+    ),
+
+    grains AS (
+      SELECT *
+      FROM (VALUES
+        (1, 'Day'),
+        (2, 'Week'),
+        (3, 'Month'),
+        (4, 'Fiscal quarter'),
+        (5, 'Fiscal year')
+      ) AS g(grain_order, grain)
     )
 
     SELECT
-      CAST(date_spine.date_key AS DATE) AS date_key,
-      COALESCE(daily_gmv.gmv, 0) AS gmv
-    FROM generate_series(
-      '2013-01-01'::date,
-      CURRENT_DATE,
-      '1 day'::interval
-    ) AS date_spine(date_key)
-    LEFT JOIN daily_gmv
-      ON CAST(date_spine.date_key AS DATE) = daily_gmv.order_date
+      spine.date_key,
+      spine.gmv,
+      grains.grain,
+      grains.grain_order,
+      CASE grains.grain
+        WHEN 'Day' THEN
+          TO_CHAR(spine.date_key, 'YYYY-MM-DD')
+        WHEN 'Week' THEN
+          TO_CHAR(spine.date_key, 'IYYY') || '-W' || TO_CHAR(spine.date_key, 'IW')
+        WHEN 'Month' THEN
+          TO_CHAR(spine.date_key, 'YYYY-MM') || ' (' || TO_CHAR(spine.date_key, 'Mon') || ')'
+        WHEN 'Fiscal quarter' THEN
+          'FY ' || CAST(EXTRACT(YEAR FROM spine.date_key + INTERVAL '3 months') AS INT)
+            || '-Q' || CAST(EXTRACT(QUARTER FROM spine.date_key + INTERVAL '3 months') AS INT)
+            || CASE CAST(EXTRACT(QUARTER FROM spine.date_key + INTERVAL '3 months') AS INT)
+                 WHEN 1 THEN ' (Oct-Dec)'
+                 WHEN 2 THEN ' (Jan-Mar)'
+                 WHEN 3 THEN ' (Apr-Jun)'
+                 ELSE ' (Jul-Sep)'
+               END
+        ELSE
+          'FY ' || CAST(EXTRACT(YEAR FROM spine.date_key + INTERVAL '3 months') AS INT)
+      END AS period_label
+    FROM spine
+    CROSS JOIN grains
+    ORDER BY grains.grain_order, spine.date_key
   ;;
 
   dimension date_key {
@@ -51,6 +98,36 @@ Model seed_c_dates_alternative {
     type: 'number'
     hidden: true
     definition: @sql {{ #SOURCE.gmv }} ;;
+  }
+
+  dimension gmv_value_once {
+    label: 'GMV Value (One Grain Copy)'
+    type: 'number'
+    hidden: true
+    description: 'GMV attributed to the Day copy only, so a window total can be summed without picking up the five-fold grain fan-out.'
+    definition: @sql
+      CASE WHEN {{ #SOURCE.grain }} = 'Day' THEN {{ #SOURCE.gmv }} ELSE 0 END ;;
+  }
+
+  dimension grain {
+    label: 'Aggregate By'
+    type: 'text'
+    description: 'Reporting grain the period label is cut at: Day, Week, Month, Seed fiscal quarter, or Seed fiscal year.'
+    definition: @sql {{ #SOURCE.grain }} ;;
+  }
+
+  dimension grain_order {
+    label: 'Aggregate By Order'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.grain_order }} ;;
+  }
+
+  dimension period_label {
+    label: 'Period'
+    type: 'text'
+    description: 'Chronologically sortable display label at the selected grain. Fiscal grains are named by the year the Oct-Sep fiscal year ends in.'
+    definition: @sql {{ #SOURCE.period_label }} ;;
   }
 
   dimension previous_fy_start {
