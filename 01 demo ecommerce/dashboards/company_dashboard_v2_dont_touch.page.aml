@@ -3535,7 +3535,6 @@ box-shadow: 0 0 0 2px rgba(27, 124, 228, 0.2);
   ]
   theme: holistics_ant
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 4320
     autorun_on_open: true
     autorun_on_changes: true

@@ -984,7 +984,6 @@ GamePulse is a directional score, not an impression forecast, and is shown as No
     }
   ]
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 10
     autorun_on_open: true
     autorun_on_changes: true
