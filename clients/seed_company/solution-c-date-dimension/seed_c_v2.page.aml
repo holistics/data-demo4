@@ -232,7 +232,10 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
             type: 'text'
           }
         },
-        r(seed_c_dates.is_current_fiscal_quarter)
+        r(seed_c_dates.is_current_fiscal_quarter),
+        r(seed_c_dates.is_current_fiscal_year),
+        r(seed_c_dates.is_last_fiscal_quarter),
+        r(seed_c_dates.is_last_fiscal_year)
       ]
       content: @md <style>
 [data-uname="v_aql_selector"] .ci-viz-result,
@@ -316,7 +319,10 @@ font-size:12px; font-weight:400; color:#374151; }
 {% end %}
 
 /* quick preset wins the summary label */
-.fiscal-dropdown:has(.fp-quick.h-drill-selected, .fp-quick .h-drill-selected) .fd-value::after { content:"This fiscal quarter"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="this_fq"].h-drill-selected, .fp-quick[data-quick="this_fq"] .h-drill-selected) .fd-value::after { content:"This fiscal quarter"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="this_fy"].h-drill-selected, .fp-quick[data-quick="this_fy"] .h-drill-selected) .fd-value::after { content:"This fiscal year"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="last_fq"].h-drill-selected, .fp-quick[data-quick="last_fq"] .h-drill-selected) .fd-value::after { content:"Last fiscal quarter"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="last_fy"].h-drill-selected, .fp-quick[data-quick="last_fy"] .h-drill-selected) .fd-value::after { content:"Last fiscal year"; }
 </style>
 
 <div class="fiscal-dropdown" tabindex="0">
@@ -324,7 +330,10 @@ font-size:12px; font-weight:400; color:#374151; }
 
 <div class="fiscal-panel" tabindex="-1">
 <div class="fp-section">Quick</div>
-<h-drill row="2" value="true" class="fp-quick"><span class="fp-text">This FQ</span></h-drill>
+<h-drill row="2" value="true" class="fp-quick" data-quick="this_fq"><span class="fp-text">This FQ</span></h-drill>
+<h-drill row="3" value="true" class="fp-quick" data-quick="this_fy"><span class="fp-text">This FY</span></h-drill>
+<h-drill row="4" value="true" class="fp-quick" data-quick="last_fq"><span class="fp-text">Last FQ</span></h-drill>
+<h-drill row="5" value="true" class="fp-quick" data-quick="last_fy"><span class="fp-text">Last FY</span></h-drill>
 <div class="fp-section">Specific</div>
 {% map(rows) %}
 <label class="fp-caret" data-fy-caret="{{ `Fiscal Year Label`.raw }}">
