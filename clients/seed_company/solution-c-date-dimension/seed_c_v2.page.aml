@@ -213,7 +213,7 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
       }
     }
   }
-  block v_o9lr: VizBlock {
+  block v_fy_filter: VizBlock {
     label: 'Fiscal Year Filter'
     viz: MarkdownViz {
       dataset: seed_c
@@ -238,11 +238,11 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
         r(seed_c_dates.is_last_fiscal_year)
       ]
       content: @md <style>
-[data-uname="v_aql_selector"] .ci-viz-result,
-[data-uname="v_aql_selector"] .h-full,
-[data-uname="v_aql_selector"] .text-content,
-[data-uname="v_aql_selector"] .vue-markdown { overflow: visible !important; }
-[data-uname="v_aql_selector"] { z-index: 50 !important; position: relative; }
+[data-uname="v_fy_filter"] .ci-viz-result,
+[data-uname="v_fy_filter"] .h-full,
+[data-uname="v_fy_filter"] .text-content,
+[data-uname="v_fy_filter"] .vue-markdown { overflow: visible !important; }
+[data-uname="v_fy_filter_test"] { z-index: 50 !important; position: relative; }
 
 .fiscal-dropdown { width:100%; max-width:280px; font-size:12px; outline:none; }
 .fiscal-dropdown-summary { display:flex; align-items:center; justify-content:space-between; gap:8px;
@@ -413,7 +413,7 @@ font-size:12px; font-weight:400; color:#374151; }
         position: pos(60, 440, 180, 80)
         layer: 2
       }
-      block v_o9lr {
+      block v_fy_filter {
         position: pos(460, 40, 300, 260)
         layer: 1
       }
