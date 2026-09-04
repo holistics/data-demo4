@@ -361,6 +361,9 @@ font-size:12px; font-weight:400; color:#374151; }
         }
       }
     }
+    settings {
+      hide_controls: true
+    }
   }
   view: TabLayout {
     label: 'View 1'
