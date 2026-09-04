@@ -1,0 +1,441 @@
+@tag('Endorsed')
+Dashboard seed_fy_solution_c_v2 {
+  title: 'Fiscal Year Reporting on a Non-Calendar Year (Oct-Sep)'
+  description: 'An Oct-Sep fiscal calendar defined once on the shared date dimension - no shifted dates, and no fiscal columns on any fact table. GMV by fiscal year, fiscal quarter and calendar month, with fiscal YTD and QTD.'
+  block kpi_gmv: VizBlock {
+    label: 'GMV'
+    viz: MetricKpi {
+      dataset: seed_c
+      theme {
+        metric_kpi {
+          label {
+            font_size: 12
+          }
+          value {
+            font_size: 30
+          }
+        }
+      }
+      value: VizFieldFull {
+        ref: r(seed_c.gmv)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_gmv_by_fy: VizBlock {
+    label: 'GMV by Fiscal Year'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        label: 'Fiscal Year'
+        ref: r(seed_c_dates.fiscal_year_label)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Fiscal Year'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_gmv_by_fq: VizBlock {
+    label: 'GMV by Fiscal Quarter'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        label: 'Fiscal Quarter'
+        ref: r(seed_c_dates.fiscal_year_quarter)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Fiscal Quarter'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_wz3d: TextBlock {
+    content: @md ### or;;
+  }
+  block t_on38: TextBlock {
+    content: @md # GMV — Fiscal Reporting
+### E-commerce orders, fiscal year basis;;
+  }
+  block t_0ynk: TextBlock {
+    content: @md ### Reporting with fiscal year
+
+This business closes its books on **30 September**, and names each year for the
+year it ends in - so **FY 2026 runs 1 Oct 2025 to 30 Sep 2026**.
+
+**Solution overview:**
+* A dedicated date dimension table is created with `fiscal_*` fields populated (shifted by 3 months)
+* Fiscal reporting is done off these fiscal fields
+* No fact table/metrics are modified
+* Filters are created specifically for fiscal filtering
+
+**Try it:**
+* Filter by fiscal year or quarter,
+* Switch **Period** between full history, this fiscal year or quarter, and either of those to date.
+
+The year and quarter axes are fiscal; the month axis is a real calendar month, because a fiscal calendar changes how months are *grouped*, not what a month is.;;
+  }
+  block t_joaz: TextBlock {
+    content: @md <iframe src="https://dbdiagram.io/e/6a9704bfaed2f4f6be847270/6a97a81d5450bea1bec68418" width="100%" height="460" frameborder="0" allowtransparency="true" style="border:1px solid #e5e7eb;border-radius:6px;"></iframe>;;
+  }
+  block t_izpd: TextBlock {
+    content: @md # The Modeling Setup
+;;
+  }
+  block t_block_ha_card: block_ha_card()
+  block t_ac1x: block_ha_card()
+  block t_7tbc: block_ha_card()
+  block v_jkpa: VizBlock {
+    label: 'GMV by Month (calendar year-month)'
+    viz: ColumnChart {
+      dataset: seed_c
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_c.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_atwk: block_ha_card()
+  block t_q19w: block_ha_card()
+  block v_z5lv: VizBlock {
+    label: 'Total orders'
+    viz: MetricKpi {
+      dataset: seed_c
+      theme {
+        metric_kpi {
+          label {
+            font_size: 12
+          }
+          value {
+            font_size: 30
+          }
+        }
+      }
+      value: VizFieldFull {
+        ref: r(seed_c.total_orders)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_o9lr: VizBlock {
+    label: 'Fiscal Year Filter'
+    viz: MarkdownViz {
+      dataset: seed_c
+      rows: [
+        VizFieldFull {
+          ref: r(seed_c_dates.fiscal_year_label)
+          format {
+            type: 'text'
+          }
+          uname: 'seed_c_dates_fiscal_year_label'
+        },
+        VizFieldFull {
+          label: 'Fiscal Quarter'
+          ref: r(seed_c_dates.fiscal_year_quarter)
+          format {
+            type: 'text'
+          }
+        },
+        r(seed_c_dates.is_current_fiscal_quarter)
+      ]
+      content: @md <style>
+[data-uname="v_aql_selector"] .ci-viz-result,
+[data-uname="v_aql_selector"] .h-full,
+[data-uname="v_aql_selector"] .text-content,
+[data-uname="v_aql_selector"] .vue-markdown { overflow: visible !important; }
+[data-uname="v_aql_selector"] { z-index: 50 !important; position: relative; }
+
+.fiscal-dropdown { width:100%; max-width:280px; font-size:12px; outline:none; }
+.fiscal-dropdown-summary { display:flex; align-items:center; justify-content:space-between; gap:8px;
+height:32px; padding:6px 10px; border:1px solid #E4E4E7; border-radius:8px; background:#FFFFFF;
+box-shadow:0 1px 2px rgba(0,0,0,0.04);
+color:#111827; font-weight:400; cursor:pointer; user-select:none; }
+.fiscal-dropdown-summary::after { content:'▾'; flex:none; font-size:11px; color:#9CA3AF; transition:transform 160ms ease; }
+.fiscal-dropdown-summary:hover { border-color:#C7C7CC; }
+.fiscal-dropdown:focus-within .fiscal-dropdown-summary { border-bottom-left-radius:0; border-bottom-right-radius:0; border-color:#93B4FF; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
+.fiscal-dropdown:focus-within .fiscal-dropdown-summary::after { transform:rotate(180deg); }
+
+/* --- summary text: placeholder when empty, selected value when set --- */
+.fd-value { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.fd-value::before { content:attr(data-placeholder); color:#9CA3AF; font-weight:400; }
+.fd-value::after { color:#111827; font-weight:400; }
+.fiscal-dropdown:has(.h-drill-selected) .fd-value::before { content:none; }
+.fiscal-dropdown:has(.h-drill-selected) .fiscal-dropdown-summary { border-color:#D1D5DB; }
+
+.fiscal-panel { display:none; background:#FFFFFF; border:1px solid #E4E4E7; border-top:none;
+border-radius:0 0 8px 8px; max-height:300px; overflow-y:auto; outline:none;
+box-shadow:0 4px 10px rgba(0,0,0,0.06); }
+.fiscal-dropdown:focus-within .fiscal-panel { display:grid; grid-template-columns:20px 1fr;
+align-items:center; padding:4px; border-color:#93B4FF; }
+
+.fp-caret { grid-column:1; cursor:pointer; text-align:center; color:#9CA3AF;
+font-size:10px; border-radius:4px; user-select:none; }
+.fp-caret::after { content:'▸'; display:block; transition:transform 160ms ease; }
+.fp-caret:has(.fp-toggle:checked)::after { transform:rotate(90deg); }
+.fp-caret:hover { background:#F4F4F5; color:#111827; }
+.fp-toggle { display:none; }
+
+.fp-text { color:inherit; }
+
+.fp-section { grid-column:1 / -1; padding:8px 10px 4px; font-size:10px; font-weight:600;
+text-transform:uppercase; letter-spacing:.04em; color:#9CA3AF; user-select:none; }
+.fp-section:first-child { padding-top:4px; }
+
+.fp-quick { grid-column:2; display:flex; align-items:center; justify-content:space-between;
+padding:6px 10px; margin:1px 0; border:1px solid transparent; border-radius:6px; cursor:pointer;
+font-size:12px; font-weight:400; color:#111827; }
+.fp-quick:hover { background:#F4F4F5; }
+.fp-quick.h-drill-selected, .fp-quick:has(.h-drill-selected) { background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE; }
+.fp-quick.h-drill-selected::after, .fp-quick:has(.h-drill-selected)::after { content:'✓'; font-size:11px; }
+
+.fp-parent { grid-column:2; display:flex; align-items:center; justify-content:space-between;
+padding:6px 10px; margin:1px 0; border:1px solid transparent; border-radius:6px; cursor:pointer;
+font-size:12px; font-weight:400; color:#111827; }
+.fp-parent:hover { background:#F4F4F5; }
+.fp-parent.h-drill-selected, .fp-parent:has(.h-drill-selected) { background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE; }
+.fp-parent.h-drill-selected::after, .fp-parent:has(.h-drill-selected)::after { content:'✓'; font-size:11px; }
+
+.fp-child { grid-column:2; display:none; align-items:center; justify-content:space-between;
+padding:6px 10px 6px 20px; margin:1px 0; border:1px solid transparent; border-radius:6px; cursor:pointer;
+font-size:12px; font-weight:400; color:#374151; }
+.fp-child:hover { background:#F4F4F5; }
+.fp-child.h-drill-selected, .fp-child:has(.h-drill-selected) { background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE; }
+.fp-child.h-drill-selected::after, .fp-child:has(.h-drill-selected)::after { content:'✓'; font-size:11px; }
+
+{% map(rows) %}
+/* dedupe repeated FY rows */
+[data-fy-caret="{{ `Fiscal Year Label`.raw }}"] ~ [data-fy-caret="{{ `Fiscal Year Label`.raw }}"] { display:none !important; }
+[data-fy-parent="{{ `Fiscal Year Label`.raw }}"] ~ [data-fy-parent="{{ `Fiscal Year Label`.raw }}"] { display:none !important; }
+
+/* expand on caret click */
+.fiscal-panel:has(.fp-caret[data-fy-caret="{{ `Fiscal Year Label`.raw }}"] .fp-toggle:checked) [data-fy-child="{{ `Fiscal Year Label`.raw }}"] { display:flex !important; }
+
+/* keep the group expanded when something inside it is selected */
+.fiscal-panel:has([data-fy-child="{{ `Fiscal Year Label`.raw }}"] .h-drill-selected, [data-fy-child="{{ `Fiscal Year Label`.raw }}"].h-drill-selected) [data-fy-child="{{ `Fiscal Year Label`.raw }}"] { display:flex !important; }
+.fiscal-panel:has([data-fy-parent="{{ `Fiscal Year Label`.raw }}"] .h-drill-selected, [data-fy-parent="{{ `Fiscal Year Label`.raw }}"].h-drill-selected) [data-fy-child="{{ `Fiscal Year Label`.raw }}"] { display:flex !important; }
+
+/* selected value -> summary */
+.fiscal-dropdown:has([data-fy-parent="{{ `Fiscal Year Label`.raw }}"] .h-drill-selected, [data-fy-parent="{{ `Fiscal Year Label`.raw }}"].h-drill-selected) .fd-value::after { content:"{{ `Fiscal Year Label`.formatted }}"; }
+.fiscal-dropdown:has([data-fq-child="{{ `Fiscal Quarter`.raw }}"] .h-drill-selected, [data-fq-child="{{ `Fiscal Quarter`.raw }}"].h-drill-selected) .fd-value::after { content:"{{ `Fiscal Quarter`.formatted }}"; }
+{% end %}
+
+/* quick preset wins the summary label */
+.fiscal-dropdown:has(.fp-quick.h-drill-selected, .fp-quick .h-drill-selected) .fd-value::after { content:"This fiscal quarter"; }
+</style>
+
+<div class="fiscal-dropdown" tabindex="0">
+<div class="fiscal-dropdown-summary"><span class="fd-value" data-placeholder="Fiscal period"></span></div>
+
+<div class="fiscal-panel" tabindex="-1">
+<div class="fp-section">Quick</div>
+<h-drill row="2" value="true" class="fp-quick"><span class="fp-text">This FQ</span></h-drill>
+<div class="fp-section">Specific</div>
+{% map(rows) %}
+<label class="fp-caret" data-fy-caret="{{ `Fiscal Year Label`.raw }}">
+<input type="checkbox" class="fp-toggle">
+</label>
+<h-drill row="0" value="{{ `Fiscal Year Label`.raw }}" class="fp-parent" data-fy-parent="{{ `Fiscal Year Label`.raw }}"><span class="fp-text">{{ `Fiscal Year Label`.formatted }}</span></h-drill>
+<h-drill row="1" value="{{ `Fiscal Quarter`.raw }}" class="fp-child"
+  data-fy-child="{{ `Fiscal Year Label`.raw }}"
+  data-fq-child="{{ `Fiscal Quarter`.raw }}"><span class="fp-text">{{ `Fiscal Quarter`.formatted }}</span></h-drill>{% end %}
+</div>
+</div>    ;;
+      settings {
+        pagination_size: 500
+        show_row_total: true
+        show_column_total: true
+        sorts: [
+          SortSetting {
+            key: 'seed_c_dates_fiscal_year_label'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'The final report'
+      width: 1460
+      height: 1220
+      grid_size: 20
+      block kpi_gmv {
+        position: pos(60, 240, 180, 80)
+        layer: 4
+      }
+      block v_gmv_by_fy {
+        position: pos(300, 240, 420, 340)
+        layer: 1
+      }
+      block v_gmv_by_fq {
+        position: pos(780, 240, 640, 340)
+      }
+      block t_wz3d {
+        position: pos(-320, 340, 40, 40)
+      }
+      block t_on38 {
+        position: pos(40, 40, 400, 100)
+      }
+      block t_block_ha_card {
+        position: pos(280, 220, 460, 380)
+      }
+      block t_ac1x {
+        position: pos(760, 220, 680, 380)
+        layer: -1
+      }
+      block t_7tbc {
+        position: pos(40, 620, 1400, 460)
+        layer: 1
+      }
+      block v_jkpa {
+        position: pos(60, 640, 1360, 420)
+        layer: 1
+      }
+      block t_atwk {
+        position: pos(40, 220, 220, 180)
+        layer: 3
+      }
+      block t_q19w {
+        position: pos(40, 420, 220, 180)
+        layer: 1
+      }
+      block v_z5lv {
+        position: pos(60, 440, 180, 80)
+        layer: 2
+      }
+      block v_o9lr {
+        position: pos(460, 40, 300, 260)
+        layer: 1
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_xamk: CanvasLayout {
+      label: 'The setup'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block t_0ynk {
+        position: pos(20, 100, 560, 340)
+      }
+      block t_joaz {
+        position: pos(600, 80, 680, 420)
+      }
+      block t_izpd {
+        position: pos(20, 20, 1260, 60)
+      }
+    }
+  }
+  settings {
+    timezone: 'Etc/UTC'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}
