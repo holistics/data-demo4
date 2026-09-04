@@ -242,7 +242,7 @@ The year and quarter axes are fiscal; the month axis is a real calendar month, b
 [data-uname="v_fy_filter"] .h-full,
 [data-uname="v_fy_filter"] .text-content,
 [data-uname="v_fy_filter"] .vue-markdown { overflow: visible !important; }
-[data-uname="v_fy_filter_test"] { z-index: 50 !important; position: relative; }
+[data-uname="v_fy_filter"] { z-index: 50 !important; position: relative; }
 
 .fiscal-dropdown { width:100%; max-width:280px; font-size:12px; outline:none; }
 .fiscal-dropdown-summary { display:flex; align-items:center; justify-content:space-between; gap:8px;
@@ -370,15 +370,15 @@ font-size:12px; font-weight:400; color:#374151; }
       height: 1220
       grid_size: 20
       block kpi_gmv {
-        position: pos(60, 240, 180, 80)
+        position: pos(60, 280, 180, 80)
         layer: 4
       }
       block v_gmv_by_fy {
-        position: pos(300, 240, 420, 340)
+        position: pos(300, 280, 420, 340)
         layer: 1
       }
       block v_gmv_by_fq {
-        position: pos(780, 240, 640, 340)
+        position: pos(780, 280, 640, 340)
       }
       block t_wz3d {
         position: pos(-320, 340, 40, 40)
@@ -387,34 +387,34 @@ font-size:12px; font-weight:400; color:#374151; }
         position: pos(40, 40, 400, 100)
       }
       block t_block_ha_card {
-        position: pos(280, 220, 460, 380)
+        position: pos(280, 260, 460, 380)
       }
       block t_ac1x {
-        position: pos(760, 220, 680, 380)
+        position: pos(760, 260, 680, 380)
         layer: -1
       }
       block t_7tbc {
-        position: pos(40, 620, 1400, 460)
+        position: pos(40, 660, 1400, 460)
         layer: 1
       }
       block v_jkpa {
-        position: pos(60, 640, 1360, 420)
+        position: pos(60, 680, 1360, 420)
         layer: 1
       }
       block t_atwk {
-        position: pos(40, 220, 220, 180)
+        position: pos(40, 260, 220, 180)
         layer: 3
       }
       block t_q19w {
-        position: pos(40, 420, 220, 180)
+        position: pos(40, 460, 220, 180)
         layer: 1
       }
       block v_z5lv {
-        position: pos(60, 440, 180, 80)
+        position: pos(60, 480, 180, 80)
         layer: 2
       }
       block v_fy_filter {
-        position: pos(460, 40, 300, 260)
+        position: pos(40, 160, 300, 100)
         layer: 1
       }
       mobile {
