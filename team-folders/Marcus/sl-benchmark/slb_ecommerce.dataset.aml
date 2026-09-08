@@ -7,7 +7,7 @@ so all comparison tiers (Tier 0 raw SQL, Tier 1 dbt SL, Tier 2 Cube, Tier 3 AMQL
 Governed definitions (the whole point of the benchmark):
 - GMV     = sum(quantity * price), ALL statuses.
 - NMV     = sum(quantity * price * (1 - discount)) EXCLUDING cancelled/refunded. discount is a RATE 0..1.
-- Revenue = NMV * commission (0.5). This is what "revenue" MEANS here; a naive text-to-SQL agent cannot guess it.
+- Revenue = 50% of discounted current-list-price item value from DELIVERED orders only, by order-placement date.
 - AOV     = GMV / total_orders.
 '''
   data_source_name: 'demo_public'
@@ -99,10 +99,10 @@ Governed definitions (the whole point of the benchmark):
     description: 'Realized fulfilled value after order-level discounts; excludes cancelled and refunded.'
   }
   metric revenue {
-    label: 'Total Revenue'
+    label: 'Platform Commission Revenue'
     type: 'number'
-    definition: @aql nmv * revenue_commission;;
-    description: 'Platform revenue from fulfilled orders = NMV * commission.'
+    definition: @aql (nmv * revenue_commission) | where(slb_orders.status is 'delivered');;
+    description: 'Platform commission from delivered orders only: 50% of item quantity times current product price after the order-level discount. Time periods refer to when the order was placed.'
   }
   metric aov {
     label: 'AOV (Average Order Value)'
