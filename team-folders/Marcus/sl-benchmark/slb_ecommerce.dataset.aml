@@ -69,6 +69,12 @@ Governed definitions (the whole point of the benchmark):
     definition: @aql count(slb_orders.id);;
     description: 'Count of orders, all statuses.'
   }
+  metric total_delivery_attempts {
+    label: 'Total Delivery Attempts'
+    type: 'number'
+    definition: @aql slb_orders | sum(slb_orders.delivery_attempts);;
+    description: 'Delivery attempts recorded per order, across all statuses. Each order contributes its full attempts once to every product category it contains, and once overall. Category totals are not additive to the overall total. Time periods refer to when the order was placed.'
+  }
   metric total_users {
     label: 'Total Users'
     type: 'number'
