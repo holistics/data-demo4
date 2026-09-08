@@ -36,7 +36,6 @@ Model slb_orders {
   dimension user_id {
     label: 'User Id'
     type: 'number'
-    hidden: true
     definition: @sql {{ #SOURCE.user_id }};;
   }
   dimension discount {
