@@ -280,4 +280,48 @@ Model seed_c_dates = dim_dates.extend({
         END
       ) ;;
   }
+
+  // The whole of the current fiscal year, not just fiscal-year-to-date.
+  //
+  // The uncapped counterpart of `is_fiscal_ytd`, the same relationship
+  // `is_current_fiscal_quarter` has to `is_fiscal_qtd`. Built on
+  // `fiscal_year_offset` rather than a fresh CURRENT_DATE comparison, so
+  // there is still exactly one place that resolves "the fiscal year
+  // containing today".
+  dimension is_current_fiscal_year {
+    label: 'This Fiscal Year'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal year containing today, including dates after today. The uncapped counterpart of Fiscal YTD.'
+    definition: @sql {{ fiscal_year_offset }} = 0 ;;
+  }
+
+  // The fiscal year immediately before the current one.
+  //
+  // Also built on `fiscal_year_offset`, so it rolls over on the same
+  // 1 October boundary with nothing to edit.
+  dimension is_last_fiscal_year {
+    label: 'Last Fiscal Year'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal year immediately before the one containing today.'
+    definition: @sql {{ fiscal_year_offset }} = -1 ;;
+  }
+
+  // The fiscal quarter immediately before the current one.
+  //
+  // Same one-quarter-shift shortcut as `is_fiscal_qtd` / `is_current_fiscal_quarter`:
+  // fiscal quarter boundaries coincide with calendar quarter boundaries here,
+  // so subtracting exactly 3 months from the start of the current calendar
+  // quarter lands on the start of the previous one. Rewrite alongside those
+  // two if Seed ever moves to a non-quarter-boundary year end.
+  //
+  // INTERVAL '3 month' arithmetic on a DATE is valid on Postgres, Snowflake
+  // and Redshift.
+  dimension is_last_fiscal_quarter {
+    label: 'Last Fiscal Quarter'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal quarter immediately before the one containing today. Fiscal quarters coincide with calendar quarters here, because the fiscal year is shifted by exactly one quarter.'
+    definition: @sql
+      DATE_TRUNC('quarter', {{ #SOURCE.date_key }})
+        = DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '3 month' ;;
+  }
 })

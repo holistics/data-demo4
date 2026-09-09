@@ -20,7 +20,6 @@ Model slb_merchants {
   dimension city_id {
     label: 'City Id'
     type: 'number'
-    hidden: true
     definition: @sql {{ #SOURCE.city_id }};;
   }
 }
