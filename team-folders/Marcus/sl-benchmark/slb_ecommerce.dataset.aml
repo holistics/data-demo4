@@ -24,6 +24,7 @@ Governed definitions (the whole point of the benchmark):
     slb_categories,
     slb_merchants,
     slb_stock_snapshots,
+    slb_stock_daily_balances,
   ]
 
   relationships: [
@@ -36,6 +37,7 @@ Governed definitions (the whole point of the benchmark):
     relationship(slb_products.merchant_id > slb_merchants.id, true),
     relationship(slb_merchants.city_id > slb_cities.id, false),
     relationship(slb_stock_snapshots.product_id > slb_products.id, true),
+    relationship(slb_stock_daily_balances.product_id > slb_products.id, true),
   ]
 
   // ── buyer/cohort dimensions (user grain) ──────────────────────────────────
@@ -82,16 +84,16 @@ Governed definitions (the whole point of the benchmark):
     label: 'Closing Stock Units'
     type: 'number'
     definition: @aql
-      unique(slb_stock_snapshots.product_location_key)
+      unique(slb_stock_daily_balances.product_location_key)
         | select(
-            product_location_key: slb_stock_snapshots.product_location_key,
+            product_location_key: slb_stock_daily_balances.product_location_key,
             latest_stock_units:
-              sum(slb_stock_snapshots.stock_units)
-                | where(slb_stock_snapshots.snapshot_date == max(slb_stock_snapshots.snapshot_date))
+              sum(slb_stock_daily_balances.stock_units)
+                | where(slb_stock_daily_balances.balance_date == max(slb_stock_daily_balances.balance_date))
           )
         | sum(latest_stock_units)
     ;;
-    description: 'Semi-additive stock balance. Sum across products and stock locations, but across time use each product/location entity’s latest observed snapshot in the selected period. Missing dates carry forward to the latest observed snapshot in the period; observed zero balances remain zero.'
+    description: 'Semi-additive stock balance. Sum across products and stock locations, but across time use each product/location entity’s latest carried daily balance in the selected period. Daily balances are derived from sparse observed snapshots using latest observation on or before each date; observed zero balances remain zero.'
   }
   metric total_users {
     label: 'Total Users'
