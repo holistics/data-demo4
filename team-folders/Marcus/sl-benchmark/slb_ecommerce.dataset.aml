@@ -1,16 +1,17 @@
 Dataset slb_ecommerce {
   label: 'SL Benchmark - Ecommerce'
   description: '''
-Benchmark dataset for the AMQL-vs-other-SL comparison. Reads testdb.ecommerce (via demo_public)
+Benchmark dataset for the AMQL-vs-other-SL comparison. Reads the Neon benchmark projection (via slb_ecommerce_neon_h4)
 so all comparison tiers (Tier 0 raw SQL, Tier 1 dbt SL, Tier 2 Cube, Tier 3 AMQL) query identical data.
 
 Governed definitions (the whole point of the benchmark):
 - GMV     = sum(quantity * price), ALL statuses.
 - NMV     = sum(quantity * price * (1 - discount)) EXCLUDING cancelled/refunded. discount is a RATE 0..1.
-- Revenue = NMV * commission (0.5). This is what "revenue" MEANS here; a naive text-to-SQL agent cannot guess it.
+- Revenue = 50% of discounted current-list-price item value from DELIVERED orders only, by order-placement date.
 - AOV     = GMV / total_orders.
+- Closing stock units = sum the latest product/location stock balance on or before the period end.
 '''
-  data_source_name: 'demo_public'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
 
   models: [
@@ -22,6 +23,8 @@ Governed definitions (the whole point of the benchmark):
     slb_countries,
     slb_categories,
     slb_merchants,
+    slb_stock_snapshots,
+    slb_stock_daily_balances,
   ]
 
   relationships: [
@@ -33,6 +36,8 @@ Governed definitions (the whole point of the benchmark):
     relationship(slb_products.category_id > slb_categories.id, true),
     relationship(slb_products.merchant_id > slb_merchants.id, true),
     relationship(slb_merchants.city_id > slb_cities.id, false),
+    relationship(slb_stock_snapshots.product_id > slb_products.id, true),
+    relationship(slb_stock_daily_balances.product_id > slb_products.id, true),
   ]
 
   // ── buyer/cohort dimensions (user grain) ──────────────────────────────────
@@ -69,6 +74,27 @@ Governed definitions (the whole point of the benchmark):
     definition: @aql count(slb_orders.id);;
     description: 'Count of orders, all statuses.'
   }
+  metric total_delivery_attempts {
+    label: 'Total Delivery Attempts'
+    type: 'number'
+    definition: @aql slb_orders | sum(slb_orders.delivery_attempts);;
+    description: 'Delivery attempts recorded per order, across all statuses. Each order contributes its full attempts once to every product category it contains, and once overall. Category totals are not additive to the overall total. Time periods refer to when the order was placed.'
+  }
+  metric closing_stock_units {
+    label: 'Closing Stock Units'
+    type: 'number'
+    definition: @aql
+      unique(slb_stock_daily_balances.product_location_key)
+        | select(
+            product_location_key: slb_stock_daily_balances.product_location_key,
+            latest_stock_units:
+              sum(slb_stock_daily_balances.stock_units)
+                | where(slb_stock_daily_balances.balance_date == max(slb_stock_daily_balances.balance_date))
+          )
+        | sum(latest_stock_units)
+    ;;
+    description: 'Semi-additive stock balance. Sum across products and stock locations, but across time use each product/location entity’s latest carried daily balance in the selected period. Daily balances are derived from sparse observed snapshots using latest observation on or before each date; observed zero balances remain zero.'
+  }
   metric total_users {
     label: 'Total Users'
     type: 'number'
@@ -93,10 +119,10 @@ Governed definitions (the whole point of the benchmark):
     description: 'Realized fulfilled value after order-level discounts; excludes cancelled and refunded.'
   }
   metric revenue {
-    label: 'Total Revenue'
+    label: 'Platform Commission Revenue'
     type: 'number'
-    definition: @aql nmv * revenue_commission;;
-    description: 'Platform revenue from fulfilled orders = NMV * commission.'
+    definition: @aql (nmv * revenue_commission) | where(slb_orders.status is 'delivered');;
+    description: 'Platform commission from delivered orders only: 50% of item quantity times current product price after the order-level discount. Time periods refer to when the order was placed.'
   }
   metric aov {
     label: 'AOV (Average Order Value)'

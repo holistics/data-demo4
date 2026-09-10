@@ -1,11 +1,17 @@
 Model slb_order_items {
   type: 'table'
   label: 'SLB Order Items'
-  description: 'Line items within an order (testdb.ecommerce via demo_public).'
-  data_source_name: 'demo_public'
+  description: 'Line items within an order (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
-  table_name: '"ecommerce"."order_items"'
+  table_name: '"benchmark"."order_items"'
 
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
   dimension order_id {
     label: 'Order Id'
     type: 'number'
