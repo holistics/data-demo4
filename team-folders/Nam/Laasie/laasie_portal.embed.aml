@@ -35,7 +35,7 @@ EmbedPortal laasie_portal {
   objects: [
     // Dashboards — external only
     laasie_owner_portal,
-    laasie_client,
+    laasie,
   ]
   required_permissions: [
     laasie_client.permission.owner_group_scope,

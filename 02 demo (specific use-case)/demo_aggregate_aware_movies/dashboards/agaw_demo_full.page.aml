@@ -1,38 +1,18 @@
 Dashboard aggregate_awareness_demo_dashboard_full {
-  // ------------------------------------------------
-  // -------------- 0. Table of Content -------------
-  // ------------------------------------------------
-
-  // 1. Dashboard File Metadata
-  // 2. Visualization Widgets
-  // -- 2.1. Group - Introduction
-  // -- 2.2. Group - Filter
-  // -- 2.3. Group - Widgets NOT using Aggregate Awareness
-  // -- 2.4. Group - Widgets using Aggregate Awareness
-  // 3. Dashboard Customization
-  // -- 3.1. Custom Theme
-  // -- 3.2. Layout & Positions
-  // -- 3.3. Interations
-  // -- 3.4. Dashboard Settings
-
-  // ------------------------------------------------
-  // ---------- 1. Dashboard File Metadata ----------
-  // ------------------------------------------------
   title: 'Aggregate Awareness - Full Example'
-  description: @md 
-    This demo illustrates the capability of Aggregate Awareness in Holistics
+  description: @md This demo illustrates the capability of Aggregate Awareness in Holistics
 
-    ---
+---
 
-    Aggregate Awareness is the capability of automatically identifying eligible pre-aggregates (transformed by tools like dbt, Airflow, BI like Holistics, etc.) and substituting them into queries, making the queries use smaller pre-aggregated tables while still producing accurate results. It can reduce the time to analyze gigabytes-to-terabytes of data from several minutes to a few seconds.
+Aggregate Awareness is the capability of automatically identifying eligible pre-aggregates (transformed by tools like dbt, Airflow, BI like Holistics, etc.) and substituting them into queries, making the queries use smaller pre-aggregated tables while still producing accurate results. It can reduce the time to analyze gigabytes-to-terabytes of data from several minutes to a few seconds.
 
-    This feature has impacts on everyone in the team:
+This feature has impacts on everyone in the team:
 
-    - Analysts can maintain the pre-aggregates better with less effort (improved process).
-    - Business users will get the same insights faster by pre-aggregated tables instead of raw data (improved timeliness).
+- Analysts can maintain the pre-aggregates better with less effort (improved process).
+- Business users will get the same insights faster by pre-aggregated tables instead of raw data (improved timeliness).
 
-    Aggregate Awareness is now in **Closed Beta**. You can [Request Beta Access](https://form.jotform.com/230511857392457/prefill/664c2fcc633961c7bed679d6969e) to try it out!
-    Learn about this feature on [Aggregate Awareness | Public Doc](https://docs.holistics.io/docs/aggregate-awareness) or different use cases on [Aggregate Awareness | Tutorial](https://docs.holistics.io/tutorials/using-aggregate-awareness).;;
+Aggregate Awareness is now in **Closed Beta**. You can [Request Beta Access](https://form.jotform.com/230511857392457/prefill/664c2fcc633961c7bed679d6969e) to try it out!
+Learn about this feature on [Aggregate Awareness | Public Doc](https://docs.holistics.io/docs/aggregate-awareness) or different use cases on [Aggregate Awareness | Tutorial](https://docs.holistics.io/tutorials/using-aggregate-awareness).;;
 
   // ------------------------------------------------
   // ----------- 2. Visualization Widgets -----------
@@ -544,11 +524,8 @@ different use cases on [Aggregate Awareness | Tutorial](https://docs.holistics.i
       ]
     }
   ]
-
-  // 3.4. Dashboard Settings
   settings {
-    timezone: 'America/Los_Angeles'
-    autorun: false
     cache_duration: 10
+    autorun_on_open: false
   }
 }

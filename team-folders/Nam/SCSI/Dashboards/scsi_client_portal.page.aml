@@ -326,5 +326,5 @@ Every account you have placed, with its current balance, status and aging bucket
     }
   }
 
-  theme: scsi_theme
+  theme: scsi_client_portal_theme
 }

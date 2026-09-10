@@ -1,10 +1,10 @@
 Model slb_countries {
   type: 'table'
   label: 'SLB Countries'
-  description: 'Countries (testdb.ecommerce via demo_public).'
-  data_source_name: 'demo_public'
+  description: 'Countries (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
-  table_name: '"ecommerce"."countries"'
+  table_name: '"benchmark"."countries"'
 
   dimension code {
     label: 'Country Code'

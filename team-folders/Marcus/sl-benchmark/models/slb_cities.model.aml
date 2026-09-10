@@ -1,10 +1,10 @@
 Model slb_cities {
   type: 'table'
   label: 'SLB Cities'
-  description: 'Cities (testdb.ecommerce via demo_public).'
-  data_source_name: 'demo_public'
+  description: 'Cities (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
-  table_name: '"ecommerce"."cities"'
+  table_name: '"benchmark"."cities"'
 
   dimension id {
     label: 'Id'

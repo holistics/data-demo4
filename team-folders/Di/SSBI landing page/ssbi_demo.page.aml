@@ -825,7 +825,6 @@ Dashboard ssbi_demo {
   ]
   theme: H.themes.vanilla
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 4320
     autorun_on_open: true
     autorun_on_changes: true

@@ -28,7 +28,7 @@ Model ecommerce_users_copy {
     description: ""
     hidden: false
     definition: @aql concat(
-      'mailto:', ecommerce_users.email
+      'mailto:', ecommerce_users_copy.email
     );;
     primary_key: false
   }
@@ -176,7 +176,7 @@ end;;
     type: 'number'
     description: ""
     hidden: false
-    definition: @aql count(ecommerce_users.id);;
+    definition: @aql count(ecommerce_users_copy.id);;
     aggregation_type: "custom"
   }
   measure total_users {
@@ -184,7 +184,7 @@ end;;
     type: "number"
     description: ""
     hidden: false
-    definition: @aql count(ecommerce_users.id);;
+    definition: @aql count(ecommerce_users_copy.id);;
     aggregation_type: "custom"
   }
 

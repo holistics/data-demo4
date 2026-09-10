@@ -1,0 +1,49 @@
+// =====================================================================
+// Solution A - shifted Fiscal Date, on the fact table.
+//
+// Self-contained: this dataset, the model beside it and the page beside
+// it are used by no other solution folder, and this folder uses nothing
+// from theirs. The only shared objects are the core-demo base models
+// (`ecommerce_orders`, `ecommerce_order_items`, `ecommerce_products`),
+// which every solution extends and none of them edits.
+// =====================================================================
+Dataset seed_a {
+  label: 'Seed Company - Solution A (Shifted Fiscal Date)'
+  description: '''
+Fiscal year on the fact table, as a shifted date. FY runs 1 Oct - 30 Sep and is named by the calendar year it ends in, so FY2026 = 1 Oct 2025 - 30 Sep 2026.
+
+`Fiscal Date` and `Fiscal Month Start` on `seed_a_orders` are the close date shifted forward 3 months, so the shifted date's calendar year IS the fiscal year. They are still date fields, so `this year` on them means the current fiscal year, and date drills and date transformations all keep working.
+
+The catch, which the page beside this dataset is built to show: any absolute date typed into a filter on them is shifted too, and every axis label reads as a calendar date three months late. 15 Nov 2025 renders as 15 Feb 2026.
+
+Ecommerce order data stands in for Seed's HubSpot pipeline; `created_at` stands in for `closedate`.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    seed_a_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > seed_a_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+  ]
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross merchandise value. Stands in for Seed s Expected Amount.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  metric total_orders {
+    label: 'Orders'
+    type: 'number'
+    description: 'Order count. Stands in for Seed s deal count.'
+    definition: @aql count(seed_a_orders.id) ;;
+    format: '#,###0'
+  }
+}
