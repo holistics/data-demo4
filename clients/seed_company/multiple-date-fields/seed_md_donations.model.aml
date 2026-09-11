@@ -1,14 +1,12 @@
-// Donations with two dates: pledged and closed. Illustrative data — the shared
-// ecommerce tables re-presented as donations.
+// Illustrative data: the shared ecommerce tables re-presented as donations.
 Model seed_md_donations {
   type: 'query'
   label: 'Donations'
   description: 'Donations with both a pledge date and a close date. Illustrative data: the shared ecommerce tables re-presented as donations, so shapes are real and amounts are not Seed figures.'
   data_source_name: 'demodb'
 
-  // The pledge lag varies per row (30-119 days) so that some donations cross the
-  // 30 Sep / 1 Oct line and some do not. A fixed lag would slide every donation
-  // by the same amount.
+  // Pledge lag varies 30-119 days so some gifts cross the 30 Sep / 1 Oct line and
+  // some do not. A fixed lag would move every gift by the same amount.
   query: @sql
     SELECT o.id                                    AS donation_id
          , o.user_id                               AS donor_id
@@ -56,9 +54,8 @@ Model seed_md_donations {
     definition: @sql {{ #SOURCE.amount }};;
   }
 
-  // Carries the dropdown value into AQL; filters nothing by itself. Only metrics
-  // that read it respond. Keep it text — a number param with numeric
-  // allowed_values makes the dataset return HTTP 500 on every query.
+  // Filters nothing by itself — only metrics that read it respond. Keep the type
+  // text: a number param with numeric allowed_values returns HTTP 500 on every query.
   param date_basis {
     label: 'Date Basis'
     type: 'text'

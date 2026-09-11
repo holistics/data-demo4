@@ -1,21 +1,17 @@
-// Oct-Sep fiscal calendar on a single date dimension. Every date field on the
-// donations fact joins to this one model; the active join is switched per metric.
-//
+// Fiscal year runs 1 Oct - 30 Sep, named by the ending year: 2026 = Oct 2025 - Sep 2026.
 // Extends the shared `dim_dates` (@tag('Endorsed')) — read, never edited.
-// Fiscal year is named by the ending calendar year: 2026 = 1 Oct 2025 to 30 Sep 2026.
 //
-// Built on `month_number` / `year` rather than date arithmetic on `date_key`.
-// `date_diff` on `date_key` is off by a whole month: it gets cast to timestamptz
-// in the tenant timezone, which rolls month starts into the previous month.
+// Derive from `month_number` / `year`, never `date_diff` on `date_key`: `date_key` is
+// cast to timestamptz in the tenant timezone, which rolls month starts into the
+// previous month and shifts the whole calendar by one month.
 //
-// All @sql, so these survive being extended again. Written in AQL they would
-// carry this model's name into any copy and fail with E102.
+// Keep every definition @sql. In AQL they carry this model's name into any copy and
+// fail with E102 when extended.
 Model seed_md_dates = dim_dates.extend({
   label: 'Fiscal Dates'
   description: 'Shared date dimension plus Seed Company fiscal year columns (FY runs Oct 1 - Sep 30, named by ending year). Every date field on the donations fact joins to this one model.'
 
-  // Lets the monthly chart sit on the date dimension, so its axis follows the
-  // Date Basis toggle.
+  // The month chart's axis, so it follows the Date Basis toggle.
   dimension calendar_month {
     label: 'Calendar Month'
     type: 'text'
@@ -43,7 +39,6 @@ Model seed_md_dates = dim_dates.extend({
     definition: @sql 'FY ' || CAST({{ fiscal_year }} AS VARCHAR) ;;
   }
 
-  // Year dropped — use as a filter, not a time-series axis.
   dimension fiscal_quarter {
     label: 'Fiscal Quarter'
     type: 'text'
@@ -56,8 +51,6 @@ Model seed_md_dates = dim_dates.extend({
       END ;;
   }
 
-  // One value per quarter per year, so a quarterly series does not collapse every
-  // Q1 into one bar.
   dimension fiscal_year_quarter {
     label: 'Fiscal Year & Quarter'
     type: 'text'
@@ -76,8 +69,6 @@ Model seed_md_dates = dim_dates.extend({
       END ;;
   }
 
-  // The sort key lives inside the label because chart sorting addresses fields by
-  // their position in the viz, so a text axis cannot be sorted by another field.
   dimension fiscal_period_label {
     label: 'Month Position in FY (label)'
     type: 'text'
@@ -87,10 +78,9 @@ Model seed_md_dates = dim_dates.extend({
         || ' ' || {{ #SOURCE.month_name_abbr }} ;;
   }
 
-  // Row-level against CURRENT_DATE, not `fiscal_year - max(fiscal_year)`: an
-  // aggregate re-bases whenever a filter narrows the query, so a card filtered to
-  // FY2024 would call FY2024 current. CURRENT_DATE is a keyword, so the SQL text
-  // is stable and the query cache still hits — unlike @now.
+  // Keep row-level. `fiscal_year - max(fiscal_year)` re-bases when a filter narrows
+  // the query. Keep CURRENT_DATE, not @now, which inlines a timestamp and defeats
+  // the query cache.
   dimension fiscal_year_offset {
     label: 'Fiscal Year Offset'
     type: 'number'
@@ -113,10 +103,8 @@ Model seed_md_dates = dim_dates.extend({
       AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
   }
 
-  // The fiscal year is shifted by exactly one quarter, so fiscal and calendar
-  // quarter boundaries are the same dates and no fiscal arithmetic is needed.
-  // This and the two quarter dimensions below need rewriting together if Seed
-  // ever moves to a year end that is not a quarter boundary.
+  // Assumes fiscal quarters coincide with calendar quarters, true only while the
+  // year end is a quarter boundary. This and the two below break together if it moves.
   dimension is_fiscal_qtd {
     label: 'Fiscal QTD'
     type: 'truefalse'

@@ -1,13 +1,8 @@
-// Fiscal reporting on two date fields. Same page as `seed_fy_solution_c_v2`,
-// rebuilt on `seed_md` with the Seed brand theme and a Date Basis dropdown.
-//
-// Three things to know before editing a block — full notes in AGENTS.md:
-//   1. Metric blocks must use `giving_by_basis` / `donations_by_basis`. A block on
-//      a plain metric ignores the Date Basis dropdown with no error.
-//   2. The month chart plots `seed_md_dates.calendar_month`, a date-dimension
-//      field, so its axis follows the dropdown. A fact date column would not.
-//   3. `v_fy_filter`'s CSS is keyed to its block name, its field labels and its
-//      row order. Renaming or reordering breaks it silently.
+// `seed_fy_solution_c_v2` rebuilt on `seed_md`, themed, plus a Date Basis dropdown.
+// Fuller notes in AGENTS.md. Three things break silently:
+//   - metric blocks must use `giving_by_basis` / `donations_by_basis`
+//   - the month chart's axis must stay on a date-dimension field
+//   - `v_fy_filter`'s CSS is keyed to its block name, field labels and row order
 @tag('Endorsed')
 Dashboard seed_md_fiscal_dashboard {
   title: 'Fiscal Year Reporting on a Non-Calendar Year (Oct-Sep) - Two Date Fields'
@@ -172,8 +167,7 @@ font-size:12px; font-weight:400; color:#636466; }
     }
   }
 
-  // A param filter is a `type: 'field'` block pointed at a param. The default is
-  // load-bearing: `case()` has no else branch, so a cleared filter returns null.
+  // The default is load-bearing: a cleared filter makes the metrics return null.
   block f_date_basis: FilterBlock {
     label: 'Date Basis'
     type: 'field'
@@ -330,7 +324,7 @@ font-size:12px; font-weight:400; color:#636466; }
     }
   }
 
-  // Axis on the date dimension, so it re-buckets when the dropdown flips.
+  // Date-dimension axis, so it re-buckets when the dropdown flips.
   block v_jkpa: VizBlock {
     label: 'Giving by Month (calendar year-month)'
     viz: ColumnChart {
@@ -396,8 +390,6 @@ Each donation carries **two** dates: the date it was **pledged** and the date it
     content: @md <iframe src='https://dbdiagram.io/e/6aa38ce3fa3334712c0c79be/6aa38ecdfa3334712c0ca4fe' width="100%" height="350" frameborder="0" allowtransparency="true" style="border:1px solid #CDC3B0;border-radius:6px;"></iframe>;;
   }
 
-  // Both bases at once — the comparison the dropdown cannot show, since it is one
-  // basis at a time. Same gifts in both series, so the grand totals match.
   block v_basis_compare: VizBlock {
     label: 'Same donations, both bases - close vs pledge by fiscal year'
     viz: ColumnChart {
