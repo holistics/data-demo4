@@ -1,0 +1,160 @@
+// Oct-Sep fiscal calendar on a single date dimension. Every date field on the
+// donations fact joins to this one model; the active join is switched per metric.
+//
+// Extends the shared `dim_dates` (@tag('Endorsed')) — read, never edited.
+// Fiscal year is named by the ending calendar year: 2026 = 1 Oct 2025 to 30 Sep 2026.
+//
+// Built on `month_number` / `year` rather than date arithmetic on `date_key`.
+// `date_diff` on `date_key` is off by a whole month: it gets cast to timestamptz
+// in the tenant timezone, which rolls month starts into the previous month.
+//
+// All @sql, so these survive being extended again. Written in AQL they would
+// carry this model's name into any copy and fail with E102.
+Model seed_md_dates = dim_dates.extend({
+  label: 'Fiscal Dates'
+  description: 'Shared date dimension plus Seed Company fiscal year columns (FY runs Oct 1 - Sep 30, named by ending year). Every date field on the donations fact joins to this one model.'
+
+  // Lets the monthly chart sit on the date dimension, so its axis follows the
+  // Date Basis toggle.
+  dimension calendar_month {
+    label: 'Calendar Month'
+    type: 'text'
+    description: "Plain calendar month, e.g. '2025-10 (Oct)'. Sorts chronologically as text. Unshifted - a fiscal year changes how months are grouped, not what a month is."
+    definition: @sql
+      {{ #SOURCE.year }} || '-' || {{ #SOURCE.month_number }}
+        || ' (' || {{ #SOURCE.month_name_abbr }} || ')' ;;
+  }
+
+  dimension fiscal_year {
+    label: 'Fiscal Year'
+    type: 'number'
+    description: 'Fiscal year number, named by the ending calendar year. Oct 2025 - Sep 2026 = 2026.'
+    definition: @sql
+      CASE WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 10
+           THEN CAST({{ #SOURCE.year }} AS INT) + 1
+           ELSE CAST({{ #SOURCE.year }} AS INT)
+      END ;;
+  }
+
+  dimension fiscal_year_label {
+    label: 'Fiscal Year Label'
+    type: 'text'
+    description: "Display form of the fiscal year, e.g. 'FY 2026' = 1 Oct 2025 - 30 Sep 2026. Alphabetical order is chronological order."
+    definition: @sql 'FY ' || CAST({{ fiscal_year }} AS VARCHAR) ;;
+  }
+
+  // Year dropped — use as a filter, not a time-series axis.
+  dimension fiscal_quarter {
+    label: 'Fiscal Quarter'
+    type: 'text'
+    description: "Which quarter of the fiscal year, with the year dropped. 'Q1 (Oct-Dec)' covers Q1 of every year. Use Fiscal Year & Quarter to plot a quarterly series."
+    definition: @sql
+      CASE WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 10 THEN 'Q1 (Oct-Dec)'
+           WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 7  THEN 'Q4 (Jul-Sep)'
+           WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 4  THEN 'Q3 (Apr-Jun)'
+           ELSE 'Q2 (Jan-Mar)'
+      END ;;
+  }
+
+  // One value per quarter per year, so a quarterly series does not collapse every
+  // Q1 into one bar.
+  dimension fiscal_year_quarter {
+    label: 'Fiscal Year & Quarter'
+    type: 'text'
+    description: "Fiscal quarter including its year, e.g. 'FY 2026-Q1 (Oct-Dec)' = Oct-Dec 2025. Alphabetical order is chronological order, so it works directly as a chart axis."
+    definition: @sql {{ fiscal_year_label }} || '-' || {{ fiscal_quarter }} ;;
+  }
+
+  dimension fiscal_period_number {
+    label: 'Month Position in FY'
+    type: 'number'
+    description: "Position of the calendar month within the fiscal year: Oct = 1, Sep = 12. A sort key for overlaying fiscal years on one axis, not a fiscal month number. For a plain monthly series use Calendar Month."
+    definition: @sql
+      CASE WHEN CAST({{ #SOURCE.month_number }} AS INT) >= 10
+           THEN CAST({{ #SOURCE.month_number }} AS INT) - 9
+           ELSE CAST({{ #SOURCE.month_number }} AS INT) + 3
+      END ;;
+  }
+
+  // The sort key lives inside the label because chart sorting addresses fields by
+  // their position in the viz, so a text axis cannot be sorted by another field.
+  dimension fiscal_period_label {
+    label: 'Month Position in FY (label)'
+    type: 'text'
+    description: "Real calendar months labelled '01 Oct' ... '12 Sep' so they sort in fiscal order. The leading number is a sort key, not a fiscal month number."
+    definition: @sql
+      LPAD(CAST({{ fiscal_period_number }} AS VARCHAR), 2, '0')
+        || ' ' || {{ #SOURCE.month_name_abbr }} ;;
+  }
+
+  // Row-level against CURRENT_DATE, not `fiscal_year - max(fiscal_year)`: an
+  // aggregate re-bases whenever a filter narrows the query, so a card filtered to
+  // FY2024 would call FY2024 current. CURRENT_DATE is a keyword, so the SQL text
+  // is stable and the query cache still hits — unlike @now.
+  dimension fiscal_year_offset {
+    label: 'Fiscal Year Offset'
+    type: 'number'
+    description: '0 = the fiscal year containing today, -1 = the one before it. Resolves against CURRENT_DATE row by row and is not affected by dashboard filters.'
+    definition: @sql
+      {{ fiscal_year }} - (
+        CASE WHEN CAST(EXTRACT(MONTH FROM CURRENT_DATE) AS INT) >= 10
+             THEN CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INT) + 1
+             ELSE CAST(EXTRACT(YEAR FROM CURRENT_DATE) AS INT)
+        END
+      ) ;;
+  }
+
+  dimension is_fiscal_ytd {
+    label: 'Fiscal YTD'
+    type: 'truefalse'
+    description: 'True for dates in the fiscal year containing today, up to and including today. Resolves against CURRENT_DATE, so it rolls forward on its own.'
+    definition: @sql
+      {{ fiscal_year_offset }} = 0
+      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+  }
+
+  // The fiscal year is shifted by exactly one quarter, so fiscal and calendar
+  // quarter boundaries are the same dates and no fiscal arithmetic is needed.
+  // This and the two quarter dimensions below need rewriting together if Seed
+  // ever moves to a year end that is not a quarter boundary.
+  dimension is_fiscal_qtd {
+    label: 'Fiscal QTD'
+    type: 'truefalse'
+    description: 'True for dates in the fiscal quarter containing today, up to and including today. Fiscal quarters coincide with calendar quarters here.'
+    definition: @sql
+      {{ #SOURCE.date_key }} >= DATE_TRUNC('quarter', CURRENT_DATE)
+      AND {{ #SOURCE.date_key }} <= CURRENT_DATE ;;
+  }
+
+  dimension is_current_fiscal_quarter {
+    label: 'This Fiscal Quarter'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal quarter containing today, including dates after today. The uncapped counterpart of Fiscal QTD.'
+    definition: @sql
+      DATE_TRUNC('quarter', {{ #SOURCE.date_key }})
+        = DATE_TRUNC('quarter', CURRENT_DATE) ;;
+  }
+
+  dimension is_current_fiscal_year {
+    label: 'This Fiscal Year'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal year containing today, including dates after today. The uncapped counterpart of Fiscal YTD.'
+    definition: @sql {{ fiscal_year_offset }} = 0 ;;
+  }
+
+  dimension is_last_fiscal_year {
+    label: 'Last Fiscal Year'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal year immediately before the one containing today.'
+    definition: @sql {{ fiscal_year_offset }} = -1 ;;
+  }
+
+  dimension is_last_fiscal_quarter {
+    label: 'Last Fiscal Quarter'
+    type: 'truefalse'
+    description: 'True for every date in the fiscal quarter immediately before the one containing today.'
+    definition: @sql
+      DATE_TRUNC('quarter', {{ #SOURCE.date_key }})
+        = DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '3 month' ;;
+  }
+})

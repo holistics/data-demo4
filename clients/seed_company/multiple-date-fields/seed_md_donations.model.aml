@@ -1,0 +1,70 @@
+// Donations with two dates: pledged and closed. Illustrative data — the shared
+// ecommerce tables re-presented as donations.
+Model seed_md_donations {
+  type: 'query'
+  label: 'Donations'
+  description: 'Donations with both a pledge date and a close date. Illustrative data: the shared ecommerce tables re-presented as donations, so shapes are real and amounts are not Seed figures.'
+  data_source_name: 'demodb'
+
+  // The pledge lag varies per row (30-119 days) so that some donations cross the
+  // 30 Sep / 1 Oct line and some do not. A fixed lag would slide every donation
+  // by the same amount.
+  query: @sql
+    SELECT o.id                                    AS donation_id
+         , o.user_id                               AS donor_id
+         , o.created_at::date                      AS close_date
+         , (o.created_at - ((30 + (o.id % 90)) * interval '1 day'))::date AS pledge_date
+         , SUM(oi.quantity * p.price)              AS amount
+    FROM "ecommerce"."orders" o
+    JOIN "ecommerce"."order_items" oi ON oi.order_id = o.id
+    JOIN "ecommerce"."products"    p  ON p.id = oi.product_id
+    GROUP BY 1, 2, 3, 4 ;;
+  models: []
+
+  dimension donation_id {
+    label: 'Donation Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.donation_id }};;
+  }
+
+  dimension donor_id {
+    label: 'Donor Id'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.donor_id }};;
+  }
+
+  dimension close_date {
+    label: 'Close Date'
+    type: 'date'
+    description: 'Date the gift closed / the transaction landed. The default fiscal reporting basis.'
+    definition: @sql {{ #SOURCE.close_date }};;
+  }
+
+  dimension pledge_date {
+    label: 'Pledge Date'
+    type: 'date'
+    description: 'Date the gift was pledged, 30-119 days before it closed. Becomes the fiscal reporting basis when Date Basis is set to Pledge date.'
+    definition: @sql {{ #SOURCE.pledge_date }};;
+  }
+
+  dimension amount {
+    label: 'Amount'
+    type: 'number'
+    description: 'Gift amount.'
+    definition: @sql {{ #SOURCE.amount }};;
+  }
+
+  // Carries the dropdown value into AQL; filters nothing by itself. Only metrics
+  // that read it respond. Keep it text — a number param with numeric
+  // allowed_values makes the dataset return HTTP 500 on every query.
+  param date_basis {
+    label: 'Date Basis'
+    type: 'text'
+    allowed_values: [
+      'Close date',
+      'Pledge date'
+    ]
+  }
+}

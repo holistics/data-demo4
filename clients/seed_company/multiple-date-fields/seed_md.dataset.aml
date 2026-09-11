@@ -1,0 +1,136 @@
+// Fiscal reporting with two date fields on one fact.
+//
+// Both dates are joined to the same fiscal date dimension. One join is active
+// (close date) and `with_relationships` switches it per metric, driven by the
+// `date_basis` param. No second copy of the date dimension, so there is one
+// 'Fiscal Year' in the field list however many dates the fact carries.
+//
+// Adding another date field: one inactive relationship here, one allowed_value on
+// the param, one more `when:` per basis-aware metric.
+//
+// Both fact-side dates are DATEs cast in the warehouse, matching `date_key`.
+// Seed's HubSpot `closedate` is a timestamp, so porting needs the same
+// warehouse-side cast — not a Holistics date truncation, or the tenant timezone
+// moves gifts across the 30 Sep / 1 Oct line.
+Dataset seed_md {
+  label: 'Seed Company - Fiscal Year with Two Date Fields'
+  description: '''
+Donations carrying both a **pledge date** and a **close date**, reported on an Oct-Sep fiscal
+year that is defined once on a single date dimension.
+
+- `Date Basis` - the dropdown. 'Close date' (default) or 'Pledge date'. It switches which
+  date field is joined to the fiscal calendar; it does not filter anything.
+- `Total Giving` / `Donations` - the basis-aware metrics. **Point every block at these.**
+- `Giving (close date basis)` / `Giving (pledge date basis)` - both bases at once, for
+  comparing them side by side on one fiscal axis. No dropdown involved.
+- `Fiscal Year`, `Fiscal Year & Quarter`, `Calendar Month` - group and filter with these.
+  There is only ONE of each, however many date fields the fact has.
+
+Every fiscal window (`Fiscal YTD`, `Fiscal QTD`, `This Fiscal Year`, ...) resolves against
+CURRENT_DATE row by row, so they roll forward on their own.
+
+Illustrative data only: the shared ecommerce tables re-presented as donations. Shapes are
+real, amounts are not Seed figures.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    seed_md_donations,
+    seed_md_dates,
+  ]
+
+  relationships: [
+    relationship(seed_md_donations.close_date  > seed_md_dates.date_key, true),
+    relationship(seed_md_donations.pledge_date > seed_md_dates.date_key, false),
+  ]
+
+  // Building blocks. These read whatever relationship is active, i.e. close date.
+  // The dashboard does not use them directly.
+
+  metric total_giving {
+    label: 'Total Giving (close date)'
+    type: 'number'
+    description: 'Sum of gift amounts on the default close-date basis. Building block - dashboards should use Total Giving, which follows the Date Basis dropdown.'
+    definition: @aql sum(seed_md_donations.amount) ;;
+    format: '#,###0'
+  }
+
+  metric total_donations {
+    label: 'Donations (close date)'
+    type: 'number'
+    description: 'Count of gifts on the default close-date basis. Building block - dashboards should use Donations, which follows the Date Basis dropdown.'
+    definition: @aql count(seed_md_donations.donation_id) ;;
+    format: '#,###0'
+  }
+
+  // The basis-aware pair — what the dashboard uses. A block on plain
+  // `total_giving` ignores the dropdown with no error.
+  //
+  // `case()` has no else branch, so both allowed_values need a `when` and the
+  // filter block needs its default, or the metric returns null.
+  //
+  // The override names both relationships, one false and one true: an override can
+  // lose to a competing active path unless that path is explicitly disabled.
+
+  metric giving_by_basis {
+    label: 'Total Giving'
+    type: 'number'
+    description: 'Sum of gift amounts on whichever date basis the Date Basis dropdown selects. Close date by default.'
+    definition: @aql
+      case(
+        when: 'Pledge date' in seed_md_donations.date_basis
+        , then: total_giving | with_relationships(
+            relationship(seed_md_donations.close_date  > seed_md_dates.date_key, false, 'two_way'),
+            relationship(seed_md_donations.pledge_date > seed_md_dates.date_key, true, 'two_way'),
+          )
+
+        , when: 'Close date' in seed_md_donations.date_basis
+        , then: total_giving
+      )
+    ;;
+    format: '#,###0'
+  }
+
+  metric donations_by_basis {
+    label: 'Donations'
+    type: 'number'
+    description: 'Count of gifts on whichever date basis the Date Basis dropdown selects. Close date by default.'
+    definition: @aql
+      case(
+        when: 'Pledge date' in seed_md_donations.date_basis
+        , then: total_donations | with_relationships(
+            relationship(seed_md_donations.close_date  > seed_md_dates.date_key, false, 'two_way'),
+            relationship(seed_md_donations.pledge_date > seed_md_dates.date_key, true, 'two_way'),
+          )
+
+        , when: 'Close date' in seed_md_donations.date_basis
+        , then: total_donations
+      )
+    ;;
+    format: '#,###0'
+  }
+
+  // Both bases on one axis — the comparison the dropdown cannot show, since it is
+  // one basis at a time. Same gifts in both, so the grand totals match.
+
+  metric giving_on_close {
+    label: 'Giving (close date basis)'
+    type: 'number'
+    description: 'Gift amounts bucketed by close date, whatever the Date Basis dropdown says.'
+    definition: @aql total_giving ;;
+    format: '#,###0'
+  }
+
+  metric giving_on_pledge {
+    label: 'Giving (pledge date basis)'
+    type: 'number'
+    description: 'Gift amounts bucketed by pledge date, whatever the Date Basis dropdown says.'
+    definition: @aql
+      total_giving | with_relationships(
+        relationship(seed_md_donations.close_date  > seed_md_dates.date_key, false, 'two_way'),
+        relationship(seed_md_donations.pledge_date > seed_md_dates.date_key, true, 'two_way'),
+      )
+    ;;
+    format: '#,###0'
+  }
+}

@@ -1,0 +1,515 @@
+// Fiscal reporting on two date fields. Same page as `seed_fy_solution_c_v2`,
+// rebuilt on `seed_md` with the Seed brand theme and a Date Basis dropdown.
+//
+// Three things to know before editing a block — full notes in AGENTS.md:
+//   1. Metric blocks must use `giving_by_basis` / `donations_by_basis`. A block on
+//      a plain metric ignores the Date Basis dropdown with no error.
+//   2. The month chart plots `seed_md_dates.calendar_month`, a date-dimension
+//      field, so its axis follows the dropdown. A fact date column would not.
+//   3. `v_fy_filter`'s CSS is keyed to its block name, its field labels and its
+//      row order. Renaming or reordering breaks it silently.
+@tag('Endorsed')
+Dashboard seed_md_fiscal_dashboard {
+  title: 'Fiscal Year Reporting on a Non-Calendar Year (Oct-Sep) - Two Date Fields'
+  description: 'An Oct-Sep fiscal calendar defined once on a single date dimension, with two date fields on the fact - pledge date and close date - and a Date Basis dropdown that switches which one the fiscal calendar reads. No duplicated date dimension, no fiscal columns on the fact.'
+  theme: seed_company
+
+  block t_on38: TextBlock {
+    content: @md # Giving - Fiscal Reporting
+### Donations on an Oct-Sep fiscal year, pledge or close date;;
+  }
+
+  block v_fy_filter: VizBlock {
+    label: 'Fiscal Year Filter'
+    viz: MarkdownViz {
+      dataset: seed_md
+      rows: [
+        VizFieldFull {
+          ref: r(seed_md_dates.fiscal_year_label)
+          format {
+            type: 'text'
+          }
+          uname: 'seed_md_dates_fiscal_year_label'
+        },
+        VizFieldFull {
+          label: 'Fiscal Quarter'
+          ref: r(seed_md_dates.fiscal_year_quarter)
+          format {
+            type: 'text'
+          }
+        },
+        r(seed_md_dates.is_current_fiscal_quarter),
+        r(seed_md_dates.is_current_fiscal_year),
+        r(seed_md_dates.is_last_fiscal_quarter),
+        r(seed_md_dates.is_last_fiscal_year)
+      ]
+      content: @md <style>
+[data-uname="v_fy_filter"] .ci-viz-result,
+[data-uname="v_fy_filter"] .h-full,
+[data-uname="v_fy_filter"] .text-content,
+[data-uname="v_fy_filter"] .vue-markdown { overflow: visible !important; }
+[data-uname="v_fy_filter"] { z-index: 50 !important; position: relative; }
+
+.fiscal-dropdown { width:100%; max-width:280px; font-size:12px; outline:none; }
+.fiscal-dropdown-summary { display:flex; align-items:center; justify-content:space-between; gap:8px;
+height:32px; padding:6px 10px; border:1px solid #CDC3B0; border-radius:8px; background:#FFFFFF;
+box-shadow:0 1px 2px rgba(50,50,50,0.04);
+color:#323232; font-weight:400; cursor:pointer; user-select:none; }
+.fiscal-dropdown-summary::after { content:'▾'; flex:none; font-size:11px; color:#636466; transition:transform 160ms ease; }
+.fiscal-dropdown-summary:hover { border-color:#636466; }
+.fiscal-dropdown:focus-within .fiscal-dropdown-summary { border-bottom-left-radius:0; border-bottom-right-radius:0; border-color:#41452B; box-shadow:0 0 0 3px rgba(65,69,43,0.12); }
+.fiscal-dropdown:focus-within .fiscal-dropdown-summary::after { transform:rotate(180deg); }
+
+/* --- summary text: placeholder when empty, selected value when set --- */
+.fd-value { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.fd-value::before { content:attr(data-placeholder); color:#636466; font-weight:400; }
+.fd-value::after { color:#323232; font-weight:400; }
+.fiscal-dropdown:has(.h-drill-selected) .fd-value::before { content:none; }
+.fiscal-dropdown:has(.h-drill-selected) .fiscal-dropdown-summary { border-color:#CDC3B0; }
+
+.fiscal-panel { display:none; background:#FFFFFF; border:1px solid #CDC3B0; border-top:none;
+border-radius:0 0 8px 8px; max-height:300px; overflow-y:auto; outline:none;
+box-shadow:0 4px 10px rgba(50,50,50,0.06); }
+.fiscal-dropdown:focus-within .fiscal-panel { display:grid; grid-template-columns:20px 1fr;
+align-items:center; padding:4px; border-color:#41452B; }
+
+.fp-caret { grid-column:1; cursor:pointer; text-align:center; color:#636466;
+font-size:10px; border-radius:4px; user-select:none; }
+.fp-caret::after { content:'▸'; display:block; transition:transform 160ms ease; }
+.fp-caret:has(.fp-toggle:checked)::after { transform:rotate(90deg); }
+.fp-caret:hover { background:#F7F1E7; color:#323232; }
+.fp-toggle { display:none; }
+
+.fp-text { color:inherit; }
+
+.fp-section { grid-column:1 / -1; padding:8px 10px 4px; font-size:10px; font-weight:600;
+text-transform:uppercase; letter-spacing:.04em; color:#636466; user-select:none; }
+.fp-section:first-child { padding-top:4px; }
+
+.fp-quick { grid-column:2; display:flex; align-items:center; justify-content:space-between;
+padding:6px 10px; margin:1px 0; border:1px solid transparent; border-radius:6px; cursor:pointer;
+font-size:12px; font-weight:400; color:#323232; }
+.fp-quick:hover { background:#F7F1E7; }
+.fp-quick.h-drill-selected, .fp-quick:has(.h-drill-selected) { background:#F7F1E7; color:#41452B; border-color:#CDC3B0; }
+.fp-quick.h-drill-selected::after, .fp-quick:has(.h-drill-selected)::after { content:'✓'; font-size:11px; }
+
+.fp-parent { grid-column:2; display:flex; align-items:center; justify-content:space-between;
+padding:6px 10px; margin:1px 0; border:1px solid transparent; border-radius:6px; cursor:pointer;
+font-size:12px; font-weight:400; color:#323232; }
+.fp-parent:hover { background:#F7F1E7; }
+.fp-parent.h-drill-selected, .fp-parent:has(.h-drill-selected) { background:#F7F1E7; color:#41452B; border-color:#CDC3B0; }
+.fp-parent.h-drill-selected::after, .fp-parent:has(.h-drill-selected)::after { content:'✓'; font-size:11px; }
+
+.fp-child { grid-column:2; display:none; align-items:center; justify-content:space-between;
+padding:6px 10px 6px 20px; margin:1px 0; border:1px solid transparent; border-radius:6px; cursor:pointer;
+font-size:12px; font-weight:400; color:#636466; }
+.fp-child:hover { background:#F7F1E7; }
+.fp-child.h-drill-selected, .fp-child:has(.h-drill-selected) { background:#F7F1E7; color:#41452B; border-color:#CDC3B0; }
+.fp-child.h-drill-selected::after, .fp-child:has(.h-drill-selected)::after { content:'✓'; font-size:11px; }
+
+{% map(rows) %}
+/* dedupe repeated FY rows */
+[data-fy-caret="{{ `Fiscal Year Label`.raw }}"] ~ [data-fy-caret="{{ `Fiscal Year Label`.raw }}"] { display:none !important; }
+[data-fy-parent="{{ `Fiscal Year Label`.raw }}"] ~ [data-fy-parent="{{ `Fiscal Year Label`.raw }}"] { display:none !important; }
+
+/* expand on caret click */
+.fiscal-panel:has(.fp-caret[data-fy-caret="{{ `Fiscal Year Label`.raw }}"] .fp-toggle:checked) [data-fy-child="{{ `Fiscal Year Label`.raw }}"] { display:flex !important; }
+
+/* keep the group expanded when something inside it is selected */
+.fiscal-panel:has([data-fy-child="{{ `Fiscal Year Label`.raw }}"] .h-drill-selected, [data-fy-child="{{ `Fiscal Year Label`.raw }}"].h-drill-selected) [data-fy-child="{{ `Fiscal Year Label`.raw }}"] { display:flex !important; }
+.fiscal-panel:has([data-fy-parent="{{ `Fiscal Year Label`.raw }}"] .h-drill-selected, [data-fy-parent="{{ `Fiscal Year Label`.raw }}"].h-drill-selected) [data-fy-child="{{ `Fiscal Year Label`.raw }}"] { display:flex !important; }
+
+/* selected value -> summary */
+.fiscal-dropdown:has([data-fy-parent="{{ `Fiscal Year Label`.raw }}"] .h-drill-selected, [data-fy-parent="{{ `Fiscal Year Label`.raw }}"].h-drill-selected) .fd-value::after { content:"{{ `Fiscal Year Label`.formatted }}"; }
+.fiscal-dropdown:has([data-fq-child="{{ `Fiscal Quarter`.raw }}"] .h-drill-selected, [data-fq-child="{{ `Fiscal Quarter`.raw }}"].h-drill-selected) .fd-value::after { content:"{{ `Fiscal Quarter`.formatted }}"; }
+{% end %}
+
+/* quick preset wins the summary label */
+.fiscal-dropdown:has(.fp-quick[data-quick="this_fq"].h-drill-selected, .fp-quick[data-quick="this_fq"] .h-drill-selected) .fd-value::after { content:"This fiscal quarter"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="this_fy"].h-drill-selected, .fp-quick[data-quick="this_fy"] .h-drill-selected) .fd-value::after { content:"This fiscal year"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="last_fq"].h-drill-selected, .fp-quick[data-quick="last_fq"] .h-drill-selected) .fd-value::after { content:"Last fiscal quarter"; }
+.fiscal-dropdown:has(.fp-quick[data-quick="last_fy"].h-drill-selected, .fp-quick[data-quick="last_fy"] .h-drill-selected) .fd-value::after { content:"Last fiscal year"; }
+</style>
+
+<div class="fiscal-dropdown" tabindex="0">
+<div class="fiscal-dropdown-summary"><span class="fd-value" data-placeholder="Fiscal period"></span></div>
+
+<div class="fiscal-panel" tabindex="-1">
+<div class="fp-section">Quick</div>
+<h-drill row="2" value="true" class="fp-quick" data-quick="this_fq"><span class="fp-text">This FQ</span></h-drill>
+<h-drill row="3" value="true" class="fp-quick" data-quick="this_fy"><span class="fp-text">This FY</span></h-drill>
+<h-drill row="4" value="true" class="fp-quick" data-quick="last_fq"><span class="fp-text">Last FQ</span></h-drill>
+<h-drill row="5" value="true" class="fp-quick" data-quick="last_fy"><span class="fp-text">Last FY</span></h-drill>
+<div class="fp-section">Specific</div>
+{% map(rows) %}
+<label class="fp-caret" data-fy-caret="{{ `Fiscal Year Label`.raw }}">
+<input type="checkbox" class="fp-toggle">
+</label>
+<h-drill row="0" value="{{ `Fiscal Year Label`.raw }}" class="fp-parent" data-fy-parent="{{ `Fiscal Year Label`.raw }}"><span class="fp-text">{{ `Fiscal Year Label`.formatted }}</span></h-drill>
+<h-drill row="1" value="{{ `Fiscal Quarter`.raw }}" class="fp-child"
+  data-fy-child="{{ `Fiscal Year Label`.raw }}"
+  data-fq-child="{{ `Fiscal Quarter`.raw }}"><span class="fp-text">{{ `Fiscal Quarter`.formatted }}</span></h-drill>{% end %}
+</div>
+</div>    ;;
+      settings {
+        pagination_size: 500
+        show_row_total: true
+        show_column_total: true
+        sorts: [
+          SortSetting {
+            key: 'seed_md_dates_fiscal_year_label'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_controls: true
+    }
+  }
+
+  // A param filter is a `type: 'field'` block pointed at a param. The default is
+  // load-bearing: `case()` has no else branch, so a cleared filter returns null.
+  block f_date_basis: FilterBlock {
+    label: 'Date Basis'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_md
+      field: r(seed_md_donations.date_basis)
+    }
+    default {
+      operator: 'is'
+      value: 'Close date'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block kpi_gmv: VizBlock {
+    label: 'Total Giving'
+    viz: MetricKpi {
+      dataset: seed_md
+      theme {
+        metric_kpi {
+          label {
+            font_size: 12
+          }
+          value {
+            font_size: 30
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: ' '
+        ref: r(seed_md.giving_by_basis)
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block v_z5lv: VizBlock {
+    label: 'Donations'
+    viz: MetricKpi {
+      dataset: seed_md
+      theme {
+        metric_kpi {
+          label {
+            font_size: 12
+          }
+          value {
+            font_size: 30
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: ' '
+        ref: r(seed_md.donations_by_basis)
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block v_gmv_by_fy: VizBlock {
+    label: 'Giving by Fiscal Year'
+    viz: ColumnChart {
+      dataset: seed_md
+      x_axis: VizFieldFull {
+        label: 'Fiscal Year'
+        ref: r(seed_md_dates.fiscal_year_label)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Giving'
+            ref: r(seed_md.giving_by_basis)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Fiscal Year'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block v_gmv_by_fq: VizBlock {
+    label: 'Giving by Fiscal Quarter'
+    viz: ColumnChart {
+      dataset: seed_md
+      x_axis: VizFieldFull {
+        label: 'Fiscal Quarter'
+        ref: r(seed_md_dates.fiscal_year_quarter)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Giving'
+            ref: r(seed_md.giving_by_basis)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Fiscal Quarter'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  // Axis on the date dimension, so it re-buckets when the dropdown flips.
+  block v_jkpa: VizBlock {
+    label: 'Giving by Month (calendar year-month)'
+    viz: ColumnChart {
+      dataset: seed_md
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(seed_md_dates.calendar_month)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Total Giving'
+            ref: r(seed_md.giving_by_basis)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Month'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  block t_izpd: TextBlock {
+    content: @md # The Modeling Setup;;
+  }
+  block t_0ynk: TextBlock {
+    content: @md ### Two date fields, one fiscal calendar
+
+This business closes its books on **30 September** and names each year for the year it
+ends in - so **FY 2026 runs 1 Oct 2025 to 30 Sep 2026**.
+
+Each donation carries **two** dates: the date it was **pledged** and the date it
+**closed**. Both are joined to the *same* fiscal date dimension.
+
+**How it works:**
+* The fiscal calendar is defined **once**, on the date dimension - there is one
+  `Fiscal Year` field however many dates the fact carries
+* **Both** date fields are joined to it; exactly **one join is active at a time**,
+  close date by default
+* The **Date Basis** dropdown switches which one is active, per metric, using
+  `with_relationships`
+
+**Trade-off:** Each metric that uses the dropdown must include `case()` function.;;
+  }
+  block t_joaz: TextBlock {
+    content: @md <iframe src='https://dbdiagram.io/e/6aa38ce3fa3334712c0c79be/6aa38ecdfa3334712c0ca4fe' width="100%" height="350" frameborder="0" allowtransparency="true" style="border:1px solid #CDC3B0;border-radius:6px;"></iframe>;;
+  }
+
+  // Both bases at once — the comparison the dropdown cannot show, since it is one
+  // basis at a time. Same gifts in both series, so the grand totals match.
+  block v_basis_compare: VizBlock {
+    label: 'Same donations, both bases - close vs pledge by fiscal year'
+    viz: ColumnChart {
+      dataset: seed_md
+      x_axis: VizFieldFull {
+        label: 'Fiscal Year'
+        ref: r(seed_md_dates.fiscal_year_label)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Close date basis'
+            ref: r(seed_md.giving_on_close)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Pledge date basis'
+            ref: r(seed_md.giving_on_pledge)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Fiscal Year'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'The final report'
+      width: 1480
+      height: 1100
+      grid_size: 20
+      block t_on38 {
+        position: pos(40, 40, 620, 100)
+      }
+      block v_fy_filter {
+        position: pos(40, 160, 300, 120)
+      }
+      block f_date_basis {
+        position: pos(360, 160, 300, 120)
+      }
+      block kpi_gmv {
+        position: pos(40, 300, 300, 160)
+      }
+      block v_z5lv {
+        position: pos(40, 480, 300, 160)
+      }
+      block v_gmv_by_fy {
+        position: pos(360, 300, 540, 340)
+      }
+      block v_gmv_by_fq {
+        position: pos(920, 300, 520, 340)
+      }
+      block v_jkpa {
+        position: pos(40, 660, 1400, 400)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_xamk: CanvasLayout {
+      label: 'The setup'
+      width: 1300
+      height: 1000
+      grid_size: 20
+      auto_expand_vertically: true
+      block t_izpd {
+        position: pos(40, 40, 1220, 100)
+      }
+      block t_0ynk {
+        position: pos(40, 160, 600, 400)
+      }
+      block t_joaz {
+        position: pos(660, 160, 600, 400)
+      }
+      block v_basis_compare {
+        position: pos(40, 580, 1220, 380)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+
+  settings {
+    timezone: 'Etc/UTC'
+    cache_duration: 4320
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}

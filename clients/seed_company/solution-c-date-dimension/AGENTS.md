@@ -10,7 +10,8 @@ The recommended answer. Fiscal columns live on the date dimension; fact tables c
 | `seed_c_dates_signup.model.aml` | The same dimension in a second role, joined on signup date. Three lines |
 | `seed_c_period.model.aml` | Parameter model behind the Period dropdown. Joined to nothing |
 | `seed_c.dataset.aml` | `Dataset seed_c` — both date roles plus orders, order items, products, users |
-| `seed_c.page.aml` | `Dashboard seed_fy_solution_c` |
+| `seed_c.page.aml` | `Dashboard seed_fy_solution_c` — native FilterBlocks, every block on `gmv_period` |
+| `seed_c_v2.page.aml` | `Dashboard seed_fy_solution_c_v2` — same title, two tabs, and a hand-built fiscal dropdown (`MarkdownViz` + `h-drill`) instead of filter blocks. **Its blocks read plain `gmv`, not `gmv_period`**, so the Period dropdown does not exist on it |
 
 **Seven models, and that is on purpose.** `ecommerce_cities` and `ecommerce_countries` were dropped on 2 Sep 2026 — they were declared and joined to each other but no metric, dimension or block referenced them. `ecommerce_users` stays only because `sign_up_date` is the one second date field this warehouse has; without it there is nothing to demo the signup role on.
 
@@ -48,7 +49,16 @@ There was also an `orders_from_users_signed_up_this_fy`, removed on 2 Sep 2026. 
 
 ## Verification status
 
-**Nothing in this folder has been verified by live query since the four-folder split.** Every number quoted above was measured before it. The dev MCP has been down since — `execute_aql` on `seed_c` returns "Dataset `seed_c` not found" while `aml validate` passes, so it is MCP scope, not AML. Restart `holistics mcp --dev` and re-check the FY labels, the quarter axis and the YTD/QTD windows before demoing.
+**The dev MCP works again** (re-checked 11 Sep 2026) — the previous note here said `execute_aql` on `seed_c` returned "Dataset `seed_c` not found"; it no longer does. GMV and order counts by fiscal year, measured live on 11 Sep 2026:
+
+| | FY 2023 | FY 2024 | FY 2025 | FY 2026 |
+|---|---|---|---|---|
+| GMV | 33,444 | 921,096 | 3,123,366 | 7,503,636 |
+| Orders | 97 | 2,642 | 8,941 | 21,330 |
+
+Underlying data: 33,010 orders spanning 2023-08-04 → 2026-09-10. The quarter axis, the YTD/QTD windows and the `of_all` figures quoted above still date from before the four-folder split — re-check those before demoing.
+
+Note that `execute_viz_block` returns **null** for blocks built on `gmv_period`: the tool does not apply the dashboard filter's default, and `case()` has no else branch. That is a property of the tool, not a fault in the page — the dashboard itself supplies `'Full history'` on open. Test param-driven metrics with `execute_aql` and an explicit `filters { seed_c_period.window is ("...") }` instead.
 
 `holistics sync-code` runs as a live watcher against Project 7, so edits here reach the Holistics `tsco` dev branch as they hit disk — including deletions. They still need a separate commit and merge in the Holistics UI to reach master.
 
