@@ -75,7 +75,7 @@ Model ecommerce_products_copy {
     type: 'text'
     description: ""
     hidden: false
-    definition: @aql concat('<img src="', ecommerce_products.product_image_url, '" style="text-align:center;height:50px;width:50px;object-fit:cover" />') ;;
+    definition: @aql concat('<img src="', ecommerce_products_copy.product_image_url, '" style="text-align:center;height:50px;width:50px;object-fit:cover" />') ;;
     primary_key: false
   }
 
@@ -84,7 +84,7 @@ Model ecommerce_products_copy {
     type: 'text'
     description: ""
     hidden: false
-    definition: @aql concat('<img src="', ecommerce_products.product_image_url, '" style="text-align:center;height:100px;width:100px;object-fit:cover" />') ;;
+    definition: @aql concat('<img src="', ecommerce_products_copy.product_image_url, '" style="text-align:center;height:100px;width:100px;object-fit:cover" />') ;;
     primary_key: false
   }
   dimension video {
@@ -111,7 +111,7 @@ Model ecommerce_products_copy {
   measure total_products {
     label: 'Total Products'
     type: 'number'
-    definition: @aql count(ecommerce_products.id) ;;
+    definition: @aql count(ecommerce_products_copy.id) ;;
   }
 
   owner: 'vincent+demo4@holistics.io'

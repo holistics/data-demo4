@@ -1,7 +1,7 @@
 Dataset slb_ecommerce {
   label: 'SL Benchmark - Ecommerce'
   description: '''
-Benchmark dataset for the AMQL-vs-other-SL comparison. Reads testdb.ecommerce (via demo_public)
+Benchmark dataset for the AMQL-vs-other-SL comparison. Reads the Neon benchmark projection (via slb_ecommerce_neon_h4)
 so all comparison tiers (Tier 0 raw SQL, Tier 1 dbt SL, Tier 2 Cube, Tier 3 AMQL) query identical data.
 
 Governed definitions (the whole point of the benchmark):
@@ -9,8 +9,9 @@ Governed definitions (the whole point of the benchmark):
 - NMV     = sum(quantity * price * (1 - discount)) EXCLUDING cancelled/refunded. discount is a RATE 0..1.
 - Revenue = 50% of discounted current-list-price item value from DELIVERED orders only, by order-placement date.
 - AOV     = GMV / total_orders.
+- Closing stock units = sum the latest product/location stock balance on or before the period end.
 '''
-  data_source_name: 'demo_public'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
 
   models: [
@@ -22,6 +23,8 @@ Governed definitions (the whole point of the benchmark):
     slb_countries,
     slb_categories,
     slb_merchants,
+    slb_stock_snapshots,
+    slb_stock_daily_balances,
   ]
 
   relationships: [
@@ -33,6 +36,8 @@ Governed definitions (the whole point of the benchmark):
     relationship(slb_products.category_id > slb_categories.id, true),
     relationship(slb_products.merchant_id > slb_merchants.id, true),
     relationship(slb_merchants.city_id > slb_cities.id, false),
+    relationship(slb_stock_snapshots.product_id > slb_products.id, true),
+    relationship(slb_stock_daily_balances.product_id > slb_products.id, true),
   ]
 
   // ── buyer/cohort dimensions (user grain) ──────────────────────────────────

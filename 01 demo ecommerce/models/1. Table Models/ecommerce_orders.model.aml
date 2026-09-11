@@ -31,6 +31,7 @@ Model ecommerce_orders {
   dimension created_at_fy {
     label: 'Created At FY'
     type: 'datetime'
+    description: "Order creation date shifted forward three months, so the fiscal calendar runs ahead of the real one: an order created Oct-Dec 2026 falls in fiscal Q1 2027. Use for fiscal-year, fiscal-quarter and fiscal-period reporting; use **created_at** for the actual order date."
     hidden: false
     definition: @aql ecommerce_orders.created_at + interval(3 month);;
   }

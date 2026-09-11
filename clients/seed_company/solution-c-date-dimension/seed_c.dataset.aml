@@ -1,0 +1,160 @@
+// =====================================================================
+// Solution C - fiscal year on the date dimension.
+//
+// Oct-Sep fiscal year, done the recommended way: the date dimension
+// carries fiscal columns, and everything else is ordinary filtering and
+// grouping on a real field. On top of that base there is a second
+// date role, a sortable fiscal-period axis, and KPIs pinned past the
+// dashboard filter.
+//
+// Self-contained: this dataset, the models beside it and the page
+// beside it are used by no other solution folder, and this folder uses
+// nothing from theirs. The only shared objects are the core-demo base
+// models (`dim_dates`, `ecommerce_*`), which every solution extends and
+// none of them edits.
+//
+
+// The fiscal logic lives in exactly one place, `seed_c_dates`.
+//
+// Built on the shared ecommerce models. `ecommerce_orders.created_date`
+// stands in for Seed's close date — repoint the relationship below to
+// port this to their tenant.
+//
+// ---------------------------------------------------------------------
+// What it costs to extend this to more of Seed's data
+// ---------------------------------------------------------------------
+//   a new metric            nothing. Any metric on a joined fact is
+//                           fiscal-aware the moment the join exists.
+//   a new fact entity       one relationship line here, IF the fact
+//                           already exposes a date-typed column.
+//                           Otherwise one date dimension on the fact
+//                           plus the line — and see the boundary note.
+//   a new timestamp field   one role model (three lines, see
+//                           `seed_c_dates_signup`) plus one line here.
+//
+// ---------------------------------------------------------------------
+// The join key is the one place a boundary bug can hide
+// ---------------------------------------------------------------------
+// `date_key` is a DATE, so the fact side has to join on a date too.
+// `created_date` is already `{{ #SOURCE.created_at }}::date`, cast in
+// the warehouse, which is correct. Seed's HubSpot `closedate` is a
+// timestamp, so porting means adding an equivalent cast — and it must be
+// a warehouse-side cast, not a Holistics date truncation, or the
+// tenant-timezone conversion will move deals across the 30 Sep / 1 Oct
+// line into the wrong fiscal year. Test those two days explicitly when
+// porting.
+//
+// =====================================================================
+Dataset seed_c {
+  label: 'Seed Company - Solution C (Date Dimension, Full)'
+  description: '''
+Oct-Sep fiscal year carried as columns on the date dimension. Nothing on the fact tables.
+
+- `Fiscal Year` - 2026 means 1 Oct 2025 to 30 Sep 2026. Filter it, group by it, drill it.
+- `Fiscal Year Label` - 'FY 2026' for display, spelled out in full.
+- `Fiscal Quarter` - 'Q1 (Oct-Dec)'. Which quarter, year dropped - the date_part form. Filter with it.
+- `Fiscal Year & Quarter` - 'FY 2026-Q1 (Oct-Dec)'. The date_trunc form, one point per quarter per year. Plot with it.
+- `Fiscal Period Number` - Oct = 1, Sep = 12. Sort key for lining two fiscal years up on one axis.
+- Months need nothing from this model. A fiscal year is the calendar year shifted three months and a fiscal quarter is a calendar quarter shifted three months, but October is October in both calendars - so a monthly series is `Created At` with a `datetrunc month`, exactly as it would be without a fiscal calendar.
+- `Month Position in FY` / `(label)` - Oct = 1 ... Sep = 12, '01 Oct' ... '12 Sep'. Sort keys for overlaying several fiscal years on one shared axis, not a fiscal month.
+- `Fiscal Year Offset` - 0 = the fiscal year containing today, -1 = the one before.
+- `Fiscal YTD` / `Fiscal QTD` - true/false flags for the year-to-date and quarter-to-date windows. Both resolve against CURRENT_DATE row by row, so they roll forward on their own and are not affected by what the newest data in the warehouse is.
+
+Chart axes stay on the real calendar date, so month labels are the real months and no
+mental translation is needed. Fiscal year is a filter or a grouping, not a shifted date.
+
+`Fiscal Year Offset` resolves against CURRENT_DATE row by row and rolls over on 1 October
+with nothing to edit. Two separate things have to be true for a "current FY" card to hold
+when the dashboard is filtered to another year: the offset must not re-base (it does not),
+and the metric must opt out of the dashboard's date filter. `GMV (Current FY)` does both -
+see its definition.
+
+`Signup Date` is the same date dimension in a second role, joined on user signup instead
+of order date — the pattern for Seed's close-date-vs-created-date case. `Users Signed Up
+(Current FY)` is the demo-safe metric built on it; `Orders from Users Who Signed Up This FY`
+is the same idea on the orders fact, and is left off the dashboards because this warehouse's
+synthetic signup dates make it collide with `Total Orders` — see the comment on the metric.
+'''
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+    ecommerce_users,
+    seed_c_dates,
+    seed_c_dates_signup,
+    seed_c_period,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+    relationship(ecommerce_orders.user_id > ecommerce_users.id, true),
+
+    // Seed's close date equivalent. Repoint this one line to port.
+    relationship(ecommerce_orders.created_date > seed_c_dates.date_key, true),
+
+    // The second date role. Both are active: the one-active rule is per
+    // model PAIR, and these are two different date models.
+    relationship(ecommerce_users.sign_up_date > seed_c_dates_signup.date_key, true),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════
+  // METRICS — no fiscal logic needed, the date dimension handles it
+  // ═══════════════════════════════════════════════════════════════════
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross value of items ordered, before discount, all statuses.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  metric total_orders {
+    label: 'Total Orders'
+    type: 'number'
+    description: 'Count of orders, all statuses.'
+    definition: @aql count(ecommerce_orders.id) ;;
+    format: '#,###0'
+  }
+
+  // GMV with the Period dropdown applied.
+  //
+  // Point every block on the page at this rather than at plain `gmv`.
+  // Fiscal YTD and Fiscal QTD are overlapping windows, so they cannot be
+  // two values of one field filter - the choice comes in as a param and
+  // has to be read explicitly here. Anything that reads plain `gmv`
+  // silently ignores the dropdown.
+  //
+  // `case()` has no else branch, so 'Full history' is a real branch and
+  // the dashboard filter carries a default. If the filter is ever cleared
+  // the metric returns null rather than the full total - visible, not
+  // silently wrong.
+  metric gmv_period {
+    label: 'GMV'
+    type: 'number'
+    description: 'GMV narrowed by the Period dropdown: full history, the whole current fiscal year or quarter, or either of those to date. Every window resolves against CURRENT_DATE row by row, so they roll forward on their own.'
+    definition: @aql
+      case(
+        when: 'Full history' in seed_c_period.window
+        , then: gmv
+
+        , when: 'This fiscal year' in seed_c_period.window
+        , then: gmv | where(seed_c_dates.fiscal_year_offset == 0)
+
+        , when: 'Fiscal YTD' in seed_c_period.window
+        , then: gmv | where(seed_c_dates.is_fiscal_ytd == true)
+
+        , when: 'This fiscal quarter' in seed_c_period.window
+        , then: gmv | where(seed_c_dates.is_current_fiscal_quarter == true)
+
+        , when: 'Fiscal QTD' in seed_c_period.window
+        , then: gmv | where(seed_c_dates.is_fiscal_qtd == true)
+      )
+    ;;
+    format: '#,###0'
+  }
+
+}

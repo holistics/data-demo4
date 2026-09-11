@@ -2750,7 +2750,7 @@ background: #EFF6FF;
       mobile {
         mode: 'auto'
       }
-      default_zoom: 0.9
+      default_zoom: 0.86
     }
     tab tab_dstw: CanvasLayout {
       label: 'Key Metrics'

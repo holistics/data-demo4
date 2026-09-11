@@ -84,7 +84,7 @@ Model ecommerce_orders_copy {
     type: 'number'
     description: ""
     hidden: true
-    definition: @aql running_total(ecommerce_orders.total_order, ecommerce_orders.order_month) ;;
+    definition: @aql running_total(ecommerce_orders_copy.total_order, ecommerce_orders_copy.order_month) ;;
     aggregation_type: "custom"
   }
   measure delivered_orders_count {
@@ -92,7 +92,7 @@ Model ecommerce_orders_copy {
     type: "number"
     description: ""
     hidden: false
-    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'delivered');;
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.status == 'delivered');;
     aggregation_type: "custom"
   }
   measure cancelled_orders_count {
@@ -100,7 +100,7 @@ Model ecommerce_orders_copy {
     type: 'number'
     description: ""
     hidden: false
-    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.status == 'cancelled');;
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.status == 'cancelled');;
     aggregation_type: "custom"
   }
   measure refunded_orders_count {
@@ -108,7 +108,7 @@ Model ecommerce_orders_copy {
     type: 'number'
     description: ""
     hidden: false
-    definition: @aql count_distinct(ecommerce_orders.id) | where(ecommerce_orders.status == 'refunded');;
+    definition: @aql count_distinct(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.status == 'refunded');;
     aggregation_type: "custom"
   }
   measure total_order {
@@ -116,7 +116,7 @@ Model ecommerce_orders_copy {
     type: "number"
     description: ""
     hidden: false
-    definition: @aql count(ecommerce_orders.id);;
+    definition: @aql count(ecommerce_orders_copy.id);;
     aggregation_type: "custom"
   }
   measure total_orders_count {
@@ -124,7 +124,7 @@ Model ecommerce_orders_copy {
     type: "number"
     description: ""
     hidden: true
-    definition: @aql count(ecommerce_orders.id);;
+    definition: @aql count(ecommerce_orders_copy.id);;
     aggregation_type: "custom"
   }
 
@@ -133,25 +133,25 @@ Model ecommerce_orders_copy {
     type: "datetime"
     description: ""
     hidden: false
-    definition: @aql min(ecommerce_orders.created_at) ;;
+    definition: @aql min(ecommerce_orders_copy.created_at) ;;
     aggregation_type: "custom"
   }
 
   measure days_since_last_order {
     label: "Days Since Last Order"
     type: "number"
-    definition: @aql date_diff('day', max(ecommerce_orders.created_at), @now);;
+    definition: @aql date_diff('day', max(ecommerce_orders_copy.created_at), @now);;
   }
 
   measure orders_2023 {
     label: '2023'
     type: "number"
-    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.created_at matches @2023) ;;
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.created_at matches @2023) ;;
   }
 
   measure orders_2024 {
     label: '2024'
     type: "number"
-    definition: @aql count(ecommerce_orders.id) | where(ecommerce_orders.created_at matches @2024) ;;
+    definition: @aql count(ecommerce_orders_copy.id) | where(ecommerce_orders_copy.created_at matches @2024) ;;
   }
 }

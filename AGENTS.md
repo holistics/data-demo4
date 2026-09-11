@@ -93,5 +93,6 @@ Holistics AI at query time. They describe the same tenant, so **they must not dr
 
 ## User's rules
 
+- Before using the Holistics CLI, ensure it is authenticated with `demo4.holistics.io`.
 - When developing AMQL, use tools from the holistics cli (`holistics mcp ...`)
 - SUPER IMPORTANT: everytime, you must run `holistics aml validate` after new/edit AMQL files to validate syntax

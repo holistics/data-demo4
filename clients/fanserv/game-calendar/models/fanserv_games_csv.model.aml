@@ -1,0 +1,129 @@
+Model fanserv_games_csv {
+  type: 'table'
+  label: 'FanServ Games — CSV Source'
+  description: 'Source game schedule extract imported from clients/fanserv/game-calendar/data/gamedata.csv.'
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension uuid {
+    label: 'Uuid'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.uuid }};;
+  }
+  dimension status {
+    label: 'Status'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.status }};;
+  }
+  dimension scheduled {
+    label: 'Scheduled'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.scheduled }};;
+  }
+  dimension completed {
+    label: 'Completed'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.completed }};;
+  }
+  dimension league_id {
+    label: 'League'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.league_id }};;
+  }
+  dimension season_type {
+    label: 'Season type'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.season_type }};;
+  }
+  dimension broadcast {
+    label: 'Broadcast'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.broadcast }};;
+  }
+  dimension home_points {
+    label: 'Home points'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.home_points }};;
+  }
+  dimension away_points {
+    label: 'Away points'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.away_points }};;
+  }
+  dimension home_stats {
+    label: 'Home stats'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.home_stats }};;
+  }
+  dimension away_stats {
+    label: 'Away stats'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.away_stats }};;
+  }
+  dimension away_id {
+    label: 'Away'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.away_id }};;
+  }
+  dimension home_id {
+    label: 'Home'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.home_id }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'gamedata.csv'
+    uploaded_at: '2026-07-16 09:36:05'
+    hash: 'c24fc4b38bf56db4c8fa7774178453e4e013d26a725a0965a0219e987cb416f3'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("uuid", "uuid", "text"),
+      H.imports.column_config("status", "status", "text"),
+      H.imports.column_config("scheduled", "scheduled", "datetime"),
+      H.imports.column_config("completed", "completed", "datetime"),
+      H.imports.column_config("league_id", "league_id", "number"),
+      H.imports.column_config("season_type", "season_type", "text"),
+      H.imports.column_config("broadcast", "broadcast", "text"),
+      H.imports.column_config("home_points", "home_points", "number"),
+      H.imports.column_config("away_points", "away_points", "number"),
+      H.imports.column_config("home_stats", "home_stats", "text"),
+      H.imports.column_config("away_stats", "away_stats", "text"),
+      H.imports.column_config("away_id", "away_id", "number"),
+      H.imports.column_config("home_id", "home_id", "number")
+    ]
+  }
+  owner: 'chinh.dm+demo4@holistics.io'
+  table_name: '"dbt_khai"."holistics_fanserv_games_d2418_202607160936"'
+}
