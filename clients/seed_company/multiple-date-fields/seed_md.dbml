@@ -1,79 +1,39 @@
-// Dataset seed_md — fiscal reporting on two date fields.
-// Source for the dbdiagram.io embed on the dashboard's "The setup" tab.
-// Keep in step with seed_md.dataset.aml.
+// Dataset seed_md. Source for the dbdiagram.io embed. Keep in step with seed_md.dataset.aml.
 
 Project seed_md {
   database_type: 'PostgreSQL'
-  Note: '''
-  **Seed Company — fiscal year with two date fields**
-
-  Both date fields on the donations fact join to the SAME fiscal date dimension.
-  Exactly one join is active at a time — close date by default — and the
-  `Date Basis` parameter switches which one, per metric, via `with_relationships`.
-
-  No duplicated date dimension: one `Fiscal Year` field however many dates the
-  fact carries.
-  '''
 }
 
 Table seed_md_donations {
-  donation_id integer [pk, note: 'Gift identifier']
-  donor_id    integer [note: 'Hidden in the dataset']
-  close_date  date    [note: 'ACTIVE join to the fiscal calendar (default basis)']
-  pledge_date date    [note: 'INACTIVE join — activated when Date Basis = Pledge date. 30-119 days before close']
-  amount      numeric [note: 'Gift amount, summed line items']
-
-  Note: '''
-  **Donations** — query model, one row per gift.
-
-  Illustrative data: the shared ecommerce tables re-presented as donations.
-  Shapes are real, amounts are not Seed figures.
-
-  Also carries the `date_basis` **parameter** (`Close date` / `Pledge date`).
-  A parameter is not a column — it filters nothing on its own, it carries the
-  dropdown value into AQL so the metric can switch the active join.
-  '''
+  donation_id integer [pk]
+  donor_id    integer
+  close_date  date    [note: 'ACTIVE join - default reporting basis']
+  pledge_date date    [note: 'INACTIVE join - activated when Date Basis = Pledge date']
+  amount      numeric
 }
 
 Table seed_md_dates {
-  date_key         date [pk, note: 'Join key. One row per day, 2013 -> today']
-  year             text [note: 'from dim_dates — to_char(date_key, YYYY)']
-  month_number     text [note: 'from dim_dates — to_char(date_key, MM)']
-  month_name_abbr  text [note: 'from dim_dates — to_char(date_key, Mon)']
+  date_key         date [pk]
+  year             text
+  month_number     text
+  month_name_abbr  text
 
-  calendar_month            text    [note: "'2025-10 (Oct)' — sorts chronologically as text. The month chart's axis, so it follows the Date Basis toggle"]
-  fiscal_year               integer [note: 'Named by the ENDING calendar year: Oct 2025 - Sep 2026 = 2026']
-  fiscal_year_label         text    [note: "'FY 2026'"]
-  fiscal_quarter            text    [note: "'Q1 (Oct-Dec)' — year dropped. Filter with it"]
-  fiscal_year_quarter       text    [note: "'FY 2026-Q1 (Oct-Dec)' — one value per quarter per year. Plot with it"]
-  fiscal_period_number      integer [note: 'Oct = 1 ... Sep = 12. Sort key for overlaying fiscal years']
-  fiscal_period_label       text    [note: "'01 Oct' ... '12 Sep'"]
-  fiscal_year_offset        integer [note: '0 = the fiscal year containing today. Row-level against CURRENT_DATE']
-  is_fiscal_ytd             boolean [note: 'Fiscal year to date']
-  is_fiscal_qtd             boolean [note: 'Fiscal quarter to date']
-  is_current_fiscal_year    boolean [note: 'Whole current fiscal year, uncapped']
-  is_current_fiscal_quarter boolean [note: 'Whole current fiscal quarter, uncapped']
+  calendar_month            text
+  fiscal_year               integer
+  fiscal_year_label         text
+  fiscal_quarter            text
+  fiscal_year_quarter       text
+  fiscal_period_number      integer
+  fiscal_period_label       text
+  fiscal_year_offset        integer
+  is_fiscal_ytd             boolean
+  is_fiscal_qtd             boolean
+  is_current_fiscal_year    boolean
+  is_current_fiscal_quarter boolean
   is_last_fiscal_year       boolean
   is_last_fiscal_quarter    boolean
-
-  Note: '''
-  **Fiscal Dates** — `dim_dates.extend()`, the only object that knows what a
-  fiscal year is. Fiscal year runs 1 Oct to 30 Sep, named by the ending year.
-
-  Every fiscal column is `@sql` over the base columns, never date arithmetic on
-  `date_key`: `date_diff` on `date_key` is off by a whole month, because it is
-  cast to timestamptz in the tenant timezone and month starts roll back into the
-  previous month.
-
-  The four columns at the top are inherited from the shared `dim_dates`
-  (`@tag('Endorsed')`) — read, never edited.
-  '''
 }
 
-// ACTIVE — the default reporting basis.
 Ref close_basis: seed_md_donations.close_date > seed_md_dates.date_key
 
-// INACTIVE — activated per metric by with_relationships when Date Basis =
-// 'Pledge date'. DBML has no notion of an inactive relationship, so this is
-// drawn the same as the one above; the dashed intent lives in the note.
 Ref pledge_basis: seed_md_donations.pledge_date > seed_md_dates.date_key
