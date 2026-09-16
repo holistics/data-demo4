@@ -1,0 +1,1067 @@
+Dashboard ecom_cohort_dashboard {
+  title: 'Ecommerce Cohort Analysis'
+  description: 'Cohort LTV, retention and repeat purchase by acquisition month, profileable by any first-order attribute. Every cohort-profile filter opens empty, so the dashboard loads as the all-users cohort until someone chooses otherwise. The lifecycle window defaults to months 0-12, which bounds the pivot axis only and excludes no cohort.'
+  owner: 'chukwudi@holistics.io'
+
+  block header: TextBlock {
+    content: @md # Ecommerce Cohort Analysis
+
+LTV, retention and repeat purchase by the month a user first ordered. **Leave the profile filters empty for all users**, or narrow the cohort by what was in their first order — every metric still counts each user's full lifetime, across every category.;;
+  }
+
+  block f_cohort_month: FilterBlock {
+    label: 'Cohort Month (acquisition)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_lifecycle_window: FilterBlock {
+    label: 'Lifecycle Window (Month Number)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+    }
+    default {
+      operator: 'between'
+      value: [
+        0,
+        12
+      ]
+    }
+  }
+
+  block f_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecommerce_countries.name)
+    }
+  }
+
+  block f_category_at_acquisition: FilterBlock {
+    label: 'Categories at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+  }
+
+  block f_products_at_acquisition: FilterBlock {
+    label: 'Products at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+  }
+
+  block f_units_band: FilterBlock {
+    label: 'Units Band at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+    }
+  }
+
+  block pivots_context: TextBlock {
+    content: @md **Reading these.** Rows are acquisition cohorts, columns are months since acquisition. `LTV`, `Cumulative Revenue` and `Orders Per User` are running totals, so they accumulate over the lifecycle months **in scope** — a *range* window (0-12) is correct, but narrowing to a *single* month leaves the running total one month to accumulate and reports that month alone. `Retention` and `Active Users` are not running totals, so a blank cell means no orders that month; read it as zero.;;
+  }
+
+  block pivot_ltv: VizBlock {
+    label: 'LTV by Cohort'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'ltv_cohort'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'ltv_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
+          uname: 'ltv_val'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'ltv_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 500
+                color: '#CCEDE0'
+              }
+              max {
+                value: 1000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'ltv_cohort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'ltv_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block pivot_retention: VizBlock {
+    label: 'Retention by Cohort'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'ret_cohort'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'ret_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Retention'
+          ref: r(ecom_cohort_analysis.cohort_retention)
+          uname: 'ret_val'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'ret_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 0.5
+                color: '#D1E5FA'
+              }
+              max {
+                value: 1
+                color: '#8DBEF2'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'ret_cohort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'ret_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block pivot_cumulative_revenue: VizBlock {
+    label: 'Cumulative Cohort Revenue'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'rev_cohort'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'rev_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecom_cohort_analysis.cumulative_cohort_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'rev_cohort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'rev_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block pivot_orders_per_user: VizBlock {
+    label: 'Orders Per User by Cohort'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'opu_cohort'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'opu_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Orders/User'
+          ref: r(ecom_cohort_analysis.cohort_orders_per_user)
+          uname: 'opu_val'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'opu_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 1.5
+                color: '#D1E5FA'
+              }
+              max {
+                value: 3
+                color: '#8DBEF2'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'opu_cohort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'opu_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block multimembership_context: TextBlock {
+    content: @md **Multi-membership.** The split below uses the bridge model, so a user whose first order contained two categories appears under **both** rows. Category totals therefore sum to more than the user base — that is the intended semantics, not double counting: `Cohort Size` is a distinct count and each user holds exactly one bridge row per category.;;
+  }
+
+  block pivot_ltv_by_category: VizBlock {
+    label: 'LTV by Category at Acquisition (multi-membership)'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Categories at Acquisition'
+          ref: r(ecom_cohort_first_order_categories.parent_category)
+          uname: 'cat_category'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'cat_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
+          uname: 'cat_val'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'cat_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 500
+                color: '#CCEDE0'
+              }
+              max {
+                value: 1000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'cat_category'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'cat_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 10
+      }
+    }
+  }
+
+  block cohort_summary: VizBlock {
+    label: 'Cohort Summary'
+    viz: DataTable {
+      dataset: ecom_cohort_analysis
+      fields: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'sum_cohort'
+        },
+        VizFieldFull {
+          label: 'Cohort Size'
+          ref: r(ecom_cohort_analysis.cohort_user_count)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort Revenue'
+          ref: r(ecom_cohort_analysis.cohort_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort Orders'
+          ref: r(ecom_cohort_analysis.cohort_order_count)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort AOV'
+          ref: r(ecom_cohort_analysis.cohort_aov)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'sum_cohort'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 15
+      }
+    }
+  }
+
+  block header_naive: TextBlock {
+    content: @md # The trap: filtering after the cohort is formed
+
+This tab uses **the same dataset, the same metrics and the same pivots** as the first. The only difference is where the two profile filters point: at `Products / Product Categories` on the order-line path, instead of at the acquisition bridge.
+
+That is the thing worth being suspicious of in any cohort model — **a filter that trims output rows rather than cohort membership.** Leave the filters empty and this tab is identical to the first, which is exactly why the bug survives review. Set a category and watch LTV collapse.;;
+  }
+
+  block f_cohort_month_n: FilterBlock {
+    label: 'Cohort Month (acquisition)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_lifecycle_window_n: FilterBlock {
+    label: 'Lifecycle Window (Month Number)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+    }
+    default {
+      operator: 'between'
+      value: [
+        0,
+        12
+      ]
+    }
+  }
+
+  block f_naive_category: FilterBlock {
+    label: 'Category (line-item path)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(map_categories.parent_category)
+    }
+  }
+
+  block f_naive_product: FilterBlock {
+    label: 'Product (line-item path)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecommerce_products.name)
+    }
+  }
+
+  block naive_context: TextBlock {
+    content: @md **Try it.** Clear *Cohort Month* and *Lifecycle Window* on both tabs, then set *Category (line-item path)* to `Skin Care` here and *Categories at Acquisition* to `Skin Care` on the first tab. Both agree the cohort is **1,593 users** — membership is right either way, which is what makes this so easy to miss. But revenue reads **$244,667** here against **$1,697,523**, and LTV **$153.59** against **$1,065.61** — a 7x understatement.
+
+**Why.** The predicate lands inside the revenue CTE — `WHERE parent_category = 'Skin Care'` sits on the `nmv` join — so this tab counts only the cohort's *first-order Skin Care lines*, not everything those users went on to buy. The first tab pushes the predicate into a membership CTE instead, cutting the population before `COUNT(DISTINCT user_id)` and leaving the revenue join untouched.;;
+  }
+
+  block pivot_ltv_naive: VizBlock {
+    label: 'LTV by Cohort — filtered on the line-item path'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'nltv_cohort'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'nltv_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
+          uname: 'nltv_val'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'nltv_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 500
+                color: '#CCEDE0'
+              }
+              max {
+                value: 1000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'nltv_cohort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'nltv_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block pivot_retention_naive: VizBlock {
+    label: 'Retention by Cohort — filtered on the line-item path'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'nret_cohort'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'nret_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Retention'
+          ref: r(ecom_cohort_analysis.cohort_retention)
+          uname: 'nret_val'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'nret_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 0.5
+                color: '#D1E5FA'
+              }
+              max {
+                value: 1
+                color: '#8DBEF2'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'nret_cohort'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'nret_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block pivot_cumulative_revenue_naive: VizBlock {
+    label: 'Cumulative Cohort Revenue — filtered on the line-item path'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'nrev_row'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'nrev_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecom_cohort_analysis.cumulative_cohort_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'nrev_row'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'nrev_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block pivot_orders_per_user_naive: VizBlock {
+    label: 'Orders Per User by Cohort — filtered on the line-item path'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'nopu_row'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'nopu_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Orders/User'
+          ref: r(ecom_cohort_analysis.cohort_orders_per_user)
+          uname: 'nopu_val'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'nopu_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 1.5
+                color: '#D1E5FA'
+              }
+              max {
+                value: 3
+                color: '#8DBEF2'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'nopu_row'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'nopu_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 15
+      }
+    }
+  }
+
+  block naive_category_context: TextBlock {
+    content: @md **The split, on the wrong path.** The mirror of this report on the first tab rows by `Category at Acquisition` — the bridge — so each row reads "users whose first order contained this category, and everything they spent since". This one rows by the line-item category instead, so each row reads "what this cohort spent *in that category*". The second is a legitimate question, but it is not cohort LTV, and nothing on the report says which one you are looking at.;;
+  }
+
+  block pivot_ltv_by_category_naive: VizBlock {
+    label: 'LTV by Category — rowed on the line-item path'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Category (line-item path)'
+          ref: r(map_categories.parent_category)
+          uname: 'ncat_row'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'ncat_month'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
+          uname: 'ncat_val'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'ncat_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 500
+                color: '#CCEDE0'
+              }
+              max {
+                value: 1000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'ncat_row'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'ncat_month'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 10
+      }
+    }
+  }
+
+  block cohort_summary_naive: VizBlock {
+    label: 'Cohort Summary — filtered on the line-item path'
+    viz: DataTable {
+      dataset: ecom_cohort_analysis
+      fields: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'nsum_cohort'
+        },
+        VizFieldFull {
+          label: 'Cohort Size'
+          ref: r(ecom_cohort_analysis.cohort_user_count)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort Revenue'
+          ref: r(ecom_cohort_analysis.cohort_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'nsum_cohort'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 15
+      }
+    }
+  }
+
+  view: TabLayout {
+    tab cohort: CanvasLayout {
+      label: 'Cohort Analysis'
+      width: 1380
+      height: 4020
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block header {
+        position: pos(20, 20, 1340, 140)
+      }
+      block f_cohort_month {
+        position: pos(20, 180, 320, 80)
+      }
+      block f_lifecycle_window {
+        position: pos(360, 180, 320, 80)
+      }
+      block f_country {
+        position: pos(700, 180, 320, 80)
+      }
+      block f_units_band {
+        position: pos(1040, 180, 320, 80)
+      }
+      block f_category_at_acquisition {
+        position: pos(20, 280, 660, 80)
+      }
+      block f_products_at_acquisition {
+        position: pos(700, 280, 660, 80)
+      }
+      block pivots_context {
+        position: pos(20, 380, 1340, 120)
+      }
+      block pivot_ltv {
+        position: pos(20, 520, 1340, 560)
+      }
+      block pivot_retention {
+        position: pos(20, 1100, 1340, 560)
+      }
+      block pivot_cumulative_revenue {
+        position: pos(20, 1680, 1340, 560)
+      }
+      block pivot_orders_per_user {
+        position: pos(20, 2260, 1340, 560)
+      }
+      block multimembership_context {
+        position: pos(20, 2840, 1340, 120)
+      }
+      block pivot_ltv_by_category {
+        position: pos(20, 2980, 1340, 420)
+      }
+      block cohort_summary {
+        position: pos(20, 3420, 1340, 560)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab trap: CanvasLayout {
+      label: 'The Trap (filter after cohort)'
+      width: 1380
+      height: 4020
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block header_naive {
+        position: pos(20, 20, 1340, 180)
+      }
+      block f_cohort_month_n {
+        position: pos(20, 220, 320, 80)
+      }
+      block f_lifecycle_window_n {
+        position: pos(360, 220, 320, 80)
+      }
+      block f_naive_category {
+        position: pos(700, 220, 320, 80)
+      }
+      block f_naive_product {
+        position: pos(1040, 220, 320, 80)
+      }
+      block naive_context {
+        position: pos(20, 320, 1340, 160)
+      }
+      block pivot_ltv_naive {
+        position: pos(20, 500, 1340, 560)
+      }
+      block pivot_retention_naive {
+        position: pos(20, 1080, 1340, 560)
+      }
+      block pivot_cumulative_revenue_naive {
+        position: pos(20, 1660, 1340, 560)
+      }
+      block pivot_orders_per_user_naive {
+        position: pos(20, 2240, 1340, 560)
+      }
+      block naive_category_context {
+        position: pos(20, 2820, 1340, 120)
+      }
+      block pivot_ltv_by_category_naive {
+        position: pos(20, 2960, 1340, 420)
+      }
+      block cohort_summary_naive {
+        position: pos(20, 3400, 1340, 560)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+
+  settings {
+    autorun_on_open: true
+    allow_timezone_change: false
+  }
+  theme: holistics_brand
+}
