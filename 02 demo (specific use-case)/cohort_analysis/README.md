@@ -147,20 +147,68 @@ This bit twice: `cohort_aov` was originally `cumulative_cohort_revenue / cumulat
 
 **`aml validate` does not check SQL passthrough against the database, and compilation is not execution.** Every block here was executed, not just compiled — and the axis-bound bug above passes validation.
 
-## The second tab: the trap, demonstrated
+## Dashboard structure: one tab per use case
 
-The dashboard's second tab exists to make one failure mode visible rather than described. It runs **the same dataset, the same metrics and the same pivots** as the first; the only difference is that its two profile filters point at `Products` / `Product Categories` on the order-line path instead of at the acquisition bridge.
+Seven tabs. **Start Here** is a plain-language explainer written for a business audience; the other six are one per cohort report — Retention, LTV, Cumulative Revenue, Orders Per User, LTV by Category, Cohort Summary.
 
-That is the thing to be suspicious of in any cohort model: **a filter that trims output rows rather than cohort membership.** What makes it dangerous is that it looks correct until someone filters — unfiltered, both tabs return byte-identical pivots, which is exactly how such a bug survives review.
+Each report tab carries **the same report twice** and **six filters of its own**, so a tab is self-contained and you never compare across tabs:
 
-Clear the month filters on both tabs and set `Skin Care` on each:
+| Filter | Multi-select | Behaviour |
+|---|---|---|
+| Cohort Month | – | narrows the group correctly on both reports |
+| Lifecycle Window (Month Number) | – | bounds the pivot's column axis only |
+| Country | yes | narrows the group correctly on both reports |
+| Units Band at Acquisition | yes | narrows the group correctly on both reports |
+| **Category** | yes | **lands on a different field in each report** |
+| **Product** | yes | **lands on a different field in each report** |
 
-| | Cohort users | Revenue | LTV |
-|---|---|---|---|
-| Tab 1 — filtered on the bridge | 1,593 | $1,697,523 | **$1,065.61** |
-| Tab 2 — filtered on the line-item path | 1,593 | $244,667 | **$153.59** |
+### One filter, two landing points
 
-Membership is right in both — the cohort really is 1,593 users either way. Only the lifetime is wrong, by 7x, because the predicate lands inside the revenue CTE and counts just the cohort's first-order Skin Care lines instead of everything those users went on to buy.
+There is no pair of duplicate filters. `Category` and `Product` are each a **single control that drives both reports**, wired through `FilterInteraction` + `CustomMapping` in the dashboard's `interactions` block:
+
+```aml
+FilterInteraction {
+  from: 'f_ret_category'
+  to: [
+    CustomMapping { block: 'rep_ret_right', field: r(ecom_cohort_first_order_categories.parent_category) },
+    CustomMapping { block: 'rep_ret_wrong', field: r(map_categories.parent_category) }
+  ]
+}
+```
+
+Above, the predicate reaches the acquisition bridge and decides **who is in the cohort**, before any metric is calculated, so each customer's whole history still counts. Below, it reaches the line-item path, so the cohort is formed first and rows are trimmed on the way out — the filter never shapes the population it is describing.
+
+That is the entire demo: the viewer picks one category, once, and watches a single choice produce two different answers. Note the `CustomMapping` entries need **comma separators**; the documented example omits them and fails validation.
+
+### Filters are multi-select and they compose
+
+Every profile filter accepts **one value or several**, and several filters combine:
+
+- **Within one filter, multiple values are OR** — `Category` set to `Skin Care` + `Clothes` profiles customers whose first order contained *either*. A customer who bought both is counted once, never twice.
+- **Across filters it is AND** — `Category = Skin Care, Clothes` plus `Product = Face Serum` plus `Country = Germany` plus `Units Band = 01` narrows to one specific slice of acquisitions.
+- **Every combination still reports whole lifetimes.** Narrowing the group never narrows what those customers are measured on, which is the whole point of profiling at acquisition.
+- **Nothing is hardcoded per value.** The filters enumerate their own options from the data, so a new category or product needs no AML change.
+
+Combining `Category` and `Product` is matched **within the same bridge row**, so the chosen product must sit in one of the chosen categories — picking `Clothes` plus a Groceries product returns nobody, by construction. Either filter alone is the common case and behaves as expected.
+
+### Worked example
+
+January 2026, `Category = Skin Care`, one filter feeding both reports:
+
+| | Filter lands on the cohort | Filter lands on the results |
+|---|---|---|
+| Customers in the group | 83 | 210 |
+| Buying in month 0 | **100.0%** | **44.8%** |
+| Still buying in month 1 | 30.1% | 12.4% |
+| Worth per customer by month 6 | $833.03 | $207.05 |
+
+Cohort Size itself moves, 83 → 210: landing on the line-item path selects everyone who *ever* bought Skin Care rather than those who bought it at acquisition, so the report describes a different population. Month 0 is the sharpest tell — every acquired customer orders in their acquisition month by definition, so anything other than exactly 100% means the cohort is not what it claims to be.
+
+Read the right-hand column alone and you would stop the campaign. Those customers did come back; they bought other things, and the report threw that away.
+
+### On naming
+
+The reports are deliberately **not** labelled right and wrong. The mechanism is the teaching point, and "what did this cohort spend *in* that category" is a legitimate question — it simply is not what a cohort report claims to answer, and nothing on the face of the report tells you which one you are reading.
 
 ## Theme
 

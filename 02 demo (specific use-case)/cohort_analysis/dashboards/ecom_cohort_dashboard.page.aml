@@ -1,16 +1,18 @@
 Dashboard ecom_cohort_dashboard {
   title: 'Ecommerce Cohort Analysis'
-  description: 'Cohort LTV, retention and repeat purchase by acquisition month, profileable by any first-order attribute. Every cohort-profile filter opens empty, so the dashboard loads as the all-users cohort until someone chooses otherwise. The lifecycle window defaults to months 0-12, which bounds the pivot axis only and excludes no cohort.'
+  description: 'One tab per cohort use case. Each tab shows the same report built two ways — with the category filter applied during cohort profiling, and applied to final results — and carries its own independent filters.'
   owner: 'chukwudi@holistics.io'
 
-  block header: TextBlock {
-    content: @md # Ecommerce Cohort Analysis
+  block txt_ret: TextBlock {
+    content: @md ## Retention — two ways to apply the same filter
 
-LTV, retention and repeat purchase by the month a user first ordered. **Leave the profile filters empty for all users**, or narrow the cohort by what was in their first order — every metric still counts each user's full lifetime, across every category.;;
+Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+
+**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
   }
 
-  block f_cohort_month: FilterBlock {
-    label: 'Cohort Month (acquisition)'
+  block f_ret_month: FilterBlock {
+    label: 'Cohort Month'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
@@ -22,7 +24,7 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
     }
   }
 
-  block f_lifecycle_window: FilterBlock {
+  block f_ret_window: FilterBlock {
     label: 'Lifecycle Window (Month Number)'
     type: 'field'
     source: FieldFilterSource {
@@ -38,7 +40,7 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
     }
   }
 
-  block f_country: FilterBlock {
+  block f_ret_country: FilterBlock {
     label: 'Country'
     type: 'field'
     source: FieldFilterSource {
@@ -47,25 +49,7 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
     }
   }
 
-  block f_category_at_acquisition: FilterBlock {
-    label: 'Categories at Acquisition'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_first_order_categories.parent_category)
-    }
-  }
-
-  block f_products_at_acquisition: FilterBlock {
-    label: 'Products at Acquisition'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_first_order_categories.product_name)
-    }
-  }
-
-  block f_units_band: FilterBlock {
+  block f_ret_units: FilterBlock {
     label: 'Units Band at Acquisition'
     type: 'field'
     source: FieldFilterSource {
@@ -74,86 +58,32 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
     }
   }
 
-  block pivots_context: TextBlock {
-    content: @md **Reading these.** Rows are acquisition cohorts, columns are months since acquisition. `LTV`, `Cumulative Revenue` and `Orders Per User` are running totals, so they accumulate over the lifecycle months **in scope** — a *range* window (0-12) is correct, but narrowing to a *single* month leaves the running total one month to accumulate and reports that month alone. `Retention` and `Active Users` are not running totals, so a blank cell means no orders that month; read it as zero.;;
-  }
-
-  block pivot_ltv: VizBlock {
-    label: 'LTV by Cohort'
-    viz: PivotTable {
+  block f_ret_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      rows: [
-        VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
-          format {
-            type: 'date'
-            pattern: 'LLL yyyy'
-          }
-          uname: 'ltv_cohort'
-        }
-      ]
-      columns: [
-        VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
-          format {
-            type: 'number'
-            pattern: '#,###0'
-          }
-          uname: 'ltv_month'
-        }
-      ]
-      values: [
-        VizFieldFull {
-          label: 'LTV'
-          ref: r(ecom_cohort_analysis.cohort_ltv)
-          uname: 'ltv_val'
-          format {
-            type: 'number'
-            pattern: '[$$]#,###0.00'
-          }
-        }
-      ]
-      settings {
-        conditional_formats: [
-          ConditionalFormat {
-            key: 'ltv_val'
-            format: ScaleFormat {
-              min {
-                value: 0
-                color: '#FFFFFF'
-              }
-              mid {
-                value: 500
-                color: '#CCEDE0'
-              }
-              max {
-                value: 1000
-                color: '#7AD1AE'
-              }
-            }
-          }
-        ]
-        sorts: [
-          SortSetting {
-            key: 'ltv_cohort'
-            direction: 'asc'
-          },
-          SortSetting {
-            key: 'ltv_month'
-            direction: 'asc'
-          }
-        ]
-        frozen_columns: 1
-        wrap_header_text: false
-        pagination_size: 15
-      }
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+    settings {
+      input_type: 'multiple'
     }
   }
 
-  block pivot_retention: VizBlock {
-    label: 'Retention by Cohort'
+  block f_ret_product: FilterBlock {
+    label: 'Product'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block rep_ret_right: VizBlock {
+    label: 'Retention — filter applied during cohort profiling'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -164,7 +94,7 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'ret_cohort'
+          uname: 'retr_row'
         }
       ]
       columns: [
@@ -175,24 +105,24 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'ret_month'
+          uname: 'retr_col'
         }
       ]
       values: [
         VizFieldFull {
           label: 'Retention'
           ref: r(ecom_cohort_analysis.cohort_retention)
-          uname: 'ret_val'
           format {
             type: 'number'
             pattern: '#,##0.0%'
           }
+          uname: 'retr_val'
         }
       ]
       settings {
         conditional_formats: [
           ConditionalFormat {
-            key: 'ret_val'
+            key: 'retr_val'
             format: ScaleFormat {
               min {
                 value: 0
@@ -211,23 +141,23 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
         ]
         sorts: [
           SortSetting {
-            key: 'ret_cohort'
+            key: 'retr_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'ret_month'
+            key: 'retr_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 15
+        pagination_size: 13
       }
     }
   }
 
-  block pivot_cumulative_revenue: VizBlock {
-    label: 'Cumulative Cohort Revenue'
+  block rep_ret_wrong: VizBlock {
+    label: 'Retention — filter applied to final results'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -238,7 +168,7 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'rev_cohort'
+          uname: 'retw_row'
         }
       ]
       columns: [
@@ -249,89 +179,35 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'rev_month'
+          uname: 'retw_col'
         }
       ]
       values: [
         VizFieldFull {
-          label: 'Revenue'
-          ref: r(ecom_cohort_analysis.cumulative_cohort_revenue)
+          label: 'Retention'
+          ref: r(ecom_cohort_analysis.cohort_retention)
           format {
             type: 'number'
-            pattern: '[$$]#,###0'
+            pattern: '#,##0.0%'
           }
-        }
-      ]
-      settings {
-        sorts: [
-          SortSetting {
-            key: 'rev_cohort'
-            direction: 'asc'
-          },
-          SortSetting {
-            key: 'rev_month'
-            direction: 'asc'
-          }
-        ]
-        frozen_columns: 1
-        wrap_header_text: false
-        pagination_size: 15
-      }
-    }
-  }
-
-  block pivot_orders_per_user: VizBlock {
-    label: 'Orders Per User by Cohort'
-    viz: PivotTable {
-      dataset: ecom_cohort_analysis
-      rows: [
-        VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
-          format {
-            type: 'date'
-            pattern: 'LLL yyyy'
-          }
-          uname: 'opu_cohort'
-        }
-      ]
-      columns: [
-        VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
-          format {
-            type: 'number'
-            pattern: '#,###0'
-          }
-          uname: 'opu_month'
-        }
-      ]
-      values: [
-        VizFieldFull {
-          label: 'Orders/User'
-          ref: r(ecom_cohort_analysis.cohort_orders_per_user)
-          uname: 'opu_val'
-          format {
-            type: 'number'
-            pattern: '#,###0.00'
-          }
+          uname: 'retw_val'
         }
       ]
       settings {
         conditional_formats: [
           ConditionalFormat {
-            key: 'opu_val'
+            key: 'retw_val'
             format: ScaleFormat {
               min {
                 value: 0
                 color: '#FFFFFF'
               }
               mid {
-                value: 1.5
+                value: 0.5
                 color: '#D1E5FA'
               }
               max {
-                value: 3
+                value: 1
                 color: '#8DBEF2'
               }
             }
@@ -339,172 +215,37 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
         ]
         sorts: [
           SortSetting {
-            key: 'opu_cohort'
+            key: 'retw_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'opu_month'
+            key: 'retw_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 15
+        pagination_size: 13
       }
     }
   }
 
-  block multimembership_context: TextBlock {
-    content: @md **Multi-membership.** The split below uses the bridge model, so a user whose first order contained two categories appears under **both** rows. Category totals therefore sum to more than the user base — that is the intended semantics, not double counting: `Cohort Size` is a distinct count and each user holds exactly one bridge row per category.;;
+  block txt_ret_why: TextBlock {
+    content: @md **What the difference does.** Retention sags because only orders containing the chosen category count as activity, so a returning customer who bought something else reads as churned.
+
+**The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
   }
 
-  block pivot_ltv_by_category: VizBlock {
-    label: 'LTV by Category at Acquisition (multi-membership)'
-    viz: PivotTable {
-      dataset: ecom_cohort_analysis
-      rows: [
-        VizFieldFull {
-          label: 'Categories at Acquisition'
-          ref: r(ecom_cohort_first_order_categories.parent_category)
-          uname: 'cat_category'
-        }
-      ]
-      columns: [
-        VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
-          format {
-            type: 'number'
-            pattern: '#,###0'
-          }
-          uname: 'cat_month'
-        }
-      ]
-      values: [
-        VizFieldFull {
-          label: 'LTV'
-          ref: r(ecom_cohort_analysis.cohort_ltv)
-          uname: 'cat_val'
-          format {
-            type: 'number'
-            pattern: '[$$]#,###0.00'
-          }
-        }
-      ]
-      settings {
-        conditional_formats: [
-          ConditionalFormat {
-            key: 'cat_val'
-            format: ScaleFormat {
-              min {
-                value: 0
-                color: '#FFFFFF'
-              }
-              mid {
-                value: 500
-                color: '#CCEDE0'
-              }
-              max {
-                value: 1000
-                color: '#7AD1AE'
-              }
-            }
-          }
-        ]
-        sorts: [
-          SortSetting {
-            key: 'cat_category'
-            direction: 'asc'
-          },
-          SortSetting {
-            key: 'cat_month'
-            direction: 'asc'
-          }
-        ]
-        frozen_columns: 1
-        wrap_header_text: false
-        pagination_size: 10
-      }
-    }
+  block txt_ltv: TextBlock {
+    content: @md ## LTV — two ways to apply the same filter
+
+Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+
+**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
   }
 
-  block cohort_summary: VizBlock {
-    label: 'Cohort Summary'
-    viz: DataTable {
-      dataset: ecom_cohort_analysis
-      fields: [
-        VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
-          format {
-            type: 'date'
-            pattern: 'LLL yyyy'
-          }
-          uname: 'sum_cohort'
-        },
-        VizFieldFull {
-          label: 'Cohort Size'
-          ref: r(ecom_cohort_analysis.cohort_user_count)
-          format {
-            type: 'number'
-            pattern: '#,###0'
-          }
-        },
-        VizFieldFull {
-          label: 'Cohort Revenue'
-          ref: r(ecom_cohort_analysis.cohort_revenue)
-          format {
-            type: 'number'
-            pattern: '[$$]#,###0'
-          }
-        },
-        VizFieldFull {
-          label: 'Cohort Orders'
-          ref: r(ecom_cohort_analysis.cohort_order_count)
-          format {
-            type: 'number'
-            pattern: '#,###0'
-          }
-        },
-        VizFieldFull {
-          label: 'Cohort AOV'
-          ref: r(ecom_cohort_analysis.cohort_aov)
-          format {
-            type: 'number'
-            pattern: '[$$]#,###0.00'
-          }
-        },
-        VizFieldFull {
-          label: 'LTV (to date)'
-          ref: r(ecom_cohort_analysis.cohort_ltv_total)
-          format {
-            type: 'number'
-            pattern: '[$$]#,###0.00'
-          }
-        }
-      ]
-      settings {
-        sorts: [
-          SortSetting {
-            key: 'sum_cohort'
-            direction: 'asc'
-          }
-        ]
-        pagination_size: 15
-      }
-    }
-  }
-
-  block header_naive: TextBlock {
-    content: @md # The trap: filtering after the cohort is formed
-
-This tab uses **the same dataset, the same metrics and the same pivots** as the first. The only difference is where the two profile filters point: at `Products / Product Categories` on the order-line path, instead of at the acquisition bridge.
-
-That is the thing worth being suspicious of in any cohort model — **a filter that trims output rows rather than cohort membership.** Leave the filters empty and this tab is identical to the first, which is exactly why the bug survives review. Set a category and watch LTV collapse.;;
-  }
-
-  block f_cohort_month_n: FilterBlock {
-    label: 'Cohort Month (acquisition)'
+  block f_ltv_month: FilterBlock {
+    label: 'Cohort Month'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
@@ -516,7 +257,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
     }
   }
 
-  block f_lifecycle_window_n: FilterBlock {
+  block f_ltv_window: FilterBlock {
     label: 'Lifecycle Window (Month Number)'
     type: 'field'
     source: FieldFilterSource {
@@ -532,32 +273,50 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
     }
   }
 
-  block f_naive_category: FilterBlock {
-    label: 'Category (line-item path)'
+  block f_ltv_country: FilterBlock {
+    label: 'Country'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(map_categories.parent_category)
+      field: r(ecommerce_countries.name)
     }
   }
 
-  block f_naive_product: FilterBlock {
-    label: 'Product (line-item path)'
+  block f_ltv_units: FilterBlock {
+    label: 'Units Band at Acquisition'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecommerce_products.name)
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
     }
   }
 
-  block naive_context: TextBlock {
-    content: @md **Try it.** Clear *Cohort Month* and *Lifecycle Window* on both tabs, then set *Category (line-item path)* to `Skin Care` here and *Categories at Acquisition* to `Skin Care` on the first tab. Both agree the cohort is **1,593 users** — membership is right either way, which is what makes this so easy to miss. But revenue reads **$244,667** here against **$1,697,523**, and LTV **$153.59** against **$1,065.61** — a 7x understatement.
-
-**Why.** The predicate lands inside the revenue CTE — `WHERE parent_category = 'Skin Care'` sits on the `nmv` join — so this tab counts only the cohort's *first-order Skin Care lines*, not everything those users went on to buy. The first tab pushes the predicate into a membership CTE instead, cutting the population before `COUNT(DISTINCT user_id)` and leaving the revenue join untouched.;;
+  block f_ltv_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
   }
 
-  block pivot_ltv_naive: VizBlock {
-    label: 'LTV by Cohort — filtered on the line-item path'
+  block f_ltv_product: FilterBlock {
+    label: 'Product'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block rep_ltv_right: VizBlock {
+    label: 'LTV — filter applied during cohort profiling'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -568,7 +327,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'nltv_cohort'
+          uname: 'ltvr_row'
         }
       ]
       columns: [
@@ -579,24 +338,24 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'nltv_month'
+          uname: 'ltvr_col'
         }
       ]
       values: [
         VizFieldFull {
           label: 'LTV'
           ref: r(ecom_cohort_analysis.cohort_ltv)
-          uname: 'nltv_val'
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
           }
+          uname: 'ltvr_val'
         }
       ]
       settings {
         conditional_formats: [
           ConditionalFormat {
-            key: 'nltv_val'
+            key: 'ltvr_val'
             format: ScaleFormat {
               min {
                 value: 0
@@ -615,23 +374,23 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
         ]
         sorts: [
           SortSetting {
-            key: 'nltv_cohort'
+            key: 'ltvr_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'nltv_month'
+            key: 'ltvr_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 15
+        pagination_size: 13
       }
     }
   }
 
-  block pivot_retention_naive: VizBlock {
-    label: 'Retention by Cohort — filtered on the line-item path'
+  block rep_ltv_wrong: VizBlock {
+    label: 'LTV — filter applied to final results'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -642,7 +401,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'nret_cohort'
+          uname: 'ltvw_row'
         }
       ]
       columns: [
@@ -653,59 +412,144 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'nret_month'
+          uname: 'ltvw_col'
         }
       ]
       values: [
         VizFieldFull {
-          label: 'Retention'
-          ref: r(ecom_cohort_analysis.cohort_retention)
-          uname: 'nret_val'
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
           format {
             type: 'number'
-            pattern: '#,##0.0%'
+            pattern: '[$$]#,###0.00'
           }
+          uname: 'ltvw_val'
         }
       ]
       settings {
         conditional_formats: [
           ConditionalFormat {
-            key: 'nret_val'
+            key: 'ltvw_val'
             format: ScaleFormat {
               min {
                 value: 0
                 color: '#FFFFFF'
               }
               mid {
-                value: 0.5
-                color: '#D1E5FA'
+                value: 500
+                color: '#CCEDE0'
               }
               max {
-                value: 1
-                color: '#8DBEF2'
+                value: 1000
+                color: '#7AD1AE'
               }
             }
           }
         ]
         sorts: [
           SortSetting {
-            key: 'nret_cohort'
+            key: 'ltvw_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'nret_month'
+            key: 'ltvw_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 15
+        pagination_size: 13
       }
     }
   }
 
-  block pivot_cumulative_revenue_naive: VizBlock {
-    label: 'Cumulative Cohort Revenue — filtered on the line-item path'
+  block txt_ltv_why: TextBlock {
+    content: @md **What the difference does.** LTV collapses to roughly a seventh, because only the cohort's spend in the chosen category is counted rather than everything those customers went on to buy.
+
+**The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
+  }
+
+  block txt_rev: TextBlock {
+    content: @md ## Cumulative Revenue — two ways to apply the same filter
+
+Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+
+**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+  }
+
+  block f_rev_month: FilterBlock {
+    label: 'Cohort Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_rev_window: FilterBlock {
+    label: 'Lifecycle Window (Month Number)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+    }
+    default {
+      operator: 'between'
+      value: [
+        0,
+        12
+      ]
+    }
+  }
+
+  block f_rev_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecommerce_countries.name)
+    }
+  }
+
+  block f_rev_units: FilterBlock {
+    label: 'Units Band at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+    }
+  }
+
+  block f_rev_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_rev_product: FilterBlock {
+    label: 'Product'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block rep_rev_right: VizBlock {
+    label: 'Cumulative Revenue — filter applied during cohort profiling'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -716,7 +560,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'nrev_row'
+          uname: 'revr_row'
         }
       ]
       columns: [
@@ -727,7 +571,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'nrev_month'
+          uname: 'revr_col'
         }
       ]
       values: [
@@ -738,28 +582,48 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'number'
             pattern: '[$$]#,###0'
           }
+          uname: 'revr_val'
         }
       ]
       settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'revr_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 50000
+                color: '#CCEDE0'
+              }
+              max {
+                value: 150000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
         sorts: [
           SortSetting {
-            key: 'nrev_row'
+            key: 'revr_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'nrev_month'
+            key: 'revr_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 15
+        pagination_size: 13
       }
     }
   }
 
-  block pivot_orders_per_user_naive: VizBlock {
-    label: 'Orders Per User by Cohort — filtered on the line-item path'
+  block rep_rev_wrong: VizBlock {
+    label: 'Cumulative Revenue — filter applied to final results'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -770,7 +634,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'nopu_row'
+          uname: 'revw_row'
         }
       ]
       columns: [
@@ -781,24 +645,183 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'nopu_month'
+          uname: 'revw_col'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecom_cohort_analysis.cumulative_cohort_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+          uname: 'revw_val'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'revw_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 50000
+                color: '#CCEDE0'
+              }
+              max {
+                value: 150000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'revw_row'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'revw_col'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 13
+      }
+    }
+  }
+
+  block txt_rev_why: TextBlock {
+    content: @md **What the difference does.** Cumulative revenue understates by the same mechanism as LTV — the category predicate lands on the revenue join, so everything the cohort bought outside that category disappears.
+
+**The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
+  }
+
+  block txt_opu: TextBlock {
+    content: @md ## Orders Per User — two ways to apply the same filter
+
+Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+
+**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+  }
+
+  block f_opu_month: FilterBlock {
+    label: 'Cohort Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_opu_window: FilterBlock {
+    label: 'Lifecycle Window (Month Number)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+    }
+    default {
+      operator: 'between'
+      value: [
+        0,
+        12
+      ]
+    }
+  }
+
+  block f_opu_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecommerce_countries.name)
+    }
+  }
+
+  block f_opu_units: FilterBlock {
+    label: 'Units Band at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+    }
+  }
+
+  block f_opu_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_opu_product: FilterBlock {
+    label: 'Product'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block rep_opu_right: VizBlock {
+    label: 'Orders Per User — filter applied during cohort profiling'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'opur_row'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'opur_col'
         }
       ]
       values: [
         VizFieldFull {
           label: 'Orders/User'
           ref: r(ecom_cohort_analysis.cohort_orders_per_user)
-          uname: 'nopu_val'
           format {
             type: 'number'
             pattern: '#,###0.00'
           }
+          uname: 'opur_val'
         }
       ]
       settings {
         conditional_formats: [
           ConditionalFormat {
-            key: 'nopu_val'
+            key: 'opur_val'
             format: ScaleFormat {
               min {
                 value: 0
@@ -817,34 +840,34 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
         ]
         sorts: [
           SortSetting {
-            key: 'nopu_row'
+            key: 'opur_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'nopu_month'
+            key: 'opur_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 15
+        pagination_size: 13
       }
     }
   }
 
-  block naive_category_context: TextBlock {
-    content: @md **The split, on the wrong path.** The mirror of this report on the first tab rows by `Category at Acquisition` — the bridge — so each row reads "users whose first order contained this category, and everything they spent since". This one rows by the line-item category instead, so each row reads "what this cohort spent *in that category*". The second is a legitimate question, but it is not cohort LTV, and nothing on the report says which one you are looking at.;;
-  }
-
-  block pivot_ltv_by_category_naive: VizBlock {
-    label: 'LTV by Category — rowed on the line-item path'
+  block rep_opu_wrong: VizBlock {
+    label: 'Orders Per User — filter applied to final results'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
-          label: 'Category (line-item path)'
-          ref: r(map_categories.parent_category)
-          uname: 'ncat_row'
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'opuw_row'
         }
       ]
       columns: [
@@ -855,24 +878,179 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'number'
             pattern: '#,###0'
           }
-          uname: 'ncat_month'
+          uname: 'opuw_col'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Orders/User'
+          ref: r(ecom_cohort_analysis.cohort_orders_per_user)
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'opuw_val'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'opuw_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 1.5
+                color: '#D1E5FA'
+              }
+              max {
+                value: 3
+                color: '#8DBEF2'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'opuw_row'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'opuw_col'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 13
+      }
+    }
+  }
+
+  block txt_opu_why: TextBlock {
+    content: @md **What the difference does.** The repeat-purchase curve flattens, because only orders containing the chosen category are counted — a customer ordering monthly in other categories looks like a one-time buyer.
+
+**The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
+  }
+
+  block txt_cat: TextBlock {
+    content: @md ## LTV by Category — two ways to apply the same filter
+
+Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+
+**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+  }
+
+  block f_cat_month: FilterBlock {
+    label: 'Cohort Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_cat_window: FilterBlock {
+    label: 'Lifecycle Window (Month Number)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+    }
+    default {
+      operator: 'between'
+      value: [
+        0,
+        12
+      ]
+    }
+  }
+
+  block f_cat_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecommerce_countries.name)
+    }
+  }
+
+  block f_cat_units: FilterBlock {
+    label: 'Units Band at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+    }
+  }
+
+  block f_cat_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_cat_product: FilterBlock {
+    label: 'Product'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block rep_cat_right: VizBlock {
+    label: 'LTV by Category — filter applied during cohort profiling'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Category at Acquisition'
+          ref: r(ecom_cohort_first_order_categories.parent_category)
+          uname: 'catr_row'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'catr_col'
         }
       ]
       values: [
         VizFieldFull {
           label: 'LTV'
           ref: r(ecom_cohort_analysis.cohort_ltv)
-          uname: 'ncat_val'
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
           }
+          uname: 'catr_val'
         }
       ]
       settings {
         conditional_formats: [
           ConditionalFormat {
-            key: 'ncat_val'
+            key: 'catr_val'
             format: ScaleFormat {
               min {
                 value: 0
@@ -891,23 +1069,178 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
         ]
         sorts: [
           SortSetting {
-            key: 'ncat_row'
+            key: 'catr_row'
             direction: 'asc'
           },
           SortSetting {
-            key: 'ncat_month'
+            key: 'catr_col'
             direction: 'asc'
           }
         ]
         frozen_columns: 1
         wrap_header_text: false
-        pagination_size: 10
+        pagination_size: 13
       }
     }
   }
 
-  block cohort_summary_naive: VizBlock {
-    label: 'Cohort Summary — filtered on the line-item path'
+  block rep_cat_wrong: VizBlock {
+    label: 'LTV by Category — filter applied to final results'
+    viz: PivotTable {
+      dataset: ecom_cohort_analysis
+      rows: [
+        VizFieldFull {
+          label: 'Category (line-item path)'
+          ref: r(map_categories.parent_category)
+          uname: 'catw_row'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'catw_col'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'LTV'
+          ref: r(ecom_cohort_analysis.cohort_ltv)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'catw_val'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'catw_val'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 500
+                color: '#CCEDE0'
+              }
+              max {
+                value: 1000
+                color: '#7AD1AE'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'catw_row'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'catw_col'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 13
+      }
+    }
+  }
+
+  block txt_cat_why: TextBlock {
+    content: @md **What the difference does.** The first report rows by the acquisition bridge, so each row reads 'customers whose first order contained this category, and everything they spent since' — and a customer who bought two categories appears under both. The second rows by the line-item category, so each row reads 'what everyone spent IN that category'. Both are real questions; only one is cohort LTV, and nothing on the report says which.
+
+**The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
+  }
+
+  block txt_sum: TextBlock {
+    content: @md ## Cohort Summary — two ways to apply the same filter
+
+Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+
+**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+  }
+
+  block f_sum_month: FilterBlock {
+    label: 'Cohort Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_sum_window: FilterBlock {
+    label: 'Lifecycle Window (Month Number)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+    }
+    default {
+      operator: 'between'
+      value: [
+        0,
+        12
+      ]
+    }
+  }
+
+  block f_sum_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecommerce_countries.name)
+    }
+  }
+
+  block f_sum_units: FilterBlock {
+    label: 'Units Band at Acquisition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+    }
+  }
+
+  block f_sum_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.parent_category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_sum_product: FilterBlock {
+    label: 'Product'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_first_order_categories.product_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block rep_sum_right: VizBlock {
+    label: 'Cohort Summary — filter applied during cohort profiling'
     viz: DataTable {
       dataset: ecom_cohort_analysis
       fields: [
@@ -918,7 +1251,7 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
             type: 'date'
             pattern: 'LLL yyyy'
           }
-          uname: 'nsum_cohort'
+          uname: 'sumr_row'
         },
         VizFieldFull {
           label: 'Cohort Size'
@@ -964,124 +1297,619 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
       settings {
         sorts: [
           SortSetting {
-            key: 'nsum_cohort'
+            key: 'sumr_row'
             direction: 'asc'
           }
         ]
-        pagination_size: 15
+        pagination_size: 13
       }
     }
+  }
+
+  block rep_sum_wrong: VizBlock {
+    label: 'Cohort Summary — filter applied to final results'
+    viz: DataTable {
+      dataset: ecom_cohort_analysis
+      fields: [
+        VizFieldFull {
+          label: 'Cohort'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'sumw_row'
+        },
+        VizFieldFull {
+          label: 'Cohort Size'
+          ref: r(ecom_cohort_analysis.cohort_user_count)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort Revenue'
+          ref: r(ecom_cohort_analysis.cohort_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort Orders'
+          ref: r(ecom_cohort_analysis.cohort_order_count)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort AOV'
+          ref: r(ecom_cohort_analysis.cohort_aov)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'LTV (to date)'
+          ref: r(ecom_cohort_analysis.cohort_ltv_total)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'sumw_row'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 13
+      }
+    }
+  }
+
+  block txt_sum_why: TextBlock {
+    content: @md **What the difference does.** Every column shifts at once here, and Cohort Size shifts with them — which is the clearest sign that the second filter is selecting a different population rather than trimming a report.
+
+**The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
+  }
+
+  block txt_ov_hero: TextBlock {
+    content: @md <div style="border-left:4px solid #05264C;padding:4px 0 4px 18px">
+<h1 style="margin:0 0 10px;font-size:26px;color:#05264C">What this dashboard is showing</h1>
+<p style="margin:0;font-size:15px;color:#505157;line-height:1.6">
+A <strong>cohort</strong> is simply a group of customers who all started at the same time. Everyone who made their first purchase in January is the January cohort. We then follow that group month by month.
+</p>
+</div>
+
+That lets us answer the question every business eventually asks:
+
+> **"When we spend money to win a customer, do they stick around — and what are they actually worth to us?"**
+
+Each tab answers one version of it: do they come back (**Retention**), how much do they spend (**LTV**), how often do they order (**Orders Per User**), and so on.;;
+  }
+
+  block txt_ov_problem: TextBlock {
+    content: @md ## Then someone asks a sharper question
+
+*"Fine — but what about the customers we won with skincare? Were they any good?"*
+
+This is where dashboards quietly go wrong. There are **two ways to apply that filter**. They look identical on screen. Only one answers the question that was asked.;;
+  }
+
+  block txt_ov_right_card: TextBlock {
+    content: @md <div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:16px 18px;height:100%">
+<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1B7CE4;font-weight:700;margin-bottom:8px">Cohort filter</div>
+<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Use it to pick the group</div>
+<p style="margin:0 0 12px;font-size:14px;color:#212327;line-height:1.6">
+“Customers whose <strong>first purchase</strong> included skincare.”
+</p>
+<p style="margin:0 0 12px;font-size:14px;color:#505157;line-height:1.6">
+Choose the group <strong>first</strong> — then measure everything they ever bought afterwards. The shampoo, the sofa, the phone case: all of it still counts, because all of it came from a customer skincare won for us.
+</p>
+<div style="font-size:13px;color:#1F815A;font-weight:600">Answers: was skincare a good way to win customers?</div>
+</div>;;
+  }
+
+  block txt_ov_wrong_card: TextBlock {
+    content: @md <div style="background:#FFF7EA;border-left:4px solid #E36A01;border-radius:6px;padding:16px 18px;height:100%">
+<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#B04A00;font-weight:700;margin-bottom:8px">Result filter</div>
+<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Use it to trim the answer</div>
+<p style="margin:0 0 12px;font-size:14px;color:#212327;line-height:1.6">
+“Show me <strong>skincare sales</strong>.”
+</p>
+<p style="margin:0 0 12px;font-size:14px;color:#505157;line-height:1.6">
+Measure everybody first — then throw away every line on the report that isn’t skincare. The group was never narrowed, and everything else those customers bought has just been deleted from view.
+</p>
+<div style="font-size:13px;color:#B04A00;font-weight:600">Answers: how much skincare did we sell?</div>
+</div>;;
+  }
+
+  block txt_ov_numbers: TextBlock {
+    content: @md ## The same question, two very different answers
+
+Here is the January 2026 cohort, filtered to skincare both ways. Same data, same metric, same screen.
+
+| | Cohort filter | Result filter |
+|---|---|---|
+| **Customers in the group** | 83 | 210 |
+| **Buying in month 0** | 100.0% | 44.8% |
+| **Still buying in month 1** | 30.1% | 12.4% |
+| **Worth per customer by month 6** | $833.03 | $207.05 |
+
+Read the right-hand column on its own and skincare looks like a failure — barely one in eight customers comes back, and each is worth a quarter as much. You would stop the campaign.
+
+It is not true. Those customers **did** come back. They just bought something other than skincare, and the report quietly threw that away.
+
+<div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:14px 18px;margin-top:8px">
+<strong style="color:#05264C">The giveaway is the very first row.</strong> Month 0 is the month these customers joined — <em>everyone</em> buys in the month they join, by definition. It has to be 100%. When it reads 44.8%, the group on screen is not the group you think you are looking at.
+</div>;;
+  }
+
+  block txt_ov_try: TextBlock {
+    content: @md ## See it for yourself
+
+1. Open any tab — **Retention** is the clearest
+2. Set **Category** to `Skin Care`
+3. That one filter feeds **both** reports at once. Watch them separate.
+
+There is no trick in the filter. You picked one category, once. The top report uses it to **choose the group**; the bottom uses it to **trim the finished numbers** — and that single difference is worth four times the answer.
+
+**Both filters are multi-select, and they combine.** Pick `Skin Care` *and* `Clothes` to profile customers won by either. Add a **Product** or two on top, then a **Country**, and you have narrowed to a specific group of customers — every filter you add tightens the same group, and the reports keep answering for their whole history.
+
+*Cohort Month, Lifecycle Window, Country and Units Band narrow the group correctly whichever report they touch. Only Category and Product behave differently between the two.*;;
   }
 
   view: TabLayout {
-    tab cohort: CanvasLayout {
-      label: 'Cohort Analysis'
+    tab overview: CanvasLayout {
+      label: 'Start Here'
       width: 1380
-      height: 4020
+      height: 1620
       grid_size: 20
       auto_expand_vertically: false
 
-      block header {
-        position: pos(20, 20, 1340, 140)
+      block txt_ov_hero {
+        position: pos(20, 20, 1340, 300)
       }
-      block f_cohort_month {
-        position: pos(20, 180, 320, 80)
+      block txt_ov_problem {
+        position: pos(20, 340, 1340, 160)
       }
-      block f_lifecycle_window {
-        position: pos(360, 180, 320, 80)
+      block txt_ov_right_card {
+        position: pos(20, 520, 660, 340)
       }
-      block f_country {
-        position: pos(700, 180, 320, 80)
+      block txt_ov_wrong_card {
+        position: pos(700, 520, 660, 340)
       }
-      block f_units_band {
-        position: pos(1040, 180, 320, 80)
+      block txt_ov_numbers {
+        position: pos(20, 880, 1340, 440)
       }
-      block f_category_at_acquisition {
-        position: pos(20, 280, 660, 80)
-      }
-      block f_products_at_acquisition {
-        position: pos(700, 280, 660, 80)
-      }
-      block pivots_context {
-        position: pos(20, 380, 1340, 120)
-      }
-      block pivot_ltv {
-        position: pos(20, 520, 1340, 560)
-      }
-      block pivot_retention {
-        position: pos(20, 1100, 1340, 560)
-      }
-      block pivot_cumulative_revenue {
-        position: pos(20, 1680, 1340, 560)
-      }
-      block pivot_orders_per_user {
-        position: pos(20, 2260, 1340, 560)
-      }
-      block multimembership_context {
-        position: pos(20, 2840, 1340, 120)
-      }
-      block pivot_ltv_by_category {
-        position: pos(20, 2980, 1340, 420)
-      }
-      block cohort_summary {
-        position: pos(20, 3420, 1340, 560)
+      block txt_ov_try {
+        position: pos(20, 1340, 1340, 260)
       }
       mobile {
         mode: 'auto'
       }
     }
 
-    tab trap: CanvasLayout {
-      label: 'The Trap (filter after cohort)'
+    tab retention: CanvasLayout {
+      label: 'Retention'
       width: 1380
-      height: 4020
+      height: 1820
       grid_size: 20
       auto_expand_vertically: false
 
-      block header_naive {
-        position: pos(20, 20, 1340, 180)
+      block txt_ret {
+        position: pos(20, 20, 1340, 200)
       }
-      block f_cohort_month_n {
-        position: pos(20, 220, 320, 80)
+      block f_ret_month {
+        position: pos(20, 240, 440, 90)
       }
-      block f_lifecycle_window_n {
-        position: pos(360, 220, 320, 80)
+      block f_ret_window {
+        position: pos(480, 240, 440, 90)
       }
-      block f_naive_category {
-        position: pos(700, 220, 320, 80)
+      block f_ret_country {
+        position: pos(940, 240, 420, 90)
       }
-      block f_naive_product {
-        position: pos(1040, 220, 320, 80)
+      block f_ret_units {
+        position: pos(20, 350, 440, 90)
       }
-      block naive_context {
-        position: pos(20, 320, 1340, 160)
+      block f_ret_category {
+        position: pos(480, 350, 440, 90)
       }
-      block pivot_ltv_naive {
-        position: pos(20, 500, 1340, 560)
+      block f_ret_product {
+        position: pos(940, 350, 420, 90)
       }
-      block pivot_retention_naive {
-        position: pos(20, 1080, 1340, 560)
+      block rep_ret_right {
+        position: pos(20, 460, 1340, 500)
       }
-      block pivot_cumulative_revenue_naive {
-        position: pos(20, 1660, 1340, 560)
+      block rep_ret_wrong {
+        position: pos(20, 980, 1340, 500)
       }
-      block pivot_orders_per_user_naive {
-        position: pos(20, 2240, 1340, 560)
+      block txt_ret_why {
+        position: pos(20, 1500, 1340, 280)
       }
-      block naive_category_context {
-        position: pos(20, 2820, 1340, 120)
+      mobile {
+        mode: 'auto'
       }
-      block pivot_ltv_by_category_naive {
-        position: pos(20, 2960, 1340, 420)
+    }
+
+    tab ltv: CanvasLayout {
+      label: 'LTV'
+      width: 1380
+      height: 1820
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block txt_ltv {
+        position: pos(20, 20, 1340, 200)
       }
-      block cohort_summary_naive {
-        position: pos(20, 3400, 1340, 560)
+      block f_ltv_month {
+        position: pos(20, 240, 440, 90)
+      }
+      block f_ltv_window {
+        position: pos(480, 240, 440, 90)
+      }
+      block f_ltv_country {
+        position: pos(940, 240, 420, 90)
+      }
+      block f_ltv_units {
+        position: pos(20, 350, 440, 90)
+      }
+      block f_ltv_category {
+        position: pos(480, 350, 440, 90)
+      }
+      block f_ltv_product {
+        position: pos(940, 350, 420, 90)
+      }
+      block rep_ltv_right {
+        position: pos(20, 460, 1340, 500)
+      }
+      block rep_ltv_wrong {
+        position: pos(20, 980, 1340, 500)
+      }
+      block txt_ltv_why {
+        position: pos(20, 1500, 1340, 280)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab revenue: CanvasLayout {
+      label: 'Cumulative Revenue'
+      width: 1380
+      height: 1820
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block txt_rev {
+        position: pos(20, 20, 1340, 200)
+      }
+      block f_rev_month {
+        position: pos(20, 240, 440, 90)
+      }
+      block f_rev_window {
+        position: pos(480, 240, 440, 90)
+      }
+      block f_rev_country {
+        position: pos(940, 240, 420, 90)
+      }
+      block f_rev_units {
+        position: pos(20, 350, 440, 90)
+      }
+      block f_rev_category {
+        position: pos(480, 350, 440, 90)
+      }
+      block f_rev_product {
+        position: pos(940, 350, 420, 90)
+      }
+      block rep_rev_right {
+        position: pos(20, 460, 1340, 500)
+      }
+      block rep_rev_wrong {
+        position: pos(20, 980, 1340, 500)
+      }
+      block txt_rev_why {
+        position: pos(20, 1500, 1340, 280)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab orders: CanvasLayout {
+      label: 'Orders Per User'
+      width: 1380
+      height: 1820
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block txt_opu {
+        position: pos(20, 20, 1340, 200)
+      }
+      block f_opu_month {
+        position: pos(20, 240, 440, 90)
+      }
+      block f_opu_window {
+        position: pos(480, 240, 440, 90)
+      }
+      block f_opu_country {
+        position: pos(940, 240, 420, 90)
+      }
+      block f_opu_units {
+        position: pos(20, 350, 440, 90)
+      }
+      block f_opu_category {
+        position: pos(480, 350, 440, 90)
+      }
+      block f_opu_product {
+        position: pos(940, 350, 420, 90)
+      }
+      block rep_opu_right {
+        position: pos(20, 460, 1340, 500)
+      }
+      block rep_opu_wrong {
+        position: pos(20, 980, 1340, 500)
+      }
+      block txt_opu_why {
+        position: pos(20, 1500, 1340, 280)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab by_category: CanvasLayout {
+      label: 'LTV by Category'
+      width: 1380
+      height: 1820
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block txt_cat {
+        position: pos(20, 20, 1340, 200)
+      }
+      block f_cat_month {
+        position: pos(20, 240, 440, 90)
+      }
+      block f_cat_window {
+        position: pos(480, 240, 440, 90)
+      }
+      block f_cat_country {
+        position: pos(940, 240, 420, 90)
+      }
+      block f_cat_units {
+        position: pos(20, 350, 440, 90)
+      }
+      block f_cat_category {
+        position: pos(480, 350, 440, 90)
+      }
+      block f_cat_product {
+        position: pos(940, 350, 420, 90)
+      }
+      block rep_cat_right {
+        position: pos(20, 460, 1340, 500)
+      }
+      block rep_cat_wrong {
+        position: pos(20, 980, 1340, 500)
+      }
+      block txt_cat_why {
+        position: pos(20, 1500, 1340, 280)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab summary: CanvasLayout {
+      label: 'Cohort Summary'
+      width: 1380
+      height: 1820
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block txt_sum {
+        position: pos(20, 20, 1340, 200)
+      }
+      block f_sum_month {
+        position: pos(20, 240, 440, 90)
+      }
+      block f_sum_window {
+        position: pos(480, 240, 440, 90)
+      }
+      block f_sum_country {
+        position: pos(940, 240, 420, 90)
+      }
+      block f_sum_units {
+        position: pos(20, 350, 440, 90)
+      }
+      block f_sum_category {
+        position: pos(480, 350, 440, 90)
+      }
+      block f_sum_product {
+        position: pos(940, 350, 420, 90)
+      }
+      block rep_sum_right {
+        position: pos(20, 460, 1340, 500)
+      }
+      block rep_sum_wrong {
+        position: pos(20, 980, 1340, 500)
+      }
+      block txt_sum_why {
+        position: pos(20, 1500, 1340, 280)
       }
       mobile {
         mode: 'auto'
       }
     }
   }
+
+  // Each Category / Product filter drives BOTH reports on its tab, but lands on a
+  // different field in each: the acquisition bridge above (choosing who is in the
+  // cohort) and the line-item path below (trimming the finished numbers).
+  interactions: [
+    FilterInteraction {
+      from: 'f_ret_category'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecom_cohort_first_order_categories.parent_category)
+        },
+        CustomMapping {
+          block: 'rep_ret_wrong'
+          field: r(map_categories.parent_category)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ret_product'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecom_cohort_first_order_categories.product_name)
+        },
+        CustomMapping {
+          block: 'rep_ret_wrong'
+          field: r(ecommerce_products.name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_category'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecom_cohort_first_order_categories.parent_category)
+        },
+        CustomMapping {
+          block: 'rep_ltv_wrong'
+          field: r(map_categories.parent_category)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_product'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecom_cohort_first_order_categories.product_name)
+        },
+        CustomMapping {
+          block: 'rep_ltv_wrong'
+          field: r(ecommerce_products.name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_category'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecom_cohort_first_order_categories.parent_category)
+        },
+        CustomMapping {
+          block: 'rep_rev_wrong'
+          field: r(map_categories.parent_category)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_product'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecom_cohort_first_order_categories.product_name)
+        },
+        CustomMapping {
+          block: 'rep_rev_wrong'
+          field: r(ecommerce_products.name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_category'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecom_cohort_first_order_categories.parent_category)
+        },
+        CustomMapping {
+          block: 'rep_opu_wrong'
+          field: r(map_categories.parent_category)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_product'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecom_cohort_first_order_categories.product_name)
+        },
+        CustomMapping {
+          block: 'rep_opu_wrong'
+          field: r(ecommerce_products.name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_category'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecom_cohort_first_order_categories.parent_category)
+        },
+        CustomMapping {
+          block: 'rep_cat_wrong'
+          field: r(map_categories.parent_category)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_product'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecom_cohort_first_order_categories.product_name)
+        },
+        CustomMapping {
+          block: 'rep_cat_wrong'
+          field: r(ecommerce_products.name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_sum_category'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecom_cohort_first_order_categories.parent_category)
+        },
+        CustomMapping {
+          block: 'rep_sum_wrong'
+          field: r(map_categories.parent_category)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_sum_product'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecom_cohort_first_order_categories.product_name)
+        },
+        CustomMapping {
+          block: 'rep_sum_wrong'
+          field: r(ecommerce_products.name)
+        }
+      ]
+    }
+  ]
 
   settings {
     autorun_on_open: true
