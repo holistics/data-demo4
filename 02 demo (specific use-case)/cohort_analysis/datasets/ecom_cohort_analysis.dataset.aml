@@ -290,6 +290,14 @@ Consequences worth knowing:
     format: '[$$]#,###0'
   }
 
+  // ── Running-total metrics: AXIS-BOUND ───────────────────────────────────
+  // cumulative_cohort_revenue, cumulative_cohort_orders, cohort_ltv and
+  // cohort_orders_per_user all use running_total(..., month_number,
+  // fill_missing: true). fill_missing materialises the lifecycle axis, so these
+  // may ONLY be placed on a report that carries Month Number as a dimension.
+  // On a report without it (a summary table), SQL generation fails with
+  // `Field ecommerce_orders->month_number not found in model aql__tNN`.
+  // Use the axis-free cohort_ltv_total / cohort_aov there instead.
   metric cumulative_cohort_revenue {
     label: 'Cumulative Cohort Revenue'
     type: 'number'
@@ -303,6 +311,14 @@ Consequences worth knowing:
     type: 'number'
     description: 'Cumulative Cohort Revenue / Cohort Size. Must increase monotonically across the lifecycle axis — a dip means the accumulation is broken. Reads correctly when the lifecycle window is a RANGE; filtering to a SINGLE month leaves the running total one month to accumulate and reports that month alone.'
     definition: @aql cumulative_cohort_revenue / cohort_user_count ;;
+    format: '[$$]#,###0.00'
+  }
+
+  metric cohort_ltv_total {
+    label: 'LTV (to date)'
+    type: 'number'
+    description: 'Net revenue per acquired user over whatever lifecycle months are in scope. AXIS-FREE: unlike LTV it uses no running_total, so it is safe on a report with no Month Number axis. With the lifecycle window cleared it equals the final LTV column.'
+    definition: @aql cohort_revenue / cohort_user_count ;;
     format: '[$$]#,###0.00'
   }
 
@@ -333,8 +349,8 @@ Consequences worth knowing:
   metric cohort_aov {
     label: 'Cohort AOV'
     type: 'number'
-    description: 'Cumulative revenue per cumulative order. Distinct from the inherited AOV, which is gross and not cohort-scoped.'
-    definition: @aql cumulative_cohort_revenue / cumulative_cohort_orders ;;
+    description: 'Net revenue per order for the cohort, over whatever lifecycle months are in scope. AXIS-FREE: no running_total, so it is safe on a report that does not carry Month Number — see the note above cumulative_cohort_revenue.'
+    definition: @aql cohort_revenue / cohort_order_count ;;
     format: '[$$]#,###0.00'
   }
 

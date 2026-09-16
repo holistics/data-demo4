@@ -131,7 +131,21 @@ The one thing the flags could do that the multiselect cannot is a single-filter 
 
 **Sparse lifecycle axis.** `month_number` only exists where an order exists, so a cohort with no orders in a month produces no column and the axis reads `0, 1, 2, 3, 5, 7…`. The three cumulative metrics use `running_total(..., fill_missing: true)`. Non-cumulative metrics stay sparse — read a missing column as zero.
 
-**`aml validate` does not check SQL passthrough against the database, and compilation is not execution.** Every block here was executed, not just compiled.
+**Running-total metrics are AXIS-BOUND and will break a report that has no lifecycle axis.** `cumulative_cohort_revenue`, `cumulative_cohort_orders`, `cohort_ltv` and `cohort_orders_per_user` all use `running_total(..., ecommerce_orders.month_number, fill_missing: true)`. `fill_missing` has to materialise the lifecycle axis, so putting one of them on a report that does not carry `Month Number` as a dimension fails at query time with:
+
+```
+SQL Generation error: Field `ecommerce_orders->month_number` not found in model `aql__t22`
+```
+
+`aql__t22` is the pivot presentation CTE, which only ever holds the aliased output columns — so the message means a `month_number` predicate was deferred to a layer that has no such column. It compiles clean and only surfaces when someone filters, which is what makes it easy to ship.
+
+Use the **axis-free** `cohort_ltv_total` (`cohort_revenue / cohort_user_count`) and `cohort_aov` (`cohort_revenue / cohort_order_count`) on summary tables instead. Both cohort summaries do.
+
+This bit twice: `cohort_aov` was originally `cumulative_cohort_revenue / cumulative_cohort_orders` and `cohort_summary_naive` originally used `cohort_ltv`, and both sat on DataTables with no Month Number. Reproduce with *Categories at Acquisition* = Clothes + Groceries.
+
+**`exact_grains()` is not a substitute for `of_all()` here.** `count_distinct(users.id) | exact_grains(cohort_month)` compiles to a literal `NULL` in this dataset. The constant cohort denominator has to stay `of_all(ecommerce_orders.month_number)`.
+
+**`aml validate` does not check SQL passthrough against the database, and compilation is not execution.** Every block here was executed, not just compiled — and the axis-bound bug above passes validation.
 
 ## The second tab: the trap, demonstrated
 

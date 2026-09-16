@@ -473,6 +473,14 @@ LTV, retention and repeat purchase by the month a user first ordered. **Leave th
             type: 'number'
             pattern: '[$$]#,###0.00'
           }
+        },
+        VizFieldFull {
+          label: 'LTV (to date)'
+          ref: r(ecom_cohort_analysis.cohort_ltv_total)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
         }
       ]
       settings {
@@ -929,8 +937,24 @@ That is the thing worth being suspicious of in any cohort model — **a filter t
           }
         },
         VizFieldFull {
-          label: 'LTV'
-          ref: r(ecom_cohort_analysis.cohort_ltv)
+          label: 'Cohort Orders'
+          ref: r(ecom_cohort_analysis.cohort_order_count)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'Cohort AOV'
+          ref: r(ecom_cohort_analysis.cohort_aov)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'LTV (to date)'
+          ref: r(ecom_cohort_analysis.cohort_ltv_total)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
