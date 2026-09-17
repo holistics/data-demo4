@@ -6,9 +6,9 @@ Dashboard ecom_cohort_dashboard {
   block txt_ret: TextBlock {
     content: @md ## Retention — two ways to apply the same filter
 
-Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+Same cohort, same filter, same field — **two different metric definitions**.
 
-**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+**Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
   block f_ret_month: FilterBlock {
@@ -83,7 +83,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_ret_right: VizBlock {
-    label: 'Retention — filter applied during cohort profiling'
+    label: 'Retention — semantic layer'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -157,13 +157,13 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_ret_wrong: VizBlock {
-    label: 'Retention — filter applied to final results'
+    label: 'Retention — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
             pattern: 'LLL yyyy'
@@ -174,7 +174,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       columns: [
         VizFieldFull {
           label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -185,7 +185,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       values: [
         VizFieldFull {
           label: 'Retention'
-          ref: r(ecom_cohort_analysis.cohort_retention)
+          ref: r(ecom_cohort_analysis.sql_retention)
           format {
             type: 'number'
             pattern: '#,##0.0%'
@@ -239,9 +239,9 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   block txt_ltv: TextBlock {
     content: @md ## LTV — two ways to apply the same filter
 
-Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+Same cohort, same filter, same field — **two different metric definitions**.
 
-**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+**Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
   block f_ltv_month: FilterBlock {
@@ -316,7 +316,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_ltv_right: VizBlock {
-    label: 'LTV — filter applied during cohort profiling'
+    label: 'LTV — semantic layer'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -390,13 +390,13 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_ltv_wrong: VizBlock {
-    label: 'LTV — filter applied to final results'
+    label: 'LTV — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
             pattern: 'LLL yyyy'
@@ -407,7 +407,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       columns: [
         VizFieldFull {
           label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -418,7 +418,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       values: [
         VizFieldFull {
           label: 'LTV'
-          ref: r(ecom_cohort_analysis.cohort_ltv)
+          ref: r(ecom_cohort_analysis.sql_ltv)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -472,9 +472,9 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   block txt_rev: TextBlock {
     content: @md ## Cumulative Revenue — two ways to apply the same filter
 
-Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+Same cohort, same filter, same field — **two different metric definitions**.
 
-**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+**Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
   block f_rev_month: FilterBlock {
@@ -549,7 +549,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_rev_right: VizBlock {
-    label: 'Cumulative Revenue — filter applied during cohort profiling'
+    label: 'Cumulative Revenue — semantic layer'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -623,13 +623,13 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_rev_wrong: VizBlock {
-    label: 'Cumulative Revenue — filter applied to final results'
+    label: 'Cumulative Revenue — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
             pattern: 'LLL yyyy'
@@ -640,7 +640,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       columns: [
         VizFieldFull {
           label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -651,7 +651,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       values: [
         VizFieldFull {
           label: 'Revenue'
-          ref: r(ecom_cohort_analysis.cumulative_cohort_revenue)
+          ref: r(ecom_cohort_analysis.sql_cumulative_revenue)
           format {
             type: 'number'
             pattern: '[$$]#,###0'
@@ -705,9 +705,9 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   block txt_opu: TextBlock {
     content: @md ## Orders Per User — two ways to apply the same filter
 
-Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+Same cohort, same filter, same field — **two different metric definitions**.
 
-**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+**Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
   block f_opu_month: FilterBlock {
@@ -782,7 +782,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_opu_right: VizBlock {
-    label: 'Orders Per User — filter applied during cohort profiling'
+    label: 'Orders Per User — semantic layer'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -856,13 +856,13 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_opu_wrong: VizBlock {
-    label: 'Orders Per User — filter applied to final results'
+    label: 'Orders Per User — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
             pattern: 'LLL yyyy'
@@ -873,7 +873,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       columns: [
         VizFieldFull {
           label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -884,7 +884,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       values: [
         VizFieldFull {
           label: 'Orders/User'
-          ref: r(ecom_cohort_analysis.cohort_orders_per_user)
+          ref: r(ecom_cohort_analysis.sql_orders_per_user)
           format {
             type: 'number'
             pattern: '#,###0.00'
@@ -938,9 +938,9 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   block txt_cat: TextBlock {
     content: @md ## LTV by Category — two ways to apply the same filter
 
-Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+Same cohort, same filter, same field — **two different metric definitions**.
 
-**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+**Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
   block f_cat_month: FilterBlock {
@@ -1015,7 +1015,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_cat_right: VizBlock {
-    label: 'LTV by Category — filter applied during cohort profiling'
+    label: 'LTV by Category — semantic layer'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
@@ -1085,20 +1085,20 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_cat_wrong: VizBlock {
-    label: 'LTV by Category — filter applied to final results'
+    label: 'LTV by Category — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
-          label: 'Category (line-item path)'
-          ref: r(map_categories.parent_category)
+          label: 'Category at Acquisition'
+          ref: r(ecom_cohort_sql.parent_category)
           uname: 'catw_row'
         }
       ]
       columns: [
         VizFieldFull {
           label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -1109,7 +1109,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
       values: [
         VizFieldFull {
           label: 'LTV'
-          ref: r(ecom_cohort_analysis.cohort_ltv)
+          ref: r(ecom_cohort_analysis.sql_ltv)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -1163,9 +1163,9 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   block txt_sum: TextBlock {
     content: @md ## Cohort Summary — two ways to apply the same filter
 
-Both reports use the same dataset, metric and layout. **Category** and **Product** feed *both* — but land in a different place in each.
+Same cohort, same filter, same field — **two different metric definitions**.
 
-**Above:** the filter chooses who is in the cohort, before any metric runs, so each customer's whole history still counts. **Below:** the cohort forms first, then rows are trimmed on the way out.;;
+**Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
   block f_sum_month: FilterBlock {
@@ -1240,7 +1240,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_sum_right: VizBlock {
-    label: 'Cohort Summary — filter applied during cohort profiling'
+    label: 'Cohort Summary — semantic layer'
     viz: DataTable {
       dataset: ecom_cohort_analysis
       fields: [
@@ -1307,13 +1307,13 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
   }
 
   block rep_sum_wrong: VizBlock {
-    label: 'Cohort Summary — filter applied to final results'
+    label: 'Cohort Summary — hand-built SQL model (the conventional approach)'
     viz: DataTable {
       dataset: ecom_cohort_analysis
       fields: [
         VizFieldFull {
           label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
             pattern: 'LLL yyyy'
@@ -1322,7 +1322,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
         },
         VizFieldFull {
           label: 'Cohort Size'
-          ref: r(ecom_cohort_analysis.cohort_user_count)
+          ref: r(ecom_cohort_analysis.sql_cohort_size)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -1330,7 +1330,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
         },
         VizFieldFull {
           label: 'Cohort Revenue'
-          ref: r(ecom_cohort_analysis.cohort_revenue)
+          ref: r(ecom_cohort_analysis.sql_revenue)
           format {
             type: 'number'
             pattern: '[$$]#,###0'
@@ -1338,7 +1338,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
         },
         VizFieldFull {
           label: 'Cohort Orders'
-          ref: r(ecom_cohort_analysis.cohort_order_count)
+          ref: r(ecom_cohort_analysis.sql_order_count)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -1346,7 +1346,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
         },
         VizFieldFull {
           label: 'Cohort AOV'
-          ref: r(ecom_cohort_analysis.cohort_aov)
+          ref: r(ecom_cohort_analysis.sql_aov)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -1354,7 +1354,7 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
         },
         VizFieldFull {
           label: 'LTV (to date)'
-          ref: r(ecom_cohort_analysis.cohort_ltv_total)
+          ref: r(ecom_cohort_analysis.sql_ltv_total)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -1381,115 +1381,111 @@ Both reports use the same dataset, metric and layout. **Category** and **Product
 
   block txt_ov_hero: TextBlock {
     content: @md <div style="border-left:4px solid #05264C;padding:4px 0 4px 18px">
-<h1 style="margin:0 0 10px;font-size:26px;color:#05264C">What this dashboard is showing</h1>
+<h1 style="margin:0 0 10px;font-size:26px;color:#05264C">The same cohort report, built two ways</h1>
 <p style="margin:0;font-size:15px;color:#505157;line-height:1.6">
-A <strong>cohort</strong> is simply a group of customers who all started at the same time. Everyone who made their first purchase in January is the January cohort. We then follow that group month by month.
+A <strong>cohort</strong> is a group of customers who started at the same time — everyone whose first purchase was in January is the January cohort. Every tab follows one month by month, <strong>twice</strong>: once modelled in the Holistics semantic layer, once as the SQL model an analyst would normally write.
 </p>
 </div>
 
-That lets us answer the question every business eventually asks:
-
-> **"When we spend money to win a customer, do they stick around — and what are they actually worth to us?"**
-
-Each tab answers one version of it: do they come back (**Retention**), how much do they spend (**LTV**), how often do they order (**Orders Per User**), and so on.;;
+**The two agree exactly — until someone asks a question the SQL was not written for.**;;
   }
 
-  block txt_ov_problem: TextBlock {
-    content: @md ## Then someone asks a sharper question
+  block txt_ov_numbers: TextBlock {
+    content: @md ## What that looks like
 
-*"Fine — but what about the customers we won with skincare? Were they any good?"*
+January 2026, before and after filtering to skincare.
 
-This is where dashboards quietly go wrong. There are **two ways to apply that filter**. They look identical on screen. Only one answers the question that was asked.;;
+| | Semantic layer | SQL model |
+|---|---|---|
+| Cohort size | 381 | 381 |
+| Month 0 · month 1 | 100.0% · 26.2% | 100.0% · 26.2% |
+| Revenue, month 0 | $97,644 | $97,644 |
+| **Filtered — cohort size** | **84** | **381** |
+| **Filtered — month 0** | **100.0%** | **25.2%** |
+| **Filtered — month 1** | **32.1%** | **6.6%** |
+
+<div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:14px 18px;margin-top:8px">
+<strong style="color:#05264C">The top half is the point.</strong> Identical, to the dollar — the SQL build is neither careless nor wrong. It simply cannot answer a question it was not written for, and it fails quietly: cohort size stays at 381 while it counts only the customers who bought skincare. Month 0 is the tell. That is the month these customers joined, so retention is 100% by definition. 25.2% is not an approximation; it is incoherent.
+</div>
+
+Read the SQL column alone and you would stop the skincare campaign. Those customers did come back — they bought something else.;;
   }
 
   block txt_ov_right_card: TextBlock {
     content: @md <div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:16px 18px;height:100%">
-<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1B7CE4;font-weight:700;margin-bottom:8px">Cohort filter</div>
-<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Use it to pick the group</div>
+<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1B7CE4;font-weight:700;margin-bottom:8px">Semantic layer</div>
+<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Skincare picks the group</div>
 <p style="margin:0 0 12px;font-size:14px;color:#212327;line-height:1.6">
-“Customers whose <strong>first purchase</strong> included skincare.”
+“Bought at acquisition” is modelled as an attribute of the <strong>customer</strong>, so the filter changes who is in the cohort. We then measure their whole life — the shampoo, the sofa, the phone case.
 </p>
-<p style="margin:0 0 12px;font-size:14px;color:#505157;line-height:1.6">
-Choose the group <strong>first</strong> — then measure everything they ever bought afterwards. The shampoo, the sofa, the phone case: all of it still counts, because all of it came from a customer skincare won for us.
-</p>
-<div style="font-size:13px;color:#1F815A;font-weight:600">Answers: was skincare a good way to win customers?</div>
+<div style="font-size:13px;color:#1F815A;font-weight:600;margin-bottom:10px">84 customers · 100% month 0 · 32.1% month 1</div>
+<div style="font-size:12px;color:#505157;line-height:1.5;border-top:1px solid #E3E7ED;padding-top:10px">
+Nothing was written in advance for skincare. The same holds for any category, product, country or basket size.
+</div>
 </div>;;
   }
 
   block txt_ov_wrong_card: TextBlock {
     content: @md <div style="background:#FFF7EA;border-left:4px solid #E36A01;border-radius:6px;padding:16px 18px;height:100%">
-<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#B04A00;font-weight:700;margin-bottom:8px">Result filter</div>
-<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Use it to trim the answer</div>
+<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#B04A00;font-weight:700;margin-bottom:8px">SQL model</div>
+<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Skincare slices the output</div>
 <p style="margin:0 0 12px;font-size:14px;color:#212327;line-height:1.6">
-“Show me <strong>skincare sales</strong>.”
+The cohort was computed inside the query and frozen. Category is a <strong>column in the result</strong>, so filtering it cuts the finished table. It cannot reach back and change who the cohort is.
 </p>
-<p style="margin:0 0 12px;font-size:14px;color:#505157;line-height:1.6">
-Measure everybody first — then throw away every line on the report that isn’t skincare. The group was never narrowed, and everything else those customers bought has just been deleted from view.
-</p>
-<div style="font-size:13px;color:#B04A00;font-weight:600">Answers: how much skincare did we sell?</div>
+<div style="font-size:13px;color:#B04A00;font-weight:600;margin-bottom:10px">381 customers · 25.2% month 0 · 6.6% month 1</div>
+<div style="font-size:12px;color:#505157;line-height:1.5;border-top:1px solid #E3E7ED;padding-top:10px">
+To profile on something new, someone edits the query, re-runs it, and re-checks that it still ties out.
+</div>
 </div>;;
   }
 
-  block txt_ov_numbers: TextBlock {
-    content: @md ## The same question, two very different answers
+  block txt_ov_skeptic: TextBlock {
+    content: @md ## “We would parameterise the SQL”
 
-Here is the January 2026 cohort, filtered to skincare both ways. Same data, same metric, same screen.
+Fair — and it works. It is also what one customer had built before moving to a semantic layer, so the cost is known rather than hypothetical:
 
-| | Cohort filter | Result filter |
-|---|---|---|
-| **Customers in the group** | 83 | 210 |
-| **Buying in month 0** | 100.0% | 44.8% |
-| **Still buying in month 1** | 30.1% | 12.4% |
-| **Worth per customer by month 6** | $833.03 | $207.05 |
+- **“Nothing selected” stops being free.** A parameter always holds a value, so the query needs an `'All'` branch or it breaks when the filter is empty.
+- **Every metric needs a twin.** A parameter cannot filter by itself, so each metric re-implements the test. That build ended with **seven `qualified_*` metrics** shadowing the seven real ones.
+- **The value list is written by hand.** Six categories is fine. Products are **109 names across 4,543 IDs** — and a product launched this week is simply missing from the filter, with nobody told.
 
-Read the right-hand column on its own and skincare looks like a failure — barely one in eight customers comes back, and each is worth a quarter as much. You would stop the campaign.
-
-It is not true. Those customers **did** come back. They just bought something other than skincare, and the report quietly threw that away.
-
-<div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:14px 18px;margin-top:8px">
-<strong style="color:#05264C">The giveaway is the very first row.</strong> Month 0 is the month these customers joined — <em>everyone</em> buys in the month they join, by definition. It has to be 100%. When it reads 44.8%, the group on screen is not the group you think you are looking at.
-</div>;;
+Each new dimension repeats all three. On the semantic side the filters read their own values from the data, an empty filter means no condition at all, and `LTV` is `LTV` whether or not a cohort filter is set.;;
   }
 
   block txt_ov_try: TextBlock {
-    content: @md ## See it for yourself
+    content: @md ## Try it
 
-1. Open any tab — **Retention** is the clearest
-2. Set **Category** to `Skin Care`
-3. That one filter feeds **both** reports at once. Watch them separate.
+1. Open **Retention**. The two reports agree.
+2. Set **Category** to `Skin Care`.
+3. Watch the cohort size on the right refuse to move, and month 0 fall below 100%.
 
-There is no trick in the filter. You picked one category, once. The top report uses it to **choose the group**; the bottom uses it to **trim the finished numbers** — and that single difference is worth four times the answer.
-
-**Both filters are multi-select, and they combine.** Pick `Skin Care` *and* `Clothes` to profile customers won by either. Add a **Product** or two on top, then a **Country**, and you have narrowed to a specific group of customers — every filter you add tightens the same group, and the reports keep answering for their whole history.
-
-*Cohort Month, Lifecycle Window, Country and Units Band narrow the group correctly whichever report they touch. Only Category and Product behave differently between the two.*;;
+Filters are multi-select and they combine — add `Clothes`, then a **Product**, a **Country**, a **Units Band**. None of those combinations was declared in advance on the semantic side. Ask what each one would have cost on the other.;;
   }
 
   view: TabLayout {
     tab overview: CanvasLayout {
       label: 'Start Here'
       width: 1380
-      height: 1620
+      height: 1880
       grid_size: 20
       auto_expand_vertically: false
 
       block txt_ov_hero {
-        position: pos(20, 20, 1340, 300)
-      }
-      block txt_ov_problem {
-        position: pos(20, 340, 1340, 160)
-      }
-      block txt_ov_right_card {
-        position: pos(20, 520, 660, 340)
-      }
-      block txt_ov_wrong_card {
-        position: pos(700, 520, 660, 340)
+        position: pos(20, 20, 1340, 220)
       }
       block txt_ov_numbers {
-        position: pos(20, 880, 1340, 440)
+        position: pos(20, 260, 1340, 500)
+      }
+      block txt_ov_right_card {
+        position: pos(20, 780, 660, 340)
+      }
+      block txt_ov_wrong_card {
+        position: pos(700, 780, 660, 340)
+      }
+      block txt_ov_skeptic {
+        position: pos(20, 1140, 1340, 440)
       }
       block txt_ov_try {
-        position: pos(20, 1340, 1340, 260)
+        position: pos(20, 1600, 1340, 240)
       }
       mobile {
         mode: 'auto'
@@ -1749,10 +1745,62 @@ There is no trick in the filter. You picked one category, once. The top report u
     }
   }
 
-  // Each Category / Product filter drives BOTH reports on its tab, but lands on a
-  // different field in each: the acquisition bridge above (choosing who is in the
-  // cohort) and the line-item path below (trimming the finished numbers).
-  interactions: [
+  // Each filter drives BOTH reports. The semantic-layer report resolves it
+  // through relationships; the SQL model resolves it against a column its
+  // query happened to SELECT. Same choice, two architectures.
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_ret_month'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+        },
+        CustomMapping {
+          block: 'rep_ret_wrong'
+          field: r(ecom_cohort_sql.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ret_window'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+        },
+        CustomMapping {
+          block: 'rep_ret_wrong'
+          field: r(ecom_cohort_sql.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ret_country'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecommerce_countries.name)
+        },
+        CustomMapping {
+          block: 'rep_ret_wrong'
+          field: r(ecom_cohort_sql.country)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ret_units'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+        },
+        CustomMapping {
+          block: 'rep_ret_wrong'
+          field: r(ecom_cohort_sql.units_band)
+        }
+      ]
+    },
     FilterInteraction {
       from: 'f_ret_category'
       to: [
@@ -1762,7 +1810,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_ret_wrong'
-          field: r(map_categories.parent_category)
+          field: r(ecom_cohort_sql.parent_category)
         }
       ]
     },
@@ -1775,7 +1823,59 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_ret_wrong'
-          field: r(ecommerce_products.name)
+          field: r(ecom_cohort_sql.product_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_month'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+        },
+        CustomMapping {
+          block: 'rep_ltv_wrong'
+          field: r(ecom_cohort_sql.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_window'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+        },
+        CustomMapping {
+          block: 'rep_ltv_wrong'
+          field: r(ecom_cohort_sql.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_country'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecommerce_countries.name)
+        },
+        CustomMapping {
+          block: 'rep_ltv_wrong'
+          field: r(ecom_cohort_sql.country)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_units'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+        },
+        CustomMapping {
+          block: 'rep_ltv_wrong'
+          field: r(ecom_cohort_sql.units_band)
         }
       ]
     },
@@ -1788,7 +1888,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_ltv_wrong'
-          field: r(map_categories.parent_category)
+          field: r(ecom_cohort_sql.parent_category)
         }
       ]
     },
@@ -1801,7 +1901,59 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_ltv_wrong'
-          field: r(ecommerce_products.name)
+          field: r(ecom_cohort_sql.product_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_month'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+        },
+        CustomMapping {
+          block: 'rep_rev_wrong'
+          field: r(ecom_cohort_sql.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_window'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+        },
+        CustomMapping {
+          block: 'rep_rev_wrong'
+          field: r(ecom_cohort_sql.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_country'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecommerce_countries.name)
+        },
+        CustomMapping {
+          block: 'rep_rev_wrong'
+          field: r(ecom_cohort_sql.country)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_units'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+        },
+        CustomMapping {
+          block: 'rep_rev_wrong'
+          field: r(ecom_cohort_sql.units_band)
         }
       ]
     },
@@ -1814,7 +1966,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_rev_wrong'
-          field: r(map_categories.parent_category)
+          field: r(ecom_cohort_sql.parent_category)
         }
       ]
     },
@@ -1827,7 +1979,59 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_rev_wrong'
-          field: r(ecommerce_products.name)
+          field: r(ecom_cohort_sql.product_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_month'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+        },
+        CustomMapping {
+          block: 'rep_opu_wrong'
+          field: r(ecom_cohort_sql.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_window'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+        },
+        CustomMapping {
+          block: 'rep_opu_wrong'
+          field: r(ecom_cohort_sql.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_country'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecommerce_countries.name)
+        },
+        CustomMapping {
+          block: 'rep_opu_wrong'
+          field: r(ecom_cohort_sql.country)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_units'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+        },
+        CustomMapping {
+          block: 'rep_opu_wrong'
+          field: r(ecom_cohort_sql.units_band)
         }
       ]
     },
@@ -1840,7 +2044,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_opu_wrong'
-          field: r(map_categories.parent_category)
+          field: r(ecom_cohort_sql.parent_category)
         }
       ]
     },
@@ -1853,7 +2057,59 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_opu_wrong'
-          field: r(ecommerce_products.name)
+          field: r(ecom_cohort_sql.product_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_month'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+        },
+        CustomMapping {
+          block: 'rep_cat_wrong'
+          field: r(ecom_cohort_sql.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_window'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+        },
+        CustomMapping {
+          block: 'rep_cat_wrong'
+          field: r(ecom_cohort_sql.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_country'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecommerce_countries.name)
+        },
+        CustomMapping {
+          block: 'rep_cat_wrong'
+          field: r(ecom_cohort_sql.country)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_units'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+        },
+        CustomMapping {
+          block: 'rep_cat_wrong'
+          field: r(ecom_cohort_sql.units_band)
         }
       ]
     },
@@ -1866,7 +2122,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_cat_wrong'
-          field: r(map_categories.parent_category)
+          field: r(ecom_cohort_sql.parent_category)
         }
       ]
     },
@@ -1879,7 +2135,59 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_cat_wrong'
-          field: r(ecommerce_products.name)
+          field: r(ecom_cohort_sql.product_name)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_sum_month'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+        },
+        CustomMapping {
+          block: 'rep_sum_wrong'
+          field: r(ecom_cohort_sql.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_sum_window'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+        },
+        CustomMapping {
+          block: 'rep_sum_wrong'
+          field: r(ecom_cohort_sql.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_sum_country'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecommerce_countries.name)
+        },
+        CustomMapping {
+          block: 'rep_sum_wrong'
+          field: r(ecom_cohort_sql.country)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_sum_units'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_units_band)
+        },
+        CustomMapping {
+          block: 'rep_sum_wrong'
+          field: r(ecom_cohort_sql.units_band)
         }
       ]
     },
@@ -1892,7 +2200,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_sum_wrong'
-          field: r(map_categories.parent_category)
+          field: r(ecom_cohort_sql.parent_category)
         }
       ]
     },
@@ -1905,7 +2213,7 @@ There is no trick in the filter. You picked one category, once. The top report u
         },
         CustomMapping {
           block: 'rep_sum_wrong'
-          field: r(ecommerce_products.name)
+          field: r(ecom_cohort_sql.product_name)
         }
       ]
     }
