@@ -1,0 +1,39 @@
+// Dataset seed_md. Source for the dbdiagram.io embed. Keep in step with seed_md.dataset.aml.
+
+Project seed_md {
+  database_type: 'PostgreSQL'
+}
+
+Table seed_md_donations {
+  donation_id integer [pk]
+  donor_id    integer
+  close_date  date    [note: 'ACTIVE join - default reporting basis']
+  pledge_date date    [note: 'INACTIVE join - activated when Date Basis = Pledge date']
+  amount      numeric
+}
+
+Table seed_md_dates {
+  date_key         date [pk]
+  year             text
+  month_number     text
+  month_name_abbr  text
+
+  calendar_month            text
+  fiscal_year               integer
+  fiscal_year_label         text
+  fiscal_quarter            text
+  fiscal_year_quarter       text
+  fiscal_period_number      integer
+  fiscal_period_label       text
+  fiscal_year_offset        integer
+  is_fiscal_ytd             boolean
+  is_fiscal_qtd             boolean
+  is_current_fiscal_year    boolean
+  is_current_fiscal_quarter boolean
+  is_last_fiscal_year       boolean
+  is_last_fiscal_quarter    boolean
+}
+
+Ref close_basis: seed_md_donations.close_date > seed_md_dates.date_key
+
+Ref pledge_basis: seed_md_donations.pledge_date > seed_md_dates.date_key

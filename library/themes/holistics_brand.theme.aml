@@ -1,0 +1,171 @@
+// =====================================================================
+// Holistics — brand theme, tuned for cohort / heatmap reports
+//
+// Colours are the canonical Holistics design tokens (the same scales the
+// product and holistics-remotion ship): light-gray, light-blue, light-green,
+// light-red. No invented hexes.
+//
+// Apply from a dashboard with:  theme: holistics_brand
+//
+// ── Why this theme is built the way it is ────────────────────────────
+// A cohort grid carries its meaning in CELL COLOUR, so every other source
+// of colour in the table has to get out of the way:
+//
+//   banding_color: transparent  — zebra striping fights a heat ramp. With
+//     banding on, alternating rows shift the perceived value of identical
+//     cells, which is exactly the misreading a cohort table must not invite.
+//   hover_color: a pale NEUTRAL, not the brand blue. A blue hover sits in
+//     the middle of the retention ramp and reads as a data value.
+//   grid_color: one step lighter than the border, so the grid separates
+//     cells without cutting the gradient into stripes.
+//   font_color: #212327 near-black. Conditional ramps in this theme are
+//     capped at the 300-level tints (#8DBEF2 / #7AD1AE) precisely so this
+//     text stays legible in the hottest cell — a ramp running to
+//     light-blue-600 (#1B7CE4) would need the text to flip to white, which
+//     Holistics conditional formatting will not do per-cell.
+// =====================================================================
+
+// ── Canonical tokens ────────────────────────────────────────────────
+const h_gray_50   = "#F9FBFC"
+const h_gray_100  = "#F5F8FA"
+const h_gray_200  = "#EDF1F5"
+const h_gray_300  = "#E3E7ED"
+const h_gray_600  = "#666970"
+const h_gray_700  = "#505157"
+const h_ink       = "#212327"
+const h_ink_900   = "#13151A"
+
+const h_blue_50   = "#E8F2FD"
+const h_blue_100  = "#D1E5FA"
+const h_blue_300  = "#8DBEF2"
+const h_blue_600  = "#1B7CE4"
+const h_blue_800  = "#104A89"
+const h_navy      = "#05264C"
+
+const h_green_100 = "#CCEDE0"
+const h_green_300 = "#7AD1AE"
+const h_green_700 = "#1F815A"
+const h_green_50  = "#EAF8F2"
+
+const h_red_100   = "#FDE8E8"
+const h_red_800   = "#BF0E08"
+
+const h_font = "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif"
+
+// Brand-anchored categorical palette: primary blue first, then the
+// secondary hues at a weight that holds up next to it.
+ColorPalette holistics_brand_palette {
+  title: "Holistics"
+  categorical {
+    colors: [
+      "#1B7CE4", // light-blue-600  — primary
+      "#2CB67F", // light-green-500
+      "#E36A01", // light-orange-600
+      "#9250E5", // light-purple-600
+      "#05264C", // light-blue-900  — navy
+      "#E71F18", // light-red-600
+      "#1663B6", // light-blue-700
+      "#666970"  // light-gray-600
+    ]
+  }
+}
+
+PageTheme holistics_brand {
+  title: "Holistics"
+
+  background {
+    bg_color: h_gray_50
+  }
+
+  canvas {
+    background {
+      bg_color: h_gray_100
+    }
+    border {
+      border_radius: 8
+      border_width: 1
+      border_color: h_gray_300
+      border_style: "solid"
+    }
+    shadow: "sm"
+  }
+
+  block {
+    background {
+      bg_color: "#FFFFFF"
+    }
+    label {
+      font_family: h_font
+      font_size: 15
+      font_color: h_ink_900
+      font_weight: "bold"
+    }
+    text {
+      font_family: h_font
+      font_size: 14
+      font_color: h_gray_700
+    }
+    padding: 20
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: "#FFFFFF"
+        // Neutral hover and NO banding: both would otherwise compete with
+        // conditional cell fills. See the note at the top of this file.
+        hover_color: h_gray_100
+        banding_color: "transparent"
+        font_color: h_ink
+        font_size: 13
+        font_family: h_font
+        border_color: h_gray_300
+        border_width: 1
+        grid_color: h_gray_200
+        cell_padding: 8
+      }
+      header {
+        bg_color: h_navy
+        font_color: "#FFFFFF"
+        font_weight: "bold"
+      }
+      sub_header {
+        bg_color: h_gray_200
+        font_color: h_blue_800
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: h_gray_600
+        font_size: 11
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* KPI deltas in brand green / red rather than the defaults */
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: #EAF8F2;
+      color: #1F815A;
+    }
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: #FDE8E8;
+      color: #BF0E08;
+    }
+    .h-kpi-metric-label {
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+
+    /* Keep the frozen cohort-label column readable once a heat ramp is
+       applied to the cells beside it: it must stay visually a HEADER, not
+       the coldest cell in the ramp. */
+    .h-pivot-table .frozen-column,
+    .h-table-cell.is-row-header {
+      background: #F9FBFC;
+      font-weight: 600;
+    }
+  ;;
+}

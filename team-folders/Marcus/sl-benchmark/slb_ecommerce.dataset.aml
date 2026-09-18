@@ -80,21 +80,6 @@ Governed definitions (the whole point of the benchmark):
     definition: @aql slb_orders | sum(slb_orders.delivery_attempts);;
     description: 'Delivery attempts recorded per order, across all statuses. Each order contributes its full attempts once to every product category it contains, and once overall. Category totals are not additive to the overall total. Time periods refer to when the order was placed.'
   }
-  metric closing_stock_units {
-    label: 'Closing Stock Units'
-    type: 'number'
-    definition: @aql
-      unique(slb_stock_daily_balances.product_location_key)
-        | select(
-            product_location_key: slb_stock_daily_balances.product_location_key,
-            latest_stock_units:
-              sum(slb_stock_daily_balances.stock_units)
-                | where(slb_stock_daily_balances.balance_date == max(slb_stock_daily_balances.balance_date))
-          )
-        | sum(latest_stock_units)
-    ;;
-    description: 'Semi-additive stock balance. Sum across products and stock locations, but across time use each product/location entity’s latest carried daily balance in the selected period. Daily balances are derived from sparse observed snapshots using latest observation on or before each date; observed zero balances remain zero.'
-  }
   metric total_users {
     label: 'Total Users'
     type: 'number'
