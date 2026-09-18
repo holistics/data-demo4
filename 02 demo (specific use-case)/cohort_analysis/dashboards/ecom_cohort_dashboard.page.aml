@@ -159,7 +159,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
   block rep_ret_wrong: VizBlock {
     label: 'Retention — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
-      dataset: ecom_cohort_analysis
+      dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
@@ -185,7 +185,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
       values: [
         VizFieldFull {
           label: 'Retention'
-          ref: r(ecom_cohort_analysis.sql_retention)
+          ref: r(ecom_cohort_sql_analysis.sql_retention)
           format {
             type: 'number'
             pattern: '#,##0.0%'
@@ -392,7 +392,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
   block rep_ltv_wrong: VizBlock {
     label: 'LTV — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
-      dataset: ecom_cohort_analysis
+      dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
@@ -418,7 +418,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
       values: [
         VizFieldFull {
           label: 'LTV'
-          ref: r(ecom_cohort_analysis.sql_ltv)
+          ref: r(ecom_cohort_sql_analysis.sql_ltv)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -625,7 +625,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
   block rep_rev_wrong: VizBlock {
     label: 'Cumulative Revenue — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
-      dataset: ecom_cohort_analysis
+      dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
@@ -651,7 +651,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
       values: [
         VizFieldFull {
           label: 'Revenue'
-          ref: r(ecom_cohort_analysis.sql_cumulative_revenue)
+          ref: r(ecom_cohort_sql_analysis.sql_cumulative_revenue)
           format {
             type: 'number'
             pattern: '[$$]#,###0'
@@ -858,7 +858,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
   block rep_opu_wrong: VizBlock {
     label: 'Orders Per User — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
-      dataset: ecom_cohort_analysis
+      dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
           label: 'Cohort'
@@ -884,7 +884,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
       values: [
         VizFieldFull {
           label: 'Orders/User'
-          ref: r(ecom_cohort_analysis.sql_orders_per_user)
+          ref: r(ecom_cohort_sql_analysis.sql_orders_per_user)
           format {
             type: 'number'
             pattern: '#,###0.00'
@@ -1087,7 +1087,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
   block rep_cat_wrong: VizBlock {
     label: 'LTV by Category — hand-built SQL model (the conventional approach)'
     viz: PivotTable {
-      dataset: ecom_cohort_analysis
+      dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
           label: 'Category at Acquisition'
@@ -1109,7 +1109,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
       values: [
         VizFieldFull {
           label: 'LTV'
-          ref: r(ecom_cohort_analysis.sql_ltv)
+          ref: r(ecom_cohort_sql_analysis.sql_ltv)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -1309,7 +1309,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
   block rep_sum_wrong: VizBlock {
     label: 'Cohort Summary — hand-built SQL model (the conventional approach)'
     viz: DataTable {
-      dataset: ecom_cohort_analysis
+      dataset: ecom_cohort_sql_analysis
       fields: [
         VizFieldFull {
           label: 'Cohort'
@@ -1322,7 +1322,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
         },
         VizFieldFull {
           label: 'Cohort Size'
-          ref: r(ecom_cohort_analysis.sql_cohort_size)
+          ref: r(ecom_cohort_sql_analysis.sql_cohort_size)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -1330,7 +1330,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
         },
         VizFieldFull {
           label: 'Cohort Revenue'
-          ref: r(ecom_cohort_analysis.sql_revenue)
+          ref: r(ecom_cohort_sql_analysis.sql_revenue)
           format {
             type: 'number'
             pattern: '[$$]#,###0'
@@ -1338,7 +1338,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
         },
         VizFieldFull {
           label: 'Cohort Orders'
-          ref: r(ecom_cohort_analysis.sql_order_count)
+          ref: r(ecom_cohort_sql_analysis.sql_order_count)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -1346,7 +1346,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
         },
         VizFieldFull {
           label: 'Cohort AOV'
-          ref: r(ecom_cohort_analysis.sql_aov)
+          ref: r(ecom_cohort_sql_analysis.sql_aov)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
@@ -1354,7 +1354,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
         },
         VizFieldFull {
           label: 'LTV (to date)'
-          ref: r(ecom_cohort_analysis.sql_ltv_total)
+          ref: r(ecom_cohort_sql_analysis.sql_ltv_total)
           format {
             type: 'number'
             pattern: '[$$]#,###0.00'
