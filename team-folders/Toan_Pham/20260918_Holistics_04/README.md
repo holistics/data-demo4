@@ -9,3 +9,7 @@
     - **What is each user’s Full name and Email?**
     - **Which users made an order in Nov 2023?**
     - **How many orders each age range has placed?**
+
+## Answers
+-----
+Holistic dashboard: https://demo4.holistics.io/dashboards/v4/117818-tp-holistics-4?_pl=b70d0b55e57601007463f64c
