@@ -552,6 +552,9 @@ Note: this can pair with `total_buyers` or `total_users` for a ratio.
       metric aov
     }
 
+    model dim_dates {
+    }
+
     model ecommerce_orders {
     }
     model ecommerce_countries {
@@ -570,6 +573,8 @@ Note: this can pair with `total_buyers` or `total_users` for a ratio.
     }
     model ecommerce_employees {
     }
+
+    
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
