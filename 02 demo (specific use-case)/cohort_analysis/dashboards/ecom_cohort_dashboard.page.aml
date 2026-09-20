@@ -11,12 +11,28 @@ Same cohort, same filter, same field — **two different metric definitions**.
 **Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
-  block f_ret_month: FilterBlock {
-    label: 'Cohort Month'
+  block f_ret_grain: FilterBlock {
+    label: 'Cohort Granularity'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+      field: r(ecom_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_ret_month: FilterBlock {
+    label: 'Acquisition Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
     }
     default {
       operator: 'matches'
@@ -25,11 +41,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_ret_window: FilterBlock {
-    label: 'Lifecycle Window (Month Number)'
+    label: 'Lifecycle Window (Periods)'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+      field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
     }
     default {
       operator: 'between'
@@ -88,19 +104,19 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          label: 'Cohort Period'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'retr_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          label: 'Period'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.period_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -244,12 +260,28 @@ Same cohort, same filter, same field — **two different metric definitions**.
 **Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
-  block f_ltv_month: FilterBlock {
-    label: 'Cohort Month'
+  block f_ltv_grain: FilterBlock {
+    label: 'Cohort Granularity'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+      field: r(ecom_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_ltv_month: FilterBlock {
+    label: 'Acquisition Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
     }
     default {
       operator: 'matches'
@@ -258,11 +290,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_ltv_window: FilterBlock {
-    label: 'Lifecycle Window (Month Number)'
+    label: 'Lifecycle Window (Periods)'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+      field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
     }
     default {
       operator: 'between'
@@ -321,19 +353,19 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          label: 'Cohort Period'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'ltvr_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          label: 'Period'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.period_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -477,12 +509,28 @@ Same cohort, same filter, same field — **two different metric definitions**.
 **Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
-  block f_rev_month: FilterBlock {
-    label: 'Cohort Month'
+  block f_rev_grain: FilterBlock {
+    label: 'Cohort Granularity'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+      field: r(ecom_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_rev_month: FilterBlock {
+    label: 'Acquisition Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
     }
     default {
       operator: 'matches'
@@ -491,11 +539,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_rev_window: FilterBlock {
-    label: 'Lifecycle Window (Month Number)'
+    label: 'Lifecycle Window (Periods)'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+      field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
     }
     default {
       operator: 'between'
@@ -554,19 +602,19 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          label: 'Cohort Period'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'revr_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          label: 'Period'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.period_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -710,12 +758,28 @@ Same cohort, same filter, same field — **two different metric definitions**.
 **Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
-  block f_opu_month: FilterBlock {
-    label: 'Cohort Month'
+  block f_opu_grain: FilterBlock {
+    label: 'Cohort Granularity'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+      field: r(ecom_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_opu_month: FilterBlock {
+    label: 'Acquisition Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
     }
     default {
       operator: 'matches'
@@ -724,11 +788,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_opu_window: FilterBlock {
-    label: 'Lifecycle Window (Month Number)'
+    label: 'Lifecycle Window (Periods)'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+      field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
     }
     default {
       operator: 'between'
@@ -787,19 +851,19 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          label: 'Cohort Period'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'opur_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          label: 'Period'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.period_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -943,12 +1007,28 @@ Same cohort, same filter, same field — **two different metric definitions**.
 **Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
-  block f_cat_month: FilterBlock {
-    label: 'Cohort Month'
+  block f_cat_grain: FilterBlock {
+    label: 'Cohort Granularity'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+      field: r(ecom_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_cat_month: FilterBlock {
+    label: 'Acquisition Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
     }
     default {
       operator: 'matches'
@@ -957,11 +1037,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_cat_window: FilterBlock {
-    label: 'Lifecycle Window (Month Number)'
+    label: 'Lifecycle Window (Periods)'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+      field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
     }
     default {
       operator: 'between'
@@ -1027,8 +1107,8 @@ Same cohort, same filter, same field — **two different metric definitions**.
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
-          ref: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          label: 'Period'
+          ref: r(ecom_cohort_analysis, ecommerce_orders.period_number)
           format {
             type: 'number'
             pattern: '#,###0'
@@ -1168,12 +1248,28 @@ Same cohort, same filter, same field — **two different metric definitions**.
 **Above:** the filter chooses who is in the cohort, then measures their whole history. **Below:** the cohort forms first, then every line outside the chosen category is dropped — what a filter does by default in most BI tools.;;
   }
 
-  block f_sum_month: FilterBlock {
-    label: 'Cohort Month'
+  block f_sum_grain: FilterBlock {
+    label: 'Cohort Granularity'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+      field: r(ecom_cohort_params.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_sum_month: FilterBlock {
+    label: 'Acquisition Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecom_cohort_analysis
+      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
     }
     default {
       operator: 'matches'
@@ -1182,11 +1278,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_sum_window: FilterBlock {
-    label: 'Lifecycle Window (Month Number)'
+    label: 'Lifecycle Window (Periods)'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+      field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
     }
     default {
       operator: 'between'
@@ -1245,11 +1341,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_analysis
       fields: [
         VizFieldFull {
-          label: 'Cohort'
-          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          label: 'Cohort Period'
+          ref: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'sumr_row'
         },
@@ -1378,114 +1474,134 @@ Same cohort, same filter, same field — **two different metric definitions**.
 
 **The second report describes a different population.** Filtering at the final-results level selects everyone who *ever* bought the category rather than those who bought it at acquisition, so Cohort Size itself moves: for Jan 2026 / Skin Care it reads 210 against 83. Month 0 is where it shows plainest — every acquired customer orders in their acquisition month by definition, so retention there is 100% when the filter profiles the cohort, and 44.8% when it only trims the output.;;
   }
-
   block txt_ov_hero: TextBlock {
-    content: @md <div style="border-left:4px solid #05264C;padding:4px 0 4px 18px">
-<h1 style="margin:0 0 10px;font-size:26px;color:#05264C">The same cohort report, built two ways</h1>
-<p style="margin:0;font-size:15px;color:#505157;line-height:1.6">
-A <strong>cohort</strong> is a group of customers who started at the same time — everyone whose first purchase was in January is the January cohort. Every tab follows one month by month, <strong>twice</strong>: once modelled in the Holistics semantic layer, once as the SQL model an analyst would normally write.
-</p>
-</div>
+    content: @md ## Cohort reports and the grain problem
 
-**The two agree exactly — until someone asks a question the SQL was not written for.**;;
+Every cohort question mixes two things that live in different places: who the customer is, and what they did afterwards.
+
+That sounds trivial. It is the reason cohort reports are awkward to build and easy to get quietly wrong.;;
   }
 
-  block txt_ov_numbers: TextBlock {
-    content: @md ## What that looks like
-
-January 2026, before and after filtering to skincare.
-
-| | Semantic layer | SQL model |
-|---|---|---|
-| Cohort size | 381 | 381 |
-| Month 0 · month 1 | 100.0% · 26.2% | 100.0% · 26.2% |
-| Revenue, month 0 | $97,644 | $97,644 |
-| **Filtered — cohort size** | **84** | **381** |
-| **Filtered — month 0** | **100.0%** | **25.2%** |
-| **Filtered — month 1** | **32.1%** | **6.6%** |
-
-<div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:14px 18px;margin-top:8px">
-<strong style="color:#05264C">The top half is the point.</strong> Identical, to the dollar — the SQL build is neither careless nor wrong. It simply cannot answer a question it was not written for, and it fails quietly: cohort size stays at 381 while it counts only the customers who bought skincare. Month 0 is the tell. That is the month these customers joined, so retention is 100% by definition. 25.2% is not an approximation; it is incoherent.
+  block txt_ov_models: TextBlock {
+    content: @md <div style="display:flex;align-items:stretch;gap:0">
+  <div style="flex:1;background:#E8F2FD;border:1px solid #8DBEF2;border-radius:6px;padding:12px 14px">
+    <div style="font-weight:700;color:#05264C;font-size:15px">Users</div>
+    <div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#1B7CE4;margin:3px 0 8px">one row per customer</div>
+    <div style="font-size:13px;color:#212327;line-height:1.5">Who they are, and when they first bought.</div>
+  </div>
+  <div style="width:34px;display:flex;align-items:center;justify-content:center;color:#CBD0D7;font-size:20px">›</div>
+  <div style="flex:1;background:#F9FBFC;border:1px solid #E3E7ED;border-radius:6px;padding:12px 14px">
+    <div style="font-weight:700;color:#05264C;font-size:15px">Orders</div>
+    <div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#989CA6;margin:3px 0 8px">one row per order</div>
+    <div style="font-size:13px;color:#212327;line-height:1.5">When they came back.</div>
+  </div>
+  <div style="width:34px;display:flex;align-items:center;justify-content:center;color:#CBD0D7;font-size:20px">›</div>
+  <div style="flex:1;background:#E8F2FD;border:1px solid #8DBEF2;border-radius:6px;padding:12px 14px">
+    <div style="font-weight:700;color:#05264C;font-size:15px">Order Items</div>
+    <div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#1B7CE4;margin:3px 0 8px">one row per line</div>
+    <div style="font-size:13px;color:#212327;line-height:1.5">What was in each order, and what it cost.</div>
+  </div>
 </div>
 
-Read the SQL column alone and you would stop the skincare campaign. Those customers did come back — they bought something else.;;
+<div style="display:flex;justify-content:space-between;border-top:2px dashed #8DBEF2;margin-top:10px;padding-top:8px;font-size:13px;font-weight:600;color:#1663B6">
+  <span>which customers did skincare win us …</span>
+  <span>… and what were they worth</span>
+</div>
+
+<p style="margin:10px 0 0;font-size:14px;color:#505157;line-height:1.6">One real question, and it lands on the two ends. Nothing in the middle knows about either, and the answer needs both at once.</p>;;
   }
 
-  block txt_ov_right_card: TextBlock {
-    content: @md <div style="background:#F5F8FA;border-left:4px solid #1B7CE4;border-radius:6px;padding:16px 18px;height:100%">
-<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#1B7CE4;font-weight:700;margin-bottom:8px">Semantic layer</div>
-<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Skincare picks the group</div>
-<p style="margin:0 0 12px;font-size:14px;color:#212327;line-height:1.6">
-“Bought at acquisition” is modelled as an attribute of the <strong>customer</strong>, so the filter changes who is in the cohort. We then measure their whole life — the shampoo, the sofa, the phone case.
-</p>
-<div style="font-size:13px;color:#1F815A;font-weight:600;margin-bottom:10px">84 customers · 100% month 0 · 32.1% month 1</div>
-<div style="font-size:12px;color:#505157;line-height:1.5;border-top:1px solid #E3E7ED;padding-top:10px">
-Nothing was written in advance for skincare. The same holds for any category, product, country or basket size.
+  block txt_ov_sql: TextBlock {
+    content: @md ### Why this is hard in SQL
+
+<div style="display:flex;align-items:center;gap:12px;margin:8px 0 14px">
+  <div style="display:flex;gap:3px">
+    <div style="width:26px;height:34px;background:#E3E7ED;border-radius:3px"></div>
+    <div style="width:26px;height:34px;background:#E3E7ED;border-radius:3px"></div>
+    <div style="width:26px;height:34px;background:#E3E7ED;border-radius:3px"></div>
+  </div>
+  <div style="color:#989CA6;font-size:18px">›</div>
+  <div style="flex:1;background:#FFF7EA;border:1px solid #FECF7F;border-radius:6px;padding:10px 14px;font-size:13px;color:#212327">
+    <strong style="color:#B04A00">one pre-joined table</strong> &nbsp;·&nbsp; the cohort is now a column in it, alongside category, country and the rest
+  </div>
 </div>
+
+The numbers are right. But filtering skincare stops meaning *customers acquired by skincare* and starts meaning *rows where the category is skincare*, so everything else those customers bought drops out of the answer. The report still renders. It just quietly answers a different question.
+
+You can reach for query parameters. Then you maintain a parameter, a default value, and a matching branch inside every metric, for each attribute anyone might one day want to filter on. Granularity is worse: months since acquisition was computed and frozen, so showing weeks means a second model.;;
+  }
+
+  block txt_ov_aql: TextBlock {
+    content: @md ### What AQL does instead
+
+<div style="display:flex;align-items:center;gap:12px;margin:8px 0 14px">
+  <div style="background:#E8F2FD;border:1px solid #8DBEF2;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700;color:#05264C">Users</div>
+  <div style="flex:1;border-top:2px solid #1B7CE4;position:relative;text-align:center">
+    <span style="background:#FFFFFF;padding:0 10px;font-size:12px;color:#1663B6;font-weight:600;position:relative;top:-9px">dimensionalize() lifts the fact up to the person</span>
+  </div>
+  <div style="background:#E8F2FD;border:1px solid #8DBEF2;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700;color:#05264C">Order Items</div>
+</div>
+
+Cohort membership becomes a property of a person rather than a column in a result set. Filter it and you are selecting people; the metrics carry on measuring everything those people did.
+
+Granularity works the same way. `Cohort Period` and `Period Number` both read one control, so switching it re-cuts the rows and the columns together. Nothing was written in advance for weeks, or quarters, or for skincare.;;
+  }
+
+  block txt_ov_cost: TextBlock {
+    content: @md ### What it costs, in practice
+
+<table style="width:100%;border-collapse:collapse;font-size:13px;margin:8px 0 14px">
+  <tr>
+    <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #E3E7ED;color:#666970;font-weight:600">Ask it to…</th>
+    <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #1B7CE4;background:#F5F8FA;color:#05264C;width:26%">Semantic layer</th>
+    <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #E36A01;background:#FFF7EA;color:#05264C;width:26%">SQL model</th>
+  </tr>
+  <tr>
+    <td style="padding:9px 10px;border-bottom:1px solid #EDF1F5;color:#212327">Profile a cohort by what they bought at acquisition</td>
+    <td style="padding:9px 10px;border-bottom:1px solid #EDF1F5;background:#F5F8FA;color:#1F815A;font-weight:600">Picks the customers</td>
+    <td style="padding:9px 10px;border-bottom:1px solid #EDF1F5;background:#FFF7EA;color:#B04A00;font-weight:600">Cuts the rows</td>
+  </tr>
+  <tr>
+    <td style="padding:9px 10px;border-bottom:1px solid #EDF1F5;color:#212327">Switch to weekly or quarterly cohorts</td>
+    <td style="padding:9px 10px;border-bottom:1px solid #EDF1F5;background:#F5F8FA;color:#1F815A;font-weight:600">One control</td>
+    <td style="padding:9px 10px;border-bottom:1px solid #EDF1F5;background:#FFF7EA;color:#B04A00;font-weight:600">A second model</td>
+  </tr>
+  <tr>
+    <td style="padding:9px 10px;color:#212327">Slice by an attribute nobody asked for last quarter</td>
+    <td style="padding:9px 10px;background:#F5F8FA;color:#1F815A;font-weight:600">Add one field</td>
+    <td style="padding:9px 10px;background:#FFF7EA;color:#B04A00;font-weight:600">Rewrite and re-test</td>
+  </tr>
+</table>
+
+With no filters set, both builds on every tab return the same numbers. That is worth sitting with for a second: the SQL version is not sloppy, it is finished. It answers what it was built to answer and cannot be talked into answering anything else.
+
+<div style="background:#05264C;border-radius:6px;padding:12px 16px;color:#FFFFFF;font-size:14px;margin-top:12px">
+Open any tab, set <strong>Category</strong> to <code style="background:#104A89;padding:1px 6px;border-radius:3px;color:#FFFFFF">Skin Care</code>, then move <strong>Cohort Granularity</strong> to <code style="background:#104A89;padding:1px 6px;border-radius:3px;color:#FFFFFF">Week</code>.
 </div>;;
-  }
-
-  block txt_ov_wrong_card: TextBlock {
-    content: @md <div style="background:#FFF7EA;border-left:4px solid #E36A01;border-radius:6px;padding:16px 18px;height:100%">
-<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#B04A00;font-weight:700;margin-bottom:8px">SQL model</div>
-<div style="font-size:17px;font-weight:700;color:#05264C;margin-bottom:12px">Skincare slices the output</div>
-<p style="margin:0 0 12px;font-size:14px;color:#212327;line-height:1.6">
-The cohort was computed inside the query and frozen. Category is a <strong>column in the result</strong>, so filtering it cuts the finished table. It cannot reach back and change who the cohort is.
-</p>
-<div style="font-size:13px;color:#B04A00;font-weight:600;margin-bottom:10px">381 customers · 25.2% month 0 · 6.6% month 1</div>
-<div style="font-size:12px;color:#505157;line-height:1.5;border-top:1px solid #E3E7ED;padding-top:10px">
-To profile on something new, someone edits the query, re-runs it, and re-checks that it still ties out.
-</div>
-</div>;;
-  }
-
-  block txt_ov_skeptic: TextBlock {
-    content: @md ## “We would parameterise the SQL”
-
-Fair — and it works. It is also what one customer had built before moving to a semantic layer, so the cost is known rather than hypothetical:
-
-- **“Nothing selected” stops being free.** A parameter always holds a value, so the query needs an `'All'` branch or it breaks when the filter is empty.
-- **Every metric needs a twin.** A parameter cannot filter by itself, so each metric re-implements the test. That build ended with **seven `qualified_*` metrics** shadowing the seven real ones.
-- **The value list is written by hand.** Six categories is fine. Products are **109 names across 4,543 IDs** — and a product launched this week is simply missing from the filter, with nobody told.
-
-Each new dimension repeats all three. On the semantic side the filters read their own values from the data, an empty filter means no condition at all, and `LTV` is `LTV` whether or not a cohort filter is set.;;
-  }
-
-  block txt_ov_try: TextBlock {
-    content: @md ## Try it
-
-1. Open **Retention**. The two reports agree.
-2. Set **Category** to `Skin Care`.
-3. Watch the cohort size on the right refuse to move, and month 0 fall below 100%.
-
-Filters are multi-select and they combine — add `Clothes`, then a **Product**, a **Country**, a **Units Band**. None of those combinations was declared in advance on the semantic side. Ask what each one would have cost on the other.;;
   }
 
   view: TabLayout {
     tab overview: CanvasLayout {
       label: 'Start Here'
       width: 1380
-      height: 1880
+      height: 1600
       grid_size: 20
       auto_expand_vertically: false
 
       block txt_ov_hero {
-        position: pos(20, 20, 1340, 220)
+        position: pos(20, 20, 1340, 150)
       }
-      block txt_ov_numbers {
-        position: pos(20, 260, 1340, 500)
+      block txt_ov_models {
+        position: pos(20, 190, 1340, 290)
       }
-      block txt_ov_right_card {
-        position: pos(20, 780, 660, 340)
+      block txt_ov_sql {
+        position: pos(20, 500, 1340, 320)
       }
-      block txt_ov_wrong_card {
-        position: pos(700, 780, 660, 340)
+      block txt_ov_aql {
+        position: pos(20, 840, 1340, 280)
       }
-      block txt_ov_skeptic {
-        position: pos(20, 1140, 1340, 440)
-      }
-      block txt_ov_try {
-        position: pos(20, 1600, 1340, 240)
+      block txt_ov_cost {
+        position: pos(20, 1140, 1340, 420)
       }
       mobile {
         mode: 'auto'
@@ -1495,30 +1611,33 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
     tab retention: CanvasLayout {
       label: 'Retention'
       width: 1380
-      height: 1820
+      height: 1930
       grid_size: 20
       auto_expand_vertically: false
 
       block txt_ret {
         position: pos(20, 20, 1340, 200)
       }
-      block f_ret_month {
+      block f_ret_grain {
         position: pos(20, 240, 440, 90)
       }
-      block f_ret_window {
+      block f_ret_month {
         position: pos(480, 240, 440, 90)
       }
-      block f_ret_country {
+      block f_ret_window {
         position: pos(940, 240, 420, 90)
       }
-      block f_ret_units {
+      block f_ret_country {
         position: pos(20, 350, 440, 90)
       }
-      block f_ret_category {
+      block f_ret_units {
         position: pos(480, 350, 440, 90)
       }
-      block f_ret_product {
+      block f_ret_category {
         position: pos(940, 350, 420, 90)
+      }
+      block f_ret_product {
+        position: pos(20, 460, 440, 90)
       }
       block rep_ret_right {
         position: pos(20, 460, 1340, 500)
@@ -1544,23 +1663,26 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       block txt_ltv {
         position: pos(20, 20, 1340, 200)
       }
-      block f_ltv_month {
+      block f_ltv_grain {
         position: pos(20, 240, 440, 90)
       }
-      block f_ltv_window {
+      block f_ltv_month {
         position: pos(480, 240, 440, 90)
       }
-      block f_ltv_country {
+      block f_ltv_window {
         position: pos(940, 240, 420, 90)
       }
-      block f_ltv_units {
+      block f_ltv_country {
         position: pos(20, 350, 440, 90)
       }
-      block f_ltv_category {
+      block f_ltv_units {
         position: pos(480, 350, 440, 90)
       }
-      block f_ltv_product {
+      block f_ltv_category {
         position: pos(940, 350, 420, 90)
+      }
+      block f_ltv_product {
+        position: pos(20, 460, 440, 90)
       }
       block rep_ltv_right {
         position: pos(20, 460, 1340, 500)
@@ -1586,23 +1708,26 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       block txt_rev {
         position: pos(20, 20, 1340, 200)
       }
-      block f_rev_month {
+      block f_rev_grain {
         position: pos(20, 240, 440, 90)
       }
-      block f_rev_window {
+      block f_rev_month {
         position: pos(480, 240, 440, 90)
       }
-      block f_rev_country {
+      block f_rev_window {
         position: pos(940, 240, 420, 90)
       }
-      block f_rev_units {
+      block f_rev_country {
         position: pos(20, 350, 440, 90)
       }
-      block f_rev_category {
+      block f_rev_units {
         position: pos(480, 350, 440, 90)
       }
-      block f_rev_product {
+      block f_rev_category {
         position: pos(940, 350, 420, 90)
+      }
+      block f_rev_product {
+        position: pos(20, 460, 440, 90)
       }
       block rep_rev_right {
         position: pos(20, 460, 1340, 500)
@@ -1628,23 +1753,26 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       block txt_opu {
         position: pos(20, 20, 1340, 200)
       }
-      block f_opu_month {
+      block f_opu_grain {
         position: pos(20, 240, 440, 90)
       }
-      block f_opu_window {
+      block f_opu_month {
         position: pos(480, 240, 440, 90)
       }
-      block f_opu_country {
+      block f_opu_window {
         position: pos(940, 240, 420, 90)
       }
-      block f_opu_units {
+      block f_opu_country {
         position: pos(20, 350, 440, 90)
       }
-      block f_opu_category {
+      block f_opu_units {
         position: pos(480, 350, 440, 90)
       }
-      block f_opu_product {
+      block f_opu_category {
         position: pos(940, 350, 420, 90)
+      }
+      block f_opu_product {
+        position: pos(20, 460, 440, 90)
       }
       block rep_opu_right {
         position: pos(20, 460, 1340, 500)
@@ -1670,23 +1798,26 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       block txt_cat {
         position: pos(20, 20, 1340, 200)
       }
-      block f_cat_month {
+      block f_cat_grain {
         position: pos(20, 240, 440, 90)
       }
-      block f_cat_window {
+      block f_cat_month {
         position: pos(480, 240, 440, 90)
       }
-      block f_cat_country {
+      block f_cat_window {
         position: pos(940, 240, 420, 90)
       }
-      block f_cat_units {
+      block f_cat_country {
         position: pos(20, 350, 440, 90)
       }
-      block f_cat_category {
+      block f_cat_units {
         position: pos(480, 350, 440, 90)
       }
-      block f_cat_product {
+      block f_cat_category {
         position: pos(940, 350, 420, 90)
+      }
+      block f_cat_product {
+        position: pos(20, 460, 440, 90)
       }
       block rep_cat_right {
         position: pos(20, 460, 1340, 500)
@@ -1712,23 +1843,26 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       block txt_sum {
         position: pos(20, 20, 1340, 200)
       }
-      block f_sum_month {
+      block f_sum_grain {
         position: pos(20, 240, 440, 90)
       }
-      block f_sum_window {
+      block f_sum_month {
         position: pos(480, 240, 440, 90)
       }
-      block f_sum_country {
+      block f_sum_window {
         position: pos(940, 240, 420, 90)
       }
-      block f_sum_units {
+      block f_sum_country {
         position: pos(20, 350, 440, 90)
       }
-      block f_sum_category {
+      block f_sum_units {
         position: pos(480, 350, 440, 90)
       }
-      block f_sum_product {
+      block f_sum_category {
         position: pos(940, 350, 420, 90)
+      }
+      block f_sum_product {
+        position: pos(20, 460, 440, 90)
       }
       block rep_sum_right {
         position: pos(20, 460, 1340, 500)
@@ -1750,11 +1884,66 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
   // query happened to SELECT. Same choice, two architectures.
   explicit_interactions: [
     FilterInteraction {
+      from: 'f_sum_grain'
+      to: [
+        CustomMapping {
+          block: 'rep_sum_right'
+          field: r(ecom_cohort_params.cohort_grain)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cat_grain'
+      to: [
+        CustomMapping {
+          block: 'rep_cat_right'
+          field: r(ecom_cohort_params.cohort_grain)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_opu_grain'
+      to: [
+        CustomMapping {
+          block: 'rep_opu_right'
+          field: r(ecom_cohort_params.cohort_grain)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_rev_grain'
+      to: [
+        CustomMapping {
+          block: 'rep_rev_right'
+          field: r(ecom_cohort_params.cohort_grain)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ltv_grain'
+      to: [
+        CustomMapping {
+          block: 'rep_ltv_right'
+          field: r(ecom_cohort_params.cohort_grain)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_ret_grain'
+      to: [
+        CustomMapping {
+          block: 'rep_ret_right'
+          field: r(ecom_cohort_params.cohort_grain)
+        }
+      ]
+    },
+
+    FilterInteraction {
       from: 'f_ret_month'
       to: [
         CustomMapping {
           block: 'rep_ret_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
         },
         CustomMapping {
           block: 'rep_ret_wrong'
@@ -1767,7 +1956,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_ret_right'
-          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
         },
         CustomMapping {
           block: 'rep_ret_wrong'
@@ -1832,7 +2021,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_ltv_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
         },
         CustomMapping {
           block: 'rep_ltv_wrong'
@@ -1845,7 +2034,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_ltv_right'
-          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
         },
         CustomMapping {
           block: 'rep_ltv_wrong'
@@ -1910,7 +2099,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_rev_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
         },
         CustomMapping {
           block: 'rep_rev_wrong'
@@ -1923,7 +2112,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_rev_right'
-          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
         },
         CustomMapping {
           block: 'rep_rev_wrong'
@@ -1988,7 +2177,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_opu_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
         },
         CustomMapping {
           block: 'rep_opu_wrong'
@@ -2001,7 +2190,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_opu_right'
-          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
         },
         CustomMapping {
           block: 'rep_opu_wrong'
@@ -2066,7 +2255,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_cat_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
         },
         CustomMapping {
           block: 'rep_cat_wrong'
@@ -2079,7 +2268,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_cat_right'
-          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
         },
         CustomMapping {
           block: 'rep_cat_wrong'
@@ -2144,7 +2333,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_sum_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.cohort_month)
+          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
         },
         CustomMapping {
           block: 'rep_sum_wrong'
@@ -2157,7 +2346,7 @@ Filters are multi-select and they combine — add `Clothes`, then a **Product**,
       to: [
         CustomMapping {
           block: 'rep_sum_right'
-          field: r(ecom_cohort_analysis, ecommerce_orders.month_number)
+          field: r(ecom_cohort_analysis, ecommerce_orders.period_number)
         },
         CustomMapping {
           block: 'rep_sum_wrong'
