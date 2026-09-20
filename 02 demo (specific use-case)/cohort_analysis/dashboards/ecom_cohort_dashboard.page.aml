@@ -28,11 +28,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_ret_month: FilterBlock {
-    label: 'Acquisition Date'
+    label: 'Cohort Period'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
     }
     default {
       operator: 'matches'
@@ -178,18 +178,18 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
+          label: 'Cohort Period'
           ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'retw_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
+          label: 'Period'
           ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
@@ -277,11 +277,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_ltv_month: FilterBlock {
-    label: 'Acquisition Date'
+    label: 'Cohort Period'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
     }
     default {
       operator: 'matches'
@@ -427,18 +427,18 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
+          label: 'Cohort Period'
           ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'ltvw_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
+          label: 'Period'
           ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
@@ -526,11 +526,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_rev_month: FilterBlock {
-    label: 'Acquisition Date'
+    label: 'Cohort Period'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
     }
     default {
       operator: 'matches'
@@ -676,18 +676,18 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
+          label: 'Cohort Period'
           ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'revw_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
+          label: 'Period'
           ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
@@ -775,11 +775,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_opu_month: FilterBlock {
-    label: 'Acquisition Date'
+    label: 'Cohort Period'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
     }
     default {
       operator: 'matches'
@@ -925,18 +925,18 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_sql_analysis
       rows: [
         VizFieldFull {
-          label: 'Cohort'
+          label: 'Cohort Period'
           ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'opuw_row'
         }
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
+          label: 'Period'
           ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
@@ -1024,11 +1024,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_cat_month: FilterBlock {
-    label: 'Acquisition Date'
+    label: 'Cohort Period'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
     }
     default {
       operator: 'matches'
@@ -1177,7 +1177,7 @@ Same cohort, same filter, same field — **two different metric definitions**.
       ]
       columns: [
         VizFieldFull {
-          label: 'Month'
+          label: 'Period'
           ref: r(ecom_cohort_sql.month_number)
           format {
             type: 'number'
@@ -1265,11 +1265,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
   }
 
   block f_sum_month: FilterBlock {
-    label: 'Acquisition Date'
+    label: 'Cohort Period'
     type: 'field'
     source: FieldFilterSource {
       dataset: ecom_cohort_analysis
-      field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+      field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
     }
     default {
       operator: 'matches'
@@ -1408,11 +1408,11 @@ Same cohort, same filter, same field — **two different metric definitions**.
       dataset: ecom_cohort_sql_analysis
       fields: [
         VizFieldFull {
-          label: 'Cohort'
+          label: 'Cohort Period'
           ref: r(ecom_cohort_sql.cohort_month)
           format {
             type: 'date'
-            pattern: 'LLL yyyy'
+            pattern: 'yyyy-MM-dd'
           }
           uname: 'sumw_row'
         },
@@ -1943,7 +1943,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
       to: [
         CustomMapping {
           block: 'rep_ret_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
         },
         CustomMapping {
           block: 'rep_ret_wrong'
@@ -2021,7 +2021,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
       to: [
         CustomMapping {
           block: 'rep_ltv_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
         },
         CustomMapping {
           block: 'rep_ltv_wrong'
@@ -2099,7 +2099,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
       to: [
         CustomMapping {
           block: 'rep_rev_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
         },
         CustomMapping {
           block: 'rep_rev_wrong'
@@ -2177,7 +2177,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
       to: [
         CustomMapping {
           block: 'rep_opu_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
         },
         CustomMapping {
           block: 'rep_opu_wrong'
@@ -2255,7 +2255,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
       to: [
         CustomMapping {
           block: 'rep_cat_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
         },
         CustomMapping {
           block: 'rep_cat_wrong'
@@ -2333,7 +2333,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
       to: [
         CustomMapping {
           block: 'rep_sum_right'
-          field: r(ecom_cohort_analysis, ecommerce_users.first_order_date)
+          field: r(ecom_cohort_analysis, ecommerce_users.cohort_period)
         },
         CustomMapping {
           block: 'rep_sum_wrong'

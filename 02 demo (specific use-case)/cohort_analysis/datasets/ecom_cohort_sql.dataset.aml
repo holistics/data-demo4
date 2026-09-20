@@ -222,7 +222,8 @@ Unfiltered it returns exactly what the semantic dataset returns. Filter it and t
   metric sql_active_users {
     label: 'Active Users (SQL model)'
     type: 'number'
-    definition: @aql count_distinct(ecom_cohort_sql.user_id) ;;
+    description: 'Distinct customers who placed an order in the period. Gated on order_id so the never-purchased population, which exists in this model as rows with no order, is not counted as active.'
+    definition: @aql count_distinct(ecom_cohort_sql.user_id) | where(ecom_cohort_sql.order_id is not null) ;;
     format: '#,###0'
   }
 
