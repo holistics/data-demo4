@@ -1640,13 +1640,13 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
         position: pos(20, 460, 440, 90)
       }
       block rep_ret_right {
-        position: pos(20, 460, 1340, 500)
+        position: pos(20, 570, 1340, 500)
       }
       block rep_ret_wrong {
-        position: pos(20, 980, 1340, 500)
+        position: pos(20, 1090, 1340, 500)
       }
       block txt_ret_why {
-        position: pos(20, 1500, 1340, 280)
+        position: pos(20, 1610, 1340, 280)
       }
       mobile {
         mode: 'auto'
@@ -1656,7 +1656,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
     tab ltv: CanvasLayout {
       label: 'LTV'
       width: 1380
-      height: 1820
+      height: 1930
       grid_size: 20
       auto_expand_vertically: false
 
@@ -1685,13 +1685,13 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
         position: pos(20, 460, 440, 90)
       }
       block rep_ltv_right {
-        position: pos(20, 460, 1340, 500)
+        position: pos(20, 570, 1340, 500)
       }
       block rep_ltv_wrong {
-        position: pos(20, 980, 1340, 500)
+        position: pos(20, 1090, 1340, 500)
       }
       block txt_ltv_why {
-        position: pos(20, 1500, 1340, 280)
+        position: pos(20, 1610, 1340, 280)
       }
       mobile {
         mode: 'auto'
@@ -1701,7 +1701,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
     tab revenue: CanvasLayout {
       label: 'Cumulative Revenue'
       width: 1380
-      height: 1820
+      height: 1930
       grid_size: 20
       auto_expand_vertically: false
 
@@ -1730,13 +1730,13 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
         position: pos(20, 460, 440, 90)
       }
       block rep_rev_right {
-        position: pos(20, 460, 1340, 500)
+        position: pos(20, 570, 1340, 500)
       }
       block rep_rev_wrong {
-        position: pos(20, 980, 1340, 500)
+        position: pos(20, 1090, 1340, 500)
       }
       block txt_rev_why {
-        position: pos(20, 1500, 1340, 280)
+        position: pos(20, 1610, 1340, 280)
       }
       mobile {
         mode: 'auto'
@@ -1746,7 +1746,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
     tab orders: CanvasLayout {
       label: 'Orders Per User'
       width: 1380
-      height: 1820
+      height: 1930
       grid_size: 20
       auto_expand_vertically: false
 
@@ -1775,13 +1775,13 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
         position: pos(20, 460, 440, 90)
       }
       block rep_opu_right {
-        position: pos(20, 460, 1340, 500)
+        position: pos(20, 570, 1340, 500)
       }
       block rep_opu_wrong {
-        position: pos(20, 980, 1340, 500)
+        position: pos(20, 1090, 1340, 500)
       }
       block txt_opu_why {
-        position: pos(20, 1500, 1340, 280)
+        position: pos(20, 1610, 1340, 280)
       }
       mobile {
         mode: 'auto'
@@ -1791,7 +1791,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
     tab by_category: CanvasLayout {
       label: 'LTV by Category'
       width: 1380
-      height: 1820
+      height: 1930
       grid_size: 20
       auto_expand_vertically: false
 
@@ -1820,13 +1820,13 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
         position: pos(20, 460, 440, 90)
       }
       block rep_cat_right {
-        position: pos(20, 460, 1340, 500)
+        position: pos(20, 570, 1340, 500)
       }
       block rep_cat_wrong {
-        position: pos(20, 980, 1340, 500)
+        position: pos(20, 1090, 1340, 500)
       }
       block txt_cat_why {
-        position: pos(20, 1500, 1340, 280)
+        position: pos(20, 1610, 1340, 280)
       }
       mobile {
         mode: 'auto'
@@ -1836,7 +1836,7 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
     tab summary: CanvasLayout {
       label: 'Cohort Summary'
       width: 1380
-      height: 1820
+      height: 1930
       grid_size: 20
       auto_expand_vertically: false
 
@@ -1865,13 +1865,13 @@ Open any tab, set <strong>Category</strong> to <code style="background:#104A89;p
         position: pos(20, 460, 440, 90)
       }
       block rep_sum_right {
-        position: pos(20, 460, 1340, 500)
+        position: pos(20, 570, 1340, 500)
       }
       block rep_sum_wrong {
-        position: pos(20, 980, 1340, 500)
+        position: pos(20, 1090, 1340, 500)
       }
       block txt_sum_why {
-        position: pos(20, 1500, 1340, 280)
+        position: pos(20, 1610, 1340, 280)
       }
       mobile {
         mode: 'auto'
