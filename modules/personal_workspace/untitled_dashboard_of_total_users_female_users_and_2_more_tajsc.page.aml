@@ -1336,7 +1336,7 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 5900
+    height: 8020
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
@@ -1404,7 +1404,7 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       layer: 14
     }
     block v_dw41 {
-      position: pos(20, 3260, 1240, 2620)
+      position: pos(20, 3260, 1240, 4700)
       layer: 14
     }
     mobile {
