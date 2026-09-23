@@ -1290,11 +1290,53 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       }
     }
   }
-  interactions: []
+  block v_dw41: VizBlock {
+    label: 'Created At, Product Name and 2 more'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_orders.created_at)
+          format {
+            type: 'datetime'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_order_items.order_id)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_order_items.product_id)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 1000
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 3260
+    height: 5900
     grid_size: 20
     auto_expand_vertically: true
     block v_4mie {
@@ -1361,9 +1403,335 @@ Dashboard untitled_dashboard_of_total_users_female_users_and_2_more_tajsc {
       position: pos(660, 2820, 620, 420)
       layer: 14
     }
+    block v_dw41 {
+      position: pos(20, 3260, 1240, 2620)
+      layer: 14
+    }
     mobile {
       mode: 'auto'
     }
   }
   theme: H.themes.vanilla
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'v_4mie'
+      to: [
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_5euh'
+      to: [
+        'v_4mie',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_j5tp'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_uuh3'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_pmqy'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_zudj'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_9ika'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_uyom'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_z8ed'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_rauk'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_1hno'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_25bw'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_g99o'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_lyh4',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_lyh4'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_u7e8',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_u7e8'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_dw41'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_dw41'
+      to: [
+        'v_4mie',
+        'v_5euh',
+        'v_j5tp',
+        'v_uuh3',
+        'v_pmqy',
+        'v_zudj',
+        'v_9ika',
+        'v_uyom',
+        'v_z8ed',
+        'v_rauk',
+        'v_1hno',
+        'v_25bw',
+        'v_g99o',
+        'v_lyh4',
+        'v_u7e8'
+      ]
+    }
+  ]
 }
