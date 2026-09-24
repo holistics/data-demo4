@@ -988,6 +988,330 @@ Dashboard iceye_finance_dashboard {
       }
     }
   }
+  block t5_title: TextBlock {
+    content: @md <h1 style="font-size:26px; font-weight:600; color:#ffffff; margin:0; padding:0 24px; display:flex; align-items:center; height:100%; box-sizing:border-box; background:linear-gradient(97deg, #051527 15%, #123c4a 85%); border-radius:8px;">P&L Statement — Gross Margin, EBITDA & Net Profit</h1>;;
+  }
+  block t5_date_filter: FilterBlock {
+    label: 'Posting Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: profit_loss_statement_dataset
+      field: ref('iceye_fact_pl_statements', 'resolved_posting_date')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 5 years to today'
+    }
+  }
+  block t5_dept_filter: FilterBlock {
+    label: 'Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: profit_loss_statement_dataset
+      field: ref('iceye_dim_departments', 'department_name')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block t5_kpi_revenue: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(profit_loss_statement_dataset.pl_revenue)
+        format {
+          type: 'number'
+          pattern: '[€]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t5_kpi_gm: VizBlock {
+    label: 'Gross Margin %'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'Gross Margin %'
+        ref: r(profit_loss_statement_dataset.pl_gross_margin_pct)
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t5_kpi_ebitda: VizBlock {
+    label: 'EBITDA Margin %'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'EBITDA Margin %'
+        ref: r(profit_loss_statement_dataset.pl_ebitda_margin_pct)
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t5_kpi_net: VizBlock {
+    label: 'Net Profit'
+    viz: MetricKpi {
+      dataset: profit_loss_statement_dataset
+      value: VizFieldFull {
+        label: 'Net Profit'
+        ref: r(profit_loss_statement_dataset.pl_net_profit)
+        format {
+          type: 'number'
+          pattern: '[€]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme: holistics_kpi_blue_dark
+  }
+  block t5_statement: VizBlock {
+    label: 'Profit & Loss Statement (EUR)'
+    description: 'Section totals (A, B, C, D, F) and calculated subtotals (A-B Gross Margin, A-B-C EBITDA, A-B-C-D-F Net Profit) in one table, driven by the P&L Report Lines mapping. F (Financial Expenses) is mapped but has no accounts in this demo ledger, so it contributes zero and shows no row.'
+    viz: PivotTable {
+      dataset: profit_loss_statement_dataset
+      theme {
+        table {
+          general {
+            bg_color: '#FFFFFF'
+            hover_color: '#F3F6F8'
+            banding_color: '#FFFFFF'
+            font_size: 13
+            font_color: '#1F2A37'
+            border_color: '#D5DEE5'
+            border_width: 1
+            grid_color: '#EDF1F4'
+          }
+          header {
+            bg_color: '#0B2233'
+            font_size: 13
+            font_weight: 'semibold'
+            font_color: '#FFFFFF'
+          }
+          sub_header {
+            bg_color: '#123C4A'
+            font_size: 12
+            font_weight: 'medium'
+            font_color: '#CFE0E8'
+          }
+        }
+      }
+      rows: [
+        VizFieldFull {
+          ref: r(iceye_pl_report_lines.line_order)
+          uname: 'pl_line_order'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Code'
+          ref: r(iceye_pl_report_lines.line_code)
+          uname: 'pl_line_code'
+        },
+        VizFieldFull {
+          label: 'P&L Line'
+          ref: r(iceye_pl_report_lines.line_label)
+          uname: 'iceye_pl_report_lines_line_label'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Fiscal Year'
+          ref: r(iceye_fact_pl_statements.resolved_posting_date)
+          transformation: 'datetrunc year'
+          format {
+            type: 'date'
+            pattern: "'FY' yyyy"
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Amount'
+          ref: r(profit_loss_statement_dataset.total_net_amount_eur)
+          format {
+            type: 'number'
+            pattern: '[€]#,###0'
+          }
+          uname: 'pl_net_eur'
+        },
+        VizFieldFull {
+          label: '% Rev'
+          ref: r(profit_loss_statement_dataset.pl_pct_of_revenue)
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'pl_pct_rev'
+        }
+      ]
+      settings {
+        show_row_total: true
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'pl_net_eur'
+            format: SingleFormat {
+              condition {
+                operator: 'less_than'
+                value: 0
+              }
+              text_color: '#B42318'
+              background_color: '#00000000'
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'pl_line_order'
+            direction: 'asc'
+          }
+        ]
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        frozen_columns: 3
+        column_styles: [
+          ColumnStyle {
+            key: 'pl_line_code'
+            width: 80
+          },
+          ColumnStyle {
+            key: 'iceye_pl_report_lines_line_label'
+            width: 250
+          },
+          ColumnStyle {
+            key: 'pl_net_eur'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'pl_pct_rev'
+            width: 82
+          }
+        ]
+      }
+    }
+  }
+  block t5_margin_trend: VizBlock {
+    label: 'Margin Profile by Quarter'
+    viz: LineChart {
+      dataset: profit_loss_statement_dataset
+      x_axis: VizFieldFull {
+        ref: r(iceye_fact_pl_statements.resolved_posting_date)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: "yyyy 'Q'q"
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Gross Margin %'
+            ref: r(profit_loss_statement_dataset.pl_gross_margin_pct)
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'EBITDA Margin %'
+            ref: r(profit_loss_statement_dataset.pl_ebitda_margin_pct)
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Net Margin %'
+            ref: r(profit_loss_statement_dataset.pl_net_margin_pct)
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block t5_howto: TextBlock {
+    content: @md
+### How the subtotals work
+
+Every account maps to **each line it rolls into** in one small mapping model (`iceye_pl_report_lines`):
+
+| Code | Line | Accounts included |
+|---|---|---|
+| A, B, C, D, F | Section totals | accounts in that section |
+| A1, B2 … | Account detail | that account |
+| **A-B** | **Gross Margin** | Revenue + COGS |
+| **A-B-C** | **EBITDA** | + OPEX |
+| F | Financial Expenses | none in this demo ledger |
+| **A-B-C-D-F** | **Net Profit** | + D&A + Financial |
+
+Amounts are signed (credit − debit), so one `sum` per line gives both the group totals and the calculated subtotals, in order, in one pivot. Filters, periods and drill-downs still work, and a new line (e.g. EBIT, or F Financial Expenses once those accounts exist) is one more row in the mapping.
+
+*F is mapped but empty: this demo ledger has no financial-expense accounts, so no F row appears and F adds zero to Net Profit.*
+;;
+  }
   view: TabLayout {
     label: 'ICEYE Finance'
     tab budget_vs_actual: CanvasLayout {
@@ -1070,6 +1394,46 @@ Dashboard iceye_finance_dashboard {
         mode: 'auto'
       }
     }
+    tab pl_statement: CanvasLayout {
+      label: 'P&L Statement'
+      width: 1320
+      height: 1620
+      grid_size: 20
+      auto_expand_vertically: true
+      block t5_title {
+        position: pos(20, 20, 1280, 64)
+      }
+      block t5_date_filter {
+        position: pos(20, 100, 360, 40)
+      }
+      block t5_dept_filter {
+        position: pos(400, 100, 360, 40)
+      }
+      block t5_kpi_revenue {
+        position: pos(20, 170, 300, 160)
+      }
+      block t5_kpi_gm {
+        position: pos(340, 170, 300, 160)
+      }
+      block t5_kpi_ebitda {
+        position: pos(660, 170, 300, 160)
+      }
+      block t5_kpi_net {
+        position: pos(980, 170, 300, 160)
+      }
+      block t5_margin_trend {
+        position: pos(20, 1120, 780, 460)
+      }
+      block t5_howto {
+        position: pos(860, 1140, 460, 460)
+      }
+      block t5_statement {
+        position: pos(20, 360, 1260, 740)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
     tab balance_sheet: CanvasLayout {
       label: 'Balance Sheet & Fixed Assets'
       width: 1320
@@ -1143,4 +1507,47 @@ Dashboard iceye_finance_dashboard {
     }
   }
   theme: ICEYE
+  // keep the P&L and P&L Statement tabs' filters independent (they share a dataset)
+  interactions: [
+    FilterInteraction {
+      from: 't2_date_filter'
+      to: [
+        't5_kpi_revenue',
+        't5_kpi_gm',
+        't5_kpi_ebitda',
+        't5_kpi_net',
+        't5_statement',
+        't5_margin_trend'
+      ]
+      disabled: true
+    },
+    FilterInteraction {
+      from: 't5_date_filter'
+      to: [
+        't2_kpi_net',
+        't2_kpi_credit',
+        't2_kpi_debit',
+        't2_by_group',
+        't2_trend',
+        't2_by_dept',
+        't2_by_vendor',
+        't2_table'
+      ]
+      disabled: true
+    },
+    FilterInteraction {
+      from: 't5_dept_filter'
+      to: [
+        't2_kpi_net',
+        't2_kpi_credit',
+        't2_kpi_debit',
+        't2_by_group',
+        't2_trend',
+        't2_by_dept',
+        't2_by_vendor',
+        't2_table'
+      ]
+      disabled: true
+    }
+  ]
 }

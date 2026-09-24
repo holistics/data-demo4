@@ -1,0 +1,100 @@
+Model iceye_pl_report_lines {
+  type: 'query'
+  label: 'P&L Report Lines'
+  description: 'P&L statement layout (account → report line mapping). Each account maps to every line it rolls into: its section (A Revenue, B COGS, C OPEX, D D&A, F Financial Expenses), its own detail line, and each calculated subtotal (A-B Gross Margin, A-B-C EBITDA, A-B-C-D-F Net Profit). F is a placeholder: the demo ledger has no financial income/expense accounts, so no F line appears until accounts in those groups exist. Summing the signed net amount (credit − debit) by line therefore yields section totals and subtotals in one table. Add a line by adding a row here — no chart changes needed.'
+  data_source_name: 'demo_dbt_test'
+  owner: 'chukwudi@holistics.io'
+
+  dimension line_key {
+    label: 'Line Key'
+    type: 'text'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.line_code }} || '|' || {{ #SOURCE.account_number }};;
+  }
+  dimension account_number {
+    label: 'Account Number'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.account_number }};;
+  }
+  dimension line_code {
+    label: 'Code'
+    type: 'text'
+    description: 'A / B / C / D / F = sections, A1, B2… = accounts, A-B, A-B-C, A-B-C-D-F = calculated subtotals.'
+    definition: @sql {{ #SOURCE.line_code }};;
+  }
+  dimension line_label {
+    label: 'P&L Line'
+    type: 'text'
+    definition: @sql {{ #SOURCE.line_label }};;
+  }
+  dimension line_type {
+    label: 'Line Type'
+    type: 'text'
+    description: 'Section, Account or Subtotal.'
+    definition: @sql {{ #SOURCE.line_type }};;
+  }
+  dimension line_order {
+    label: 'Line Order'
+    type: 'number'
+    description: 'Sort key for the statement layout.'
+    definition: @sql {{ #SOURCE.line_order }};;
+  }
+
+  query: @sql
+    with accts as (
+      select
+        {{ #h.account_number }} as account_number,
+        {{ #h.account_name }} as account_name,
+        case
+          when {{ #h.account_group_level_1 }} = 'Revenue' then 'A'
+          when {{ #h.account_group_level_1 }} = 'Cost of Sales' then 'B'
+          when {{ #h.account_group_level_2 }} = 'Depreciation & Amortization' then 'D'
+          when {{ #h.account_group_level_1 }} = 'Operating Expenses' then 'C'
+          -- F placeholder: no accounts in these groups in the demo ledger yet
+          when {{ #h.account_group_level_1 }} in ('Financial Income', 'Financial Expenses') then 'F'
+        end as section
+      from {{ #iceye_account_hierarchy_map as h }}
+    ),
+    sections (section, section_label, section_order) as (
+      values
+        ('A', 'Revenue', 100),
+        ('B', 'COGS', 200),
+        ('C', 'OPEX', 400),
+        ('D', 'Depreciation & Amortization', 600),
+        ('F', 'Financial Expenses', 800)
+    ),
+    detail as (
+      select
+        a.account_number,
+        a.account_name,
+        a.section,
+        s.section_label,
+        s.section_order,
+        row_number() over (partition by a.section order by a.account_number) as rn
+      from accts a
+      join sections s on s.section = a.section
+    )
+    -- section header rows (A, B, C, D, F)
+    select account_number, section as line_code, section_label as line_label, 'Section' as line_type, section_order as line_order
+    from detail
+    union all
+    -- account detail rows (A1, A2, B1 ...), indented with non-breaking spaces
+    select account_number, section || rn, repeat(chr(160), 6) || account_name, 'Account', section_order + rn
+    from detail
+    where section in ('A', 'B', 'C')
+    union all
+    select account_number, 'A-B', 'GROSS MARGIN', 'Subtotal', 300
+    from detail where section in ('A', 'B')
+    union all
+    select account_number, 'A-B-C', 'EBITDA', 'Subtotal', 500
+    from detail where section in ('A', 'B', 'C')
+    union all
+    select account_number, 'A-B-C-D-F', 'NET PROFIT', 'Subtotal', 900
+    from detail where section in ('A', 'B', 'C', 'D', 'F')
+  ;;
+  models: [
+    iceye_account_hierarchy_map
+  ]
+}
