@@ -729,7 +729,7 @@ F (Financial Expenses) shows €0: this demo ledger has no financial accounts. N
         position: pos(20, 160, 860, 900)
       }
       block t6_howto {
-        position: pos(900, 160, 400, 520)
+        position: pos(880, 100, 400, 520)
       }
       mobile {
         mode: 'auto'
@@ -740,22 +740,40 @@ F (Financial Expenses) shows €0: this demo ledger has no financial accounts. N
   explicit_interactions: [
     FilterInteraction {
       from: 't5_date_filter'
-      to: ['t5_kpi_revenue', 't5_kpi_gm', 't5_kpi_ebitda', 't5_kpi_net', 't5_statement', 't5_margin_trend']
+      to: [
+        't5_kpi_revenue',
+        't5_kpi_gm',
+        't5_kpi_ebitda',
+        't5_kpi_net',
+        't5_statement',
+        't5_margin_trend'
+      ]
       field: r(iceye_fact_pl_statements.resolved_posting_date)
     },
     FilterInteraction {
       from: 't5_dept_filter'
-      to: ['t5_kpi_revenue', 't5_kpi_gm', 't5_kpi_ebitda', 't5_kpi_net', 't5_statement', 't5_margin_trend']
+      to: [
+        't5_kpi_revenue',
+        't5_kpi_gm',
+        't5_kpi_ebitda',
+        't5_kpi_net',
+        't5_statement',
+        't5_margin_trend'
+      ]
       field: r(iceye_dim_departments.department_name)
     },
     FilterInteraction {
       from: 't6_date_filter'
-      to: ['t6_sheet']
+      to: [
+        't6_sheet'
+      ]
       field: r(iceye_fact_pl_statements.resolved_posting_date)
     },
     FilterInteraction {
       from: 't6_dept_filter'
-      to: ['t6_sheet']
+      to: [
+        't6_sheet'
+      ]
       field: r(iceye_dim_departments.department_name)
     }
   ]
