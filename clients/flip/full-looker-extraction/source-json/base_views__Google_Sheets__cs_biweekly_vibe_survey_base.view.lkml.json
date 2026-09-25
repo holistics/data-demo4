@@ -1,0 +1,5 @@
+{
+ "original_path": "base_views/Google_Sheets/cs_biweekly_vibe_survey_base.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "view: cs_biweekly_vibe_survey_base {\n  sql_table_name: `fl-bi-p-poc.source_google_sheets_poc.cs_biweekly_vibe_survey` ;;\n\n  dimension: giving_high_five_to_ {\n    type: string\n    sql: ${TABLE}.Giving_high_five_to_ ;;\n  }\n  dimension: how_were_your_last_two_weeks_ {\n    type: string\n    sql: ${TABLE}.How_were_your_last_two_weeks_ ;;\n  }\n  dimension_group: timestamp {\n    type: time\n    description: \"%m/%d/%Y %H:%M:%E*S\"\n    timeframes: [raw, time, date, week, month, quarter, year]\n    sql: ${TABLE}.Timestamp ;;\n  }\n  dimension: what_went_not_so_well_ {\n    type: string\n    sql: ${TABLE}.What_went_not_so_well_ ;;\n  }\n  dimension: what_went_well_ {\n    type: string\n    sql: ${TABLE}.What_went_well_ ;;\n  }\n  measure: count {\n    type: count\n  }\n}\n"
+}
