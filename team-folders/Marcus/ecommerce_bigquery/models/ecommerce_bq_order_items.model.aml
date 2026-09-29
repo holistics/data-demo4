@@ -1,0 +1,245 @@
+Model ecommerce_bq_order_items {
+  type: 'table'
+  label: 'Order Items'
+  description: 'Order lines joined to their order and product, carrying the revenue and cost measures. Revenue and cost each have ONE formula; the revenue_<group> / cost_<group> columns are that same formula restricted to one category group, so the five of each sum to the total. Grain: one row per order x product.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.fct_order_items'
+
+  dimension order_item_id {
+    label: 'Order Item ID'
+    type: 'text'
+    description: 'Surrogate key, md5 of order_id and product_id.'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.order_item_id }};;
+  }
+
+  dimension order_id {
+    label: 'Order ID'
+    type: 'number'
+    description: 'Order the line belongs to.'
+    hidden: true
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+
+  dimension product_id {
+    label: 'Product ID'
+    type: 'number'
+    description: 'Product on the line.'
+    hidden: true
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    description: 'Customer who placed the order.'
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    description: 'Order status (see fct_orders.status).'
+    hidden: true
+    definition: @sql {{ #SOURCE.status }};;
+  }
+
+  dimension is_fulfilled {
+    label: 'Is Fulfilled'
+    type: 'truefalse'
+    description: 'True when the order was delivered.'
+    hidden: true
+    definition: @sql {{ #SOURCE.is_fulfilled }};;
+  }
+
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    description: 'Timestamp the order was placed.'
+    hidden: true
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  dimension order_date {
+    label: 'Order Date'
+    type: 'date'
+    description: 'Date the order was placed.'
+    hidden: true
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+
+  dimension discount {
+    label: 'Discount'
+    type: 'number'
+    description: 'Order-level discount rate applied to the line.'
+    hidden: true
+    definition: @sql {{ #SOURCE.discount }};;
+  }
+
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    description: 'Units ordered.'
+    definition: @sql {{ #SOURCE.quantity }};;
+  }
+
+  dimension unit_price {
+    label: 'Unit Price'
+    type: 'number'
+    description: 'Product list price per unit (USD).'
+    definition: @sql {{ #SOURCE.unit_price }};;
+  }
+
+  dimension unit_cost {
+    label: 'Unit Cost'
+    type: 'number'
+    description: 'Product cost of goods per unit (USD).'
+    definition: @sql {{ #SOURCE.unit_cost }};;
+  }
+
+  dimension category_name {
+    label: 'Category Name'
+    type: 'text'
+    description: 'Leaf category of the product.'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_name }};;
+  }
+
+  dimension parent_category_name {
+    label: 'Parent Category Name'
+    type: 'text'
+    description: 'Parent category of the product.'
+    hidden: true
+    definition: @sql {{ #SOURCE.parent_category_name }};;
+  }
+
+  dimension category_group {
+    label: 'Category Group'
+    type: 'text'
+    description: 'Reporting category group that drives the revenue_* / cost_* split.'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group }};;
+  }
+
+  dimension category_group_slug {
+    label: 'Category Group Slug'
+    type: 'text'
+    description: 'Machine-friendly key of `category_group`.'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group_slug }};;
+  }
+
+  dimension gross_value {
+    label: 'Gross Value'
+    type: 'number'
+    description: 'quantity x unit_price, before discount, all statuses (GMV contribution).'
+    hidden: true
+    definition: @sql {{ #SOURCE.gross_value }};;
+  }
+
+  dimension revenue {
+    label: 'Revenue'
+    type: 'number'
+    description: 'Base revenue formula: quantity x unit_price x (1 - discount), for delivered orders only; 0 for cancelled and refunded orders. Equivalent to NMV.'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue }};;
+  }
+
+  dimension cost {
+    label: 'Cost'
+    type: 'number'
+    description: 'Base cost formula: quantity x unit_cost, for delivered orders only; 0 for cancelled and refunded orders.'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost }};;
+  }
+
+  dimension gross_profit {
+    label: 'Gross Profit'
+    type: 'number'
+    description: 'revenue - cost.'
+    hidden: true
+    definition: @sql {{ #SOURCE.gross_profit }};;
+  }
+
+  dimension revenue_electronics {
+    label: 'Revenue Electronics'
+    type: 'number'
+    description: 'Revenue from Electronics (Mobiles & Tablets + Home Entertainment). Same formula as `revenue`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_electronics }};;
+  }
+
+  dimension revenue_groceries {
+    label: 'Revenue Groceries'
+    type: 'number'
+    description: 'Revenue from Groceries. Same formula as `revenue`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_groceries }};;
+  }
+
+  dimension revenue_home_living {
+    label: 'Revenue Home Living'
+    type: 'number'
+    description: 'Revenue from Home & Living (Home Furniture). Same formula as `revenue`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_home_living }};;
+  }
+
+  dimension revenue_fashion {
+    label: 'Revenue Fashion'
+    type: 'number'
+    description: 'Revenue from Fashion (Clothes). Same formula as `revenue`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_fashion }};;
+  }
+
+  dimension revenue_beauty {
+    label: 'Revenue Beauty'
+    type: 'number'
+    description: 'Revenue from Beauty (Skin Care). Same formula as `revenue`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_beauty }};;
+  }
+
+  dimension cost_electronics {
+    label: 'Cost Electronics'
+    type: 'number'
+    description: 'Cost of goods for Electronics (Mobiles & Tablets + Home Entertainment). Same formula as `cost`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_electronics }};;
+  }
+
+  dimension cost_groceries {
+    label: 'Cost Groceries'
+    type: 'number'
+    description: 'Cost of goods for Groceries. Same formula as `cost`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_groceries }};;
+  }
+
+  dimension cost_home_living {
+    label: 'Cost Home Living'
+    type: 'number'
+    description: 'Cost of goods for Home & Living (Home Furniture). Same formula as `cost`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_home_living }};;
+  }
+
+  dimension cost_fashion {
+    label: 'Cost Fashion'
+    type: 'number'
+    description: 'Cost of goods for Fashion (Clothes). Same formula as `cost`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_fashion }};;
+  }
+
+  dimension cost_beauty {
+    label: 'Cost Beauty'
+    type: 'number'
+    description: 'Cost of goods for Beauty (Skin Care). Same formula as `cost`, 0 for lines outside the group.'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_beauty }};;
+  }
+}

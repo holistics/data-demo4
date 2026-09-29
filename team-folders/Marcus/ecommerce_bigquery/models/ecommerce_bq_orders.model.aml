@@ -1,0 +1,79 @@
+Model ecommerce_bq_orders {
+  type: 'table'
+  label: 'Orders'
+  description: 'Customer orders with typed fields, parsed promo codes and fulfilment flags. Grain — one row per order.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.fct_orders'
+
+  dimension order_id {
+    label: 'Order ID'
+    type: 'number'
+    description: 'Order identifier.'
+    primary_key: true
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    description: 'Customer who placed the order.'
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    description: 'Order status. `delivered` = fulfilled and kept; `cancelled` = cancelled before delivery; `refunded` = delivered then refunded.'
+    definition: @sql {{ #SOURCE.status }};;
+  }
+
+  dimension is_fulfilled {
+    label: 'Is Fulfilled'
+    type: 'truefalse'
+    description: 'True when status is `delivered` — the only orders that count toward revenue and cost.'
+    definition: @sql {{ #SOURCE.is_fulfilled }};;
+  }
+
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    description: 'Timestamp the order was placed.'
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  dimension order_date {
+    label: 'Order Date'
+    type: 'date'
+    description: 'Date the order was placed.'
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+
+  dimension discount {
+    label: 'Discount'
+    type: 'number'
+    description: 'Order-level discount rate applied to every line (0.05 = 5%).'
+    definition: @sql {{ #SOURCE.discount }};;
+  }
+
+  dimension delivery_attempts {
+    label: 'Delivery Attempts'
+    type: 'number'
+    description: 'Number of delivery attempts made (1–3).'
+    definition: @sql {{ #SOURCE.delivery_attempts }};;
+  }
+
+  dimension is_multi_attempt_delivery {
+    label: 'Is Multi Attempt Delivery'
+    type: 'truefalse'
+    description: 'True when more than one delivery attempt was needed.'
+    definition: @sql {{ #SOURCE.is_multi_attempt_delivery }};;
+  }
+
+  dimension promo_code_count {
+    label: 'Promo Code Count'
+    type: 'number'
+    description: 'Number of promo codes applied.'
+    definition: @sql {{ #SOURCE.promo_code_count }};;
+  }
+}

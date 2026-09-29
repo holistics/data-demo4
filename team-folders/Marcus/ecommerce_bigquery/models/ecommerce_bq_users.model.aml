@@ -1,0 +1,110 @@
+Model ecommerce_bq_users {
+  type: 'table'
+  label: 'Users'
+  description: 'Registered customers with typed dates, derived age and location. Grain — one row per user.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.dim_users'
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    description: 'User identifier.'
+    primary_key: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    description: 'Customer full name.'
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+
+  dimension first_name {
+    label: 'First Name'
+    type: 'text'
+    description: 'Customer first name.'
+    definition: @sql {{ #SOURCE.first_name }};;
+  }
+
+  dimension last_name {
+    label: 'Last Name'
+    type: 'text'
+    description: 'Customer last name.'
+    definition: @sql {{ #SOURCE.last_name }};;
+  }
+
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    description: 'Customer email, lower-cased.'
+    definition: @sql {{ #SOURCE.email }};;
+  }
+
+  dimension gender {
+    label: 'Gender'
+    type: 'text'
+    description: 'Gender, "Female" or "Male" (decoded from raw f/m).'
+    definition: @sql {{ #SOURCE.gender }};;
+  }
+
+  dimension birth_date {
+    label: 'Birth Date'
+    type: 'date'
+    description: 'Date of birth.'
+    definition: @sql {{ #SOURCE.birth_date }};;
+  }
+
+  dimension sign_up_date {
+    label: 'Sign Up Date'
+    type: 'date'
+    description: 'Date the user registered.'
+    definition: @sql {{ #SOURCE.sign_up_date }};;
+  }
+
+  dimension sign_up_at {
+    label: 'Sign Up At'
+    type: 'datetime'
+    description: 'Timestamp the user registered.'
+    definition: @sql {{ #SOURCE.sign_up_at }};;
+  }
+
+  dimension city_id {
+    label: 'City ID'
+    type: 'number'
+    description: 'Home city of the user.'
+    hidden: true
+    definition: @sql {{ #SOURCE.city_id }};;
+  }
+
+  dimension age {
+    label: 'Age'
+    type: 'number'
+    description: 'Age in whole years as of the run date.'
+    definition: @sql {{ #SOURCE.age }};;
+  }
+
+  dimension city_name {
+    label: 'City Name'
+    type: 'text'
+    description: 'Home city name.'
+    hidden: true
+    definition: @sql {{ #SOURCE.city_name }};;
+  }
+
+  dimension country_name {
+    label: 'Country Name'
+    type: 'text'
+    description: 'Home country name.'
+    hidden: true
+    definition: @sql {{ #SOURCE.country_name }};;
+  }
+
+  dimension continent_name {
+    label: 'Continent Name'
+    type: 'text'
+    description: 'Home continent name.'
+    hidden: true
+    definition: @sql {{ #SOURCE.continent_name }};;
+  }
+}

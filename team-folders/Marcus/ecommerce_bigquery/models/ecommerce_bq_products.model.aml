@@ -1,0 +1,105 @@
+Model ecommerce_bq_products {
+  type: 'table'
+  label: 'Products'
+  description: 'Products with typed price/cost and their category hierarchy. Grain — one row per product.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.dim_products'
+
+  dimension product_id {
+    label: 'Product ID'
+    type: 'number'
+    description: 'Product identifier.'
+    primary_key: true
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+
+  dimension product_name {
+    label: 'Product Name'
+    type: 'text'
+    description: 'Product name.'
+    definition: @sql {{ #SOURCE.product_name }};;
+  }
+
+  dimension category_id {
+    label: 'Category ID'
+    type: 'number'
+    description: 'Leaf category of the product.'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_id }};;
+  }
+
+  dimension merchant_id {
+    label: 'Merchant ID'
+    type: 'number'
+    description: 'Merchant selling the product (no merchant dimension in this dataset).'
+    hidden: true
+    definition: @sql {{ #SOURCE.merchant_id }};;
+  }
+
+  dimension price {
+    label: 'Price'
+    type: 'number'
+    description: 'Current list price per unit (USD).'
+    definition: @sql {{ #SOURCE.price }};;
+  }
+
+  dimension cost {
+    label: 'Cost'
+    type: 'number'
+    description: 'Cost of goods per unit (USD).'
+    definition: @sql {{ #SOURCE.cost }};;
+  }
+
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    description: 'Timestamp the product was listed.'
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  dimension product_image_url {
+    label: 'Product Image URL'
+    type: 'text'
+    description: 'URL of the product image.'
+    definition: @sql {{ #SOURCE.product_image_url }};;
+  }
+
+  dimension unit_margin_pct {
+    label: 'Unit Margin %'
+    type: 'number'
+    description: '(price - cost) / price.'
+    definition: @sql {{ #SOURCE.unit_margin_pct }};;
+  }
+
+  dimension category_name {
+    label: 'Category Name'
+    type: 'text'
+    description: 'Leaf category name.'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_name }};;
+  }
+
+  dimension parent_category_name {
+    label: 'Parent Category Name'
+    type: 'text'
+    description: 'Parent category name.'
+    hidden: true
+    definition: @sql {{ #SOURCE.parent_category_name }};;
+  }
+
+  dimension category_group {
+    label: 'Category Group'
+    type: 'text'
+    description: 'Reporting category group (see dim_categories.category_group).'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group }};;
+  }
+
+  dimension category_group_slug {
+    label: 'Category Group Slug'
+    type: 'text'
+    description: 'Machine-friendly key of `category_group`.'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group_slug }};;
+  }
+}
