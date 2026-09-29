@@ -1,14 +1,12 @@
 Model ecommerce_bq_categories {
   type: 'table'
   label: 'Categories'
-  description: 'Leaf product categories (one row per category that has a parent), with the parent category and the reporting category group. Grain: one row per leaf category.'
   data_source_name: 'demo_bigquery'
   table_name: 'ecommerce_cleaned.dim_categories'
 
   dimension category_id {
     label: 'Category ID'
     type: 'number'
-    description: 'Leaf category identifier.'
     primary_key: true
     definition: @sql {{ #SOURCE.category_id }};;
   }
@@ -16,14 +14,12 @@ Model ecommerce_bq_categories {
   dimension category_name {
     label: 'Category Name'
     type: 'text'
-    description: 'Leaf category name, e.g. "Mobiles", "Jeans".'
     definition: @sql {{ #SOURCE.category_name }};;
   }
 
   dimension parent_category_id {
     label: 'Parent Category ID'
     type: 'number'
-    description: 'Identifier of the parent category.'
     hidden: true
     definition: @sql {{ #SOURCE.parent_category_id }};;
   }
@@ -31,21 +27,18 @@ Model ecommerce_bq_categories {
   dimension parent_category_name {
     label: 'Parent Category Name'
     type: 'text'
-    description: 'Parent category name, e.g. "Mobiles & Tablets", "Clothes".'
     definition: @sql {{ #SOURCE.parent_category_name }};;
   }
 
   dimension category_group {
     label: 'Category Group'
     type: 'text'
-    description: 'Reporting group used to split revenue and cost into five buckets: Electronics (Mobiles & Tablets + Home Entertainment), Groceries, Home & Living (Home Furniture), Fashion (Clothes), Beauty (Skin Care). Defined by var `category_groups` in dbt_project.yml.'
     definition: @sql {{ #SOURCE.category_group }};;
   }
 
   dimension category_group_slug {
     label: 'Category Group Slug'
     type: 'text'
-    description: 'Machine-friendly key of `category_group`; suffix of the revenue_* / cost_* columns.'
     hidden: true
     definition: @sql {{ #SOURCE.category_group_slug }};;
   }
@@ -53,21 +46,18 @@ Model ecommerce_bq_categories {
   dimension min_price {
     label: 'Min Price'
     type: 'number'
-    description: 'Lower bound of the typical selling price for the category (USD).'
     definition: @sql {{ #SOURCE.min_price }};;
   }
 
   dimension max_price {
     label: 'Max Price'
     type: 'number'
-    description: 'Upper bound of the typical selling price for the category (USD).'
     definition: @sql {{ #SOURCE.max_price }};;
   }
 
   dimension category_image_url {
     label: 'Category Image URL'
     type: 'text'
-    description: 'URL of the category thumbnail image.'
     definition: @sql {{ #SOURCE.category_image_url }};;
   }
 }
