@@ -1,0 +1,59 @@
+Dashboard temple_w_azpcq {
+  title: 'Temple & W'
+  owner: 'dong.ln@holistics.io'
+  block v_prpc: VizBlock {
+    label: 'Margin'
+    viz: DataTable {
+      dataset: demo_ecommerce_bigquery
+      calculation margin {
+        label: 'Margin'
+        formula: @aql (revenue_electronics + revenue_groceries - cost_electronics - cost_groceries) / (revenue_electronics + revenue_groceries);;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: 'none'
+        }
+      }
+      fields: [
+        VizFieldFull {
+          ref: 'margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  explicit_interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_prpc {
+      position: pos(20, 20, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  settings {
+    autorun_on_open: true
+  }
+}
