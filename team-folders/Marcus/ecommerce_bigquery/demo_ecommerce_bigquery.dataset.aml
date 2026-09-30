@@ -166,6 +166,13 @@ Simplified BigQuery twin of `demo_ecommerce_version_2`, built on the dbt project
     format: "[\$\$]#,###0"
     description: 'Total Cost for Beauty (Skin Care).'
   }
+  metric margin {
+    label: "Margin"
+    type: "number"
+    description: ""
+    definition: @aql (revenue_beauty + revenue_groceries - cost_beauty - cost_groceries) / (revenue_beauty + revenue_groceries);;
+    format: "none"
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CUSTOM VIEWS
