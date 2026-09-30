@@ -1,0 +1,277 @@
+// Flip GmbH — focused ERD for source-lookml/internal_marketing.model.lkml.
+// Scope: current Looker Explore `marketing_funnel_allocation` from the funnel-alias prep bundle.
+// This is logical ERD documentation, not warehouse DDL. It preserves Looker role-playing aliases as
+// separate DBML tables even when they point to the same physical BigQuery table.
+//
+// Fully inspected local source files:
+// - source-lookml/model/internal_marketing.model.lkml
+// - source-lookml/base_views/Reports/marketing_filters_allocation_base.view.lkml
+// - source-lookml/extended_views/Reports/marketing_filters_allocation_ext.view.lkml
+// - source-lookml/base_views/Datamarts/hubspot_deals_all_base.view.lkml
+// - source-lookml/extended_views/Datamarts/hubspot_deals_all_ext.view.lkml
+//
+// External/stub entities below are referenced by the model file but their view definitions are not
+// present in this narrow prep source-lookml folder.
+
+// COLOR LEGEND BY ORIGINAL SOURCE
+// #1E88E5 marketing_filters_allocation_ext / reports_poc.marketing_filters_allocation
+// #43A047 hubspot_deals_all_ext / datamarts_poc.hubspot_deals_all role aliases
+// #FB8C00 gtm_targets_by_department_ext
+// #F9A825 gtm_sales_pipeline_over_time_ext
+// #FBC02D gtm_partner_pipeline_over_time_ext
+// #8E24AA hubspot_contacts_all_ext role aliases
+// #6D4C41 hubspot_engagement_calls_sales_ext
+// #546E7A hubspot_engagement_emails_sales_ext
+// #00ACC1 hubspot_engagement_meetings_sales_ext role aliases
+// #3949AB salesloft_meetings_held_ext
+// #E53935 hubspot_deal_marketing_influence_touchpoint_ext role aliases
+
+Project flip_funnel_alias_erd {
+  database_type: 'BigQuery'
+  Note: 'Logical ERD for Flip Looker marketing_funnel_allocation. Root table is reports_poc.marketing_filters_allocation. Deal stage aliases all use datamarts_poc.hubspot_deals_all with different stage/date foreign keys. Looker join types are mostly FULL OUTER; DBML arrows document field equality/cardinality only, while join type and predicates are kept in notes.'
+}
+
+Table flip_funnel_allocation [headercolor: #1E88E5, note: 'LookML view: marketing_filters_allocation_ext extends marketing_filters_allocation_base. Physical table: `fl-bi-p-poc.reports_poc.marketing_filters_allocation`. Explore alias/root: marketing_funnel_allocation. Grain appears to be one row per date/source/allocation/target key via primary_key, but warehouse uniqueness was not verified.'] {
+  primary_key varchar [pk, note: 'Source: marketing_filters_allocation.primary_key. Main join key for deal stage aliases.']
+  date_date date [note: 'LookML dimension_group date, date timeframe. Used to join target and pipeline snapshot facts.']
+  deal_allocation varchar [note: 'Used with date_date to join pipeline snapshots and department targets.']
+  deal_source_channel_department_hubspot varchar [note: 'Used with date_date and deal_allocation to join department targets.']
+  deal_source_channel_cluster_hubspot varchar
+  deal_source_channel_inbound_vs_outbound_hubspot varchar
+  asset_name varchar
+  sales_region varchar
+  bdr_team varchar
+  bdr_teamlead varchar
+  foreign_key_contacts_table varchar [note: 'Contact lifecycle aliases join through this key. Contact view definitions are outside this prep bundle.']
+  foreign_key_bdr_targets varchar [note: 'Sales activity aliases join through this key. Activity view definitions are outside this prep bundle.']
+  foreign_key_date_source_channel varchar [note: 'Distinct key for daily spend measures.']
+  foreign_key_date_trunc_quarter_source_channel varchar [note: 'Distinct key for quarterly planned spend measures.']
+  unique_key_targets_in_looker varchar [note: 'Distinct key used by target sum_distinct measures.']
+  lead_count_base_target decimal
+  mql_count_base_target decimal
+  sql_count_base_target decimal
+  sal_count_base_target decimal
+  sao_count_base_target decimal
+  sao_volume_euros_base_target decimal
+  closed_won_count_base_target decimal
+  closed_won_volume_euros_base_target decimal
+  channel_daily_total_spend_euros decimal
+  channel_planned_quarterly_spend_euros decimal
+}
+
+Table flip_deals_sal [headercolor: #43A047, note: 'Role alias: hubspot_sal. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many. Additional local predicates: is_license_overrun_deal IS false AND exclude_flip_flow_sals IS true.'] {
+  deal_id varchar [pk]
+  primary_key varchar [note: 'Source view primary_key, not the funnel-allocation key used by this role.']
+  foreign_key_sal_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_sal_date date [note: 'Role date for SAL counting.']
+  is_license_overrun_deal boolean [note: 'SAL-local filter requires false.']
+  exclude_flip_flow_sals boolean [note: 'SAL-local filter requires true.']
+  deal_name varchar
+  deal_allocation varchar
+  deal_source_channel_department_hubspot varchar
+  new_business_vs_upsell varchar
+  current_amount_euros decimal
+}
+
+Table flip_deals_sao [headercolor: #43A047, note: 'Role alias: hubspot_sao. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many. Marketing-influence touchpoints join downstream from this role by deal_id.'] {
+  deal_id varchar [pk]
+  primary_key varchar
+  foreign_key_sao_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_sao_date date [note: 'Role date for SAO counting.']
+  deal_name varchar
+  deal_allocation varchar
+  deal_source_channel_department_hubspot varchar
+  new_business_vs_upsell varchar
+  current_amount_euros decimal
+}
+
+Table flip_deals_solution_design [headercolor: #43A047, note: 'Role alias: hubspot_solution_design. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_solution_design_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_solution_design_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_evaluation [headercolor: #43A047, note: 'Role alias: hubspot_evaluation. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_evaluation_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_evaluation_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_proposal [headercolor: #43A047, note: 'Role alias: hubspot_proposal. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_proposal_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_proposal_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_negotiation [headercolor: #43A047, note: 'Role alias: hubspot_negotiation. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_negotiations_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_negotiations_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_closing_validation [headercolor: #43A047, note: 'Role alias: hubspot_closing_validation. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_closing_validation_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_closed_won_validation_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_closed_won [headercolor: #43A047, note: 'Role alias: hubspot_closed_won. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many. Marketing-influence touchpoints join downstream from this role by deal_id.'] {
+  deal_id varchar [pk]
+  primary_key varchar
+  foreign_key_closed_won_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_closed_won_date date [note: 'Role date for Closed Won counting.']
+  deal_name varchar
+  deal_allocation varchar
+  deal_source_channel_department_hubspot varchar
+  new_business_vs_upsell varchar
+  current_amount_euros decimal
+}
+
+Table flip_deals_closed_lost [headercolor: #43A047, note: 'Role alias: hubspot_closed_lost. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_closed_lost_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  dmt_closed_lost_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_close_date [headercolor: #43A047, note: 'Role alias: hubspot_close_date. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_close_date_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  close_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_deals_expected_sd_date [headercolor: #43A047, note: 'Role alias: hubspot_expected_sd_date. Physical table: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all`. Looker join: FULL OUTER one_to_many.'] {
+  deal_id varchar [pk]
+  foreign_key_expected_sd_date_marketing_filters_allocation varchar [note: 'Joins to flip_funnel_allocation.primary_key.']
+  expected_sd_date date
+  deal_name varchar
+  deal_allocation varchar
+}
+
+Table flip_gtm_targets_by_department [headercolor: #FB8C00, note: 'External/stub. Referenced by internal_marketing.model.lkml but view file is not present in source-lookml. Looker join alias: gtm_targets_by_department_ext. Join: LEFT OUTER many_to_one on date_date + department + deal_allocation.'] {
+  target_key varchar [pk, note: 'Synthetic diagram key only; not observed in this source bundle.']
+  date_date date
+  department varchar
+  deal_allocation varchar
+}
+
+Table flip_gtm_sales_pipeline_snapshot [headercolor: #F9A825, note: 'External/stub. Referenced by internal_marketing.model.lkml but view file is not present in source-lookml. Looker role alias: hubspot_pipeline_volume_shapshots. Join: FULL OUTER many_to_many on date/allocation.'] {
+  snapshot_key varchar [pk, note: 'Synthetic diagram key only; not observed in this source bundle.']
+  period_date date
+  deal_allocation varchar
+}
+
+Table flip_gtm_partner_pipeline_snapshot [headercolor: #FBC02D, note: 'External/stub. Referenced by internal_marketing.model.lkml but view file is not present in source-lookml. Looker role alias: hubspot_partner_pipeline_volume_snapshots. Join: FULL OUTER many_to_many on week/allocation.'] {
+  snapshot_key varchar [pk, note: 'Synthetic diagram key only; not observed in this source bundle.']
+  period_week_date date
+  deal_allocation varchar
+}
+
+Table flip_contacts_lead [headercolor: #8E24AA, note: 'External/stub. Source view hubspot_contacts_all_ext is referenced but absent from source-lookml. Role alias: hubspot_contacts_lead. Looker join: FULL OUTER one_to_many.'] {
+  contact_id varchar [pk]
+  foreign_key_lead_marketing_filters_allocation varchar
+}
+
+Table flip_contacts_mql [headercolor: #8E24AA, note: 'External/stub. Source view hubspot_contacts_all_ext is referenced but absent from source-lookml. Role alias: hubspot_contacts_mql. Looker join: FULL OUTER one_to_many.'] {
+  contact_id varchar [pk]
+  foreign_key_mql_marketing_filters_allocation varchar
+}
+
+Table flip_contacts_sql [headercolor: #8E24AA, note: 'External/stub. Source view hubspot_contacts_all_ext is referenced but absent from source-lookml. Role alias: hubspot_contacts_sql. Looker join: FULL OUTER one_to_many.'] {
+  contact_id varchar [pk]
+  foreign_key_sql_marketing_filters_allocation varchar
+}
+
+Table flip_contacts_opportunity [headercolor: #8E24AA, note: 'External/stub. Source view hubspot_contacts_all_ext is referenced but absent from source-lookml. Role alias: hubspot_contacts_opportunity. Looker join: FULL OUTER one_to_many.'] {
+  contact_id varchar [pk]
+  foreign_key_opportunity_marketing_filters_allocation varchar
+}
+
+Table flip_contacts_created_at [headercolor: #8E24AA, note: 'External/stub. Source view hubspot_contacts_all_ext is referenced but absent from source-lookml. Role alias: hubspot_contacts_all / Contact Lifecycle #0 Create Date. Looker join: FULL OUTER one_to_many.'] {
+  contact_id varchar [pk]
+  foreign_key_created_at_date_marketing_filters_allocation varchar
+}
+
+Table flip_hubspot_calls_sales [headercolor: #6D4C41, note: 'External/stub. Source view hubspot_engagement_calls_sales_ext is referenced but absent from source-lookml. Looker join: FULL OUTER many_to_many.'] {
+  activity_id varchar [pk]
+  joining_key_date_owner varchar
+}
+
+Table flip_hubspot_emails_sales [headercolor: #546E7A, note: 'External/stub. Source view hubspot_engagement_emails_sales_ext is referenced but absent from source-lookml. Looker join: FULL OUTER many_to_many.'] {
+  activity_id varchar [pk]
+  joining_key_date_owner varchar
+}
+
+Table flip_hubspot_meetings_by_meeting_date [headercolor: #00ACC1, note: 'External/stub. Source view hubspot_engagement_meetings_sales_ext is referenced but absent from source-lookml. Role: hubspot_engagement_meetings_sales_ext. Looker join: FULL OUTER many_to_many.'] {
+  meeting_id varchar [pk]
+  joining_key_date_owner varchar
+}
+
+Table flip_hubspot_meetings_by_create_date [headercolor: #00ACC1, note: 'External/stub. Source view hubspot_engagement_meetings_sales_ext is referenced but absent from source-lookml. Role alias: meetings_on_create_date. Looker join: FULL OUTER many_to_many.'] {
+  meeting_id varchar [pk]
+  joining_key_create_date_owner varchar
+}
+
+Table flip_salesloft_meetings_held [headercolor: #3949AB, note: 'External/stub. Source view salesloft_meetings_held_ext is referenced but absent from source-lookml. Role alias: salesloft_meetings_occured_at_date. Looker join: FULL OUTER many_to_many.'] {
+  meeting_id varchar [pk]
+  foreign_key_date_name varchar
+}
+
+Table flip_marketing_influence_for_sao [headercolor: #E53935, note: 'External/stub. Source view hubspot_deal_marketing_influence_touchpoint_ext is referenced but absent from source-lookml. Role alias: hubspot_sao_marketing_influenced. Looker join: LEFT OUTER many_to_many from hubspot_sao.deal_id, plus date window and New Business/Upsell predicates.'] {
+  touchpoint_id varchar [pk]
+  deal_id varchar
+  event_date_date date
+  created_at_date_date date
+  dmt_sao_date date
+}
+
+Table flip_marketing_influence_for_closed_won [headercolor: #E53935, note: 'External/stub. Source view hubspot_deal_marketing_influence_touchpoint_ext is referenced but absent from source-lookml. Role alias: hubspot_closed_won_marketing_influenced. Looker join: LEFT OUTER many_to_many from hubspot_closed_won.deal_id, plus date window and New Business/Upsell predicates.'] {
+  touchpoint_id varchar [pk]
+  deal_id varchar
+  event_date_date date
+  created_at_date_date date
+  dmt_closed_won_date date
+}
+
+// Current allocation Explore role-playing deal aliases.
+Ref: flip_funnel_allocation.primary_key < flip_deals_sal.foreign_key_sal_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_sao.foreign_key_sao_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_solution_design.foreign_key_solution_design_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_evaluation.foreign_key_evaluation_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_proposal.foreign_key_proposal_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_negotiation.foreign_key_negotiations_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_closing_validation.foreign_key_closing_validation_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_closed_won.foreign_key_closed_won_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_closed_lost.foreign_key_closed_lost_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_close_date.foreign_key_close_date_marketing_filters_allocation
+Ref: flip_funnel_allocation.primary_key < flip_deals_expected_sd_date.foreign_key_expected_sd_date_marketing_filters_allocation
+
+// Current allocation Explore non-deal joins.
+Ref: flip_funnel_allocation.(date_date, deal_source_channel_department_hubspot, deal_allocation) > flip_gtm_targets_by_department.(date_date, department, deal_allocation)
+Ref: flip_funnel_allocation.(date_date, deal_allocation) <> flip_gtm_sales_pipeline_snapshot.(period_date, deal_allocation)
+Ref: flip_funnel_allocation.(date_date, deal_allocation) <> flip_gtm_partner_pipeline_snapshot.(period_week_date, deal_allocation)
+Ref: flip_funnel_allocation.foreign_key_contacts_table < flip_contacts_lead.foreign_key_lead_marketing_filters_allocation
+Ref: flip_funnel_allocation.foreign_key_contacts_table < flip_contacts_mql.foreign_key_mql_marketing_filters_allocation
+Ref: flip_funnel_allocation.foreign_key_contacts_table < flip_contacts_sql.foreign_key_sql_marketing_filters_allocation
+Ref: flip_funnel_allocation.foreign_key_contacts_table < flip_contacts_opportunity.foreign_key_opportunity_marketing_filters_allocation
+Ref: flip_funnel_allocation.foreign_key_contacts_table < flip_contacts_created_at.foreign_key_created_at_date_marketing_filters_allocation
+Ref: flip_funnel_allocation.foreign_key_bdr_targets <> flip_hubspot_calls_sales.joining_key_date_owner
+Ref: flip_funnel_allocation.foreign_key_bdr_targets <> flip_hubspot_emails_sales.joining_key_date_owner
+Ref: flip_funnel_allocation.foreign_key_bdr_targets <> flip_hubspot_meetings_by_meeting_date.joining_key_date_owner
+Ref: flip_funnel_allocation.foreign_key_bdr_targets <> flip_hubspot_meetings_by_create_date.joining_key_create_date_owner
+Ref: flip_funnel_allocation.foreign_key_bdr_targets <> flip_salesloft_meetings_held.foreign_key_date_name
+Ref: flip_deals_sao.deal_id <> flip_marketing_influence_for_sao.deal_id
+Ref: flip_deals_closed_won.deal_id <> flip_marketing_influence_for_closed_won.deal_id

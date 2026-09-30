@@ -16,8 +16,9 @@ Three ways to give Seed an Oct-Sep fiscal year, each in its own folder. **The fo
 | `solution-b-fiscal-labels/` | `seed_b_orders`, `seed_b`, page `seed_fy_solution_b` | Huy's: same shift, exposed only as text labels |
 | `solution-c-date-dimension/` | `seed_c_dates`, `seed_c_dates_signup`, `seed_c_period`, `seed_c`, page `seed_fy_solution_c` | **The recommendation.** Fiscal columns on the **date dimension** |
 | `fiscal-year-poc/` | `seed_fy_poc_*`, page `seed_fy_poc_fiscal_calendar` | Relative FY/FQ/month windows + switchable grain, built twice: **SQL vs AQL** |
+| `multiple-date-fields/` | `seed_md_*`, page `seed_md_fiscal_dashboard` | **Two date fields on one fact**, one fiscal calendar, join switched by a Date Basis param |
 
-`fiscal-year-poc/` is a later addition and not one of the three solutions; it demonstrates relative fiscal windows and how much of the modelling AQL can carry without hand-written SQL.
+`fiscal-year-poc/` and `multiple-date-fields/` are later additions and not among the three solutions. The first demonstrates relative fiscal windows and how much of the modelling AQL can carry without hand-written SQL. The second answers Seed's follow-up question — several MSTR datasets carry more than one date per row (pledge date *and* close date) — by joining every date field to a **single** fiscal date dimension and switching the active join per metric with `with_relationships`, rather than adding a date-role model per field. It is brand-themed and is the one to open when that question comes up.
 
 Each folder has its own `AGENTS.md` with that solution's gotchas. Read the folder you are working in; do not assume the others apply.
 
@@ -64,7 +65,18 @@ C defines the offset as a row-level `@sql` comparison against `CURRENT_DATE`, so
 
 ### Multiple date fields
 
-Lori noted the relevant date differs per dataset (forecast uses close date). Only ONE relationship to the date dimension can be active **per model pair** — two different date models can each have an active relationship to the same fact. For a second date role, extend the date dimension again into a role model with its own active relationship. Solution C demos this (`seed_c_dates_signup`, three lines, zero re-declared fields). The documented alternative, `with_relationships()` in each metric, scales with metrics × roles rather than roles alone.
+Lori noted the relevant date differs per dataset (forecast uses close date); they later asked the sharper version — several MSTR datasets carry more than one date per row (pledge date *and* close/transaction date), so does the fiscal model work with that, or must you pick a single join key?
+
+Only ONE relationship to the date dimension can be active **per model pair**, so there are two ways to answer, and **both are built here**. Pick per conversation:
+
+| | `solution-c-date-dimension/` — a date role per field | `multiple-date-fields/` — one dimension, switched join |
+|---|---|---|
+| How | Extend the date dimension again into a role model with its own active relationship (`seed_c_dates_signup`, three lines, zero re-declared fields) | Join every date field to the **same** dimension, one active, and switch per metric with `with_relationships` driven by a Date Basis param |
+| Cost | Scales with **roles** — nothing per metric | Scales with **metrics × dates** — one `case()` per basis-aware metric |
+| Field list | One `Fiscal Year` **per date field** | **One** `Fiscal Year`, however many dates |
+| Can cross the two dates in one report | **Yes** — pledge FY × close FY cross-tab | No — one basis at a time (two hardcoded metrics on one axis is as close as it gets) |
+
+Role models are cheaper to maintain; the switched join is what Seed asked for, because their datasets carry several dates each and one `Fiscal Year` in the picker is the point — it also mirrors MicroStrategy's date-type selector. Lead with `multiple-date-fields/` when the question is "we have many date fields", and reach for C's role model when someone wants to compare two dates against each other in one report.
 
 ### Approaches already tried and rejected
 

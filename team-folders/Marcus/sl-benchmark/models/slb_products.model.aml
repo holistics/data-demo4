@@ -1,10 +1,10 @@
 Model slb_products {
   type: 'table'
   label: 'SLB Products'
-  description: 'Products listed on the platform (testdb.ecommerce via demo_public).'
-  data_source_name: 'demo_public'
+  description: 'Products listed on the platform (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
-  table_name: '"ecommerce"."products"'
+  table_name: '"benchmark"."products"'
 
   dimension id {
     label: 'Product Id'

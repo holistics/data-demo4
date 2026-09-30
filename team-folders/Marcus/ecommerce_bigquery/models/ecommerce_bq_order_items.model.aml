@@ -1,0 +1,214 @@
+Model ecommerce_bq_order_items {
+  type: 'table'
+  label: 'Order Items'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.fct_order_items'
+
+  dimension order_item_id {
+    label: 'Order Item ID'
+    type: 'text'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.order_item_id }};;
+  }
+
+  dimension order_id {
+    label: 'Order ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+
+  dimension product_id {
+    label: 'Product ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.status }};;
+  }
+
+  dimension is_fulfilled {
+    label: 'Is Fulfilled'
+    type: 'truefalse'
+    hidden: true
+    definition: @sql {{ #SOURCE.is_fulfilled }};;
+  }
+
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: true
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  dimension order_date {
+    label: 'Order Date'
+    type: 'date'
+    hidden: true
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+
+  dimension discount {
+    label: 'Discount'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.discount }};;
+  }
+
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    definition: @sql {{ #SOURCE.quantity }};;
+  }
+
+  dimension unit_price {
+    label: 'Unit Price'
+    type: 'number'
+    definition: @sql {{ #SOURCE.unit_price }};;
+  }
+
+  dimension unit_cost {
+    label: 'Unit Cost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.unit_cost }};;
+  }
+
+  dimension category_name {
+    label: 'Category Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_name }};;
+  }
+
+  dimension parent_category_name {
+    label: 'Parent Category Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.parent_category_name }};;
+  }
+
+  dimension category_group {
+    label: 'Category Group'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group }};;
+  }
+
+  dimension category_group_slug {
+    label: 'Category Group Slug'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group_slug }};;
+  }
+
+  dimension gross_value {
+    label: 'Gross Value'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.gross_value }};;
+  }
+
+  dimension revenue {
+    label: 'Revenue'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue }};;
+  }
+
+  dimension cost {
+    label: 'Cost'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost }};;
+  }
+
+  dimension gross_profit {
+    label: 'Gross Profit'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.gross_profit }};;
+  }
+
+  dimension revenue_electronics {
+    label: 'Revenue Electronics'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_electronics }};;
+  }
+
+  dimension revenue_groceries {
+    label: 'Revenue Groceries'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_groceries }};;
+  }
+
+  dimension revenue_home_living {
+    label: 'Revenue Home Living'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_home_living }};;
+  }
+
+  dimension revenue_fashion {
+    label: 'Revenue Fashion'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_fashion }};;
+  }
+
+  dimension revenue_beauty {
+    label: 'Revenue Beauty'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.revenue_beauty }};;
+  }
+
+  dimension cost_electronics {
+    label: 'Cost Electronics'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_electronics }};;
+  }
+
+  dimension cost_groceries {
+    label: 'Cost Groceries'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_groceries }};;
+  }
+
+  dimension cost_home_living {
+    label: 'Cost Home Living'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_home_living }};;
+  }
+
+  dimension cost_fashion {
+    label: 'Cost Fashion'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_fashion }};;
+  }
+
+  dimension cost_beauty {
+    label: 'Cost Beauty'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cost_beauty }};;
+  }
+}

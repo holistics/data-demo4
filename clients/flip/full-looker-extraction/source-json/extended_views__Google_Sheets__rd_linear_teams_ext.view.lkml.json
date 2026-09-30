@@ -1,0 +1,5 @@
+{
+ "original_path": "extended_views/Google_Sheets/rd_linear_teams_ext.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "include: \"/base_views/Google_Sheets/rd_linear_teams_base.view\"\n\nview: rd_linear_teams_ext {\n  extends: [rd_linear_teams_base]\n\n### DIMENSIONS ----------------\n\n    dimension: department {\n      type: string\n    }\n    dimension: team_name {\n      type: string\n    }\n  dimension: sub_team_name {\n    type:  string\n    }\n    measure: count {\n      type: count\n      drill_fields: [team_name]\n    }\n  }\n"
+}

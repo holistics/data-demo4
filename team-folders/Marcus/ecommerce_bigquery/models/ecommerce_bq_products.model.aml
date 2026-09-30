@@ -1,0 +1,91 @@
+Model ecommerce_bq_products {
+  type: 'table'
+  label: 'Products'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.dim_products'
+
+  dimension product_id {
+    label: 'Product ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+
+  dimension product_name {
+    label: 'Product Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.product_name }};;
+  }
+
+  dimension category_id {
+    label: 'Category ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_id }};;
+  }
+
+  dimension merchant_id {
+    label: 'Merchant ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.merchant_id }};;
+  }
+
+  dimension price {
+    label: 'Price'
+    type: 'number'
+    definition: @sql {{ #SOURCE.price }};;
+  }
+
+  dimension cost {
+    label: 'Cost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.cost }};;
+  }
+
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  dimension product_image_url {
+    label: 'Product Image URL'
+    type: 'text'
+    definition: @sql {{ #SOURCE.product_image_url }};;
+  }
+
+  dimension unit_margin_pct {
+    label: 'Unit Margin %'
+    type: 'number'
+    definition: @sql {{ #SOURCE.unit_margin_pct }};;
+  }
+
+  dimension category_name {
+    label: 'Category Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_name }};;
+  }
+
+  dimension parent_category_name {
+    label: 'Parent Category Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.parent_category_name }};;
+  }
+
+  dimension category_group {
+    label: 'Category Group'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group }};;
+  }
+
+  dimension category_group_slug {
+    label: 'Category Group Slug'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.category_group_slug }};;
+  }
+}

@@ -1,10 +1,10 @@
 Model slb_merchants {
   type: 'table'
   label: 'SLB Merchants'
-  description: 'Merchants supplying products (testdb.ecommerce via demo_public).'
-  data_source_name: 'demo_public'
+  description: 'Merchants supplying products (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
-  table_name: '"ecommerce"."merchants"'
+  table_name: '"benchmark"."merchants"'
 
   dimension id {
     label: 'Id'
@@ -20,6 +20,7 @@ Model slb_merchants {
   dimension city_id {
     label: 'City Id'
     type: 'number'
+    description: 'References slb_cities.id through an INACTIVE dataset relationship (the active path to slb_cities is slb_users.city_id). To attribute merchants to a city or country, activate it per measure: metric | with_relationships(slb_merchants.city_id > slb_cities.id).'
     definition: @sql {{ #SOURCE.city_id }};;
   }
 }

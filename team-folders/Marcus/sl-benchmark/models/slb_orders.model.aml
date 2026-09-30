@@ -1,10 +1,10 @@
 Model slb_orders {
   type: 'table'
   label: 'SLB Orders'
-  description: 'Benchmark copy of orders (testdb.ecommerce via demo_public). discount is a RATE 0..1.'
-  data_source_name: 'demo_public'
+  description: 'Benchmark copy of orders (Neon benchmark projection). discount is a RATE 0..1.'
+  data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
-  table_name: '"ecommerce"."orders"'
+  table_name: '"benchmark"."orders"'
 
   dimension id {
     label: 'Id'

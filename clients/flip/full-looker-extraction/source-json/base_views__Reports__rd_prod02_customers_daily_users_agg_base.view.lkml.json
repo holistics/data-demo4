@@ -1,0 +1,5 @@
+{
+ "original_path": "base_views/Reports/rd_prod02_customers_daily_users_agg_base.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "view: rd_prod02_customers_daily_users_agg_base {\n  sql_table_name: `fl-bi-p-poc.reports_poc.rd_prod02_customers_daily_users_agg` ;;\n\n  dimension_group: date_berlin {\n    type: time\n    timeframes: [raw, date, week, month, quarter, year]\n    convert_tz: no\n    datatype: date\n    sql: ${TABLE}.date_berlin ;;\n  }\n  dimension: dau {\n    type: number\n    sql: ${TABLE}.dau ;;\n  }\n  dimension: mau {\n    type: number\n    sql: ${TABLE}.mau ;;\n  }\n  dimension: users_created {\n    type: number\n    sql: ${TABLE}.users_created ;;\n  }\n  dimension: users_onboarded {\n    type: number\n    sql: ${TABLE}.users_onboarded ;;\n  }\n  dimension: wau {\n    type: number\n    sql: ${TABLE}.wau ;;\n  }\n  measure: count {\n    type: count\n  }\n}\n"
+}
