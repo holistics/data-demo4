@@ -1,0 +1,368 @@
+Dashboard sales_performance_deejy {
+  title: 'Sales Performance'
+  owner: 'di.hoang@holistics.io'
+  block title: TextBlock {
+    content: @md # Sales Performance
+Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and refunded orders) and platform **Revenue** (commission earned on NMV). ;;
+  }
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(map_categories.category)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block kpi_nmv: VizBlock {
+    label: 'NMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'NMV'
+        ref: r(demo_ecommerce_version_2.nmv)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_revenue: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Revenue'
+        ref: r(demo_ecommerce_version_2.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Orders'
+        ref: r(demo_ecommerce_version_2.total_orders)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_gmv: VizBlock {
+    label: 'GMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'GMV'
+        ref: r(demo_ecommerce_version_2.gmv)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block heading_trend: TextBlock {
+    content: @md ## Sales trend
+Follow fulfilled sales and platform earnings over time. ;;
+  }
+  block heading_drivers: TextBlock {
+    content: @md ## Sales drivers
+Compare revenue by category and identify the merchants generating fulfilled sales. ;;
+  }
+  block v_sales_trend: VizBlock {
+    label: 'Sales Trend'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Order Month'
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'NMV'
+            ref: r(demo_ecommerce_version_2.nmv)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Order Month'
+      }
+    }
+  }
+  block v_category_revenue: VizBlock {
+    label: 'Revenue by Category'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Category'
+        ref: r(map_categories.category)
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Category'
+      }
+    }
+  }
+  block v_merchant_nmv: VizBlock {
+    label: 'Merchant NMV'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull {
+          label: 'Merchant Name'
+          ref: r(ecommerce_merchants.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'NMV'
+          ref: r(demo_ecommerce_version_2.nmv)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'nmv'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'nmv'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+      }
+    }
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        'kpi_nmv',
+        'kpi_revenue',
+        'kpi_orders',
+        'kpi_gmv',
+        'v_sales_trend',
+        'v_category_revenue',
+        'v_merchant_nmv'
+      ]
+      field: r(ecommerce_orders.created_at)
+    },
+    FilterInteraction {
+      from: 'f_country'
+      to: [
+        'kpi_nmv',
+        'kpi_revenue',
+        'kpi_orders',
+        'kpi_gmv',
+        'v_sales_trend',
+        'v_category_revenue',
+        'v_merchant_nmv'
+      ]
+      field: r(ecommerce_countries.name)
+    },
+    FilterInteraction {
+      from: 'f_category'
+      to: [
+        'kpi_nmv',
+        'kpi_revenue',
+        'kpi_orders',
+        'kpi_gmv',
+        'v_sales_trend',
+        'v_category_revenue',
+        'v_merchant_nmv'
+      ]
+      field: r(map_categories.category)
+    }
+  ]
+  view: CanvasLayout {
+    label: 'Sales Performance'
+    width: 1300
+    height: 1240
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(320, 20, 940, 100)
+      layer: 1
+    }
+    block kpi_gmv {
+      position: pos(1040, 140, 220, 120)
+      layer: 1
+    }
+    block kpi_nmv {
+      position: pos(320, 140, 220, 120)
+      layer: 1
+    }
+    block f_country {
+      position: pos(20, 240, 280, 100)
+      layer: 1
+    }
+    block f_category {
+      position: pos(20, 360, 280, 100)
+      layer: 1
+    }
+    block kpi_orders {
+      position: pos(800, 140, 220, 120)
+      layer: 1
+    }
+    block kpi_revenue {
+      position: pos(560, 140, 220, 120)
+      layer: 1
+    }
+    block f_order_date {
+      position: pos(20, 120, 280, 100)
+      layer: 1
+    }
+    block heading_trend {
+      position: pos(320, 280, 940, 60)
+      layer: 1
+    }
+    block v_sales_trend {
+      position: pos(320, 360, 940, 320)
+      layer: 1
+    }
+    block v_merchant_nmv {
+      position: pos(800, 780, 460, 420)
+      layer: 1
+    }
+    block heading_drivers {
+      position: pos(320, 700, 940, 60)
+      layer: 1
+    }
+    block v_category_revenue {
+      position: pos(320, 780, 460, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.classic
+  settings {
+    autorun_on_open: true
+  }
+}
