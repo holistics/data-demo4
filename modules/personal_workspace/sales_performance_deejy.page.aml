@@ -3,7 +3,22 @@ Dashboard sales_performance_deejy {
   owner: 'di.hoang@holistics.io'
   block title: TextBlock {
     content: @md # Sales Performance
-Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and refunded orders) and platform **Revenue** (commission earned on NMV). ;;
+Track realized **NMV**—fulfilled sales after discounts, excluding cancelled and refunded orders—and platform **Revenue**, the commission earned on NMV. ;;
+    theme {
+      text {
+        font_family: 'Segoe UI, Arial, sans-serif'
+        font_color: '#FFFFFF'
+      }
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: '#0078D4'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#0078D4'
+      }
+    }
   }
   block f_order_date: FilterBlock {
     label: 'Order Date'
@@ -25,8 +40,11 @@ Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and
       field: r(ecommerce_countries.name)
     }
     default {
-      operator: 'matches'
+      operator: 'is'
       value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
     }
   }
   block f_category: FilterBlock {
@@ -37,14 +55,29 @@ Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and
       field: r(map_categories.category)
     }
     default {
-      operator: 'matches'
+      operator: 'is'
       value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
     }
   }
   block kpi_nmv: VizBlock {
     label: 'NMV'
     viz: MetricKpi {
       dataset: demo_ecommerce_version_2
+      theme {
+        metric_kpi {
+          label {
+            font_color: '#0F548C'
+            font_weight: 'semibold'
+          }
+          value {
+            font_color: '#0078D4'
+            font_weight: 'semibold'
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'NMV'
         ref: r(demo_ecommerce_version_2.nmv)
@@ -63,11 +96,34 @@ Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and
     settings {
       hide_label: true
     }
+    theme {
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: '#B3D6F2'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#E6F2FB'
+      }
+    }
   }
   block kpi_revenue: VizBlock {
     label: 'Revenue'
     viz: MetricKpi {
       dataset: demo_ecommerce_version_2
+      theme {
+        metric_kpi {
+          label {
+            font_color: '#5C2D91'
+            font_weight: 'semibold'
+          }
+          value {
+            font_color: '#7719AA'
+            font_weight: 'semibold'
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Total Revenue'
         ref: r(demo_ecommerce_version_2.revenue)
@@ -86,11 +142,34 @@ Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and
     settings {
       hide_label: true
     }
+    theme {
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: '#D9B8F2'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#F3E8FF'
+      }
+    }
   }
   block kpi_orders: VizBlock {
     label: 'Orders'
     viz: MetricKpi {
       dataset: demo_ecommerce_version_2
+      theme {
+        metric_kpi {
+          label {
+            font_color: '#006F65'
+            font_weight: 'semibold'
+          }
+          value {
+            font_color: '#007C70'
+            font_weight: 'semibold'
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Total Orders'
         ref: r(demo_ecommerce_version_2.total_orders)
@@ -109,11 +188,34 @@ Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and
     settings {
       hide_label: true
     }
+    theme {
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: '#A7DED6'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#E0F5F1'
+      }
+    }
   }
   block kpi_gmv: VizBlock {
     label: 'GMV'
     viz: MetricKpi {
       dataset: demo_ecommerce_version_2
+      theme {
+        metric_kpi {
+          label {
+            font_color: '#8A5A00'
+            font_weight: 'semibold'
+          }
+          value {
+            font_color: '#C19C00'
+            font_weight: 'semibold'
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'GMV'
         ref: r(demo_ecommerce_version_2.gmv)
@@ -131,6 +233,17 @@ Track realized **NMV** (fulfilled sales after discounts, excluding cancelled and
     }
     settings {
       hide_label: true
+    }
+    theme {
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: '#F2D98B'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#FFF4CE'
+      }
     }
   }
   block heading_trend: TextBlock {
@@ -302,66 +415,157 @@ Compare revenue by category and identify the merchants generating fulfilled sale
   view: CanvasLayout {
     label: 'Sales Performance'
     width: 1300
-    height: 1240
+    height: 1320
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(320, 20, 940, 100)
+      position: pos(20, 20, 1240, 120)
       layer: 1
     }
     block kpi_gmv {
-      position: pos(1040, 140, 220, 120)
+      position: pos(1040, 160, 220, 120)
       layer: 1
     }
     block kpi_nmv {
-      position: pos(320, 140, 220, 120)
+      position: pos(320, 160, 220, 120)
       layer: 1
     }
     block f_country {
-      position: pos(20, 240, 280, 100)
+      position: pos(20, 280, 280, 100)
       layer: 1
     }
     block f_category {
-      position: pos(20, 360, 280, 100)
+      position: pos(20, 400, 280, 100)
       layer: 1
     }
     block kpi_orders {
-      position: pos(800, 140, 220, 120)
+      position: pos(800, 160, 220, 120)
       layer: 1
     }
     block kpi_revenue {
-      position: pos(560, 140, 220, 120)
+      position: pos(560, 160, 220, 120)
       layer: 1
     }
     block f_order_date {
-      position: pos(20, 120, 280, 100)
+      position: pos(20, 160, 280, 100)
       layer: 1
     }
     block heading_trend {
-      position: pos(320, 280, 940, 60)
+      position: pos(320, 300, 940, 100)
       layer: 1
     }
     block v_sales_trend {
-      position: pos(320, 360, 940, 320)
+      position: pos(320, 420, 940, 320)
       layer: 1
     }
     block v_merchant_nmv {
-      position: pos(800, 780, 460, 420)
+      position: pos(800, 880, 460, 420)
       layer: 1
     }
     block heading_drivers {
-      position: pos(320, 700, 940, 60)
+      position: pos(320, 760, 940, 100)
       layer: 1
     }
     block v_category_revenue {
-      position: pos(320, 780, 460, 420)
+      position: pos(320, 880, 460, 420)
       layer: 1
     }
     mobile {
       mode: 'auto'
     }
   }
-  theme: H.themes.classic
+  theme {
+    background {
+      bg_color: '#F5F5F5'
+    }
+    canvas {
+      border {
+        border_width: 1
+        border_radius: 2
+        border_color: '#E1E1E1'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#FFFFFF'
+      }
+      shadow: 'none'
+      opacity: 1
+    }
+    block {
+      label {
+        font_family: 'Segoe UI, Arial, sans-serif'
+        font_color: '#242424'
+        font_size: 14
+        font_weight: 'semibold'
+        font_style: 'normal'
+      }
+      text {
+        font_family: 'Segoe UI, Arial, sans-serif'
+        font_color: '#242424'
+        font_size: 14
+        font_weight: 'normal'
+        font_style: 'normal'
+      }
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: '#E1E1E1'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#FFFFFF'
+      }
+      padding: 16
+      shadow: 'sm'
+      opacity: 1
+    }
+    viz {
+      table {
+        general {
+          bg_color: '#FFFFFF'
+          hover_color: '#F3F9FD'
+          banding_color: '#F8F8F8'
+          font_size: 14
+          font_color: '#242424'
+          font_family: 'Segoe UI, Arial, sans-serif'
+          border_color: '#E1E1E1'
+          border_width: 1
+          grid_color: '#E1E1E1'
+        }
+        header {
+          bg_color: '#0078D4'
+          font_size: 14
+          font_weight: 'semibold'
+          font_color: '#FFFFFF'
+        }
+        sub_header {
+          bg_color: '#F3F9FD'
+          font_size: 14
+          font_weight: 'semibold'
+          font_color: '#242424'
+        }
+        sub_title {
+          font_size: 14
+          font_weight: 'normal'
+          font_color: '#616161'
+        }
+      }
+      metric_kpi {
+        label {
+          font_family: 'Segoe UI, Arial, sans-serif'
+          font_color: '#616161'
+          font_size: 13
+          font_weight: 'semibold'
+        }
+        value {
+          font_family: 'Segoe UI, Arial, sans-serif'
+          font_color: '#0078D4'
+          font_size: 28
+          font_weight: 'semibold'
+        }
+      }
+    }
+  }
   settings {
     autorun_on_open: true
   }
