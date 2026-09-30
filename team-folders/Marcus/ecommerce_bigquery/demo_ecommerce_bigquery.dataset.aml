@@ -169,7 +169,7 @@ Simplified BigQuery twin of `demo_ecommerce_version_2`, built on the dbt project
   metric margin {
     label: "Margin"
     type: "number"
-    description: ""
+    description: "Margin of beauty and groceries categories"
     definition: @aql (revenue_beauty + revenue_groceries - cost_beauty - cost_groceries) / (revenue_beauty + revenue_groceries);;
     format: "none"
   }
