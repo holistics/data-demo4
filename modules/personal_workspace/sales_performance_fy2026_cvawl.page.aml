@@ -418,6 +418,8 @@ Monitor platform commission, demand, basket size, and fulfilment across fiscal p
     dark: H.themes.charcoal
   }
   settings {
+    timezone: 'Asia/Ho_Chi_Minh'
     autorun_on_open: true
+    autorun_on_changes: true
   }
 }
