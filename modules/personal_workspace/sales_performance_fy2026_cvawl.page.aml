@@ -1,0 +1,423 @@
+Dashboard sales_performance_fy2026_cvawl {
+  title: 'Sales Performance FY2026'
+  owner: 'di.hoang@holistics.io'
+  block title: TextBlock {
+    content: @md # Sales Performance FY2026
+Monitor platform commission, demand, basket size, and fulfilment across fiscal periods. Use the filter rail to focus the view, then use **Compare To** for period-over-period context.;;
+  }
+  block footnote: TextBlock {
+    content: @md *Revenue is platform commission on fulfilled orders. Country is the available proxy for Region in this dashboard.* ;;
+  }
+  block kpi_revenue: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Revenue'
+        ref: r(demo_ecommerce_version_2.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Orders'
+        ref: r(demo_ecommerce_version_2.total_orders)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_aov: VizBlock {
+    label: 'AOV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'AOV'
+        ref: r(demo_ecommerce_version_2.aov)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block kpi_fulfilment: VizBlock {
+    label: 'Fulfilment'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Order Fulfillment Rate'
+        ref: r(demo_ecommerce_version_2.order_fulfillment_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block monthly_performance: VizBlock {
+    label: 'Monthly Revenue & Fulfilment'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Fiscal Month'
+        ref: r(ecommerce_orders.created_at_fy)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Total Revenue'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      y_axis {
+        label: 'Order Fulfillment Rate'
+        settings {
+          alignment: 'right'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Order Fulfillment Rate'
+            ref: r(demo_ecommerce_version_2.order_fulfillment_rate)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Fiscal Month'
+      }
+    }
+  }
+  block category_mix: VizBlock {
+    label: 'Revenue by Product Category'
+    viz: PieChart {
+      dataset: demo_ecommerce_version_2
+      legend: VizFieldFull {
+        label: 'Product Category'
+        ref: r(map_categories.category)
+      }
+      series {
+        field: VizFieldFull {
+          label: 'Total Revenue'
+          ref: r(demo_ecommerce_version_2.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        sort: 'desc'
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block top_products: VizBlock {
+    label: 'Top 8 Products by Revenue'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Product Name'
+        ref: r(ecommerce_products.name)
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            label: 'Total Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 8
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Product Name'
+      }
+    }
+  }
+  block country_performance: VizBlock {
+    label: 'Country Performance'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull {
+          label: 'Country Name'
+          ref: r(ecommerce_countries.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Total Revenue'
+          ref: r(demo_ecommerce_version_2.revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'total_revenue'
+        },
+        VizFieldFull {
+          label: 'Total Orders'
+          ref: r(demo_ecommerce_version_2.total_orders)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          label: 'AOV'
+          ref: r(demo_ecommerce_version_2.aov)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        wrap_header_text: true
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'total_revenue'
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block fiscal_date: FilterBlock {
+    label: 'Fiscal Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at_fy)
+    }
+  }
+  block country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+  }
+  block product_category: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(map_categories.category)
+    }
+  }
+  block compare_to: PopBlock {
+    label: 'Compare To'
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'fiscal_date'
+      to: [
+        'monthly_performance'
+      ]
+      field: r(ecommerce_orders.created_at_fy)
+    },
+    FilterInteraction {
+      from: 'country'
+      to: [
+        'kpi_revenue',
+        'kpi_orders',
+        'kpi_aov',
+        'kpi_fulfilment',
+        'monthly_performance',
+        'category_mix',
+        'top_products',
+        'country_performance'
+      ]
+      field: r(ecommerce_countries.name)
+    },
+    FilterInteraction {
+      from: 'product_category'
+      to: [
+        'kpi_revenue',
+        'kpi_orders',
+        'kpi_aov',
+        'kpi_fulfilment',
+        'monthly_performance',
+        'category_mix',
+        'top_products',
+        'country_performance'
+      ]
+      field: r(map_categories.category)
+    },
+    PopInteraction {
+      from: 'compare_to'
+      to: [
+        'kpi_revenue',
+        'kpi_orders',
+        'kpi_aov',
+        'kpi_fulfilment',
+        'monthly_performance'
+      ]
+      field: r(ecommerce_orders.created_at_fy)
+    }
+  ]
+  view: CanvasLayout {
+    label: 'Sales Performance FY2026'
+    width: 1500
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(220, 20, 1260, 100)
+      layer: 1
+    }
+    block country {
+      position: pos(20, 180, 180, 140)
+      layer: 1
+    }
+    block kpi_aov {
+      position: pos(860, 140, 300, 140)
+      layer: 1
+    }
+    block footnote {
+      position: pos(220, 1120, 1260, 60)
+      layer: 1
+    }
+    block compare_to {
+      position: pos(20, 500, 180, 140)
+      layer: 1
+    }
+    block kpi_orders {
+      position: pos(540, 140, 300, 140)
+      layer: 1
+    }
+    block fiscal_date {
+      position: pos(20, 20, 180, 140)
+      layer: 1
+    }
+    block kpi_revenue {
+      position: pos(220, 140, 300, 140)
+      layer: 1
+    }
+    block category_mix {
+      position: pos(1060, 300, 420, 380)
+      layer: 1
+    }
+    block top_products {
+      position: pos(220, 700, 620, 400)
+      layer: 1
+    }
+    block kpi_fulfilment {
+      position: pos(1180, 140, 300, 140)
+      layer: 1
+    }
+    block product_category {
+      position: pos(20, 340, 180, 140)
+      layer: 1
+    }
+    block country_performance {
+      position: pos(860, 700, 620, 400)
+      layer: 1
+    }
+    block monthly_performance {
+      position: pos(220, 300, 820, 380)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  settings {
+    autorun_on_open: true
+  }
+}
