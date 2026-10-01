@@ -9,7 +9,6 @@ Governed definitions (the whole point of the benchmark):
 - NMV     = sum(quantity * price * (1 - discount)) EXCLUDING cancelled/refunded. discount is a RATE 0..1.
 - Revenue = 50% of discounted current-list-price item value from DELIVERED orders only, by order-placement date.
 - AOV     = GMV / total_orders.
-- Closing stock units = sum the latest product/location stock balance on or before the period end.
 
 Inactive relationships (not listed by fetch_dataset): slb_merchants.city_id > slb_cities.id. The active path to slb_cities
 is the customer's city (slb_users.city_id). Merchant-side geography must activate the inactive path per measure with
@@ -27,8 +26,6 @@ is the customer's city (slb_users.city_id). Merchant-side geography must activat
     slb_countries,
     slb_categories,
     slb_merchants,
-    slb_stock_snapshots,
-    slb_stock_daily_balances,
   ]
 
   relationships: [
@@ -40,8 +37,6 @@ is the customer's city (slb_users.city_id). Merchant-side geography must activat
     relationship(slb_products.category_id > slb_categories.id, true),
     relationship(slb_products.merchant_id > slb_merchants.id, true),
     relationship(slb_merchants.city_id > slb_cities.id, false),
-    relationship(slb_stock_snapshots.product_id > slb_products.id, true),
-    relationship(slb_stock_daily_balances.product_id > slb_products.id, true),
   ]
 
   // ── buyer/cohort dimensions (user grain) ──────────────────────────────────
