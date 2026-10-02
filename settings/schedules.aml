@@ -5,5 +5,11 @@ const schedules = [
   PreAggregateSchedule  {
     cron: '15 20 * * *'
     object: movie_ratings_analysis
+  },
+
+  AiSchedule {
+    cron: '0 8 * * *'
+    targets: [ping]
+    run_as: 'tien.tt@holistics.io'
   }
 ]
