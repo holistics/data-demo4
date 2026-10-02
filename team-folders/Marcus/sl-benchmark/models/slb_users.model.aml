@@ -1,0 +1,35 @@
+Model slb_users {
+  type: 'table'
+  label: 'SLB Users'
+  description: 'Users on the ecommerce platform (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"benchmark"."users"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension sign_up_date {
+    label: 'Sign Up Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.sign_up_date }};;
+  }
+  dimension sign_up_at {
+    label: 'Sign Up At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.sign_up_at }};;
+  }
+  dimension gender {
+    label: 'Gender'
+    type: 'text'
+    definition: @sql {{ #SOURCE.gender }};;
+  }
+  dimension city_id {
+    label: 'City Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.city_id }};;
+  }
+}

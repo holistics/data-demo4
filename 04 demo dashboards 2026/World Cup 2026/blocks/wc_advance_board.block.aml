@@ -1,0 +1,296 @@
+// Groups tab — the Advancement Projector: a brushed-steel magnet board. Each group A–L is a machined
+// lane; the four teams are glossy flag-faced magnet pucks slid along the lane by their Monte-Carlo odds
+// to reach the Round of 32 (position = probability, left = long shot, right = into the knockouts). Tap a
+// puck → a native Popover-API card with that team's full R32→Champion projection (the popover renders in
+// the browser top layer, so it escapes the viz block's overflow:hidden clip). Own bespoke material
+// (brushed steel + magnet discs) — NOT the chalk slate hq_scout uses, NOT the clipboard.
+
+Func wc_advance_board() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Ord'
+          ref: r(wc_teams.group_order)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Grp'
+          ref: r(wc_teams.group_code)
+        },
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_teams.code)
+        },
+        VizFieldFull {
+          label: 'TeamName'
+          ref: r(wc_teams.name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_teams.flag_url)
+        },
+        VizFieldFull {
+          label: 'Color'
+          ref: r(wc_teams.color_hex)
+        },
+        VizFieldFull {
+          label: 'EloRank'
+          ref: r(wc_team_snapshot.elo_rank)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Pct'
+          ref: r(wc_team_snapshot.p_r32_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'R16'
+          ref: r(wc_team_snapshot.p_r16_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'QF'
+          ref: r(wc_team_snapshot.p_qf_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'SF'
+          ref: r(wc_team_snapshot.p_sf_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Fin'
+          ref: r(wc_team_snapshot.p_final_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Chmp'
+          ref: r(wc_team_snapshot.p_champion_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          label: 'RunLabel'
+          ref: r(wc_team_snapshot.run_date_label)
+        }
+      ]
+      content: @md
+<style>
+/* THE ADVANCEMENT PROJECTOR — bespoke material: a brushed-steel tactics board bolted to the wall.
+   Twelve machined lanes (groups A–L); each team is a glossy flag-faced magnet puck whose horizontal
+   position IS its odds to reach the Round of 32 (long shot at the rail, locked-in at the gate). Tap a
+   puck for a top-layer Popover card with the full survival ladder. Surface is the only thing bespoke;
+   type uses the SHARED scale (Saira Condensed: eyebrow 10px/700/.2em, 9px engraved, .wc-num tabular). */
+.mb-wrap { width:100%; height:100%; box-sizing:border-box; padding:0;
+  --eng:#e7ecf1; --eng-mut:rgba(220,227,235,.86); --gold:#ffd35c; }
+.mb-plate { position:relative; height:100%; box-sizing:border-box; padding:15px 20px 13px; display:flex;
+  flex-direction:column; border-radius:10px; overflow:hidden;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,0) 16%, rgba(0,0,0,0) 80%, rgba(0,0,0,.26)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px),
+    linear-gradient(118deg, #6d747c 0%, #494f56 26%, #353a41 52%, #4a5159 74%, #2f343a 100%);
+  box-shadow:0 16px 34px -16px var(--shadow-dir,rgba(0,0,0,.6)), 0 2px 0 rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(0,0,0,.45), inset 0 -3px 10px rgba(0,0,0,.4);
+  animation:mb-plate-in .5s cubic-bezier(.2,.7,.25,1) both; }
+.mb-plate::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:linear-gradient(108deg, transparent 30%, rgba(255,255,255,.09) 47%, rgba(255,255,255,.02) 53%, transparent 64%); }
+.mb-bolt { position:absolute; width:8px; height:8px; border-radius:50%; z-index:4;
+  background:radial-gradient(circle at 36% 30%, #d6dbe0, #888f96 56%, #4b5258 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.55), inset 0 0 0 1px rgba(0,0,0,.3); }
+.mb-bolt.tl { top:9px; left:9px; } .mb-bolt.tr { top:9px; right:9px; }
+.mb-bolt.bl { bottom:9px; left:9px; } .mb-bolt.br { bottom:9px; right:9px; }
+/* header */
+.mb-head { position:relative; z-index:2; display:flex; align-items:flex-end; justify-content:space-between;
+  gap:14px; padding:0 4px 10px; margin-bottom:9px; border-bottom:1px solid rgba(0,0,0,.4);
+  box-shadow:0 1px 0 rgba(255,255,255,.1); }
+.mb-tt { display:flex; flex-direction:column; gap:3px; }
+.mb-eye { font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--eng-mut); }
+.mb-eye b { color:var(--gold,#f2c84b); font-weight:700; }
+.mb-title { font-family:var(--font-disp); font-weight:800; font-size:19px; line-height:1; letter-spacing:.02em;
+  text-transform:uppercase; color:var(--eng); text-shadow:0 1px 0 rgba(0,0,0,.55), 0 -1px 0 rgba(255,255,255,.12); }
+.mb-sub { text-align:right; font-family:var(--font-disp); font-weight:700; font-size:9px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--eng-mut); max-width:380px; line-height:1.5; }
+.mb-sub b { color:var(--eng); font-weight:800; }
+/* lanes region (scaffold + pucks share inset math) */
+.mb-lanes { position:relative; z-index:1; flex:1; min-height:0; }
+.mb-scaffold { position:absolute; inset:0; display:flex; flex-direction:column; }
+.mb-lane { flex:1; min-height:0; position:relative; display:flex; align-items:center; }
+.mb-lane + .mb-lane { border-top:1px solid rgba(0,0,0,.32); box-shadow:0 -1px 0 rgba(255,255,255,.05); }
+.mb-rail { width:56px; flex:none; display:flex; align-items:center; justify-content:center; align-self:stretch;
+  background:linear-gradient(118deg, rgba(0,0,0,.22), rgba(0,0,0,.05)); box-shadow:inset -1px 0 0 rgba(0,0,0,.35), inset 1px 0 0 rgba(255,255,255,.06); }
+.mb-grp { font-family:var(--font-disp); font-weight:800; font-size:17px; letter-spacing:.04em; color:var(--eng);
+  text-shadow:0 1px 0 rgba(255,255,255,.14), 0 -1px 1px rgba(0,0,0,.6); }
+.mb-track { position:relative; flex:1; align-self:center; height:11px; margin:0 14px 0 13px; border-radius:6px;
+  background:
+    linear-gradient(90deg, rgba(220,48,26,.62), rgba(216,150,26,.3) 50%, rgba(30,196,98,.66)),
+    linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.04) 45%, rgba(255,255,255,.08));
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.08); }
+.mb-gate { width:44px; flex:none; align-self:stretch; position:relative; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(118deg, rgba(0,0,0,.32), rgba(0,0,0,.1)); box-shadow:inset 1px 0 0 rgba(0,0,0,.4), inset -1px 0 0 rgba(255,255,255,.05); }
+.mb-gate .net { width:19px; height:19px; color:rgba(242,200,75,.72); line-height:0; }
+.mb-grid { position:absolute; top:6px; bottom:6px; left:69px; right:58px; pointer-events:none; }
+.mb-grid i { position:absolute; top:0; bottom:0; width:1px; background:rgba(255,255,255,.06); box-shadow:1px 0 0 rgba(0,0,0,.18); }
+.mb-grid i.g25 { left:25%; } .mb-grid i.g50 { left:50%; } .mb-grid i.g75 { left:75%; }
+/* pucks overlay — left/right insets match rail(56)+margin(13) and gate(44)+margin(14) */
+.mb-pucks { position:absolute; top:0; bottom:0; left:69px; right:58px; }
+.mb-puck { appearance:none; -webkit-appearance:none; border:none; background:none; padding:0; margin:0; font:inherit;
+  position:absolute; transform:translate(-50%,-50%); width:30px; height:30px; cursor:pointer;
+  animation:mb-snap .55s cubic-bezier(.34,1.4,.5,1) both; }
+.mb-disc { position:relative; width:100%; height:100%; border-radius:50%; overflow:hidden; display:block;
+  box-shadow:0 3px 5px -1px rgba(0,0,0,.55), inset 0 0 0 1.5px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08); }
+.mb-flag { width:100%; height:100%; object-fit:cover; display:block; }
+/* glossy dome over the flag — keeps the magnet read */
+.mb-disc::after { content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
+  background:
+    radial-gradient(circle at 33% 24%, rgba(255,255,255,.6), rgba(255,255,255,0) 44%),
+    radial-gradient(circle at 50% 128%, rgba(0,0,0,.5), rgba(0,0,0,0) 58%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.45), inset 0 -3px 5px rgba(0,0,0,.3); }
+.mb-puck:hover { z-index:9; }
+.mb-puck:hover .mb-disc { transform:scale(1.18);
+  box-shadow:0 6px 11px -2px rgba(0,0,0,.6), inset 0 0 0 1.5px rgba(0,0,0,.4), 0 0 0 3px rgba(242,200,75,.5); }
+.mb-disc { transition:transform .16s ease, box-shadow .16s ease; }
+/* ── the Popover-API projection card (top layer, escapes the block's overflow clip) ── */
+.mb-pop { margin:auto; border:none; padding:0; overflow:visible; width:288px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+    linear-gradient(150deg, #2b3037, #1a1e23 70%);
+  color:var(--eng); border-radius:11px;
+  box-shadow:0 24px 60px -14px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 0 1px rgba(0,0,0,.6); }
+.mb-pop::backdrop { background:rgba(8,11,15,.5); }
+/* anchor the card to the puck that opened it (falls back to viewport-centred where unsupported) */
+@supports (anchor-name: --a) {
+  .mb-pop { margin:7px; inset:auto; position-area:top; position-try-fallbacks:flip-block, flip-inline, flip-block flip-inline; }
+}
+.mb-pop:popover-open { animation:mb-pop-in .22s cubic-bezier(.2,.7,.25,1) both; }
+.pop-in { padding:17px 19px 18px; }
+.pop-h { display:flex; align-items:center; gap:13px; padding-bottom:13px; margin-bottom:13px;
+  border-bottom:1px solid rgba(255,255,255,.1); }
+.pop-disc { position:relative; width:56px; height:38px; flex:none; border-radius:3px; overflow:hidden;
+  box-shadow:0 2px 5px rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.1); }
+.pop-disc img { width:100%; height:100%; object-fit:cover; display:block; }
+.pop-disc::after { content:""; position:absolute; inset:0; border-radius:3px; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 42%); }
+.pop-id { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.pop-nm { font-family:var(--font-disp); font-weight:800; font-size:20px; line-height:1; letter-spacing:.01em;
+  text-transform:uppercase; color:#fff; }
+.pop-mt { font-family:var(--font-disp); font-weight:700; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--eng-mut); }
+.pop-sub { font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--eng-mut); margin-bottom:11px; }
+.pop-rl { display:flex; gap:7px; align-items:flex-end; }
+.pop-seg { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.pop-seg b { font-family:var(--font-disp); font-weight:800; font-size:13px; color:var(--eng); font-variant-numeric:tabular-nums; }
+.pop-bar { width:11px; height:56px; border-radius:3px; position:relative; overflow:hidden;
+  background:rgba(0,0,0,.4); box-shadow:inset 0 1px 2px rgba(0,0,0,.5); }
+.pop-bar i { position:absolute; left:0; right:0; bottom:0; border-radius:3px;
+  background:linear-gradient(180deg, var(--eng), rgba(205,211,218,.55)); }
+.pop-seg u { font-family:var(--font-disp); font-weight:700; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--eng-mut); text-decoration:none; }
+.pop-seg.win b { color:var(--gold,#f2c84b); }
+.pop-seg.win .pop-bar i { background:linear-gradient(180deg, #f6d978, var(--gold,#f2c84b)); box-shadow:0 0 6px rgba(242,200,75,.5); }
+.pop-seg.win u { color:var(--gold,#f2c84b); }
+/* footer / legend */
+.mb-foot { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between;
+  gap:14px; margin-top:9px; padding:8px 4px 0; border-top:1px solid rgba(0,0,0,.4); box-shadow:0 -1px 0 rgba(255,255,255,.08);
+  font-family:var(--font-disp); font-weight:700; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--eng-mut); }
+.mb-scale { display:flex; align-items:center; gap:8px; }
+.mb-scale .bar { width:120px; height:5px; border-radius:3px;
+  background:linear-gradient(90deg, rgba(220,48,26,.95), rgba(216,150,26,.85) 50%, rgba(30,196,98,1));
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.3); }
+.mb-foot .sp { color:var(--eng-mut); }
+.mb-foot b { color:var(--eng); font-weight:800; }
+/* motion: the plate drops in, then each lane's magnets snap to the board */
+@keyframes mb-plate-in { from { opacity:0; transform:translateY(13px); } to { opacity:1; transform:none; } }
+@keyframes mb-snap { 0% { opacity:0; transform:translate(calc(-50% - 46px), -50%) scale(.45); }
+  70% { opacity:1; } 100% { opacity:1; transform:translate(-50%, -50%) scale(1); } }
+@keyframes mb-pop-in { from { opacity:0; transform:translateY(8px) scale(.96); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .mb-plate { animation:none !important; opacity:1 !important; transform:none !important; }
+  .mb-puck { animation:none !important; opacity:1 !important; transform:translate(-50%,-50%) !important; }
+  .mb-pop:popover-open { animation:none !important; } }
+</style>
+<div class="mb-wrap">
+<div class="mb-plate">
+<span class="mb-bolt tl"></span><span class="mb-bolt tr"></span><span class="mb-bolt bl"></span><span class="mb-bolt br"></span>
+<div class="mb-head">
+<div class="mb-tt">
+<div class="mb-eye">The advancement <b>projector</b></div>
+<div class="mb-title">Road to the Round of 32</div>
+</div>
+<div class="mb-sub">Each magnet's position = its odds to escape the group<br>Tap a flag for the full projection<br>Elo&rarr;Monte Carlo &middot; 10k sims &middot; run <b>{{ rows[0].`RunLabel`.formatted }}</b></div>
+</div>
+<div class="mb-lanes">
+<div class="mb-scaffold">
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">A</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">B</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">C</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">D</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">E</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">F</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">G</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">H</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">I</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">J</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">K</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+<div class="mb-lane"><span class="mb-rail"><span class="mb-grp">L</span></span><span class="mb-track"></span><span class="mb-gate"><span class="net"><svg viewBox="0 0 24 24" style="margin:0 !important;display:block"><g fill="currentColor"><rect x="4" y="3" width="1.7" height="18" rx=".85"/><rect x="6.6" y="4.2" width="3" height="3"/><rect x="12.6" y="4.2" width="3" height="3"/><rect x="9.6" y="7.2" width="3" height="3"/><rect x="15.6" y="7.2" width="3" height="3"/><rect x="6.6" y="10.2" width="3" height="3"/><rect x="12.6" y="10.2" width="3" height="3"/></g><rect x="6.6" y="4.2" width="12" height="9" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/></svg></span></span></div>
+</div>
+<div class="mb-grid"><i class="g25"></i><i class="g50"></i><i class="g75"></i></div>
+<div class="mb-pucks">
+{% map(rows) %}
+<button class="mb-puck" type="button" popovertarget="pop-{{ `Team`.raw }}" title="{{ `TeamName`.formatted }} — tap for projection" style="top:calc(({{ `Ord`.raw }} - 0.5) * 8.3333%); left:calc({{ `Pct`.raw }} * 1%); animation-delay:calc({{ `Ord`.raw }} * 0.045s); anchor-name:--mb-{{ `Team`.raw }};"><span class="mb-disc"><img class="mb-flag" src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" /></span></button>
+<div id="pop-{{ `Team`.raw }}" popover class="mb-pop" style="position-anchor:--mb-{{ `Team`.raw }};"><div class="pop-in"><div class="pop-h"><span class="pop-disc"><img src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" /></span><span class="pop-id"><span class="pop-nm">{{ `TeamName`.formatted }}</span><span class="pop-mt">Group {{ `Grp`.formatted }} &middot; Elo #{{ `EloRank`.formatted }} of 48</span></span></div><div class="pop-sub">Chance of reaching each round</div><div class="pop-rl"><span class="pop-seg"><b class="wc-num">{{ `Pct`.formatted }}</b><span class="pop-bar"><i style="height:calc({{ `Pct`.raw }} * 1%)"></i></span><u>R32</u></span><span class="pop-seg"><b class="wc-num">{{ `R16`.formatted }}</b><span class="pop-bar"><i style="height:calc({{ `R16`.raw }} * 1%)"></i></span><u>R16</u></span><span class="pop-seg"><b class="wc-num">{{ `QF`.formatted }}</b><span class="pop-bar"><i style="height:calc({{ `QF`.raw }} * 1%)"></i></span><u>QF</u></span><span class="pop-seg"><b class="wc-num">{{ `SF`.formatted }}</b><span class="pop-bar"><i style="height:calc({{ `SF`.raw }} * 1%)"></i></span><u>SF</u></span><span class="pop-seg"><b class="wc-num">{{ `Fin`.formatted }}</b><span class="pop-bar"><i style="height:calc({{ `Fin`.raw }} * 1%)"></i></span><u>FIN</u></span><span class="pop-seg win"><b class="wc-num">{{ `Chmp`.formatted }}</b><span class="pop-bar"><i style="height:calc({{ `Chmp`.raw }} * 1%)"></i></span><u>CUP</u></span></div></div></div>
+{% end %}
+</div>
+</div>
+<div class="mb-foot">
+<span class="mb-scale">Long shot<span class="bar"></span>Into the knockouts</span>
+<span class="sp">Top 2 of each group + 8 best thirds advance &middot; <b>32</b> reach the Round of 32</span>
+</div>
+</div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'Ord'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'Pct'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 48
+      }
+    }
+  }
+}

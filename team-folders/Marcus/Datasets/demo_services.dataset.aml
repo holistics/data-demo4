@@ -1,0 +1,228 @@
+Dataset demo_services {
+  label: 'Demo Services Semantic POC'
+  description: '''
+POC dataset that demonstrates how upfront semantic modeling lets an AI agent answer
+questions a naive SQL agent would get wrong.
+
+# What this dataset can answer
+
+## 1. Contract vs Service (parent_id self-join)
+Services rows with `is_contract = true` are bundling parents — they are NOT real
+service deliveries. Real deliveries are child rows joined via `parent_id`.
+- Use the `service_count` metric to count real services (auto-excludes contracts).
+- Use `contract_count` to count contracts.
+- Use the `parent_id → service_id` relationship to fetch "all services under contract X".
+
+## 2. Cross-sell eligibility
+A service is eligible for cross-sell credit if ALL of:
+- it is not a contract,
+- it is not a Training service line,
+- delivered_hours >= 10,
+- it is not (Omega service line on a Class B account).
+
+The `is_crosssell_eligible` dimension encodes this rule. Use `crosssell_eligible_count`
+for totals.
+
+## 3. Bonus value (rule transition on 2025-01-01)
+Only ONE metric is defined: `bonus_actual`. Its description carries the rule history:
+- Before 2025-01-01: bonus = sum of `service_value` across service_lines `Alpha`, `Beta`.
+- From 2025-01-01 onward: bonus = sum of `service_value` across `Alpha`, `Beta`, `Omega`.
+
+Counterfactuals are NOT pre-built as metrics. The AI agent reads the rule history above and
+constructs ad-hoc AQL when asked things like:
+- "What if we'd never switched?" → `sum(service_value) | where(service_line in [Alpha, Beta])` across all dates.
+- "What if we'd always used the new rule?" → `sum(service_value) | where(service_line in [Alpha, Beta, Omega])` across all dates.
+- "Show actual vs both hypotheticals by year" → three on-the-fly expressions in one explore.
+
+This is intentional. Analysts don't (and shouldn't) build a metric for every hypothetical
+the business might ask. The semantic layer captures the *rule and its history*; the agent
+does the hypothetical math on top.
+
+Note: `service_value` is currently `delivered_hours` (POC has no revenue column); swap in one
+place when revenue lands.
+
+## 4. Data-quality flags
+Designed to be 0 in a clean state — non-zero values flag analyst review.
+- `dq_contracts_with_delivered_hours` — contracts should not have delivery hours.
+- `dq_overdelivered_services` — delivered_hours > contract_hours on a real service.
+- `dq_services_missing_order` — every service must trace to an order/account.
+- `dq_services_missing_date` — every service must have a service_date.
+- `dq_total_violations` — sum of the above; drives the dashboard alert widget.
+
+# What this dataset cannot answer
+- Net revenue / margin — no cost or price data in the source.
+- Salesperson / quota attribution — no rep data.
+- Customer satisfaction / churn — no CSAT or status data.
+
+# Persona notes for the AI agent
+- "How many services for Account X?" → use `service_count` (excludes contracts).
+- "What was the bonus over the transition period?" → use `bonus_actual`.
+- "What if we had never / always used the new rule?" → do NOT look for a metric. Read the
+  rule history in `bonus_actual`'s description and build an ad-hoc AQL expression that
+  filters `service_line` accordingly across all dates.
+- "Are there data quality issues?" → `dq_total_violations`, then drill on specific dq_* metrics.
+'''
+  data_source_name: 'demodb'
+  owner: 'dong.ln@holistics.io'
+
+  models: [
+    demo_services_accounts,
+    demo_services_orders,
+    demo_services_services,
+  ]
+
+  relationships: [
+    relationship(demo_services_orders.account_id > demo_services_accounts.account_id, true),
+    relationship(demo_services_services.order_id > demo_services_orders.order_id, true),
+    relationship(demo_services_services.parent_id > demo_services_services.service_id, false),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CROSS-MODEL DIMENSIONS (need account_class join)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  dimension is_crosssell_eligible {
+    model: demo_services_services
+    label: 'Is Cross-Sell Eligible'
+    type: 'truefalse'
+    description: 'Full eligibility rule: not a contract, not Training, >=10 hrs delivered, and not (Omega on Class B account).'
+    definition: @aql and(
+      not(demo_services_services.is_contract),
+      not(demo_services_services.is_training),
+      demo_services_services.meets_eligible_hours,
+      not(and(
+        demo_services_services.is_omega,
+        demo_services_accounts.account_class == 'B'
+      ))
+    );;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // METRICS — Core counts
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric service_count {
+    label: 'Service Count (excl. contracts)'
+    type: 'number'
+    description: 'Real service deliveries only. Contracts are excluded automatically via is_countable_service.'
+    definition: @aql count(demo_services_services.service_id) | where(demo_services_services.is_countable_service);;
+    format: '#,###0'
+  }
+
+  metric contract_count {
+    label: 'Contract Count'
+    type: 'number'
+    description: 'Count of contract bundling rows (is_contract = true). Use service_count for actual deliveries.'
+    definition: @aql count(demo_services_services.service_id) | where(demo_services_services.is_contract);;
+    format: '#,###0'
+  }
+
+  metric service_row_count_raw {
+    label: 'Raw Row Count (services + contracts)'
+    type: 'number'
+    description: 'Diagnostic only — use service_count or contract_count for business answers.'
+    hidden: true
+    definition: @aql count(demo_services_services.service_id);;
+    format: '#,###0'
+  }
+
+  metric crosssell_eligible_count {
+    label: 'Cross-Sell Eligible Service Count'
+    type: 'number'
+    description: 'Number of services that satisfy ALL cross-sell eligibility conditions.'
+    definition: @aql count(demo_services_services.service_id) | where(demo_services_services.is_crosssell_eligible);;
+    format: '#,###0'
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // METRICS — Bonus (rule transition 2025-01-01)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric bonus_actual {
+    label: 'Bonus Value (Actual)'
+    type: 'number'
+    description: '''
+The official bonus value as reported. The formula CHANGED on 2025-01-01:
+
+- Before 2025-01-01 (legacy rule):    bonus = sum(service_value) for service_line in {Alpha, Beta}.
+- From 2025-01-01 onward (new rule):  bonus = sum(service_value) for service_line in {Alpha, Beta, Omega}.
+
+This single metric applies the legacy rule to rows with service_date < 2025-01-01 and
+the new rule to rows with service_date >= 2025-01-01. So `bonus_actual` summed over a
+multi-year range is a mix of the two rules — that is correct and matches the historical
+reported number.
+
+Counterfactual questions ("what if we never switched", "what if we always used the new rule")
+are NOT separate metrics. The agent should construct ad-hoc AQL on top of `service_value`
+and `service_line` using the rule definitions above. Examples:
+  - Never switched: sum(service_value) | where(in(service_line, 'Alpha', 'Beta'))
+  - Always new:     sum(service_value) | where(in(service_line, 'Alpha', 'Beta', 'Omega'))
+
+service_value is the bonus-value driver, currently = delivered_hours (proxy until a real
+revenue column lands; one-line swap in demo_services_services.model.aml).
+'''
+    definition: @aql sum(demo_services_services.service_value) | where(
+      or(
+        and(
+          demo_services_services.service_date < @2025-01-01,
+          in(demo_services_services.service_line, 'Alpha', 'Beta')
+        ),
+        and(
+          demo_services_services.service_date >= @2025-01-01,
+          in(demo_services_services.service_line, 'Alpha', 'Beta', 'Omega')
+        )
+      )
+    );;
+    format: '#,###0'
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // METRICS — Data-quality flags (target value = 0)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric dq_contracts_with_delivered_hours {
+    label: 'DQ: Contracts with delivered hours'
+    type: 'number'
+    description: 'Should be 0. Contracts are bundling rows and should not have delivery hours recorded.'
+    definition: @aql count(demo_services_services.service_id) | where(and(
+      demo_services_services.is_contract,
+      demo_services_services.delivered_hours > 0
+    ));;
+    format: '#,###0'
+  }
+
+  metric dq_overdelivered_services {
+    label: 'DQ: Over-delivered services'
+    type: 'number'
+    description: 'Should be 0. Real services with delivered_hours exceeding contract_hours flag a data-entry issue.'
+    definition: @aql count(demo_services_services.service_id) | where(and(
+      not(demo_services_services.is_contract),
+      demo_services_services.delivered_hours > demo_services_services.contract_hours
+    ));;
+    format: '#,###0'
+  }
+
+  metric dq_services_missing_order {
+    label: 'DQ: Services missing order'
+    type: 'number'
+    description: 'Should be 0. Every service must trace to an order/account.'
+    definition: @aql count(demo_services_services.service_id) | where(demo_services_services.order_id is null);;
+    format: '#,###0'
+  }
+
+  metric dq_services_missing_date {
+    label: 'DQ: Services missing service_date'
+    type: 'number'
+    description: 'Should be 0. Every service must have a service_date.'
+    definition: @aql count(demo_services_services.service_id) | where(demo_services_services.service_date is null);;
+    format: '#,###0'
+  }
+
+  metric dq_total_violations {
+    label: 'DQ: Total Violations'
+    type: 'number'
+    description: 'Sum of all dq_* violation counts. Drives the dashboard alert widget — non-zero = analyst review needed.'
+    definition: @aql dq_contracts_with_delivered_hours + dq_overdelivered_services + dq_services_missing_order + dq_services_missing_date;;
+    format: '#,###0'
+  }
+}

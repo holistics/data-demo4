@@ -1,0 +1,28 @@
+Model public_unit_items {
+  type: 'table'
+  label: 'Unit Items'
+  description: ''
+  data_source_name: 'demodb'
+  dimension unit_id {
+    label: 'Unit Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.unit_id }};;
+  }
+  dimension item_name {
+    label: 'Item Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.item_name }};;
+  }
+  dimension id {
+    label: 'Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+
+  owner: 'hung.dd@holistics.io'
+  table_name: '"demo_teamfight_tactics"."unit_items"'
+}

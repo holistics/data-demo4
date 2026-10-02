@@ -47,17 +47,20 @@ Dashboard _3_customer_demographics_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_countries', 'name')
+      field: r(ecommerce_countries.name)
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -89,17 +92,20 @@ Dashboard _3_customer_demographics_demo {
     type: 'field'
     source: FieldFilterSource {
       dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_orders', 'status')
+      field: r(ecommerce_orders.status)
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
     }
     settings {
       drillthrough: Drillthrough {
         enabled: true
         sources: [
           AutoDrillthroughSource {
+            excluded_sources: [
+              'ssbi_demo'
+            ]
           }
         ]
       }
@@ -147,18 +153,6 @@ Dashboard _3_customer_demographics_demo {
       }
     }
   }
-  block age_demographic: FilterBlock {
-    label: 'Age Demographic'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: demo_ecommerce_version_2
-      field: ref('ecommerce_users', 'age_group')
-    }
-    default {
-      operator: 'is'
-      value: []
-    }
-  }
   block date_drill: DateDrillBlock {
     label: 'Date Drill'
   }
@@ -168,32 +162,33 @@ Dashboard _3_customer_demographics_demo {
       dataset: demo_ecommerce_version_2
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_users', 'id')
+          ref: r(ecommerce_users.id)
           format {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'ecommerce_users_id'
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'full_name')
+          ref: r(ecommerce_users.full_name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'email')
+          ref: r(ecommerce_users.email)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_countries', 'continent_name')
+          ref: r(ecommerce_countries.continent_name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_users', 'sign_up_date')
+          ref: r(ecommerce_users.sign_up_date)
           format {
             type: 'date'
           }
@@ -201,6 +196,16 @@ Dashboard _3_customer_demographics_demo {
       ]
       settings {
         show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'ecommerce_users_id'
+            width: 30
+          }
+        ]
       }
     }
   }
@@ -209,7 +214,7 @@ Dashboard _3_customer_demographics_demo {
     viz: PieChart {
       dataset: demo_ecommerce_version_2
       legend: VizFieldFull {
-        ref: ref('ecommerce_users', 'age_group')
+        ref: r(ecommerce_users.age_group)
         format {
           type: 'text'
         }
@@ -217,18 +222,36 @@ Dashboard _3_customer_demographics_demo {
       series {
         field: VizFieldFull {
           label: 'Total'
-          ref: ref('ecommerce_users', 'total_users')
+          ref: r(ecommerce_users.total_users)
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###'
+          }
+        }
+        settings {
+          point {
+            value: '1. Under 20'
+            color: '#05264C'
+          }
+          point {
+            value: '3. 30 and above'
+            color: '#259B6C'
+          }
+          point {
+            value: '2. From 20 to 29'
+            color: '#00627A'
           }
         }
       }
       settings {
         display_as_donut: true
-        show_total: true
         show_data_label: true
         show_percentage: true
+        data_label_position: 'outside'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -237,7 +260,7 @@ Dashboard _3_customer_demographics_demo {
     viz: PieChart {
       dataset: demo_ecommerce_version_2
       legend: VizFieldFull {
-        ref: ref('ecommerce_users', 'gender')
+        ref: r(ecommerce_users.gender)
         format {
           type: 'text'
         }
@@ -245,16 +268,20 @@ Dashboard _3_customer_demographics_demo {
       series {
         field: VizFieldFull {
           label: 'Total '
-          ref: ref('ecommerce_users', 'total_users')
+          ref: r(ecommerce_users.total_users)
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###'
           }
         }
         settings {
           point {
             value: 'Male'
-            color: '#F2B602'
+            color: '#008976'
+          }
+          point {
+            value: 'Female'
+            color: '#05264C'
           }
         }
       }
@@ -262,6 +289,11 @@ Dashboard _3_customer_demographics_demo {
         display_as_donut: true
         show_data_label: true
         show_percentage: true
+        data_label_position: 'outside'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -276,8 +308,7 @@ Dashboard _3_customer_demographics_demo {
             'gender',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -293,8 +324,7 @@ Dashboard _3_customer_demographics_demo {
             'gender',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -310,8 +340,7 @@ Dashboard _3_customer_demographics_demo {
             'gender',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -327,8 +356,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'order_status',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -344,8 +372,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'gender',
             'age_group',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -361,8 +388,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'gender',
             'order_status',
-            'order_date',
-            'age_demographic'
+            'order_date'
           ]
           disabled: true
         }
@@ -378,25 +404,7 @@ Dashboard _3_customer_demographics_demo {
             'country',
             'gender',
             'order_status',
-            'age_group',
-            'age_demographic'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'age_demographic'
-      to: [
-        CustomMapping {
-          block: [
-            'city',
-            'product_name',
-            'country',
-            'gender',
-            'order_status',
-            'age_group',
-            'order_date'
+            'age_group'
           ]
           disabled: true
         }
@@ -406,54 +414,50 @@ Dashboard _3_customer_demographics_demo {
   view: CanvasLayout {
     label: 'Canvas Layout'
     width: 1220
-    height: 1030
+    height: 870
     grid_size: 20
     block city {
-      position: pos(20, 20, 280, 100)
+      position: pos(20, 20, 280, 80)
       layer: 1
     }
     block product_name {
-      position: pos(320, 20, 280, 100)
+      position: pos(320, 20, 280, 80)
       layer: 1
     }
     block country {
-      position: pos(620, 20, 280, 100)
+      position: pos(620, 20, 280, 80)
       layer: 1
     }
     block gender {
-      position: pos(920, 20, 280, 100)
+      position: pos(920, 20, 280, 80)
       layer: 1
     }
     block order_status {
-      position: pos(20, 140, 280, 100)
+      position: pos(20, 120, 280, 80)
       layer: 1
     }
     block age_group {
-      position: pos(320, 140, 280, 100)
+      position: pos(320, 120, 280, 80)
       layer: 1
     }
     block order_date {
-      position: pos(620, 140, 280, 100)
-      layer: 1
-    }
-    block age_demographic {
-      position: pos(920, 140, 280, 100)
+      position: pos(620, 120, 280, 80)
       layer: 1
     }
     block date_drill {
-      position: pos(20, 260, 280, 100)
+      position: pos(920, 120, 280, 80)
       layer: 1
     }
     block v1 {
-      position: pos(20, 380, 630, 630)
+      position: pos(20, 220, 620, 640)
       layer: 1
     }
     block v2 {
-      position: pos(670, 380, 530, 330)
+      position: pos(660, 220, 540, 300)
       layer: 1
     }
     block v3 {
-      position: pos(670, 730, 530, 280)
+      position: pos(660, 540, 540, 320)
       layer: 1
     }
   }

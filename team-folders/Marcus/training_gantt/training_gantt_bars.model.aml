@@ -1,0 +1,153 @@
+Model training_gantt_bars {
+  type: 'query'
+  label: 'Training Gantt Bars'
+  description: 'Sample training records (dt_start / dt_end / dt_validated) with bar geometry AND month-tick axis positions pre-computed in SQL so the Markdown Gantt viz needs no template math. One flat row per training; every row also carries the shared axis ticks (tick_0..tick_11).'
+  data_source_name: 'demodb'
+
+  query: @sql
+    with t (training_name, trainer, dt_start, dt_end, dt_validated) as (
+      values
+        ('Forklift Safety',         'Marc Dubois',     date '2026-01-06', date '2026-02-28', date '2026-02-25'),
+        ('First Aid & CPR',         'Sophie Laurent',  date '2026-02-02', date '2026-03-31', date '2026-05-15'),
+        ('Fire Safety Drill',       'Marc Dubois',     date '2026-05-04', date '2026-07-31', null::date),
+        ('Data Protection (GDPR)',  'Elise Moreau',    date '2026-03-02', date '2026-05-29', null::date),
+        ('Machine Operation',       'Thomas Bernard',  date '2026-01-12', date '2026-04-30', date '2026-04-28'),
+        ('Quality Control ISO',     'Sophie Laurent',  date '2026-02-16', date '2026-04-30', date '2026-06-10'),
+        ('Leadership Essentials',   'Elise Moreau',    date '2026-06-01', date '2026-08-31', null::date),
+        ('Compliance Refresher',    'Thomas Bernard',  date '2026-01-05', date '2026-03-31', null::date)
+    ),
+    calc as (
+      select
+        training_name,
+        trainer,
+        dt_start,
+        dt_end,
+        dt_validated,
+        -- "Late" stretch ends at: the validation date if signed off after the planned
+        -- end, otherwise today if it is overdue and still not validated.
+        -- NULL => never late (validated on/before dt_end, or not yet due).
+        case
+          when dt_validated is not null and dt_validated > dt_end then dt_validated
+          when dt_validated is null     and current_date > dt_end then current_date
+          else null
+        end as red_end,
+        case
+          when dt_validated is not null and dt_validated <= dt_end then 'On time'
+          when dt_validated is not null and dt_validated >  dt_end then 'Validated late'
+          when dt_validated is null     and current_date > dt_end  then 'Overdue'
+          else 'Ongoing'
+        end as status
+      from t
+    ),
+    axis as (
+      select
+        min(dt_start)                                       as a0,
+        max(greatest(dt_end, coalesce(red_end, dt_end)))    as a1
+      from calc
+    ),
+    -- one row per month boundary inside the axis, with its label + % position
+    months as (
+      select
+        gs::date                                                                          as m_start,
+        row_number() over (order by gs) - 1                                               as rn,
+        to_char(gs, 'Mon')                                                                as lbl,
+        greatest(round((gs::date - a.a0)::numeric / nullif(a.a1 - a.a0, 0) * 100, 3), 0)  as pct
+      from axis a,
+           generate_series(date_trunc('month', a.a0), a.a1::timestamp, interval '1 month') gs
+    ),
+    -- pivot the (up to 12) month ticks onto a single row of columns
+    ticks as (
+      select
+        max(case when rn = 0  then lbl end) as tick_0_label,  coalesce(max(case when rn = 0  then pct end), -100) as tick_0_pct,
+        max(case when rn = 1  then lbl end) as tick_1_label,  coalesce(max(case when rn = 1  then pct end), -100) as tick_1_pct,
+        max(case when rn = 2  then lbl end) as tick_2_label,  coalesce(max(case when rn = 2  then pct end), -100) as tick_2_pct,
+        max(case when rn = 3  then lbl end) as tick_3_label,  coalesce(max(case when rn = 3  then pct end), -100) as tick_3_pct,
+        max(case when rn = 4  then lbl end) as tick_4_label,  coalesce(max(case when rn = 4  then pct end), -100) as tick_4_pct,
+        max(case when rn = 5  then lbl end) as tick_5_label,  coalesce(max(case when rn = 5  then pct end), -100) as tick_5_pct,
+        max(case when rn = 6  then lbl end) as tick_6_label,  coalesce(max(case when rn = 6  then pct end), -100) as tick_6_pct,
+        max(case when rn = 7  then lbl end) as tick_7_label,  coalesce(max(case when rn = 7  then pct end), -100) as tick_7_pct,
+        max(case when rn = 8  then lbl end) as tick_8_label,  coalesce(max(case when rn = 8  then pct end), -100) as tick_8_pct,
+        max(case when rn = 9  then lbl end) as tick_9_label,  coalesce(max(case when rn = 9  then pct end), -100) as tick_9_pct,
+        max(case when rn = 10 then lbl end) as tick_10_label, coalesce(max(case when rn = 10 then pct end), -100) as tick_10_pct,
+        max(case when rn = 11 then lbl end) as tick_11_label, coalesce(max(case when rn = 11 then pct end), -100) as tick_11_pct
+      from months
+    )
+    select
+      c.training_name,
+      c.trainer,
+      c.status,
+      c.dt_start,
+      c.dt_end,
+      c.dt_validated,
+      to_char(c.dt_start, 'DD Mon') || ' - ' || to_char(c.dt_end, 'DD Mon') as planned_dates,
+      x.a0 as axis_start,
+      x.a1 as axis_end,
+      -- bar geometry as % of the shared axis width
+      round((c.dt_start - x.a0)::numeric / nullif(x.a1 - x.a0, 0) * 100, 3)               as blue_left_pct,
+      round((c.dt_end   - c.dt_start)::numeric / nullif(x.a1 - x.a0, 0) * 100, 3)         as blue_width_pct,
+      round((c.dt_end - x.a0)::numeric / nullif(x.a1 - x.a0, 0) * 100, 3)                  as red_left_pct,
+      -- width is 0 when never late, so the red div renders invisibly (no template conditional needed)
+      case when c.red_end is not null
+        then round((c.red_end - c.dt_end)::numeric / nullif(x.a1 - x.a0, 0) * 100, 3)
+        else 0 end                                                                        as red_width_pct,
+      round((current_date - x.a0)::numeric / nullif(x.a1 - x.a0, 0) * 100, 3)             as today_pct,
+      tk.tick_0_label,  tk.tick_0_pct,
+      tk.tick_1_label,  tk.tick_1_pct,
+      tk.tick_2_label,  tk.tick_2_pct,
+      tk.tick_3_label,  tk.tick_3_pct,
+      tk.tick_4_label,  tk.tick_4_pct,
+      tk.tick_5_label,  tk.tick_5_pct,
+      tk.tick_6_label,  tk.tick_6_pct,
+      tk.tick_7_label,  tk.tick_7_pct,
+      tk.tick_8_label,  tk.tick_8_pct,
+      tk.tick_9_label,  tk.tick_9_pct,
+      tk.tick_10_label, tk.tick_10_pct,
+      tk.tick_11_label, tk.tick_11_pct
+    from calc c
+    cross join axis x
+    cross join ticks tk
+    order by c.dt_start, c.training_name
+  ;;
+
+  dimension training_name  { label: 'Training Name'   type: 'text'   definition: @sql {{ #SOURCE.training_name }};; }
+  dimension trainer        { label: 'Trainer'         type: 'text'   definition: @sql {{ #SOURCE.trainer }};; }
+  dimension status         { label: 'Status'          type: 'text'   definition: @sql {{ #SOURCE.status }};; }
+  dimension dt_start       { label: 'Start Date'      type: 'date'   definition: @sql {{ #SOURCE.dt_start }};; }
+  dimension dt_end         { label: 'End Date'        type: 'date'   definition: @sql {{ #SOURCE.dt_end }};; }
+  dimension dt_validated   { label: 'Validated Date'  type: 'date'   definition: @sql {{ #SOURCE.dt_validated }};; }
+  dimension planned_dates  { label: 'Planned Dates'   type: 'text'   definition: @sql {{ #SOURCE.planned_dates }};; }
+  dimension axis_start     { label: 'Axis Start'      type: 'date'   definition: @sql {{ #SOURCE.axis_start }};; }
+  dimension axis_end       { label: 'Axis End'        type: 'date'   definition: @sql {{ #SOURCE.axis_end }};; }
+  dimension blue_left_pct  { label: 'Blue Left Pct'   type: 'number' definition: @sql {{ #SOURCE.blue_left_pct }};; }
+  dimension blue_width_pct { label: 'Blue Width Pct'  type: 'number' definition: @sql {{ #SOURCE.blue_width_pct }};; }
+  dimension red_left_pct   { label: 'Red Left Pct'    type: 'number' definition: @sql {{ #SOURCE.red_left_pct }};; }
+  dimension red_width_pct  { label: 'Red Width Pct'   type: 'number' definition: @sql {{ #SOURCE.red_width_pct }};; }
+  dimension today_pct      { label: 'Today Pct'       type: 'number' definition: @sql {{ #SOURCE.today_pct }};; }
+
+  dimension tick_0_label   { label: 'Tick 0 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_0_label }};; }
+  dimension tick_0_pct     { label: 'Tick 0 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_0_pct }};; }
+  dimension tick_1_label   { label: 'Tick 1 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_1_label }};; }
+  dimension tick_1_pct     { label: 'Tick 1 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_1_pct }};; }
+  dimension tick_2_label   { label: 'Tick 2 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_2_label }};; }
+  dimension tick_2_pct     { label: 'Tick 2 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_2_pct }};; }
+  dimension tick_3_label   { label: 'Tick 3 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_3_label }};; }
+  dimension tick_3_pct     { label: 'Tick 3 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_3_pct }};; }
+  dimension tick_4_label   { label: 'Tick 4 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_4_label }};; }
+  dimension tick_4_pct     { label: 'Tick 4 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_4_pct }};; }
+  dimension tick_5_label   { label: 'Tick 5 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_5_label }};; }
+  dimension tick_5_pct     { label: 'Tick 5 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_5_pct }};; }
+  dimension tick_6_label   { label: 'Tick 6 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_6_label }};; }
+  dimension tick_6_pct     { label: 'Tick 6 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_6_pct }};; }
+  dimension tick_7_label   { label: 'Tick 7 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_7_label }};; }
+  dimension tick_7_pct     { label: 'Tick 7 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_7_pct }};; }
+  dimension tick_8_label   { label: 'Tick 8 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_8_label }};; }
+  dimension tick_8_pct     { label: 'Tick 8 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_8_pct }};; }
+  dimension tick_9_label   { label: 'Tick 9 Label'    type: 'text'   definition: @sql {{ #SOURCE.tick_9_label }};; }
+  dimension tick_9_pct     { label: 'Tick 9 Pct'      type: 'number' definition: @sql {{ #SOURCE.tick_9_pct }};; }
+  dimension tick_10_label  { label: 'Tick 10 Label'   type: 'text'   definition: @sql {{ #SOURCE.tick_10_label }};; }
+  dimension tick_10_pct    { label: 'Tick 10 Pct'     type: 'number' definition: @sql {{ #SOURCE.tick_10_pct }};; }
+  dimension tick_11_label  { label: 'Tick 11 Label'   type: 'text'   definition: @sql {{ #SOURCE.tick_11_label }};; }
+  dimension tick_11_pct    { label: 'Tick 11 Pct'     type: 'number' definition: @sql {{ #SOURCE.tick_11_pct }};; }
+
+  models: []
+}

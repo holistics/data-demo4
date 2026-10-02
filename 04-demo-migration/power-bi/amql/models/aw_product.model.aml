@@ -1,0 +1,54 @@
+Model aw_product {
+  type: 'table'
+  label: 'Product'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.product'
+
+  dimension product_key {
+    label: 'Product Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.ProductKey }};;
+  }
+  dimension sku {
+    label: 'SKU'
+    type: 'text'
+    definition: @sql {{ #SOURCE.SKU }};;
+  }
+  dimension product {
+    label: 'Product'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Product }};;
+  }
+  dimension standard_cost {
+    label: 'Standard Cost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.Standard Cost }};;
+  }
+  dimension color {
+    label: 'Color'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Color }};;
+  }
+  dimension list_price {
+    label: 'List Price'
+    type: 'number'
+    definition: @sql {{ #SOURCE.List Price }};;
+  }
+  dimension model {
+    label: 'Model'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Model }};;
+  }
+  dimension subcategory {
+    label: 'Subcategory'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Subcategory }};;
+  }
+  dimension category {
+    label: 'Category'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Category }};;
+  }
+}

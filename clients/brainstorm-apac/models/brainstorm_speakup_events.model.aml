@@ -1,0 +1,10 @@
+Model brainstorm_speakup_events {
+  type: 'table'
+  label: 'SpeakUp events (internal)'
+  data_source_name: 'brainstorm_apac_runsql'
+  table_name: '"public"."speakup_events"'
+  dimension id { label: 'Event ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.id }};; description: 'Unique SpeakUp event identifier. Use only for event-level joins or deduplication.' }
+  dimension speakup_id { label: 'SpeakUp ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.speakup_id }};; description: 'SpeakUp ticket affected by the event. Use to join event history to its parent ticket.' }
+  dimension event_type { label: 'Event type' type: 'text' hidden: true definition: @sql {{ #SOURCE.event_type }};; description: 'Lifecycle action recorded for the ticket, such as manager_response, close or reopen. Use in lifecycle calculations rather than direct reporting.' }
+  dimension created_at { label: 'Event time' type: 'datetime' hidden: true definition: @sql {{ #SOURCE.created_at }};; description: 'UTC date and time when the SpeakUp event occurred. Use to order lifecycle actions and apply the reporting cutoff.' }
+}

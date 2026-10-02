@@ -1,0 +1,416 @@
+Model fanserv_mock_games {
+  type: 'query'
+  label: 'FanServ Game Calendar Games'
+  description: 'One row per game and calendar-board month, sourced from the imported FanServ game, league, and team CSV extracts.'
+  data_source_name: 'demodb'
+
+  dimension board_game_id {
+    label: 'Board Game ID'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+
+  dimension game_id {
+    label: 'Game ID'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension board_month_start {
+    label: 'Board Month Start'
+    type: 'date'
+  }
+
+  dimension game_date {
+    label: 'Game Date'
+    type: 'date'
+  }
+
+  dimension board_grid_column {
+    label: 'Board Grid Column'
+    description: 'Monday-start calendar column for the selected board month.'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension board_grid_row {
+    label: 'Board Grid Row'
+    description: 'Calendar week row for the selected board month.'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension detail_priority {
+    label: 'Detail Priority'
+    description: 'Distance from today; used only to choose the default detail card.'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension scheduled_start_at {
+    label: 'Scheduled Start'
+    type: 'datetime'
+  }
+
+  dimension scheduled_start_display {
+    label: 'Start Time'
+    description: 'POC display time in the dashboard America/Los_Angeles timezone.'
+    type: 'text'
+  }
+
+  dimension scheduled_end_at {
+    label: 'Scheduled End'
+    type: 'datetime'
+  }
+
+  dimension timezone {
+    label: 'Timezone'
+    type: 'text'
+  }
+
+  dimension status {
+    label: 'Game Status'
+    description: 'Conservative presentation state derived from the imported source status; about-to-start is not treated as live.'
+    type: 'text'
+  }
+
+  dimension source_status {
+    label: 'Source Status'
+    description: 'Status value supplied directly by gamedata.csv.'
+    type: 'text'
+  }
+
+  dimension live_period {
+    label: 'Live Period'
+    type: 'text'
+  }
+
+  dimension live_clock {
+    label: 'Live Clock'
+    type: 'text'
+  }
+
+  dimension original_scheduled_start_at {
+    label: 'Original Scheduled Start'
+    type: 'datetime'
+  }
+
+  dimension original_start_display {
+    label: 'Original Start'
+    description: 'POC original schedule display in the dashboard America/Los_Angeles timezone.'
+    type: 'text'
+  }
+
+  dimension league_code {
+    label: 'League Code'
+    type: 'text'
+  }
+
+  dimension league_name {
+    label: 'League'
+    type: 'text'
+  }
+
+  dimension league_logo_url {
+    label: 'League Logo URL'
+    type: 'text'
+  }
+
+  dimension home_team_code {
+    label: 'Home Team Code'
+    type: 'text'
+  }
+
+  dimension home_team_name {
+    label: 'Home Team'
+    type: 'text'
+  }
+
+  dimension home_team_logo_url {
+    label: 'Home Team Logo URL'
+    type: 'text'
+  }
+
+  dimension home_score {
+    label: 'Home Score'
+    type: 'number'
+  }
+
+  dimension away_team_code {
+    label: 'Away Team Code'
+    type: 'text'
+  }
+
+  dimension away_team_name {
+    label: 'Away Team'
+    type: 'text'
+  }
+
+  dimension away_team_logo_url {
+    label: 'Away Team Logo URL'
+    type: 'text'
+  }
+
+  dimension away_score {
+    label: 'Away Score'
+    type: 'number'
+  }
+
+  dimension primary_network {
+    label: 'First Listed Network'
+    description: 'First source-listed broadcast network. Source order is preserved but does not prove commercial primacy.'
+    type: 'text'
+  }
+
+  dimension secondary_network {
+    label: 'Second Listed Network'
+    description: 'Second source-listed broadcast network when the source supplies an ordered array.'
+    type: 'text'
+  }
+
+  dimension gamepulse_score {
+    label: 'GamePulse Score'
+    description: 'Unavailable in the supplied CSV extracts. GamePulse remains a separate focal-team evaluation and is not an impression forecast.'
+    type: 'number'
+  }
+
+  dimension gamepulse_focal_team_code {
+    label: 'GamePulse Focal Team Code'
+    type: 'text'
+  }
+
+  dimension gamepulse_band {
+    label: 'GamePulse Band'
+    type: 'text'
+  }
+
+  dimension matchup_label {
+    label: 'Matchup'
+    type: 'text'
+  }
+
+  dimension game_selector_label {
+    label: 'Game'
+    description: 'Unique user-facing game selector label; game_id remains the durable interaction key.'
+    type: 'text'
+  }
+
+  dimension deterministic_sort_key {
+    label: 'Deterministic Game Sort Key'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension planning_phase {
+    label: 'Planning Phase'
+    description: 'Past, today, or future relative to the current date; this is not an inventory or impression state.'
+    type: 'text'
+  }
+
+  dimension planning_phase_label {
+    label: 'Planning Phase Label'
+    type: 'text'
+  }
+
+  dimension team_codes {
+    label: 'Team Codes'
+    type: 'text'
+  }
+
+  dimension search_text {
+    label: 'Game Search Text'
+    type: 'text'
+  }
+
+  dimension supply_team_codes {
+    label: 'Supply Team Codes'
+    description: 'Unavailable in the supplied CSV extracts. Supply affiliation would indicate a potential supply path, not inventory availability.'
+    type: 'text'
+  }
+
+  dimension has_supply_affiliation {
+    label: 'Has Supply Affiliation'
+    type: 'truefalse'
+  }
+
+  measure game_count {
+    label: 'Games'
+    type: 'number'
+    definition: @sql {{ game_id }};;
+    aggregation_type: 'count_distinct'
+  }
+
+  measure average_gamepulse_score {
+    label: 'Average GamePulse Score'
+    type: 'number'
+    definition: @sql {{ gamepulse_score }};;
+    aggregation_type: 'avg'
+  }
+
+  query: @sql
+    with source_games as (
+      select
+        games.uuid::text as game_id
+        , games.status::text as source_status
+        , games.scheduled::timestamp at time zone 'UTC' as scheduled_start_at
+        , games.completed::timestamp at time zone 'UTC' as completed_at
+        , ((games.scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date as game_date
+        , leagues.uuid::text as league_uuid
+        , leagues.alias::text as league_code
+        , leagues.name::text as league_name
+        , leagues.logo_url::text as league_logo_url
+        , home_team.uuid::text as home_team_uuid
+        , home_team.alias::text as home_team_code
+        , coalesce(
+            nullif(home_team.full_name::text, '')
+            , nullif(concat_ws(' ', nullif(home_team.market::text, ''), nullif(home_team.name::text, '')), '')
+            , home_team.alias::text
+          ) as home_team_name
+        , home_team.logo_url::text as home_team_logo_url
+        , games.home_points::integer as home_score
+        , away_team.uuid::text as away_team_uuid
+        , away_team.alias::text as away_team_code
+        , coalesce(
+            nullif(away_team.full_name::text, '')
+            , nullif(concat_ws(' ', nullif(away_team.market::text, ''), nullif(away_team.name::text, '')), '')
+            , away_team.alias::text
+          ) as away_team_name
+        , away_team.logo_url::text as away_team_logo_url
+        , games.away_points::integer as away_score
+        , coalesce(
+            case
+              when games.broadcast is null or btrim(games.broadcast::text) = '' then null
+              when jsonb_typeof(games.broadcast::jsonb) = 'array' then games.broadcast::jsonb -> 0 ->> 'network'
+              when jsonb_typeof(games.broadcast::jsonb) = 'object' then games.broadcast::jsonb ->> 'network'
+            end
+            , 'Broadcast TBC'
+          ) as primary_network
+        , case
+            when jsonb_typeof(nullif(games.broadcast::text, '')::jsonb) = 'array'
+              and jsonb_array_length(games.broadcast::jsonb) > 1
+              then nullif(games.broadcast::jsonb -> 1 ->> 'network', '')
+          end as secondary_network
+      from "dbt_khai"."holistics_fanserv_games_d2418_202607160936" as games
+      join "dbt_khai"."holistics_fanserv_leagu_2a159_202607160936" as leagues
+        on games.league_id = leagues.id
+      join "dbt_khai"."holistics_fanserv_teams_3d44f_202607160945" as home_team
+        on games.home_id = home_team.id
+      join "dbt_khai"."holistics_fanserv_teams_3d44f_202607160945" as away_team
+        on games.away_id = away_team.id
+    )
+    , month_bounds as (
+      select
+        least(
+          date_trunc('month', min(game_date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as first_month
+        , greatest(
+          date_trunc('month', max(game_date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as last_month
+        , (current_timestamp at time zone 'America/Los_Angeles')::date as today_date
+      from source_games
+    )
+    , board_months as (
+      select
+        board_month_start::date
+        , (
+            board_month_start::date
+            - (extract(isodow from board_month_start)::integer - 1)
+          )::date as grid_start
+        , today_date
+      from month_bounds
+      cross join lateral generate_series(
+        first_month
+        , last_month
+        , interval '1 month'
+      ) as board_month_start
+    )
+    , board_games as (
+      select
+        source_games.*
+        , board_months.board_month_start
+        , board_months.grid_start
+        , board_months.today_date
+        , case
+            when source_status = 'closed' then 'completed'
+            when source_status = 'scheduled'
+              and (completed_at is not null or home_score is not null or away_score is not null) then 'unknown'
+            when source_status = 'scheduled' then 'scheduled'
+            when source_status = 'cancelled' then 'cancelled'
+            when source_status = 'postponed' then 'postponed'
+            when source_status = 'about-to-start' then 'about to start'
+            else 'unknown'
+          end as status
+      from source_games
+      join board_months
+        on source_games.game_date between board_months.grid_start and board_months.grid_start + 41
+    )
+
+    select
+      to_char(board_month_start, 'YYYY-MM-DD') || '|' || game_id as board_game_id
+      , game_id
+      , board_month_start
+      , game_date
+      , extract(isodow from game_date)::integer as board_grid_column
+      , (floor((game_date - grid_start) / 7.0)::integer + 1) as board_grid_row
+      , abs(game_date - today_date)::integer as detail_priority
+      , scheduled_start_at
+      , to_char(scheduled_start_at at time zone 'America/Los_Angeles', 'HH24:MI') as scheduled_start_display
+      , null::timestamp with time zone as scheduled_end_at
+      , 'America/Los_Angeles'::text as timezone
+      , status
+      , source_status
+      , null::text as live_period
+      , null::text as live_clock
+      , null::timestamp with time zone as original_scheduled_start_at
+      , null::text as original_start_display
+      , league_code
+      , league_name
+      , league_logo_url
+      , home_team_code
+      , home_team_name
+      , home_team_logo_url
+      , home_score
+      , away_team_code
+      , away_team_name
+      , away_team_logo_url
+      , away_score
+      , primary_network
+      , secondary_network
+      , null::integer as gamepulse_score
+      , null::text as gamepulse_focal_team_code
+      , 'Not scored'::text as gamepulse_band
+      , away_team_code || ' vs ' || home_team_code as matchup_label
+      , to_char(game_date, 'YYYY-MM-DD') || ' · '
+        || to_char(scheduled_start_at at time zone 'America/Los_Angeles', 'HH24:MI') || ' · '
+        || league_code || ' · ' || away_team_code || ' @ ' || home_team_code as game_selector_label
+      , to_char(scheduled_start_at at time zone 'UTC', 'YYYYMMDDHH24MISS.US') || '|'
+        || league_uuid || '|' || away_team_uuid || '|' || home_team_uuid || '|' || game_id as deterministic_sort_key
+      , case
+          when status = 'completed' then 'past'
+          when status in ('cancelled', 'postponed', 'unknown') then 'neutral'
+          when game_date = today_date then 'today'
+          when game_date > today_date then 'future'
+          else 'past'
+        end as planning_phase
+      , case
+          when status = 'completed' then 'Completed game · evidence context'
+          when status = 'cancelled' then 'Cancelled · no planning claim'
+          when status = 'postponed' then 'Postponed · schedule pending'
+          when status = 'unknown' then 'Unknown source state'
+          when game_date < today_date then 'Past game · evidence context'
+          when game_date = today_date then 'Today · planning focus'
+          else 'Future game · opportunity context'
+        end as planning_phase_label
+      , away_team_code || ',' || home_team_code as team_codes
+      , lower(
+          away_team_code || ' ' || away_team_name || ' '
+          || home_team_code || ' ' || home_team_name || ' '
+          || league_code || ' ' || game_id
+        ) as search_text
+      , null::text as supply_team_codes
+      , false as has_supply_affiliation
+    from board_games;;
+}

@@ -1,0 +1,40 @@
+Model wc_scorers {
+  type: 'table'
+  label: 'Scorers'
+  description: 'Top-scorer leaderboard derived from the goal event stream (Golden Boot race).'
+  data_source_name: 'demo_worldcup'
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_player_id }};;
+    primary_key: true
+  }
+  dimension player_name {
+    label: 'Scorer'
+    type: 'text'
+    definition: @sql {{ #SOURCE.player_name }};;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension goals {
+    label: 'Goals'
+    type: 'number'
+    definition: @sql {{ #SOURCE.goals }};;
+  }
+  dimension penalty_goals {
+    label: 'Penalty Goals'
+    type: 'number'
+    definition: @sql {{ #SOURCE.penalty_goals }};;
+  }
+  dimension boot_rank {
+    label: 'Boot Rank'
+    type: 'number'
+    description: 'Golden Boot rank by goals across all scorers (ties share a rank; the next rank skips, e.g. 1,2,2,4).'
+    definition: @aql rank(order: wc_scorers.goals | desc()) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_scorers"'
+}

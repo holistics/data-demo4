@@ -1,0 +1,21 @@
+Model dbt_finance_expense_categories {
+  type: 'table'
+  label: 'Expense Categories (dbt)'
+  description: 'Expense category dimension from dbt staging (stg_finance__expense_categories).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension category_id {
+    label: 'Category Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.category_id }};;
+  }
+  dimension category_name {
+    label: 'Category Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.category_name }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_staging"."stg_finance__expense_categories"'
+}

@@ -1,0 +1,37 @@
+Model ecommerce_bq_cities {
+  type: 'table'
+  label: 'Cities'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.dim_cities'
+
+  dimension city_id {
+    label: 'City ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.city_id }};;
+  }
+
+  dimension city_name {
+    label: 'City Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.city_name }};;
+  }
+
+  dimension country_code {
+    label: 'Country Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+
+  dimension country_name {
+    label: 'Country Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.country_name }};;
+  }
+
+  dimension continent_name {
+    label: 'Continent Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.continent_name }};;
+  }
+}

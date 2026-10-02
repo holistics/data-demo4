@@ -1,0 +1,52 @@
+Model iceye_fact_pl_budget_vs_actual {
+  type: 'table'
+  label: 'Fact P&L Budget vs Actual'
+  description: 'Monthly plan vs actual, EUR (prod_reporting_finance_fact_pl_budget_vs_actual).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension account_number { label: 'Account Number' type: 'text' definition: @sql {{ #SOURCE.account_number }};; }
+  dimension department_number { label: 'Department Number' type: 'text' definition: @sql {{ #SOURCE.department_number }};; }
+  dimension posting_period_date { label: 'Posting Period Date' type: 'date' definition: @sql {{ #SOURCE.posting_period_date }};; }
+  dimension actual_amount_eur { label: 'Actual Amount EUR' type: 'number' definition: @sql {{ #SOURCE.actual_amount_eur }};; }
+  dimension actual_amount_eur_debit { label: 'Actual Amount EUR Debit' type: 'number' definition: @sql {{ #SOURCE.actual_amount_eur_debit }};; }
+  dimension actual_amount_eur_credit { label: 'Actual Amount EUR Credit' type: 'number' definition: @sql {{ #SOURCE.actual_amount_eur_credit }};; }
+  dimension plan_amount_eur { label: 'Plan Amount EUR' type: 'number' definition: @sql {{ #SOURCE.plan_amount_eur }};; }
+  dimension variance_amount_eur { label: 'Variance Amount EUR' type: 'number' definition: @sql {{ #SOURCE.variance_amount_eur }};; }
+  dimension variance_status { label: 'Variance Status' type: 'text' definition: @sql {{ #SOURCE.variance_status }};; }
+  dimension dwh_created_at { label: 'Dwh Created At' type: 'datetime' definition: @sql {{ #SOURCE.dwh_created_at }};; }
+
+  dimension net_actual_amount_eur {
+    label: 'Net Actual Amount EUR'
+    type: 'number'
+    description: 'Actual credit EUR − Actual debit EUR at line level.'
+    definition: @aql coalesce(iceye_fact_pl_budget_vs_actual.actual_amount_eur_credit, 0) - coalesce(iceye_fact_pl_budget_vs_actual.actual_amount_eur_debit, 0);;
+    format: '[€]#,###0.00'
+  }
+  measure net_actual_amount_eur_agg {
+    label: 'Net Actual Amount EUR'
+    type: 'number'
+    description: 'Aggregatable net actual = sum(credit EUR) − sum(debit EUR).'
+    definition: @aql sum(iceye_fact_pl_budget_vs_actual.actual_amount_eur_credit) - sum(iceye_fact_pl_budget_vs_actual.actual_amount_eur_debit);;
+    aggregation_type: 'custom'
+    format: '[€]#,###0.00'
+  }
+  measure actual_amount_eur_agg {
+    label: 'Actual (EUR)'
+    type: 'number'
+    description: 'Total booked activity in EUR (credit + debit) — always positive, so it compares directly to the positive Plan on the budget-vs-actual view.'
+    definition: @aql sum(iceye_fact_pl_budget_vs_actual.actual_amount_eur_credit) + sum(iceye_fact_pl_budget_vs_actual.actual_amount_eur_debit);;
+    aggregation_type: 'custom'
+    format: '[€]#,###0.00'
+  }
+  measure variance_vs_plan_eur_agg {
+    label: 'Variance (EUR)'
+    type: 'number'
+    description: 'Plan − Actual activity (positive = under plan).'
+    definition: @aql sum(iceye_fact_pl_budget_vs_actual.plan_amount_eur) - (sum(iceye_fact_pl_budget_vs_actual.actual_amount_eur_credit) + sum(iceye_fact_pl_budget_vs_actual.actual_amount_eur_debit));;
+    aggregation_type: 'custom'
+    format: '[€]#,###0.00'
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_fact_pl_budget_vs_actual"'
+}

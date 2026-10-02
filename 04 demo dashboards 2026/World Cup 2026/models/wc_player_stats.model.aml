@@ -1,0 +1,197 @@
+Model wc_player_stats {
+  type: 'query'
+  label: 'Player Stats'
+  description: 'One row per squad player with tournament output aggregated from the event stream + lineups: goals (incl. penalties), assists (goal-event assist provider), goal contributions (G+A), appearances, starts, captaincies, and cards. Ranks (goals_rank, ga_rank) are window functions over the whole field — the Golden Boot / playmaker order. Goals come from events (type 0 open play, 41 penalty), the same source wc_scorers is derived from.'
+  data_source_name: 'demo_worldcup'
+  models: [wc_players, wc_events, wc_lineups, wc_matches]
+  query: @sql
+    with apps as (
+      select {{ #l.fifa_player_id }} as fifa_player_id,
+        count(*) as apps,
+        count(*) filter (where {{ #l.is_starter }}) as starts,
+        bool_or({{ #l.is_captain }}) as ever_captain
+      from {{ #wc_lineups as l }}
+      group by {{ #l.fifa_player_id }}
+    ),
+    ev as (
+      select {{ #e.fifa_player_id }} as fifa_player_id,
+        count(*) filter (where {{ #e.type }} in (0, 41)) as goals,
+        count(*) filter (where {{ #e.type }} = 41) as penalty_goals,
+        count(*) filter (where {{ #e.type }} = 2) as yellows,
+        count(*) filter (where {{ #e.type }} = 3) as reds
+      from {{ #wc_events as e }}
+      where {{ #e.fifa_player_id }} is not null
+      group by {{ #e.fifa_player_id }}
+    ),
+    ast as (
+      select {{ #ea.assist_player_id }} as fifa_player_id, count(*) as assists
+      from {{ #wc_events as ea }}
+      where {{ #ea.type }} in (0, 41) and {{ #ea.assist_player_id }} is not null
+      group by {{ #ea.assist_player_id }}
+    ),
+    gd as (
+      select {{ #e3.fifa_player_id }} as fifa_player_id,
+        string_agg(
+          '<li><b>' || {{ #e3.match_minute }} || '</b> vs ' ||
+          (case when {{ #e3.team_code }} = {{ #m.home_code }} then {{ #m.away_code }} else {{ #m.home_code }} end) ||
+          (case when {{ #e3.type }} = 41 then ' &middot; pen' else '' end) || '</li>',
+          '' order by {{ #m.match_num }}
+        ) as goal_log_html,
+        -- goal-mouth placement dots for the popover: only goals that carry FIFA coords contribute,
+        -- so this is NULL for players with no placed goal (the section then hides). Calibration maps
+        -- goal_x [33..69] across the posts and goal_y [0..46] from ground up, inverted into the 120x56
+        -- SVG frame (ground line y=52, crossbar y=8). Tune the four bounds against the render.
+        string_agg(
+          case when {{ #e3.goal_x }} is not null and {{ #e3.goal_y }} is not null then
+            '<circle cx="' || round(10 + (least(greatest({{ #e3.goal_x }}, 33), 69) - 33) / 36.0 * 100, 1)
+            || '" cy="' || round(52 - least(greatest({{ #e3.goal_y }}, 0), 46) / 46.0 * 44, 1)
+            || '" r="3.4" class="gp"/>'
+          end,
+          '' order by {{ #m.match_num }}
+        ) as goal_placement_svg
+      from {{ #wc_events as e3 }} join {{ #wc_matches as m }} on {{ #m.match_num }} = {{ #e3.match_num }}
+      where {{ #e3.type }} in (0, 41)
+      group by {{ #e3.fifa_player_id }}
+    )
+    select
+      {{ #p.fifa_player_id }} as fifa_player_id,
+      {{ #p.name }} as name,
+      {{ #p.team_code }} as team_code,
+      {{ #p.shirt_number }} as shirt_number,
+      {{ #p.position }} as position,
+      {{ #p.picture_url }} as picture_url,
+      case {{ #p.position }} when 0 then 'GK' when 1 then 'DF' when 2 then 'MF' when 3 then 'FW' else '—' end as position_group,
+      coalesce(ev.goals, 0) as goals,
+      coalesce(ev.penalty_goals, 0) as penalty_goals,
+      coalesce(ast.assists, 0) as assists,
+      coalesce(ev.goals, 0) + coalesce(ast.assists, 0) as goal_contributions,
+      coalesce(a.apps, 0) as apps,
+      coalesce(a.starts, 0) as starts,
+      coalesce(a.ever_captain, false) as ever_captain,
+      coalesce(ev.yellows, 0) as yellows,
+      coalesce(ev.reds, 0) as reds,
+      rank() over (order by coalesce(ev.goals, 0) desc) as goals_rank,
+      rank() over (order by coalesce(ast.assists, 0) desc) as assists_rank,
+      rank() over (order by coalesce(ev.goals, 0) + coalesce(ast.assists, 0) desc) as ga_rank,
+      -- bar length relative to the current leader (the race ladder fill); the viz has no
+      -- cross-row max, so the proportion is resolved here. nullif guards an all-zero field.
+      round(coalesce(ev.goals, 0)::numeric / nullif(max(coalesce(ev.goals, 0)) over (), 0) * 100, 1) as goals_bar_pct,
+      round(coalesce(ast.assists, 0)::numeric / nullif(max(coalesce(ast.assists, 0)) over (), 0) * 100, 1) as assists_bar_pct,
+      case when coalesce(ev.goals, 0) + coalesce(ast.assists, 0) >= 3 then 1
+           when coalesce(ev.goals, 0) + coalesce(ast.assists, 0) = 2 then 2
+           else 3 end as card_tier,
+      gd.goal_log_html as goal_log_html,
+      gd.goal_placement_svg as goal_placement_svg
+    from {{ #wc_players as p }}
+    left join ev on ev.fifa_player_id = {{ #p.fifa_player_id }}
+    left join ast on ast.fifa_player_id = {{ #p.fifa_player_id }}
+    left join apps a on a.fifa_player_id = {{ #p.fifa_player_id }}
+    left join gd on gd.fifa_player_id = {{ #p.fifa_player_id }};;
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    primary_key: true
+  }
+  dimension name {
+    label: 'Player'
+    type: 'text'
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+  }
+  dimension shirt_number {
+    label: 'Shirt Number'
+    type: 'number'
+  }
+  dimension position {
+    label: 'Position Code'
+    type: 'number'
+    hidden: true
+  }
+  dimension picture_url {
+    label: 'Picture URL'
+    type: 'text'
+  }
+  dimension position_group {
+    label: 'Position Group'
+    type: 'text'
+  }
+  dimension goals {
+    label: 'Goals'
+    type: 'number'
+  }
+  dimension penalty_goals {
+    label: 'Penalty Goals'
+    type: 'number'
+  }
+  dimension assists {
+    label: 'Assists'
+    type: 'number'
+  }
+  dimension goal_contributions {
+    label: 'Goal Contributions'
+    type: 'number'
+    description: 'Goals + assists (G+A) — the gallery hero metric.'
+  }
+  dimension apps {
+    label: 'Appearances'
+    type: 'number'
+  }
+  dimension starts {
+    label: 'Starts'
+    type: 'number'
+  }
+  dimension ever_captain {
+    label: 'Has Captained'
+    type: 'truefalse'
+  }
+  dimension yellows {
+    label: 'Yellow Cards'
+    type: 'number'
+  }
+  dimension reds {
+    label: 'Red Cards'
+    type: 'number'
+  }
+  dimension goals_rank {
+    label: 'Goals Rank'
+    type: 'number'
+    description: 'Golden Boot rank over the whole field (ties share a rank).'
+  }
+  dimension assists_rank {
+    label: 'Assists Rank'
+    type: 'number'
+    description: 'Playmaker rank over the whole field (ties share a rank).'
+  }
+  dimension ga_rank {
+    label: 'G+A Rank'
+    type: 'number'
+  }
+  dimension goals_bar_pct {
+    label: 'Goals Bar %'
+    type: 'number'
+    description: 'Goals as a percentage of the leader\'s goals — the Golden Boot ladder fill width.'
+  }
+  dimension assists_bar_pct {
+    label: 'Assists Bar %'
+    type: 'number'
+    description: 'Assists as a percentage of the leader\'s assists — the Playmaker ladder fill width.'
+  }
+  dimension card_tier {
+    label: 'Card Tier'
+    type: 'number'
+    description: 'FUT card tier by G+A: 1 = gold (3+), 2 = silver (2), 3 = bronze (1). Drives the t{n} class shared with the boot podium.'
+  }
+  dimension goal_log_html {
+    label: 'Goal Log HTML'
+    type: 'text'
+    description: 'Pre-built <li> list of this player\'s goals (minute vs opponent, pen marker) for the card-back popover; null for non-scorers.'
+  }
+  dimension goal_placement_svg {
+    label: 'Goal Placement SVG'
+    type: 'text'
+    description: 'Pre-built <circle> dots (one per goal that carries FIFA goal-mouth coords) for the popover goal map; null when the player has no placed goal, so the map section hides.'
+  }
+  owner: 'hung.dd@holistics.io'
+}

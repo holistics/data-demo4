@@ -1,0 +1,137 @@
+Model demo_services_services {
+  type: 'table'
+  label: 'Services'
+  description: '''
+Service delivery records. NOTE: rows with is_contract=true are bundling parents
+(contracts) — they are NOT real service deliveries. Real deliveries are child rows
+linked via parent_id. Use the is_countable_service flag (or measure service_count
+at the dataset level) to exclude contracts from service counts.
+'''
+  data_source_name: 'demodb'
+
+  dimension service_id {
+    label: 'Service Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.service_id }};;
+    primary_key: true
+  }
+  dimension order_id {
+    label: 'Order Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+  dimension parent_id {
+    label: 'Parent Id'
+    type: 'text'
+    hidden: false
+    description: 'For child services this points to the contract (parent service) that bundles them.'
+    definition: @sql {{ #SOURCE.parent_id }};;
+  }
+  dimension service_line {
+    label: 'Service Line'
+    type: 'text'
+    hidden: false
+    description: 'Examples: Contract, Training, Alpha, Beta, Omega.'
+    definition: @sql {{ #SOURCE.service_line }};;
+  }
+  dimension service_date {
+    label: 'Service Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.service_date }};;
+  }
+  dimension delivered_hours {
+    label: 'Delivered Hours'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.delivered_hours }};;
+  }
+  dimension contract_hours {
+    label: 'Contract Hours'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.contract_hours }};;
+  }
+  dimension is_contract {
+    label: 'Is Contract'
+    type: 'truefalse'
+    hidden: false
+    description: 'TRUE means this row is a contract (bundling parent), not a real service delivery.'
+    definition: @sql {{ #SOURCE.is_contract }};;
+  }
+  dimension is_countable_service {
+    label: 'Is Countable Service'
+    type: 'truefalse'
+    hidden: false
+    description: 'TRUE = real service delivery (the inverse of is_contract). Use this to filter "count of services".'
+    definition: @sql {{ #SOURCE.is_countable_service }};;
+  }
+
+  // ── Derived business-rule dimensions ──────────────────────────────────────
+
+  dimension is_training {
+    label: 'Is Training'
+    type: 'truefalse'
+    description: 'TRUE for Training service line. Training services are NOT eligible for cross-sell credit.'
+    definition: @aql demo_services_services.service_line == 'Training';;
+  }
+
+  dimension is_omega {
+    label: 'Is Omega'
+    type: 'truefalse'
+    description: 'TRUE for Omega service line. Eligible for cross-sell on Class A accounts but NOT Class B.'
+    definition: @aql demo_services_services.service_line == 'Omega';;
+  }
+
+  dimension meets_eligible_hours {
+    label: 'Meets Eligible Hours (>= 10)'
+    type: 'truefalse'
+    description: 'Cross-sell eligibility requires delivered_hours >= 10.'
+    definition: @aql demo_services_services.delivered_hours >= 10;;
+  }
+
+  dimension bonus_rule_era {
+    label: 'Bonus Rule Era'
+    type: 'text'
+    description: '"pre_2025" = legacy rule (Alpha + Beta). "from_2025" = new rule (Alpha + Beta + Omega). Transition date: 2025-01-01.'
+    definition: @aql case(
+      when: demo_services_services.service_date < @2025-01-01, then: 'pre_2025',
+      else: 'from_2025'
+    );;
+  }
+
+  dimension service_value {
+    label: 'Service Value'
+    type: 'number'
+    description: 'Bonus-value proxy. Currently = delivered_hours (POC has no revenue column). Swap to actual revenue field in one place when available.'
+    definition: @aql demo_services_services.delivered_hours;;
+  }
+
+  // ── Convenience measures ──────────────────────────────────────────────────
+
+  measure sum_delivered_hours {
+    label: 'Total Delivered Hours'
+    type: 'number'
+    definition: @aql sum(demo_services_services.delivered_hours);;
+    aggregation_type: 'custom'
+  }
+
+  measure sum_contract_hours {
+    label: 'Total Contract Hours'
+    type: 'number'
+    definition: @aql sum(demo_services_services.contract_hours);;
+    aggregation_type: 'custom'
+  }
+
+  measure sum_service_value {
+    label: 'Total Service Value'
+    type: 'number'
+    definition: @aql sum(demo_services_services.service_value);;
+    aggregation_type: 'custom'
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"demo_services"."services"'
+}

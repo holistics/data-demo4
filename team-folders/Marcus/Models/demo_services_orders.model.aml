@@ -1,0 +1,28 @@
+Model demo_services_orders {
+  type: 'table'
+  label: 'Orders'
+  description: ''
+  data_source_name: 'demodb'
+  dimension order_id {
+    label: 'Order Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_id }};;
+    primary_key: true
+  }
+  dimension account_id {
+    label: 'Account Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.account_id }};;
+  }
+  dimension order_date {
+    label: 'Order Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"demo_services"."orders"'
+}

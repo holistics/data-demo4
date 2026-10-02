@@ -1,0 +1,138 @@
+Dashboard simple_kpi_dashboard {
+  title: 'Simple KPI Dashboard'
+  description: 'A simple dashboard with 3 KPI widgets: GMV, Total Revenue, and Total Orders.'
+
+  block kpi_gmv: VizBlock {
+    label: 'GMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        ref: r(demo_ecommerce_version_2.gmv)
+        label: 'GMV'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_orders.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        label {
+          font_size: 13
+          font_color: '#6B7280'
+        }
+        metric_value {
+          font_size: 28
+          font_color: '#111827'
+        }
+        compare_value {
+          font_size: 13
+        }
+      }
+    }
+  }
+
+  block kpi_revenue: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        ref: r(demo_ecommerce_version_2.revenue)
+        label: 'Total Revenue'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_orders.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        label {
+          font_size: 13
+          font_color: '#6B7280'
+        }
+        metric_value {
+          font_size: 28
+          font_color: '#111827'
+        }
+        compare_value {
+          font_size: 13
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Total Orders'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        ref: r(demo_ecommerce_version_2.total_orders)
+        label: 'Total Orders'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_orders.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        label {
+          font_size: 13
+          font_color: '#6B7280'
+        }
+        metric_value {
+          font_size: 28
+          font_color: '#111827'
+        }
+        compare_value {
+          font_size: 13
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'Overview'
+    width: 1440
+    height: 400
+
+    block kpi_gmv {
+      position: pos(0, 0, 466, 140)
+    }
+
+    block kpi_revenue {
+      position: pos(487, 0, 466, 140)
+    }
+
+    block kpi_orders {
+      position: pos(974, 0, 466, 140)
+    }
+  }
+
+  theme: holistics_ant
+}

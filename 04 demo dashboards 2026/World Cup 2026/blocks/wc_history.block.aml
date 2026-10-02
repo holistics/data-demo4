@@ -1,0 +1,617 @@
+// History tab blocks (honours wall).
+
+Func wc_hist_wall() {
+  TextBlock {
+    content: @md
+<style>
+/* dark green-stained wood paneling: fine vertical grain over wide plank seams (dark groove + thin
+   highlight) on a cool green-wood base, with a soft overhead light pool. The bronze board hangs on it
+   like an honours board on a club wall. */
+.hist-wall { position:relative; width:100%; height:100%; border-radius:14px; overflow:hidden;
+  background:
+    radial-gradient(64% 50% at 50% 40%, rgba(242,200,75,.075), transparent 72%),
+    repeating-linear-gradient(90deg, transparent 0 196px, rgba(0,0,0,.3) 196px 198px, rgba(255,236,200,.03) 198px 199px, transparent 199px 200px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.1) 0 1px, transparent 1px 8px, rgba(255,232,192,.018) 8px 9px, transparent 9px 16px),
+    linear-gradient(180deg, #1b2a22 0%, #122019 52%, #0c1610 100%);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.3); }
+/* gentle ambient vignette so the board sits in a soft pool of light, not a fake cone */
+.hist-wall .glow { position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(118% 86% at 50% 46%, transparent 60%, rgba(3,10,7,.5) 100%); }
+</style>
+<div class="hist-wall"><i class="glow"></i></div>
+;;
+  }
+}
+
+Func wc_hist_zone() {
+  TextBlock {
+    content: @md
+<style>
+.hist-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="hist-zone-label">The archive · 1930–2022 · who owns the World Cup</p>
+;;
+  }
+}
+
+Func wc_hist_champions() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      // Hall of champions = the nations that have actually won (exactly 8). Filtering on wc_titles>0
+      // is both the correct definition and shareable-safe; row_limit is dropped on MarkdownViz
+      // shareable links, and without this guard every nation that ever played would render.
+      filter {
+        field: r(worldcup.wc_titles)
+        operator: 'greater_than'
+        value: 0
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_team_aliases.entity_name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_team_aliases.entity_flag)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Titles'
+          ref: r(worldcup.wc_titles)
+          uname: 'titles'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Finals'
+          ref: r(worldcup.wc_finals_reached)
+          uname: 'finals'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Semis'
+          ref: r(worldcup.wc_semis_reached)
+          uname: 'semis'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Apps'
+          ref: r(worldcup.wc_appearances)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Years'
+          ref: r(worldcup.hist_title_years)
+        }
+      ]
+      content: @md
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&display=swap');
+/* engraved text = dark bronze ink + a 1px light highlight on the lower edge (debossed into metal). */
+.hof-wrap { width:100%; box-sizing:border-box; padding:2px; }
+/* walnut frame: fine grain threads (dark + light) + vertical plank-tone figure + a top-down shade, with a
+   carved bevel (bright top inner edge, dark lower edge). Grain is high-contrast so the wood reads at a glance. */
+.hof { position:relative; border-radius:13px; padding:22px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.13) 0 1px, transparent 1px 7px, rgba(255,212,150,.045) 7px 8px, transparent 8px 14px),
+    linear-gradient(90deg, #3a2817, #4c3722 17%, #32220f 39%, #4a3320 61%, #2c1c0c 83%, #3f2c19),
+    linear-gradient(180deg,#43301d,#2a1b0c);
+  box-shadow:0 30px 48px -22px rgba(4,18,11,.72), 0 2px 0 rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,224,164,.24), inset 0 -5px 8px rgba(0,0,0,.6), inset 0 0 0 1px rgba(0,0,0,.45); }
+/* brass corner screws on the walnut frame */
+.hof::before, .hof::after { content:""; position:absolute; top:6px; width:10px; height:10px; border-radius:50%;
+  background:radial-gradient(120% 120% at 34% 28%, #e4cf94, #6e5526); box-shadow:0 1px 2px rgba(0,0,0,.55), inset 0 -1px 1px rgba(60,40,10,.6); }
+.hof::before { left:6px; } .hof::after { right:6px; }
+.hof-plate { position:relative; overflow:hidden; border-radius:7px; padding:18px 26px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,250,225,.05) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg,#cdaa6a,#b89252 44%,#9c7836);
+  box-shadow:inset 0 0 0 1px rgba(255,240,200,.3), inset 0 2px 7px rgba(255,245,215,.32),
+    inset 0 -12px 26px rgba(60,40,12,.38),
+    0 0 0 2px #241708, 0 0 0 4px rgba(214,176,108,.55), 0 0 0 5px rgba(0,0,0,.35), 0 4px 11px rgba(0,0,0,.55); }
+/* sheen-sweep: a single diagonal glint travels across the bronze on load — light catching polished metal */
+.hof-plate::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:4;
+  background:linear-gradient(105deg, transparent 40%, rgba(255,252,232,.4) 49%, rgba(255,252,232,.12) 53%, transparent 62%);
+  transform:translateX(-130%); animation:hof-sheen 1.5s cubic-bezier(.4,0,.2,1) .35s 1 forwards; }
+@keyframes hof-sheen { to { transform:translateX(130%); } }
+.hof-cap { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:16px; }
+.hof-cap .lr { flex:none; width:60px; height:1.5px; background:linear-gradient(90deg, transparent, rgba(74,52,16,.7)); }
+.hof-cap .lr.r { background:linear-gradient(90deg, rgba(74,52,16,.7), transparent); }
+.hof-title { font-family:'Cinzel',serif; font-weight:800; font-size:27px; letter-spacing:.2em; text-transform:uppercase;
+  color:#46330f; text-shadow:0 1px 0 rgba(255,247,218,.6); white-space:nowrap; }
+.hof-sub { text-align:center; font-family:var(--font-body); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(70,50,16,.66); margin:-10px 0 16px; }
+.hof-colhead, .hof-row { display:grid; grid-template-columns:46px 58px 256px minmax(0,1fr) 72px 72px 80px;
+  gap:16px; align-items:center; }
+.hof-colhead { padding:0 6px 9px; font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:rgba(70,50,16,.62); border-bottom:1px solid rgba(74,52,16,.32);
+  box-shadow:0 1px 0 rgba(255,247,218,.4); }
+.hof-colhead .c { text-align:center; }
+.hof-list { counter-reset:hof; }
+/* engrave-in: rows settle onto the plaque top→bottom, like names being struck one by one */
+.hof-row { counter-increment:hof; padding:11px 6px; border-top:1px solid rgba(74,52,16,.22);
+  box-shadow:inset 0 1px 0 rgba(255,247,218,.34);
+  opacity:0; animation:hof-engrave .5s ease-out forwards; }
+.hof-row:first-child { border-top:0; box-shadow:none; }
+.hof-row:nth-child(1){animation-delay:.30s} .hof-row:nth-child(2){animation-delay:.40s}
+.hof-row:nth-child(3){animation-delay:.50s} .hof-row:nth-child(4){animation-delay:.60s}
+.hof-row:nth-child(5){animation-delay:.70s} .hof-row:nth-child(6){animation-delay:.80s}
+.hof-row:nth-child(7){animation-delay:.90s} .hof-row:nth-child(8){animation-delay:1.0s}
+@keyframes hof-engrave { from { opacity:0; transform:translateY(9px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .hof-row { opacity:1; animation:none; }
+  .hof-plate::after { animation:none; display:none; }
+}
+.hof-rk { font-family:'Cinzel',serif; font-weight:700; font-size:21px; text-align:center; color:rgba(70,50,16,.7);
+  text-shadow:0 1px 0 rgba(255,247,218,.5); }
+.hof-rk::before { content:counter(hof); }
+.hof-row:first-child .hof-rk { color:#7a5a16; }
+.hof .hof-row img { width:42px !important; height:28px !important; border-radius:2px !important; margin:0 !important;
+  display:block !important; object-fit:cover; box-shadow:0 0 0 1px rgba(74,52,16,.5), 0 2px 4px rgba(40,26,8,.5); }
+.hof .hof-row img[src=""], .hof .hof-row img:not([src]) { display:none !important; }
+.hof-nm { min-width:0; }
+.hof-nm .n { display:block; font-family:'Cinzel',serif; font-weight:700; font-size:23px; letter-spacing:.03em;
+  text-transform:uppercase; color:#3c2a0c; text-shadow:0 1px 0 rgba(255,247,218,.55);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hof-nm .y { display:block; font-family:var(--font-body); font-size:10.5px; letter-spacing:.05em;
+  color:rgba(70,50,16,.62); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* the trophy shelf: a recessed bronze channel spanning the column; each title is a cup, so the
+   ribbon length IS the title count — the rows descend like a chart, and the empty channel to the
+   right reads as shelf, not dead space. Cup count comes from --n (inline), width = n × tile. */
+.hof-shelf { position:relative; height:42px; border-radius:5px; display:flex; align-items:center;
+  gap:14px; padding:0 14px; overflow:hidden;
+  background:linear-gradient(180deg, rgba(60,40,12,.2), rgba(60,40,12,.06));
+  box-shadow:inset 0 2px 3px rgba(40,26,8,.4), inset 0 -1px 0 rgba(255,247,218,.28); }
+.hof-shelf .ct { flex:none; font-family:'Cinzel',serif; font-weight:800; font-size:32px; line-height:1; color:#43300d;
+  text-shadow:0 1px 0 rgba(255,247,218,.6), 0 -1px 1px rgba(60,40,10,.22); }
+.hof-shelf .cups { flex:none; height:30px; width:calc(var(--n) * 34px);
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 24'><g fill='%236e5113'><path d='M8 3h12v2.5c0 3.6-2.7 6.5-6 6.5S8 9.1 8 5.5V3z'/><path d='M5 4h3v2H7c0 1.3.6 2.3 1.5 2.9C6 9 5 7.1 5 5V4z'/><path d='M23 4h-3v2h1c0 1.3-.6 2.3-1.5 2.9C22 9 23 7.1 23 5V4z'/><rect x='13' y='12' width='2' height='3'/><path d='M10 16h8l-1-2H11z'/><rect x='9' y='16' width='10' height='2.2' rx='1'/></g></svg>") repeat-x left center;
+  background-size:34px 30px; filter:drop-shadow(0 1px 0 rgba(255,247,218,.4)); }
+.hof-stat { text-align:center; line-height:1; }
+.hof-stat .v { display:block; font-family:'Cinzel',serif; font-weight:700; font-size:25px; color:#43300d;
+  text-shadow:0 1px 0 rgba(255,247,218,.5); }
+.hof-foot { margin-top:15px; padding-top:12px; border-top:1px solid rgba(74,52,16,.28);
+  display:flex; justify-content:space-between; gap:10px;
+  font-family:var(--font-body); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:rgba(70,50,16,.58); }
+</style>
+<div class="hof-wrap"><div class="hof"><div class="hof-plate">
+  <div class="hof-cap"><span class="lr"></span><span class="hof-title">Hall of Champions</span><span class="lr r"></span></div>
+  <div class="hof-sub">Every nation to lift the trophy · 1930–2022</div>
+  <div class="hof-colhead"><span class="c">#</span><span></span><span>Nation</span><span>Titles won</span><span class="c">Finals</span><span class="c">Semis</span><span class="c">Apps</span></div>
+  <div class="hof-list">
+{% map(rows) %}
+  <div class="hof-row">
+    <span class="hof-rk wc-num"></span>
+    <img src="{{ `Flag`.raw }}" alt="" />
+    <span class="hof-nm"><span class="n">{{ `Team`.formatted }}</span><span class="y wc-num">Won {{ values.`Years`.raw }}</span></span>
+    <span class="hof-shelf"><span class="ct wc-num">{{ values.`Titles`.formatted }}</span><span class="cups" style="--n:{{ values.`Titles`.raw }};"></span></span>
+    <span class="hof-stat"><span class="v wc-num">{{ values.`Finals`.formatted }}</span></span>
+    <span class="hof-stat"><span class="v wc-num">{{ values.`Semis`.formatted }}</span></span>
+    <span class="hof-stat"><span class="v wc-num">{{ values.`Apps`.formatted }}</span></span>
+  </div>
+{% end %}
+  </div>
+  <div class="hof-foot">
+    <span>Engraved by titles · West Germany counts as Germany</span>
+    <span>22 editions played · 8 nations have ever lifted it</span>
+  </div>
+</div></div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'titles'
+            direction: 'desc'
+          },
+          SortSetting {
+            key: 'finals'
+            direction: 'desc'
+          },
+          SortSetting {
+            key: 'semis'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 8
+      }
+    }
+  }
+}
+
+Func wc_hist_roll() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      rows: [
+        VizFieldFull {
+          label: 'Yr'
+          ref: r(wc_history_finals.year)
+          uname: 'yr'
+          hidden: true
+        },
+        VizFieldFull {
+          label: 'Edition'
+          ref: r(wc_history_finals.year_text)
+        },
+        VizFieldFull {
+          label: 'Host'
+          ref: r(wc_history_finals.host_name)
+        },
+        VizFieldFull {
+          label: 'Champ'
+          ref: r(wc_history_finals.champ_name)
+        },
+        VizFieldFull {
+          label: 'CFlag'
+          ref: r(wc_history_finals.champ_flag)
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(wc_history_finals.score_label)
+        },
+        VizFieldFull {
+          label: 'Runner'
+          ref: r(wc_history_finals.runner_name)
+        },
+        VizFieldFull {
+          label: 'RFlag'
+          ref: r(wc_history_finals.runner_flag)
+        }
+      ]
+      content: @md
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&display=swap');
+.roll-wrap { width:100%; box-sizing:border-box; padding:2px; }
+/* walnut frame — same grain/bevel/corner-screw language as the Hall plaque */
+.roll { position:relative; border-radius:13px; padding:22px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.13) 0 1px, transparent 1px 7px, rgba(255,212,150,.045) 7px 8px, transparent 8px 14px),
+    linear-gradient(90deg, #3a2817, #4c3722 17%, #32220f 39%, #4a3320 61%, #2c1c0c 83%, #3f2c19),
+    linear-gradient(180deg,#43301d,#2a1b0c);
+  box-shadow:0 30px 48px -22px rgba(4,18,11,.72), 0 2px 0 rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,224,164,.24), inset 0 -5px 8px rgba(0,0,0,.6), inset 0 0 0 1px rgba(0,0,0,.45); }
+.roll::before, .roll::after { content:""; position:absolute; top:6px; width:10px; height:10px; border-radius:50%;
+  background:radial-gradient(120% 120% at 34% 28%, #e4cf94, #6e5526); box-shadow:0 1px 2px rgba(0,0,0,.55), inset 0 -1px 1px rgba(60,40,10,.6); }
+.roll::before { left:6px; } .roll::after { right:6px; }
+.roll-plate { position:relative; overflow:hidden; border-radius:7px; padding:18px 26px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,250,225,.05) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg,#cdaa6a,#b89252 44%,#9c7836);
+  box-shadow:inset 0 0 0 1px rgba(255,240,200,.3), inset 0 2px 7px rgba(255,245,215,.32),
+    inset 0 -12px 26px rgba(60,40,12,.38),
+    0 0 0 2px #241708, 0 0 0 4px rgba(214,176,108,.55), 0 0 0 5px rgba(0,0,0,.35), 0 4px 11px rgba(0,0,0,.55); }
+.roll-plate::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:4;
+  background:linear-gradient(105deg, transparent 40%, rgba(255,252,232,.4) 49%, rgba(255,252,232,.12) 53%, transparent 62%);
+  transform:translateX(-130%); animation:roll-sheen 1.6s cubic-bezier(.4,0,.2,1) .35s 1 forwards; }
+@keyframes roll-sheen { to { transform:translateX(130%); } }
+.roll-cap { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:14px; }
+.roll-cap .lr { flex:none; width:60px; height:1.5px; background:linear-gradient(90deg, transparent, rgba(74,52,16,.7)); }
+.roll-cap .lr.r { background:linear-gradient(90deg, rgba(74,52,16,.7), transparent); }
+.roll-title { font-family:'Cinzel',serif; font-weight:800; font-size:25px; letter-spacing:.2em; text-transform:uppercase;
+  color:#46330f; text-shadow:0 1px 0 rgba(255,247,218,.6); white-space:nowrap; }
+.roll-sub { text-align:center; font-family:var(--font-body); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(70,50,16,.66); margin:-8px 0 14px; }
+.roll-colhead, .roll-row { display:grid; grid-template-columns:210px minmax(0,1fr) 150px minmax(0,1fr);
+  gap:18px; align-items:center; }
+.roll-colhead { padding:0 6px 8px; font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:rgba(70,50,16,.62); border-bottom:1px solid rgba(74,52,16,.32);
+  box-shadow:0 1px 0 rgba(255,247,218,.4); }
+.roll-colhead .c { text-align:center; }
+.roll-colhead .e { text-align:right; }
+/* engrave-in: finals settle onto the plaque oldest→newest, like a roll being struck line by line */
+.roll-row { padding:8.5px 6px; border-top:1px solid rgba(74,52,16,.2); box-shadow:inset 0 1px 0 rgba(255,247,218,.3);
+  opacity:0; animation:roll-engrave .5s ease-out forwards; }
+.roll-row:first-child { border-top:0; box-shadow:none; }
+.roll-row:nth-child(1){animation-delay:.30s} .roll-row:nth-child(2){animation-delay:.33s}
+.roll-row:nth-child(3){animation-delay:.36s} .roll-row:nth-child(4){animation-delay:.39s}
+.roll-row:nth-child(5){animation-delay:.42s} .roll-row:nth-child(6){animation-delay:.45s}
+.roll-row:nth-child(7){animation-delay:.48s} .roll-row:nth-child(8){animation-delay:.51s}
+.roll-row:nth-child(9){animation-delay:.54s} .roll-row:nth-child(10){animation-delay:.57s}
+.roll-row:nth-child(11){animation-delay:.60s} .roll-row:nth-child(12){animation-delay:.63s}
+.roll-row:nth-child(13){animation-delay:.66s} .roll-row:nth-child(14){animation-delay:.69s}
+.roll-row:nth-child(15){animation-delay:.72s} .roll-row:nth-child(16){animation-delay:.75s}
+.roll-row:nth-child(17){animation-delay:.78s} .roll-row:nth-child(18){animation-delay:.81s}
+.roll-row:nth-child(19){animation-delay:.84s} .roll-row:nth-child(20){animation-delay:.87s}
+.roll-row:nth-child(21){animation-delay:.90s} .roll-row:nth-child(22){animation-delay:.93s}
+@keyframes roll-engrave { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .roll-row { opacity:1; animation:none; }
+  .roll-plate::after { animation:none; display:none; }
+}
+.roll-ed { line-height:1.05; }
+.roll-ed .y { font-family:'Cinzel',serif; font-weight:700; font-size:20px; color:#3c2a0c; text-shadow:0 1px 0 rgba(255,247,218,.55); }
+.roll-ed .h { display:block; font-family:var(--font-body); font-size:10px; letter-spacing:.05em; text-transform:uppercase;
+  color:rgba(70,50,16,.6); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.roll-side { display:flex; align-items:center; gap:10px; min-width:0; }
+.roll-side.win { font-weight:700; }
+.roll-side.lose { justify-content:flex-end; text-align:right; }
+.roll .roll-side img { width:34px !important; height:23px !important; border-radius:2px !important; margin:0 !important;
+  display:block !important; flex:none; object-fit:cover; box-shadow:0 0 0 1px rgba(74,52,16,.5), 0 2px 4px rgba(40,26,8,.5); }
+.roll .roll-side img[src=""], .roll .roll-side img:not([src]) { display:none !important; }
+.roll-side .nm { font-family:'Cinzel',serif; letter-spacing:.02em; text-transform:uppercase; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.roll-side.win .nm { font-weight:700; font-size:17px; color:#7a5a16; text-shadow:0 1px 0 rgba(255,247,218,.6); }
+.roll-side.lose .nm { font-weight:600; font-size:14px; color:rgba(60,42,12,.78); }
+/* scoreline cartouche — a small recessed bronze plate, the engraved final result */
+.roll-score { justify-self:center; font-family:'Cinzel',serif; font-weight:700; font-size:16px; color:#43300d;
+  text-shadow:0 1px 0 rgba(255,247,218,.5); padding:3px 12px; border-radius:5px; white-space:nowrap;
+  background:linear-gradient(180deg, rgba(60,40,12,.16), rgba(60,40,12,.04));
+  box-shadow:inset 0 1px 2px rgba(40,26,8,.35), inset 0 -1px 0 rgba(255,247,218,.3); }
+.roll-foot { margin-top:14px; padding-top:12px; border-top:1px solid rgba(74,52,16,.28);
+  display:flex; justify-content:space-between; gap:10px;
+  font-family:var(--font-body); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:rgba(70,50,16,.58); }
+</style>
+<div class="roll-wrap"><div class="roll"><div class="roll-plate">
+  <div class="roll-cap"><span class="lr"></span><span class="roll-title">Roll of Champions</span><span class="lr r"></span></div>
+  <div class="roll-sub">Every final · 1930–2022</div>
+  <div class="roll-colhead"><span>Edition · Host</span><span>Champion</span><span class="c">Final</span><span class="e">Runner-up</span></div>
+  <div class="roll-list">
+{% map(rows) %}
+  <div class="roll-row">
+    <span class="roll-ed"><span class="y wc-num">{{ `Edition`.formatted }}</span><span class="h">{{ `Host`.formatted }}</span></span>
+    <span class="roll-side win"><img src="{{ `CFlag`.raw }}" alt="" /><span class="nm">{{ `Champ`.formatted }}</span></span>
+    <span class="roll-score wc-num">{{ `Score`.formatted }}</span>
+    <span class="roll-side lose"><span class="nm">{{ `Runner`.formatted }}</span><img src="{{ `RFlag`.raw }}" alt="" /></span>
+  </div>
+{% end %}
+  </div>
+  <div class="roll-foot">
+    <span>Engraved oldest → newest · gold = lifted the trophy</span>
+    <span>1950 decided by the final pool — Uruguay's win over Brazil stands as the final</span>
+  </div>
+</div></div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'yr'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 22
+      }
+    }
+  }
+}
+
+Func wc_hist_pedigree() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      // Top 12 nations by all-time pedigree. row_limit is dropped on MarkdownViz shareable links, so
+      // the cap lives in the query as a Top-12 rank on the pedigree_score metric (aggregation 'custom'
+      // uses the metric's own definition). Without it every nation that ever played would render.
+      filter {
+        field: r(wc_team_aliases.entity_name)
+        operator: 'top'
+        value: 12
+        options {
+          rank_by {
+            field: r(worldcup.pedigree_score)
+            aggregation: 'custom'
+            logic: 'standard'
+          }
+        }
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Team'
+          ref: r(wc_team_aliases.entity_name)
+        },
+        VizFieldFull {
+          label: 'Flag'
+          ref: r(wc_team_aliases.entity_flag)
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Ped'
+          ref: r(worldcup.pedigree_score)
+          uname: 'ped'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Titles'
+          ref: r(worldcup.wc_titles)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Finals'
+          ref: r(worldcup.wc_finals_reached)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Semis'
+          ref: r(worldcup.wc_semis_reached)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'Apps'
+          ref: r(worldcup.wc_appearances)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'BarPct'
+          ref: r(worldcup.pedigree_bar_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'AvgPct'
+          ref: r(worldcup.pedigree_avg_pct)
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        },
+        VizFieldFull {
+          label: 'FieldAvg'
+          ref: r(worldcup.pedigree_field_avg)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        }
+      ]
+      content: @md
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&display=swap');
+.ped-wrap { width:100%; box-sizing:border-box; padding:2px; }
+.ped { position:relative; border-radius:13px; padding:22px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.13) 0 1px, transparent 1px 7px, rgba(255,212,150,.045) 7px 8px, transparent 8px 14px),
+    linear-gradient(90deg, #3a2817, #4c3722 17%, #32220f 39%, #4a3320 61%, #2c1c0c 83%, #3f2c19),
+    linear-gradient(180deg,#43301d,#2a1b0c);
+  box-shadow:0 30px 48px -22px rgba(4,18,11,.72), 0 2px 0 rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,224,164,.24), inset 0 -5px 8px rgba(0,0,0,.6), inset 0 0 0 1px rgba(0,0,0,.45); }
+.ped::before, .ped::after { content:""; position:absolute; top:6px; width:10px; height:10px; border-radius:50%;
+  background:radial-gradient(120% 120% at 34% 28%, #e4cf94, #6e5526); box-shadow:0 1px 2px rgba(0,0,0,.55), inset 0 -1px 1px rgba(60,40,10,.6); }
+.ped::before { left:6px; } .ped::after { right:6px; }
+.ped-plate { position:relative; overflow:hidden; border-radius:7px; padding:18px 26px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,250,225,.05) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg,#cdaa6a,#b89252 44%,#9c7836);
+  box-shadow:inset 0 0 0 1px rgba(255,240,200,.3), inset 0 2px 7px rgba(255,245,215,.32),
+    inset 0 -12px 26px rgba(60,40,12,.38),
+    0 0 0 2px #241708, 0 0 0 4px rgba(214,176,108,.55), 0 0 0 5px rgba(0,0,0,.35), 0 4px 11px rgba(0,0,0,.55); }
+.ped-plate::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:4;
+  background:linear-gradient(105deg, transparent 40%, rgba(255,252,232,.4) 49%, rgba(255,252,232,.12) 53%, transparent 62%);
+  transform:translateX(-130%); animation:ped-sheen 1.6s cubic-bezier(.4,0,.2,1) .35s 1 forwards; }
+@keyframes ped-sheen { to { transform:translateX(130%); } }
+.ped-cap { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:14px; }
+.ped-cap .lr { flex:none; width:60px; height:1.5px; background:linear-gradient(90deg, transparent, rgba(74,52,16,.7)); }
+.ped-cap .lr.r { background:linear-gradient(90deg, rgba(74,52,16,.7), transparent); }
+.ped-title { font-family:'Cinzel',serif; font-weight:800; font-size:25px; letter-spacing:.2em; text-transform:uppercase;
+  color:#46330f; text-shadow:0 1px 0 rgba(255,247,218,.6); white-space:nowrap; }
+.ped-sub { text-align:center; font-family:var(--font-body); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(70,50,16,.66); margin:-8px 0 14px; }
+.ped-colhead, .ped-row { display:grid; grid-template-columns:44px 56px 230px minmax(0,1fr) 58px;
+  gap:16px; align-items:center; }
+.ped-colhead { padding:0 6px 8px; font-family:var(--font-disp); font-weight:700; font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:rgba(70,50,16,.62); border-bottom:1px solid rgba(74,52,16,.32);
+  box-shadow:0 1px 0 rgba(255,247,218,.4); }
+.ped-colhead .c { text-align:center; }
+.ped-colhead .e { text-align:right; }
+.ped-list { counter-reset:ped; }
+.ped-row { counter-increment:ped; padding:9px 6px; border-top:1px solid rgba(74,52,16,.22);
+  box-shadow:inset 0 1px 0 rgba(255,247,218,.32);
+  opacity:0; animation:ped-engrave .5s ease-out forwards; }
+.ped-row:first-child { border-top:0; box-shadow:none; }
+.ped-row:nth-child(1){animation-delay:.30s} .ped-row:nth-child(2){animation-delay:.37s}
+.ped-row:nth-child(3){animation-delay:.44s} .ped-row:nth-child(4){animation-delay:.51s}
+.ped-row:nth-child(5){animation-delay:.58s} .ped-row:nth-child(6){animation-delay:.65s}
+.ped-row:nth-child(7){animation-delay:.72s} .ped-row:nth-child(8){animation-delay:.79s}
+.ped-row:nth-child(9){animation-delay:.86s} .ped-row:nth-child(10){animation-delay:.93s}
+.ped-row:nth-child(11){animation-delay:1.0s} .ped-row:nth-child(12){animation-delay:1.07s}
+@keyframes ped-engrave { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ped-row { opacity:1; animation:none; }
+  .ped-plate::after { animation:none; display:none; }
+}
+.ped-rk { font-family:'Cinzel',serif; font-weight:700; font-size:20px; text-align:center; color:rgba(70,50,16,.7);
+  text-shadow:0 1px 0 rgba(255,247,218,.5); }
+.ped-rk::before { content:counter(ped); }
+.ped-row:first-child .ped-rk { color:#7a5a16; }
+.ped .ped-row img { width:40px !important; height:27px !important; border-radius:2px !important; margin:0 !important;
+  display:block !important; object-fit:cover; box-shadow:0 0 0 1px rgba(74,52,16,.5), 0 2px 4px rgba(40,26,8,.5); }
+.ped .ped-row img[src=""], .ped .ped-row img:not([src]) { display:none !important; }
+.ped-nm { min-width:0; }
+.ped-nm .n { display:block; font-family:'Cinzel',serif; font-weight:700; font-size:19px; letter-spacing:.02em;
+  text-transform:uppercase; color:#3c2a0c; text-shadow:0 1px 0 rgba(255,247,218,.55);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ped-nm .br { display:block; font-family:var(--font-body); font-size:10px; letter-spacing:.03em;
+  color:rgba(70,50,16,.62); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ped-nm .br b { color:#7a5a16; font-weight:700; }
+/* pedigree meter: a recessed bronze channel; the gold fill length is the score relative to the leader,
+   the engraved notch marks the field-average baseline — every nation read against the typical WC nation. */
+.ped-meter-wrap { display:flex; align-items:center; gap:12px; min-width:0; }
+.ped-meter { position:relative; flex:1; height:16px; border-radius:4px; overflow:hidden; min-width:40px;
+  background:linear-gradient(180deg, rgba(60,40,12,.24), rgba(60,40,12,.08));
+  box-shadow:inset 0 2px 3px rgba(40,26,8,.4), inset 0 -1px 0 rgba(255,247,218,.26); }
+.ped-meter i { position:absolute; left:0; top:0; bottom:0; border-radius:4px 2px 2px 4px;
+  background:linear-gradient(180deg,#e9cf86,#caa251 52%,#a87f33);
+  box-shadow:inset 0 1px 0 rgba(255,247,218,.55), inset 0 -2px 3px rgba(90,62,18,.5); }
+.ped-meter .base { position:absolute; top:-2px; bottom:-2px; width:2px; z-index:3;
+  background:repeating-linear-gradient(180deg, rgba(40,26,8,.85) 0 2px, transparent 2px 4px); }
+.ped-sc { font-family:'Cinzel',serif; font-weight:800; font-size:21px; text-align:right; color:#43300d;
+  text-shadow:0 1px 0 rgba(255,247,218,.5); }
+.ped-row:first-child .ped-sc { color:#7a5a16; }
+.ped-foot { margin-top:14px; padding-top:12px; border-top:1px solid rgba(74,52,16,.28);
+  display:flex; justify-content:space-between; gap:10px;
+  font-family:var(--font-body); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:rgba(70,50,16,.58); }
+.ped-foot .base-key { display:inline-block; width:2px; height:10px; vertical-align:-1px; margin-right:5px;
+  background:repeating-linear-gradient(180deg, rgba(40,26,8,.85) 0 2px, transparent 2px 4px); }
+</style>
+<div class="ped-wrap"><div class="ped"><div class="ped-plate">
+  <div class="ped-cap"><span class="lr"></span><span class="ped-title">All-time Pedigree</span><span class="lr r"></span></div>
+  <div class="ped-sub">Weighted prestige · 1930–2022</div>
+  <div class="ped-colhead"><span class="c">#</span><span></span><span>Nation</span><span>Pedigree score</span><span class="e">Pts</span></div>
+  <div class="ped-list">
+{% map(rows) %}
+  <div class="ped-row">
+    <span class="ped-rk wc-num"></span>
+    <img src="{{ `Flag`.raw }}" alt="" />
+    <span class="ped-nm"><span class="n">{{ `Team`.formatted }}</span><span class="br"><b class="wc-num">{{ values.`Titles`.formatted }}</b> titles · <b class="wc-num">{{ values.`Finals`.formatted }}</b> finals · <b class="wc-num">{{ values.`Semis`.formatted }}</b> semis · <b class="wc-num">{{ values.`Apps`.formatted }}</b> apps</span></span>
+    <span class="ped-meter-wrap"><span class="ped-meter"><i style="width:{{ values.`BarPct`.raw }}%;"></i><span class="base" style="left:{{ values.`AvgPct`.raw }}%;"></span></span></span>
+    <span class="ped-sc wc-num">{{ values.`Ped`.formatted }}</span>
+  </div>
+{% end %}
+  </div>
+  <div class="ped-foot">
+    <span><span class="base-key"></span>Baseline = field-average pedigree ({{ rows[0].values.`FieldAvg`.formatted }})</span>
+    <span>8·title · 4·final · 2·semi · 1·appearance · West Germany counts as Germany</span>
+  </div>
+</div></div></div>
+;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'ped'
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 12
+      }
+    }
+  }
+}

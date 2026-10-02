@@ -1,0 +1,28 @@
+Model demo_services_accounts {
+  type: 'table'
+  label: 'Accounts'
+  description: ''
+  data_source_name: 'demodb'
+  dimension account_id {
+    label: 'Account Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.account_id }};;
+    primary_key: true
+  }
+  dimension account_name {
+    label: 'Account Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.account_name }};;
+  }
+  dimension account_class {
+    label: 'Account Class'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.account_class }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"demo_services"."accounts"'
+}

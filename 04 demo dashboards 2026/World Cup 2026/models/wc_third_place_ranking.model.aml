@@ -1,0 +1,71 @@
+Model wc_third_place_ranking {
+  type: 'table'
+  label: 'Third Place Ranking'
+  description: '2026 format: the 8 best third-placed teams (of 12 groups) advance to the Round of 32.'
+  data_source_name: 'demo_worldcup'
+  dimension group_code {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.group_code }};;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+    primary_key: true
+  }
+  dimension team_name {
+    label: 'Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_name }};;
+  }
+  dimension played {
+    label: 'Played'
+    type: 'number'
+    definition: @sql {{ #SOURCE.played }};;
+  }
+  dimension pts {
+    label: 'Points'
+    type: 'number'
+    definition: @sql {{ #SOURCE.pts }};;
+  }
+  dimension gd {
+    label: 'Goal Difference'
+    type: 'number'
+    definition: @sql {{ #SOURCE.gd }};;
+  }
+  dimension gf {
+    label: 'Goals For'
+    type: 'number'
+    definition: @sql {{ #SOURCE.gf }};;
+  }
+  dimension overall_rank {
+    label: 'Overall Rank'
+    type: 'number'
+    definition: @sql {{ #SOURCE.overall_rank }};;
+  }
+  dimension advances {
+    label: 'Advances'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.advances }};;
+  }
+  dimension qual_status {
+    label: 'Qualification Status'
+    type: 'text'
+    definition: @aql case(
+      when: wc_third_place_ranking.overall_rank <= 8, then: 'In the 8',
+      else: 'Below the line'
+    ) ;;
+  }
+  dimension qual_color {
+    label: 'Qualification Color'
+    type: 'text'
+    description: 'Driver field: best-thirds band color (top-8 green, else red).'
+    definition: @aql case(
+      when: wc_third_place_ranking.overall_rank <= 8, then: '#1FA36B',
+      else: '#E5362B'
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_third_place_ranking"'
+}

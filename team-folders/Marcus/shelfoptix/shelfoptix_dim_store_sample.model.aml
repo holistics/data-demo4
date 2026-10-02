@@ -1,0 +1,72 @@
+Model shelfoptix_dim_store_sample {
+  type: 'table'
+  label: 'Shelfoptix dim store sample'
+  description: ''
+  data_source_name: 'demo_bigquery'
+  dimension store_no {
+    label: 'Store no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_no }};;
+  }
+  dimension store_id_no {
+    label: 'Store id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_id_no }};;
+  }
+  dimension retailer_id {
+    label: 'Retailer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.retailer_id }};;
+  }
+  dimension store_name {
+    label: 'Store name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_name }};;
+  }
+  dimension retailer_banner {
+    label: 'Retailer banner'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.retailer_banner }};;
+  }
+  dimension region {
+    label: 'Region'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.region }};;
+  }
+  dimension state {
+    label: 'State'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.state }};;
+  }
+  dimension city {
+    label: 'City'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension store_format {
+    label: 'Store format'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_format }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '${schema_name}.dim_store'
+}

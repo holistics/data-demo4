@@ -1,0 +1,424 @@
+Dataset dabble_trading {
+  label: 'Dabble AU Trading'
+  description: 'Privacy-safe prototype at allocated bet-leg financial grain. Relationships follow leg > bet > user and leg > market > fixture > competition > sport. Date, active, Rocket, restricted-stake, dividend and period-comparison semantics are documented demo assumptions pending Dabble confirmation.'
+  data_source_name: 'dabble_neon'
+  models: [
+    dabble_fact_bet_leg,
+    dabble_fact_bet,
+    dabble_dim_user,
+    dabble_dim_market,
+    dabble_dim_fixture,
+    dabble_dim_competition,
+    dabble_dim_sport
+  ]
+  relationships: [
+    relationship(dabble_fact_bet_leg.bet_id > dabble_fact_bet.bet_id, true),
+    relationship(dabble_fact_bet.user_id > dabble_dim_user.user_id, true),
+    relationship(dabble_fact_bet_leg.market_id > dabble_dim_market.market_id, true),
+    relationship(dabble_dim_market.fixture_id > dabble_dim_fixture.fixture_id, true),
+    relationship(dabble_dim_fixture.competition_id > dabble_dim_competition.competition_id, true),
+    relationship(dabble_dim_competition.sport_id > dabble_dim_sport.sport_id, true),
+  ]
+
+  metric actives {
+    label: 'Actives #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_dim_user.user_id);;
+    description: 'Distinct synthetic users with at least one settled bet in the selected reporting-date and dimension context. This is the demo definition of active and is non-additive across periods.'
+  }
+  metric bets {
+    label: 'Bets #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_fact_bet.bet_id);;
+    description: 'Distinct settled bets in the selected context. Distinct counting prevents multi-leg fanout.'
+  }
+  metric cash_stake {
+    label: 'Cash Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.cash_stake);;
+    description: 'Allocated leg-level cash stake in Australian dollars; additive across all exposed dimensions.'
+  }
+  metric bonus_cash_stake {
+    label: 'Bonus Cash Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.bonus_stake);;
+    description: 'Allocated leg-level bonus cash stake in Australian dollars; additive across all exposed dimensions.'
+  }
+  metric combined_stake {
+    label: 'Combined Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.combined_stake);;
+    description: 'Allocated cash plus bonus stake in Australian dollars. This is the additive source metric for report turnover.'
+  }
+  metric cash_payout {
+    label: 'Cash Payout'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.cash_payout);;
+    description: 'Allocated leg-level cash payout in Australian dollars; additive across exposed dimensions.'
+  }
+  metric bonus_cash_payout {
+    label: 'Bonus Cash Payout'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.bonus_payout);;
+    description: 'Allocated leg-level bonus cash payout in Australian dollars; additive across exposed dimensions.'
+  }
+  metric combined_payout {
+    label: 'Combined Payout'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.combined_payout);;
+    description: 'Allocated cash plus bonus payout in Australian dollars; additive across exposed dimensions.'
+  }
+  metric restricted_stake {
+    label: 'Restricted Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.restricted_stake);;
+    description: 'Allocated restricted stake in Australian dollars. This is synthetic demo logic, not a supplied Dabble production rule.'
+  }
+  metric restricted_stake_pct {
+    label: 'Restricted Stake %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(restricted_stake, combined_stake);;
+    description: 'Restricted Stake divided by Combined Stake. Demo assumption; do not sum percentages.'
+  }
+  metric gross_win {
+    label: 'Gross Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.gross_win);;
+    description: 'Allocated Cash Stake minus Cash Payout plus Rocket Boost, in Australian dollars.'
+  }
+  metric gross_win_pct {
+    label: 'Gross Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(gross_win, combined_stake);;
+    description: 'Gross Win divided by Combined Stake. Recalculate from components at each grouping; do not sum percentages.'
+  }
+  metric rocket_boost {
+    label: 'Rocket Boost'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.rocket_boost);;
+    description: 'Allocated Rocket boost in Australian dollars. Rocket categories and allocation are demo assumptions based on the supplied sample.'
+  }
+  metric bonus_cash_pct {
+    label: 'Bonus Cash %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(bonus_cash_stake, combined_stake);;
+    description: 'Bonus Cash Stake divided by Combined Stake. Recalculate at each grouping; do not sum percentages.'
+  }
+  metric brg {
+    label: 'BRG (Generosity)'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.brg);;
+    description: 'Allocated bonus and generosity give-back in Australian dollars - the deduction between Gross Win and Trading Net Win. Additive across all exposed dimensions, on settled reporting date. Report as a cost: rising BRG dilutes margin without any pricing change, and it is owned by Marketing rather than Trading.'
+  }
+  metric brg_pct {
+    label: 'BRG % of Turnover'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(brg, combined_stake);;
+    description: 'BRG divided by Combined Stake - the share of turnover given back as generosity. Equals Gross Win % less Trading Net Win %. Recalculate from components at each grouping; never sum or average this percentage.'
+  }
+  metric cogs {
+    label: 'COGS'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.cogs);;
+    description: 'Allocated cost of goods sold in Australian dollars - racing product and race-field fees, sports controlling-body fees, point-of-consumption tax and GST - deducted between Trading Net Win and Trading Net Revenue. Additive across all exposed dimensions, on settled reporting date. Scales with racing turnover and with customer home-state mix, so a COGS move can be pure mix rather than a cost change.'
+  }
+  metric cogs_pct {
+    label: 'COGS % of Turnover'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(cogs, combined_stake);;
+    description: 'COGS divided by Combined Stake. Equals Trading Net Win % less Trading Net Revenue %. Recalculate from components at each grouping; never sum or average this percentage.'
+  }
+  metric trading_net_win {
+    label: 'Trading Net Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.trading_net_win);;
+    description: 'Allocated Gross Win less BRG in Australian dollars.'
+  }
+  metric trading_net_win_pct {
+    label: 'Trading Net Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(trading_net_win, combined_stake);;
+    description: 'Trading Net Win divided by Combined Stake. Recalculate at each grouping; do not sum percentages.'
+  }
+  metric trading_net_revenue {
+    label: 'Trading Net Revenue'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.trading_net_revenue);;
+    description: 'Allocated Trading Net Win less COGS in Australian dollars.'
+  }
+  metric trading_net_revenue_pct {
+    label: 'Trading Net Revenue %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(trading_net_revenue, combined_stake);;
+    description: 'Trading Net Revenue divided by Combined Stake. Recalculate at each grouping; do not sum percentages.'
+  }
+  metric avg_bet_size {
+    label: 'Avg Bet Size'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql safe_divide(combined_stake, bets);;
+    description: 'Combined Stake divided by distinct Bets in the selected context, in Australian dollars.'
+  }
+  metric avg_stake_per_active {
+    label: 'Avg Stake per Active'
+    type: 'number'
+    format: '$#,##0.00'
+    definition: @aql safe_divide(combined_stake, actives);;
+    description: 'Combined Stake divided by distinct active users in the selected context, in Australian dollars.'
+  }
+  metric weighted_dividend {
+    label: 'Dividend'
+    type: 'number'
+    format: '#,##0.00'
+    definition: @aql safe_divide(sum(dabble_fact_bet_leg, dabble_fact_bet_leg.dividend * dabble_fact_bet_leg.combined_stake), combined_stake);;
+    description: 'Combined-Stake-weighted mean leg dividend. This aggregation is a demo assumption until Dabble confirms production dividend semantics.'
+  }
+  metric expected_gross_win {
+    label: 'Expected Gross Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg, dabble_fact_bet_leg.combined_stake * dabble_fact_bet_leg.expected_margin_rate);;
+    description: 'Gross Win the priced book should have returned: allocated leg stake multiplied by the theoretical margin implied by that leg dividend. Additive across all exposed dimensions.'
+  }
+  metric expected_gross_win_pct {
+    label: 'Expected Gross Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(expected_gross_win, combined_stake);;
+    description: 'Stake-weighted theoretical margin for the selected context - the margin the book was priced to hold. Compare against Gross Win % to separate pricing from result variance.'
+  }
+  metric margin_variance_pct {
+    label: 'Margin Variance (pts)'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql gross_win_pct - expected_gross_win_pct;;
+    description: 'Realised Gross Win % less Expected Gross Win %, in percentage points. Positive means the book ran better than priced; negative means worse. Recalculate at each grouping; do not sum.'
+  }
+
+  metric racing_actives {
+    label: 'Racing Actives #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_dim_user.user_id) | where(dabble_dim_sport.is_racing == true);;
+    description: 'Distinct active users on demo-classified racing sports.'
+  }
+  metric racing_bets {
+    label: 'Racing Bets #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_fact_bet.bet_id) | where(dabble_dim_sport.is_racing == true);;
+    description: 'Distinct bets with allocated legs on demo-classified racing sports.'
+  }
+  metric racing_combined_stake {
+    label: 'Racing Combined Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.combined_stake) | where(dabble_dim_sport.is_racing == true);;
+  }
+  metric racing_gross_win {
+    label: 'Racing Gross Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.gross_win) | where(dabble_dim_sport.is_racing == true);;
+  }
+  metric racing_gross_win_pct {
+    label: 'Racing Gross Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(racing_gross_win, racing_combined_stake);;
+  }
+
+  metric sport_actives {
+    label: 'Sport Actives #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_dim_user.user_id) | where(dabble_dim_sport.is_racing == false);;
+    description: 'Distinct active users on demo-classified non-racing sports.'
+  }
+  metric sport_bets {
+    label: 'Sport Bets #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_fact_bet.bet_id) | where(dabble_dim_sport.is_racing == false);;
+    description: 'Distinct bets with allocated legs on demo-classified non-racing sports.'
+  }
+  metric sport_combined_stake {
+    label: 'Sport Combined Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.combined_stake) | where(dabble_dim_sport.is_racing == false);;
+  }
+  metric sport_gross_win {
+    label: 'Sport Gross Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.gross_win) | where(dabble_dim_sport.is_racing == false);;
+  }
+  metric sport_gross_win_pct {
+    label: 'Sport Gross Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(sport_gross_win, sport_combined_stake);;
+  }
+
+  metric copy_actives {
+    label: 'Copy Actives #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_dim_user.user_id) | where(dabble_fact_bet.rocket_category != 'Not Rocket');;
+    description: 'Distinct users with a synthetic copied or non-copied Rocket bet.'
+  }
+  metric copy_bets {
+    label: 'Copy Bets #'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(dabble_fact_bet.bet_id) | where(dabble_fact_bet.rocket_category != 'Not Rocket');;
+  }
+  metric copy_combined_stake {
+    label: 'Copy Combined Stake'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.combined_stake) | where(dabble_fact_bet.rocket_category != 'Not Rocket');;
+  }
+  metric copy_rocket_boost {
+    label: 'Copy Rocket Boost'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.rocket_boost) | where(dabble_fact_bet.rocket_category != 'Not Rocket');;
+  }
+  metric copy_gross_win {
+    label: 'Copy Gross Win'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql sum(dabble_fact_bet_leg.gross_win) | where(dabble_fact_bet.rocket_category != 'Not Rocket');;
+  }
+  metric copy_gross_win_pct {
+    label: 'Copy Gross Win %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(copy_gross_win, copy_combined_stake);;
+  }
+
+  metric combined_stake_prior_year {
+    label: 'Combined Stake - Prior Year'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql combined_stake | relative_period(dabble_fact_bet.reporting_date, interval(-1 year));;
+    description: 'Combined Stake evaluated one year before the surrounding reporting-date context using relative_period. Demo period comparison follows settled reporting date.'
+  }
+  metric combined_stake_yoy_pct {
+    label: 'Combined Stake YoY %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(combined_stake - combined_stake_prior_year, combined_stake_prior_year);;
+    description: 'Year-over-year change in Combined Stake using the reusable prior-year metric and safe_divide. Demo comparison follows reporting-date context.'
+  }
+  metric trading_net_revenue_prior_year {
+    label: 'Trading Net Revenue - Prior Year'
+    type: 'number'
+    format: '$#,##0'
+    definition: @aql trading_net_revenue | relative_period(dabble_fact_bet.reporting_date, interval(-1 year));;
+    description: 'Trading Net Revenue evaluated one year before the surrounding reporting-date context using relative_period.'
+  }
+  metric trading_net_revenue_yoy_pct {
+    label: 'Trading Net Revenue YoY %'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(trading_net_revenue - trading_net_revenue_prior_year, trading_net_revenue_prior_year);;
+    description: 'Year-over-year change in Trading Net Revenue using the reusable prior-year metric and safe_divide.'
+  }
+
+  view {
+    group trading_metrics {
+      metric actives
+      metric bets
+      metric avg_bet_size
+      metric avg_stake_per_active
+      metric cash_stake
+      metric bonus_cash_stake
+      metric combined_stake
+      metric cash_payout
+      metric bonus_cash_payout
+      metric combined_payout
+      metric restricted_stake
+      metric restricted_stake_pct
+      metric gross_win
+      metric gross_win_pct
+      metric rocket_boost
+      metric bonus_cash_pct
+      metric brg
+      metric brg_pct
+      metric cogs
+      metric cogs_pct
+      metric trading_net_win
+      metric trading_net_win_pct
+      metric trading_net_revenue
+      metric trading_net_revenue_pct
+      metric weighted_dividend
+      metric expected_gross_win
+      metric expected_gross_win_pct
+      metric margin_variance_pct
+    }
+    group prototype_summary_metrics {
+      metric racing_actives
+      metric racing_bets
+      metric racing_combined_stake
+      metric racing_gross_win
+      metric racing_gross_win_pct
+      metric sport_actives
+      metric sport_bets
+      metric sport_combined_stake
+      metric sport_gross_win
+      metric sport_gross_win_pct
+      metric copy_actives
+      metric copy_bets
+      metric copy_combined_stake
+      metric copy_rocket_boost
+      metric copy_gross_win
+      metric copy_gross_win_pct
+    }
+    group period_comparisons {
+      metric combined_stake_prior_year
+      metric combined_stake_yoy_pct
+      metric trading_net_revenue_prior_year
+      metric trading_net_revenue_yoy_pct
+    }
+    model dabble_fact_bet_leg {
+    }
+    model dabble_fact_bet {
+    }
+    model dabble_dim_user {
+    }
+    model dabble_dim_market {
+    }
+    model dabble_dim_fixture {
+    }
+    model dabble_dim_competition {
+    }
+    model dabble_dim_sport {
+    }
+  }
+
+}

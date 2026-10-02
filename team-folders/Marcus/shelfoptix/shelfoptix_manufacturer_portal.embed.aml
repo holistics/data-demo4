@@ -1,0 +1,39 @@
+// Manufacturer cross-retailer embed portal — SEPARATE from the retailer portal
+// (shelfoptix_portal) on purpose: this keeps the union / manufacturer dataset out of
+// retailers' reach entirely. Row scope comes from the `manufacturer` user attribute in
+// the embed token (enforced by the shelfoptix_manufacturer dataset RLP). The app chooses
+// retailer-vs-manufacturer by the logged-in user's type and loads the matching portal.
+EmbedPortal shelfoptix_manufacturer_portal {
+  description: 'ShelfOptix manufacturer self-serve exploration + Ask AI over OSA/OOS, scoped to their own products across their assigned retailers.'
+  objects: [
+    shelfoptix_manufacturer_overview,
+    shelfoptix_manufacturer,
+  ]
+  initial_object: 'ai'
+  ai {
+    customization {
+      global {
+        assistant_name: 'ShelfOptix Assistant'
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
+      }
+      chat_page {
+        icon: 'https://media.holistics.io/shelfoptix_assistant.png'
+        intro {
+          header: 'Ask about your on-shelf availability and out-of-stocks across your retailers.'
+          body: @md
+            ## 🟢 Track your availability across every assigned retailer
+            ## 🏬 Compare retailers, categories and SKUs — your products only
+            ## 📌 Save any insight to your dashboard
+          ;;
+        }
+        prompt_placeholder: 'e.g. Which retailer has the lowest availability for my brand this month?'
+      }
+      toolbar {
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
+      }
+      left_panel {
+        icon: 'https://media.holistics.io/shelfoptix-icon.png'
+      }
+    }
+  }
+}

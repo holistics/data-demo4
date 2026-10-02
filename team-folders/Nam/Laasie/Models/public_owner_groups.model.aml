@@ -1,0 +1,41 @@
+// The tenant boundary of the Laasie demo.
+//
+// An owner group is the external client: a hotel owner or management company that
+// contracts with Laasie to run instant-gratification rewards across its properties.
+// Every fact in this project ultimately rolls up to one owner group, which is why the
+// row-level permission on the `laasie_client` dataset is anchored on THIS model rather
+// than on any individual fact — see Datasets/laasie_client.dataset.aml for why.
+Model public_owner_groups {
+  type: 'table'
+  label: 'Owner Groups'
+  description: 'Hotel owner and management companies that contract with Laasie. One row per owner group. This is the client/tenant entity of the platform: properties belong to an owner group, and every booking, loyalty transaction and redemption rolls up to one through its property. It is also the anchor of row-level scoping in the client-facing dataset.'
+  data_source_name: 'demo_laasie_nam'
+
+  dimension owner_group_id {
+    label: 'Owner Group Id'
+    type: 'number'
+    description: "The **Owner Group Id** uniquely identifies each hotel owner or management company on the platform.  \nIt is the primary key of this model and the field the client portal's row-level permission matches against the scoping user attribute — so an embedded viewer only ever sees rows belonging to their own group. That attribute is `company_id` today; see `laasie_client.dataset.aml` for why it is borrowed and how to move it to a dedicated one."
+    hidden: false
+    definition: @sql {{ #SOURCE.owner_group_id }};;
+    primary_key: true
+  }
+
+  dimension group_name {
+    label: 'Group Name'
+    type: 'text'
+    description: "The **Group Name** is the display name of the owner or management company.  \nUse this for client-level reporting instead of the numeric id. In the external portal a viewer sees only their own group here, so it is a useful confirmation that scoping is working."
+    hidden: false
+    definition: @sql {{ #SOURCE.group_name }};;
+  }
+
+  dimension group_type {
+    label: 'Group Type'
+    type: 'text'
+    description: "The **Group Type** classifies the commercial relationship — for example whether the group owns its properties outright or manages them on behalf of owners.  \nUse it to compare portfolio behaviour across relationship models. This is a label, not an ordinal."
+    hidden: false
+    definition: @sql {{ #SOURCE.group_type }};;
+  }
+
+  owner: 'nam.tran@holistics.io'
+  table_name: '"public"."owner_groups"'
+}

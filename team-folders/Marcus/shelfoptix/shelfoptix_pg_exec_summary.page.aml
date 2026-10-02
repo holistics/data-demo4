@@ -1,0 +1,297 @@
+// ShelfOptix — P&G RetailFocus "Shelf Availability Executive Summary", rebuilt in Holistics.
+//
+// Replicates the customer's own export (RetailFocus _ Shelf Availability — Executive
+// Summary_v20260803_MDM) on their real numbers, seeded by shelfoptix_pg_seed.sql.
+//
+// Every percentage on this page comes from a dataset-level metric, not from a
+// widget-level calculation — that is the point of the replication. Base OSA and
+// Adjusted OSA are each defined once in shelfoptix_pg_exec and reused everywhere.
+Dashboard shelfoptix_pg_exec_summary {
+  title: 'ShelfOptix — P&G Shelf Availability Executive Summary'
+  description: 'Weekly on-shelf availability for the P&G RetailFocus programme. Base OSA counts every in-stock facing; Adjusted OSA removes phantom (ghost) inventory. Rebuilt from the customer export dated 2026-08-03.'
+  theme: shelfoptix
+
+  block header: TextBlock {
+    content: @md <div style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(90deg,#B3141A,#E11B22); padding:16px 24px; border-radius:8px; font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;">
+  <div>
+    <div style="color:#ffffff; font-size:17px; font-weight:700;">P&amp;G RetailFocus — Shelf Availability</div>
+    <div style="color:#ffffff; font-size:12px; opacity:0.85;">Executive Summary · weeks commencing 11 May – 13 Jul 2026</div>
+  </div>
+  <div style="color:#ffffff; text-align:right; font-size:11px; opacity:0.85; line-height:1.4;">
+    Rebuilt in Holistics<br/>from ShelfOptix export v20260803
+  </div>
+</div>;;
+    theme: BlockTheme {
+      padding: 1
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_color: 'transparent'
+        border_width: '0px'
+      }
+    }
+  }
+
+  block kpi_adj: VizBlock {
+    label: 'Adjusted OSA % (phantom removed)'
+    viz: MetricKpi {
+      dataset: shelfoptix_pg_exec
+      value: VizFieldFull {
+        label: ' '
+        ref: r(shelfoptix_pg_exec.adj_osa_pct)
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+  }
+
+  block kpi_base: VizBlock {
+    label: 'Base OSA %'
+    viz: MetricKpi {
+      dataset: shelfoptix_pg_exec
+      value: VizFieldFull {
+        label: ' '
+        ref: r(shelfoptix_pg_exec.base_osa_pct)
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+  }
+
+  block kpi_drag: VizBlock {
+    label: 'Phantom Drag (pts)'
+    viz: MetricKpi {
+      dataset: shelfoptix_pg_exec
+      value: VizFieldFull {
+        label: ' '
+        ref: r(shelfoptix_pg_exec.ghost_drag_pts)
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+  }
+
+  block kpi_stores: VizBlock {
+    label: 'Stores Reporting'
+    viz: MetricKpi {
+      dataset: shelfoptix_pg_exec
+      value: VizFieldFull {
+        label: ' '
+        ref: r(shelfoptix_pg_exec.stores_reporting)
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+      }
+    }
+  }
+
+  block v_trend: VizBlock {
+    label: 'Weekly OSA — Base vs Adjusted (the gap is phantom inventory)'
+    viz: LineChart {
+      dataset: shelfoptix_pg_exec
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_pg_osa_weekly.week_date)
+        label: 'Week'
+        format {
+          type: 'date'
+          pattern: 'dd LLL'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_pg_exec.base_osa_pct)
+            label: 'Base OSA %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color_palette: 1
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_pg_exec.adj_osa_pct)
+            label: 'Adjusted OSA %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 500
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  block v_arms: VizBlock {
+    label: 'Adjusted OSA % by Arm — treated before/after vs matched control'
+    viz: ColumnChart {
+      dataset: shelfoptix_pg_exec
+      x_axis: VizFieldFull {
+        ref: r(shelfoptix_pg_osa_weekly_arms.arm)
+        label: 'Arm'
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(shelfoptix_pg_exec.arm_adj_osa_pct)
+            label: 'Adjusted OSA %'
+            format {
+              type: 'number'
+              pattern: '#,##0.0'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 100
+      }
+    }
+  }
+
+  block t_detail: VizBlock {
+    label: 'Weekly detail by arm'
+    viz: DataTable {
+      dataset: shelfoptix_pg_exec
+      fields: [
+        VizFieldFull {
+          ref: r(shelfoptix_pg_osa_weekly_arms.week_date)
+          label: 'Week'
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_pg_osa_weekly_arms.arm)
+          label: 'Arm'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_pg_exec.arm_adj_osa_pct)
+          label: 'Adj OSA %'
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_pg_exec.arm_base_osa_pct)
+          label: 'Base OSA %'
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        },
+        VizFieldFull {
+          ref: r(shelfoptix_pg_exec.arm_matched_pairs)
+          label: 'Matched Pairs'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      settings {
+        row_limit: 500
+      }
+    }
+  }
+
+  block notes: TextBlock {
+    content: @md
+**How these numbers are defined** — both measures are governed metrics in the `shelfoptix_pg_exec` dataset, so every widget here and any future dashboard or AI answer uses the same definition.
+
+- **Base OSA %** = in-stock facings ÷ observed facings
+- **Adjusted OSA %** = (in-stock facings − ghost facings) ÷ observed facings
+- **Phantom Drag** = the gap between the two, in percentage points
+
+Recovered from the ShelfOptix export dated 2026-08-03 and verified against all 40 rows with no mismatches. Open questions for ShelfOptix: how ghost and negative-on-hand are detected, and how the treated/control pairs are matched.;;
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    grid_size: 20
+    auto_expand_vertically: true
+    block header {
+      position: pos(20, 20, 1260, 80)
+    }
+    block kpi_adj {
+      position: pos(20, 120, 300, 150)
+    }
+    block kpi_base {
+      position: pos(340, 120, 300, 150)
+    }
+    block kpi_drag {
+      position: pos(660, 120, 300, 150)
+    }
+    block kpi_stores {
+      position: pos(980, 120, 300, 150)
+    }
+    block v_trend {
+      position: pos(20, 280, 1260, 360)
+    }
+    block v_arms {
+      position: pos(20, 670, 620, 360)
+    }
+    block t_detail {
+      position: pos(660, 670, 620, 360)
+    }
+    block notes {
+      position: pos(20, 1050, 1260, 200)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

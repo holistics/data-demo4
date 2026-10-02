@@ -218,7 +218,6 @@ Dashboard demo_func_ecommerce {
   block v19: get_bar(revenue, 'India', 'Revenue $')
   block v20: get_bar(revenue, 'Singapore', 'Revenue $')
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 1440
   }
 }

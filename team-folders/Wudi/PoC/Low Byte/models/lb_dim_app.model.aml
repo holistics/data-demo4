@@ -1,0 +1,118 @@
+Model lb_dim_app {
+  type: 'table'
+  label: 'Dim App'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_app"'
+
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension game_key {
+    label: 'Game Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.game_key }};;
+  }
+  dimension platform_key {
+    label: 'Platform Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.platform_key }};;
+  }
+  dimension app_identifier {
+    label: 'App Identifier'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_identifier }};;
+  }
+  dimension store_app_id {
+    label: 'Store App Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_app_id }};;
+  }
+  dimension firebase_project_id {
+    label: 'Firebase Project Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.firebase_project_id }};;
+  }
+  dimension firebase_app_id {
+    label: 'Firebase App Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.firebase_app_id }};;
+  }
+  dimension bytebrew_app_id {
+    label: 'Bytebrew App Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.bytebrew_app_id }};;
+  }
+  dimension appsflyer_app_id {
+    label: 'Appsflyer App Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.appsflyer_app_id }};;
+  }
+  dimension admob_app_id {
+    label: 'Admob App Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.admob_app_id }};;
+  }
+  dimension app_display_name {
+    label: 'App Display Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_display_name }};;
+  }
+  dimension release_status {
+    label: 'Release Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.release_status }};;
+  }
+  dimension default_time_zone {
+    label: 'Default Time Zone'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.default_time_zone }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension valid_from {
+    label: 'Valid From'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.valid_from }};;
+  }
+  dimension valid_to {
+    label: 'Valid To'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.valid_to }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}

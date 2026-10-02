@@ -1,0 +1,174 @@
+// Players tab — "The Race": two broadcast TIMING-BOARDS standing apart from the FUT wall.
+//   · Golden Boot  — top scorers, lanes lit gold, ranked by goals (wc_player_stats.goals_rank)
+//   · Playmaker    — top assisters, lanes lit ice, ranked by assists (wc_player_stats.assists_rank)
+// Each contender owns a lane that FILLS toward the current leader (goals_bar_pct / assists_bar_pct,
+// resolved in SQL since MarkdownViz has no cross-row max). The shared rl-* material lives in
+// header_rail (global host) so the two boards are one component differing only by metric + hue —
+// deliberately NOT the foil .fut card. These boards stay analytical (no popover) so the gallery
+// owns the card-back interaction and we avoid duplicate popover ids on the page.
+
+// Backdrop for the race section so the two timing-boards sit in one unified dark zone instead of
+// floating as two panels on the green page surround. A CALMER sibling of the gallery's pack-reveal
+// (its own material — a broadcast "analyst's desk", no gantry/motes): a deep navy-black panel with
+// a soft central lift + faint scanlines, and accent pools that echo each board — GOLD under the
+// Golden Boot (left), ICE under the Playmaker (right). Lowest layer; the boards + label stack on it.
+Func wc_race_backdrop() {
+  TextBlock {
+    content: @md
+<style>
+.rbk { position:relative; width:100%; height:100%; border-radius:16px; overflow:hidden;
+  background:
+    radial-gradient(48% 82% at -1% 52%, rgba(242,200,75,.11), transparent 60%),
+    radial-gradient(48% 82% at 101% 52%, rgba(120,210,232,.11), transparent 60%),
+    radial-gradient(82% 72% at 50% 32%, rgba(150,184,224,.07), transparent 64%),
+    radial-gradient(130% 96% at 50% -8%, #1a2531 0%, #0c121b 54%, #060a10 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 0 0 1px rgba(0,0,0,.5),
+    inset 0 0 54px -10px rgba(150,184,224,.16), 0 30px 60px -34px rgba(0,0,0,.6); }
+/* faint broadcast scanlines — the analyst-desk texture that sets it apart from the stadium void */
+.rbk::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 4px); }
+/* vignette into the corners */
+.rbk::after { content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(122% 100% at 50% 40%, transparent 56%, rgba(0,0,0,.5) 100%); }
+</style>
+<div class="rbk"></div>
+;;
+  }
+}
+
+Func wc_race_zone_label() {
+  TextBlock {
+    content: @md
+<style>
+.rc-zone-label { text-align:center; font-family:var(--font-disp); font-weight:700; text-transform:uppercase;
+  letter-spacing:.22em; font-size:11px; color:var(--line); text-shadow:0 1px 4px rgba(0,0,0,.4); opacity:.9; margin:0; }
+</style>
+<p class="rc-zone-label">The race · golden boot &amp; playmaker</p>
+;;
+  }
+}
+
+Func wc_boot_ladder() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_player_stats.goals)
+        operator: 'greater_than'
+        value: 0
+      }
+      // Top 8 by goals: filter to the 8th rank instead of row_limit (row_limit is dropped on
+      // MarkdownViz shareable links, so the limit must live in the query as a filter). The goals>0
+      // guard above stops zero-goal players (collapsed to one tie rank) from flooding in on ties.
+      filter {
+        field: r(wc_player_stats.goals_rank)
+        operator: 'less_than'
+        value: 9
+      }
+      rows: [
+        VizFieldFull { label: 'Rank' ref: r(wc_player_stats.goals_rank) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Name' ref: r(wc_player_stats.name) },
+        VizFieldFull { label: 'Team' ref: r(wc_player_stats.team_code) },
+        VizFieldFull { label: 'Club' ref: r(wc_player_bio.club) },
+        VizFieldFull { label: 'Flag' ref: r(wc_teams.flag_url) },
+        VizFieldFull { label: 'Bar' ref: r(wc_player_stats.goals_bar_pct) },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(wc_player_stats.goals)
+          uname: 'goals'
+          format { type: 'number' pattern: '#,##0' }
+        }
+      ]
+      content: @md
+<div class="rl boot">
+  <div class="rl-head">
+    <div class="rl-mark"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="margin:0 !important"><path d="M3 7h3.4l.7 4.1 7.3 2.3c2.4.7 4.3 1.9 4.3 4V18a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><path d="M6 19v1.4M10 19v1.4M14 19v1.4" stroke-width="1.5"/></svg></div>
+    <div class="rl-ttl"><span class="a">Golden Boot</span><span class="b">The race for <em>goals</em></span></div>
+  </div>
+  <div class="rl-list">
+{% map(rows) %}
+  <div class="rl-row r{{ `Rank`.formatted }}">
+  <span class="rl-fill" style="--w:{{ `Bar`.raw }}%"></span>
+  <span class="rl-rank wc-num">{{ `Rank`.formatted }}</span>
+  <img class="rl-flag" src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />
+  <span class="rl-id"><span class="n">{{ `Name`.formatted }}</span><span class="s">{{ `Team`.formatted }} &middot; {{ `Club`.formatted }}</span></span>
+  <span class="rl-val wc-num">{{ `Goals`.formatted }}</span>
+  </div>
+{% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting { key: 'goals' direction: 'desc' }
+        ]
+        pagination_size: 8
+      }
+    }
+  }
+}
+
+Func wc_playmaker_ladder() {
+  VizBlock {
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: worldcup
+      filter {
+        field: r(wc_player_stats.assists)
+        operator: 'greater_than'
+        value: 0
+      }
+      // Top 8 by assists via 8th-rank filter (see Golden Boot above) — row_limit is not honoured on
+      // MarkdownViz shareable links; the assists>0 guard prevents zero-assist tie flooding.
+      filter {
+        field: r(wc_player_stats.assists_rank)
+        operator: 'less_than'
+        value: 9
+      }
+      rows: [
+        VizFieldFull { label: 'Rank' ref: r(wc_player_stats.assists_rank) format { type: 'number' pattern: '#,##0' } },
+        VizFieldFull { label: 'Name' ref: r(wc_player_stats.name) },
+        VizFieldFull { label: 'Team' ref: r(wc_player_stats.team_code) },
+        VizFieldFull { label: 'Club' ref: r(wc_player_bio.club) },
+        VizFieldFull { label: 'Flag' ref: r(wc_teams.flag_url) },
+        VizFieldFull { label: 'Bar' ref: r(wc_player_stats.assists_bar_pct) },
+        VizFieldFull {
+          label: 'Assists'
+          ref: r(wc_player_stats.assists)
+          uname: 'assists'
+          format { type: 'number' pattern: '#,##0' }
+        }
+      ]
+      content: @md
+<div class="rl play">
+  <div class="rl-head">
+    <div class="rl-mark"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ac)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="margin:0 !important"><path d="M3 8h12M12 5l3 3-3 3"/><path d="M21 16H9m3 3-3-3 3-3"/></svg></div>
+    <div class="rl-ttl"><span class="a">Playmaker</span><span class="b">The race for <em>assists</em></span></div>
+  </div>
+  <div class="rl-list">
+{% map(rows) %}
+  <div class="rl-row r{{ `Rank`.formatted }}">
+  <span class="rl-fill" style="--w:{{ `Bar`.raw }}%"></span>
+  <span class="rl-rank wc-num">{{ `Rank`.formatted }}</span>
+  <img class="rl-flag" src="{{ `Flag`.raw }}" alt="" style="margin:0 !important" />
+  <span class="rl-id"><span class="n">{{ `Name`.formatted }}</span><span class="s">{{ `Team`.formatted }} &middot; {{ `Club`.formatted }}</span></span>
+  <span class="rl-val wc-num">{{ `Assists`.formatted }}</span>
+  </div>
+{% end %}
+  </div>
+</div>
+;;
+      settings {
+        sorts: [
+          SortSetting { key: 'assists' direction: 'desc' }
+        ]
+        pagination_size: 8
+      }
+    }
+  }
+}

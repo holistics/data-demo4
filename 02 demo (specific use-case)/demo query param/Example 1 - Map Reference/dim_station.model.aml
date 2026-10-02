@@ -2,7 +2,7 @@ Model dim_station {
   type: 'query'
   label: 'Dim Station'
   description: ''
-  data_source_name: 'demo_bigquery'
+  data_source_name: 'demo_bigquery_parameters'
   dimension station_code {
     label: 'Station Code'
     type: 'number'

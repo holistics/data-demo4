@@ -1,0 +1,345 @@
+Model wc_matches {
+  type: 'table'
+  label: 'Matches'
+  description: 'World Cup 2026 fixtures and results (104). Match grain: one row per match.'
+  data_source_name: 'demo_worldcup'
+  dimension match_num {
+    label: 'Match Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.match_num }};;
+    primary_key: true
+  }
+  dimension fifa_match_id {
+    label: 'FIFA Match Id'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.fifa_match_id }};;
+  }
+  dimension fifa_stage_id {
+    label: 'FIFA Stage Id'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.fifa_stage_id }};;
+  }
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+    definition: @sql {{ #SOURCE.stage }};;
+  }
+  dimension group_code {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.group_code }};;
+  }
+  dimension matchday {
+    label: 'Matchday'
+    type: 'number'
+    definition: @sql {{ #SOURCE.matchday }};;
+  }
+  dimension kickoff_utc {
+    label: 'Kickoff (UTC)'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.kickoff_utc }};;
+  }
+  dimension home_slot {
+    label: 'Home Slot'
+    type: 'text'
+    definition: @sql {{ #SOURCE.home_slot }};;
+  }
+  dimension away_slot {
+    label: 'Away Slot'
+    type: 'text'
+    definition: @sql {{ #SOURCE.away_slot }};;
+  }
+  dimension home_code {
+    label: 'Home Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.home_code }};;
+  }
+  dimension away_code {
+    label: 'Away Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.away_code }};;
+  }
+  dimension home_score {
+    label: 'Home Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.home_score }};;
+  }
+  dimension away_score {
+    label: 'Away Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.away_score }};;
+  }
+  dimension home_pen {
+    label: 'Home Penalties'
+    type: 'number'
+    definition: @sql {{ #SOURCE.home_pen }};;
+  }
+  dimension away_pen {
+    label: 'Away Penalties'
+    type: 'number'
+    definition: @sql {{ #SOURCE.away_pen }};;
+  }
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+  }
+  dimension fifa_status {
+    label: 'FIFA Status'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.fifa_status }};;
+  }
+  dimension winner_code {
+    label: 'Winner Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.winner_code }};;
+  }
+  dimension home_formation {
+    label: 'Home Formation'
+    type: 'text'
+    definition: @sql {{ #SOURCE.home_formation }};;
+  }
+  dimension away_formation {
+    label: 'Away Formation'
+    type: 'text'
+    definition: @sql {{ #SOURCE.away_formation }};;
+  }
+  dimension possession_home {
+    label: 'Possession Home'
+    type: 'number'
+    definition: @sql {{ #SOURCE.possession_home }};;
+  }
+  dimension possession_away {
+    label: 'Possession Away'
+    type: 'number'
+    definition: @sql {{ #SOURCE.possession_away }};;
+  }
+  dimension attendance {
+    label: 'Attendance'
+    type: 'number'
+    definition: @sql {{ #SOURCE.attendance }};;
+  }
+  dimension venue {
+    label: 'Venue'
+    type: 'text'
+    definition: @sql {{ #SOURCE.venue }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+  dimension match_label {
+    label: 'Match'
+    type: 'text'
+    description: 'Picker/display key, e.g. "06/12 · 02:00 · KOR vs CZE". Leads with zero-padded month/day + 24h UTC kickoff so the field-filter dropdown sorts CHRONOLOGICALLY (match_num is NOT in kickoff order, and a field filter has no configurable sort — the order must be baked into the value). Undecided knockout teams fall back to slot grammar (1A, W49). Built in SQL because AQL cast() re-applies digit grouping.'
+    definition: @sql to_char({{ #SOURCE.kickoff_utc }}, 'MM/DD · HH24:MI') || ' · ' || coalesce({{ #SOURCE.home_code }}, {{ #SOURCE.home_slot }}) || ' vs ' || coalesce({{ #SOURCE.away_code }}, {{ #SOURCE.away_slot }});;
+  }
+  dimension is_finished {
+    label: 'Is Finished'
+    type: 'truefalse'
+    definition: @aql wc_matches.status == 'FT' ;;
+  }
+  dimension total_match_goals {
+    label: 'Total Match Goals'
+    type: 'number'
+    definition: @aql wc_matches.home_score + wc_matches.away_score ;;
+  }
+  dimension status_label {
+    label: 'Status Label'
+    type: 'text'
+    definition: @aql case(
+      when: wc_matches.status == 'NS', then: 'Upcoming',
+      when: wc_matches.status == 'LIVE', then: 'Live',
+      when: wc_matches.status == 'FT', then: 'Full time',
+      else: wc_matches.status
+    ) ;;
+  }
+  dimension status_color {
+    label: 'Status Color'
+    type: 'text'
+    description: 'Driver field: badge color for the match status (live=red, finished=green, else grey).'
+    definition: @aql case(
+      when: wc_matches.status == 'LIVE', then: '#E5362B',
+      when: wc_matches.status == 'FT', then: '#1FA36B',
+      else: '#9AA4B2'
+    ) ;;
+  }
+  dimension kickoff_label {
+    label: 'Kickoff Label'
+    type: 'text'
+    description: 'Pre-formatted kickoff for card display, e.g. "Sat 13 Jun · 19:00" (UTC).'
+    definition: @aql date_format(wc_matches.kickoff_utc, '%a %d %b · %H:%M') ;;
+  }
+  dimension kickoff_day {
+    label: 'Kickoff Day'
+    type: 'text'
+    description: 'Short kickoff date for compact display, e.g. "13 Jun".'
+    definition: @aql date_format(wc_matches.kickoff_utc, '%d %b') ;;
+  }
+  dimension kickoff_time {
+    label: 'Kickoff Time'
+    type: 'text'
+    description: 'Kickoff time only, 24h UTC, e.g. "19:00".'
+    definition: @aql date_format(wc_matches.kickoff_utc, '%H:%M') ;;
+  }
+  // ---- Time / period drill dimensions (filterable; the dataset's primary date dim is kickoff_date) ----
+  dimension kickoff_date {
+    label: 'Kickoff Date'
+    type: 'date'
+    description: 'Calendar day of kickoff (UTC) — the primary date-drill dimension. Filtering matches (or any per-team fact) to kickoff_date <= D yields an "as of date D" view; a date range drills a window of fixtures.'
+    definition: @aql date_trunc(wc_matches.kickoff_utc, 'day') ;;
+  }
+  dimension phase {
+    label: 'Phase'
+    type: 'text'
+    description: 'Group stage vs Knockout — the coarse split for group-vs-knockout comparison measures.'
+    definition: @aql case(
+      when: wc_matches.stage == 'group', then: 'Group stage',
+      else: 'Knockout'
+    ) ;;
+  }
+  dimension matchday_label {
+    label: 'Matchday / Round'
+    type: 'text'
+    description: 'Filterable round label: "Matchday 1/2/3" for the group stage (from the backfilled matchday column — 2 fixtures per group per matchday), falling back to the knockout stage name ("Round of 32" … "Final"). Use this for the matchday/round drill; matchday itself is NULL for knockouts.'
+    definition: @aql case(
+      when: wc_matches.matchday == 1, then: 'Matchday 1',
+      when: wc_matches.matchday == 2, then: 'Matchday 2',
+      when: wc_matches.matchday == 3, then: 'Matchday 3',
+      else: wc_matches.stage_label
+    ) ;;
+  }
+  dimension matchday_sort {
+    label: 'Matchday Sort'
+    type: 'number'
+    hidden: true
+    description: 'Driver field: chronological sort key for the matchday/round drill — group matchdays 1-3, then knockout rounds in funnel order (R32=4 … Final=9).'
+    definition: @aql case(
+      when: wc_matches.matchday == 1, then: 1,
+      when: wc_matches.matchday == 2, then: 2,
+      when: wc_matches.matchday == 3, then: 3,
+      when: wc_matches.stage == 'r32', then: 4,
+      when: wc_matches.stage == 'r16', then: 5,
+      when: wc_matches.stage == 'qf', then: 6,
+      when: wc_matches.stage == 'sf', then: 7,
+      when: wc_matches.stage == 'third_place', then: 8,
+      when: wc_matches.stage == 'final', then: 9,
+      else: 99
+    ) ;;
+  }
+  dimension featured_sort {
+    label: 'Featured Sort'
+    type: 'number'
+    hidden: true
+    description: 'Driver field: featured-match priority. Live matches sort first (0), then upcoming by soonest kickoff (epoch seconds), then finished by most recent kickoff (inverted epoch keeps the FT bucket after all upcoming values).'
+    definition: @aql case(
+      when: wc_matches.status == 'LIVE', then: 0,
+      when: wc_matches.status == 'NS', then: epoch(wc_matches.kickoff_utc),
+      else: 100000000000 - epoch(wc_matches.kickoff_utc)
+    ) ;;
+  }
+  dimension is_featured {
+    label: 'Is Featured'
+    type: 'truefalse'
+    description: 'Driver: the single featured match — lowest featured_sort (live, else soonest upcoming, else most recent finished) with a match_num tie-break for determinism. The featured hero filters on this and the upcoming-fixtures band excludes it, so the two never show the same match twice.'
+    definition: @sql ({{ #SOURCE.match_num }} = (
+      select sub.match_num
+      from "public"."wc_matches" sub
+      order by (case when sub.status = 'LIVE' then 0
+                     when sub.status = 'NS' then extract(epoch from sub.kickoff_utc)
+                     else 100000000000 - extract(epoch from sub.kickoff_utc) end) asc, sub.match_num asc
+      limit 1
+    )) ;;
+  }
+  dimension in_fixture_band {
+    label: 'In Fixture Band'
+    type: 'truefalse'
+    description: 'Driver: belongs in the Tournament upcoming-fixtures band — not finished AND not the featured match (the featured one is the hero card above, so the band lists the upcoming fixtures after it).'
+    definition: @aql wc_matches.is_finished == false and wc_matches.is_featured == false ;;
+  }
+  dimension stage_label {
+    label: 'Stage Label'
+    type: 'text'
+    description: 'Display name of the match stage, e.g. "Group A", "Round of 32", "Final".'
+    definition: @aql case(
+      when: wc_matches.stage == 'group', then: concat('Group ', wc_matches.group_code),
+      when: wc_matches.stage == 'r32', then: 'Round of 32',
+      when: wc_matches.stage == 'r16', then: 'Round of 16',
+      when: wc_matches.stage == 'qf', then: 'Quarter-final',
+      when: wc_matches.stage == 'sf', then: 'Semi-final',
+      when: wc_matches.stage == 'third_place', then: 'Third place',
+      when: wc_matches.stage == 'final', then: 'Final',
+      else: wc_matches.stage
+    ) ;;
+  }
+  dimension featured_display {
+    label: 'Featured Display'
+    type: 'text'
+    description: 'Driver field: card centre text — score "2 – 1" once the match is live or finished, kickoff time "19:00" while upcoming.'
+    definition: @aql case(
+      when: wc_matches.status == 'NS', then: date_format(wc_matches.kickoff_utc, '%H:%M'),
+      else: concat(cast(wc_matches.home_score, 'text'), ' – ', cast(wc_matches.away_score, 'text'))
+    ) ;;
+  }
+  dimension featured_display_sub {
+    label: 'Featured Display Sub'
+    type: 'text'
+    description: 'Driver field: caption under the card centre text — what the centre value represents per status.'
+    definition: @aql case(
+      when: wc_matches.status == 'NS', then: 'kick-off · UTC',
+      when: wc_matches.status == 'LIVE', then: 'live score',
+      else: 'full time'
+    ) ;;
+  }
+  dimension featured_note {
+    label: 'Featured Note'
+    type: 'text'
+    description: 'Driver field: status-aware footnote for the featured match card.'
+    definition: @aql case(
+      when: wc_matches.status == 'NS', then: 'Possession, xG and scorers go live at kick-off.',
+      when: wc_matches.status == 'LIVE', then: 'Match in progress — score updates with each refresh.',
+      else: 'Full time — final score on the board.'
+    ) ;;
+  }
+  // ---- Header stage-progress ribbon (group on ribbon_short; filter stage to the six funnel stages) ----
+  dimension ribbon_order {
+    label: 'Ribbon Order'
+    type: 'number'
+    hidden: true
+    description: 'Sort key for the header stage-progress ribbon (group=1 → final=6); third place=9 and is filtered out of the ribbon.'
+    definition: @aql case(
+      when: wc_matches.stage == 'group', then: 1,
+      when: wc_matches.stage == 'r32', then: 2,
+      when: wc_matches.stage == 'r16', then: 3,
+      when: wc_matches.stage == 'qf', then: 4,
+      when: wc_matches.stage == 'sf', then: 5,
+      when: wc_matches.stage == 'final', then: 6,
+      else: 9
+    ) ;;
+  }
+  dimension ribbon_short {
+    label: 'Ribbon Stage'
+    type: 'text'
+    description: 'Short stage label for the header ribbon (Group, R32, R16, QF, SF, Final).'
+    definition: @aql case(
+      when: wc_matches.stage == 'group', then: 'Group',
+      when: wc_matches.stage == 'r32', then: 'R32',
+      when: wc_matches.stage == 'r16', then: 'R16',
+      when: wc_matches.stage == 'qf', then: 'QF',
+      when: wc_matches.stage == 'sf', then: 'SF',
+      when: wc_matches.stage == 'final', then: 'Final',
+      else: 'Third place'
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_matches"'
+}

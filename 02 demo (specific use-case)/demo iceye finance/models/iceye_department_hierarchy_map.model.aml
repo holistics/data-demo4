@@ -1,0 +1,19 @@
+Model iceye_department_hierarchy_map {
+  type: 'table'
+  label: 'Department Hierarchy Map'
+  description: 'Department rollup hierarchy (prod_reporting_finance_department_hierarchy_map).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension department_number { label: 'Department Number' type: 'text' primary_key: true definition: @sql {{ #SOURCE.department_number }};; }
+  dimension department_name { label: 'Department Name' type: 'text' definition: @sql {{ #SOURCE.department_name }};; }
+  dimension department_name_mapping { label: 'Department Name Mapping' type: 'text' definition: @sql {{ #SOURCE.department_name_mapping }};; }
+  dimension department_group { label: 'Department Group' type: 'text' definition: @sql {{ #SOURCE.department_group }};; }
+  dimension department_function { label: 'Department Function' type: 'text' definition: @sql {{ #SOURCE.department_function }};; }
+  dimension area { label: 'Area' type: 'text' definition: @sql {{ #SOURCE.area }};; }
+  dimension clt { label: 'CLT' type: 'text' definition: @sql {{ #SOURCE.clt }};; }
+  dimension fbp { label: 'FBP' type: 'text' definition: @sql {{ #SOURCE.fbp }};; }
+  dimension department_status { label: 'Department Status' type: 'text' definition: @sql {{ #SOURCE.department_status }};; }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_iceye_marts"."prod_reporting_finance_department_hierarchy_map"'
+}

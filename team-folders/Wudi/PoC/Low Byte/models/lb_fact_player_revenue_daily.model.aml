@@ -1,0 +1,105 @@
+Model lb_fact_player_revenue_daily {
+  type: 'table'
+  label: 'Fact Player Revenue Daily'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_player_revenue_daily"'
+
+  dimension date_key {
+    label: 'Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.date_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension cohort_install_key {
+    label: 'Cohort Install Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.cohort_install_key }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension reporting_currency_code {
+    label: 'Reporting Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reporting_currency_code }};;
+  }
+  dimension iap_gross_revenue_reporting {
+    label: 'Iap Gross Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iap_gross_revenue_reporting }};;
+  }
+  dimension iap_net_revenue_reporting {
+    label: 'Iap Net Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iap_net_revenue_reporting }};;
+  }
+  dimension ad_revenue_reporting {
+    label: 'Ad Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_revenue_reporting }};;
+  }
+  dimension total_revenue_reporting {
+    label: 'Total Revenue Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.total_revenue_reporting }};;
+  }
+  dimension iap_transaction_count {
+    label: 'Iap Transaction Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iap_transaction_count }};;
+  }
+  dimension ad_impression_count {
+    label: 'Ad Impression Count'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ad_impression_count }};;
+  }
+  dimension attribution_method {
+    label: 'Attribution Method'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.attribution_method }};;
+  }
+  dimension lineage_sources {
+    label: 'Lineage Sources'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.lineage_sources }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

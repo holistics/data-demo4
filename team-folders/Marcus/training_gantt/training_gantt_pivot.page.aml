@@ -1,0 +1,122 @@
+Dashboard training_gantt_pivot {
+  title: 'Training Timeline (Adaptive Pivot)'
+  description: 'Gantt built off the per-day base model as a PIVOT. Columns = full_date by month (the axis adapts to the data / Date Range filter). Cells colored via blue/red 0-1 measures used as CSS opacity. No hard-coded month ticks.'
+
+  block title: TextBlock {
+    content: @md # Training Timeline — Adaptive;;
+  }
+
+  block f_date_range: FilterBlock {
+    label: 'Date Range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: training_pivot
+      field: r(training_gantt_base.full_date)
+    }
+    default {
+      operator: 'matches'
+      value: '2026'
+    }
+  }
+
+  block v_pivot: VizBlock {
+    label: 'Training Gantt (Pivot)'
+    viz: MarkdownViz {
+      dataset: training_pivot
+      rows: [
+        VizFieldFull { ref: r(training_gantt_base.full_name)     format { type: 'text' } },
+        VizFieldFull { ref: r(training_gantt_base.training_name) format { type: 'text' } },
+        VizFieldFull { ref: r(training_gantt_base.trainer)       format { type: 'text' } }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(training_gantt_base.full_date)
+          transformation: 'datetrunc month'
+          format { type: 'date' pattern: 'LLL yy' }
+        }
+      ]
+      values: [
+        VizFieldFull { ref: r(training_pivot.blue_on) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { ref: r(training_pivot.red_on)  format { type: 'number' pattern: 'inherited' } }
+      ]
+      content: @md <style>
+  .pv { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #1f2937; font-size: 12px; padding: 8px 12px 14px 12px; }
+  .pv-legend { display: flex; gap: 22px; align-items: center; font-size: 12px; color: #6b7280; padding: 0 0 12px 250px; }
+  .lg { display: flex; align-items: center; gap: 7px; }
+  .lg-sw { width: 14px; height: 14px; border-radius: 3px; }
+  .lg-blue { background: #3b82f6; }
+  .lg-red { background: #ef4444; }
+  .pv-head { display: flex; align-items: flex-end; border-bottom: 2px solid #e5e7eb; }
+  .pv-head .sp { width: 250px; box-sizing: border-box; flex-shrink: 0; padding: 0 8px 8px 0; font-size: 12px; font-weight: 600; color: #6b7280; }
+  .pv-head .cols { display: flex; flex: 1; }
+  .col-h { flex: 1; text-align: center; font-size: 11px; color: #9ca3af; padding-bottom: 8px; white-space: nowrap; overflow: hidden; }
+  .pv-row { display: flex; align-items: center; height: 34px; border-bottom: 1px solid #f3f4f6; }
+  .pv-row:hover { background: #fafbfc; }
+  .pv-row .lbl { width: 250px; box-sizing: border-box; flex-shrink: 0; padding-right: 10px; overflow: hidden; }
+  .pv-row .nm { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pv-row .sub { font-size: 11px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cells { display: flex; flex: 1; height: 100%; }
+  .cell { flex: 1; position: relative; border-left: 1px solid #f1f3f5; }
+  .fill { position: absolute; top: 50%; transform: translateY(-50%); left: 0; right: 0; height: 17px; }
+  .fill.blue { background: #3b82f6; }
+  .fill.red { background: #ef4444; }
+</style>
+
+<div class="pv">
+  <div class="pv-legend">
+    <div class="lg"><span class="lg-sw lg-blue"></span>Ongoing - planned period</div>
+    <div class="lg"><span class="lg-sw lg-red"></span>Late - overdue until validated / today</div>
+  </div>
+
+  <div class="pv-head">
+    <div class="sp">Employee &middot; Training</div>
+    <div class="cols">
+      {% map(columns) %}<div class="col-h">{{ `Full Date`.formatted }}</div>{% end %}
+    </div>
+  </div>
+
+  {% map(rows) %}
+  <div class="pv-row">
+    <div class="lbl">
+      <div class="nm">{{ `Full Name`.formatted }}</div>
+      <div class="sub">{{ `Training Name`.formatted }} &middot; {{ `Trainer`.formatted }}</div>
+    </div>
+    <div class="cells">
+      {% map(values) %}
+      <div class="cell">
+        <div class="fill blue" style="opacity: {{ value.`Blue On`.raw }};"></div>
+        <div class="fill red" style="opacity: {{ value.`Red On`.raw }};"></div>
+      </div>
+      {% end %}
+    </div>
+  </div>
+  {% end %}
+</div> ;;
+      settings {
+        show_row_total: false
+        show_column_total: false
+        pagination_size: 1000
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1340
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(40, 20, 900, 50)
+    }
+    block f_date_range {
+      position: pos(960, 20, 300, 60)
+    }
+    block v_pivot {
+      position: pos(40, 90, 1260, 460)
+    }
+    mobile {
+      mode: 'auto'
+    }
+    height: 600
+  }
+}

@@ -1,0 +1,70 @@
+Model lb_dim_event {
+  type: 'table'
+  label: 'Dim Event'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_event"'
+
+  dimension event_key {
+    label: 'Event Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.event_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension event_name {
+    label: 'Event Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.event_name }};;
+  }
+  dimension event_category {
+    label: 'Event Category'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.event_category }};;
+  }
+  dimension funnel_stage {
+    label: 'Funnel Stage'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.funnel_stage }};;
+  }
+  dimension event_description {
+    label: 'Event Description'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.event_description }};;
+  }
+  dimension is_conversion_event {
+    label: 'Is Conversion Event'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_conversion_event }};;
+  }
+  dimension is_revenue_event {
+    label: 'Is Revenue Event'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_revenue_event }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

@@ -1,0 +1,72 @@
+Model wc_title_odds_movement {
+  type: 'query'
+  label: 'Title Odds Movement'
+  description: 'One row per team: latest Monte-Carlo championship odds vs the previous nightly run, with the day-over-day shift. Materialised for the same reason as wc_match_odds — a run-over-run lag and signed delta label are not AQL dimensions. NOTE: only a few nightly runs exist this early (first run 12 Jun 2026), so deltas are sparse until runs accumulate; the full title-odds *trend* line is wc_advance_probs (long format, one point per run_date).'
+  data_source_name: 'demo_worldcup'
+  models: [wc_advance_probs]
+  query: @sql
+    with ranked as (
+      select {{ #a.team_code }} as team_code, {{ #a.run_date }} as run_date, {{ #a.p_champion }} as p_champion,
+        row_number() over (partition by {{ #a.team_code }} order by {{ #a.run_date }} desc) as rn
+      from {{ #wc_advance_probs as a }}
+    )
+    select
+      c.team_code,
+      c.run_date,
+      c.p_champion,
+      round(c.p_champion * 100, 1) as p_champion_pct,
+      p.run_date as prev_run_date,
+      p.p_champion as p_champion_prev,
+      round((c.p_champion - p.p_champion) * 100, 1) as delta_pct,
+      case when p.run_date is null then ''
+           when c.p_champion - p.p_champion > 0.0005 then '▲ ' || to_char((c.p_champion - p.p_champion) * 100, 'FM990.0')
+           when p.p_champion - c.p_champion > 0.0005 then '▼ ' || to_char((p.p_champion - c.p_champion) * 100, 'FM990.0')
+           else '· 0.0' end as delta_label,
+      case when p.run_date is null or abs(c.p_champion - p.p_champion) <= 0.0005 then '#9AA4B2'
+           when c.p_champion > p.p_champion then '#1FA36B' else '#E5362B' end as delta_color
+    from ranked c
+    left join ranked p on p.team_code = c.team_code and p.rn = 2
+    where c.rn = 1;;
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    primary_key: true
+  }
+  dimension run_date {
+    label: 'Run Date'
+    type: 'date'
+  }
+  dimension p_champion {
+    label: 'P Champion (latest)'
+    type: 'number'
+  }
+  dimension p_champion_pct {
+    label: 'Title Odds %'
+    type: 'number'
+    description: 'p_champion × 100 for display.'
+  }
+  dimension prev_run_date {
+    label: 'Previous Run Date'
+    type: 'date'
+  }
+  dimension p_champion_prev {
+    label: 'P Champion (previous)'
+    type: 'number'
+  }
+  dimension delta_pct {
+    label: 'Title Odds Δ (pts)'
+    type: 'number'
+    description: 'Percentage-point shift in championship odds vs the previous run.'
+  }
+  dimension delta_label {
+    label: 'Title Odds Δ Label'
+    type: 'text'
+    description: 'Driver field: signed move, e.g. "▲ 2.4" / "▼ 1.1"; empty when only one run exists (hides via :empty).'
+  }
+  dimension delta_color {
+    label: 'Title Odds Δ Color'
+    type: 'text'
+    description: 'Driver field: rising green / falling red / flat grey.'
+  }
+  owner: 'hung.dd@holistics.io'
+}

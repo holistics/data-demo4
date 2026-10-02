@@ -1,0 +1,53 @@
+Model slb_stock_daily_balances {
+  type: 'table'
+  label: 'SLB Stock Daily Balances'
+  description: 'Synthetic H4 derived daily stock balances in the Neon benchmark projection. Grain: product, stock location and calendar date. Each row carries forward the latest observed stock snapshot on or before the balance date.'
+  data_source_name: 'slb_ecommerce_neon_h4'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"benchmark"."stock_daily_balances"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension product_id {
+    label: 'Product Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+  dimension location_id {
+    label: 'Stock Location Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.location_id }};;
+    description: 'Synthetic stock location identifier for the H4 fixture; not a city or warehouse dimension from the ecommerce source.'
+  }
+  dimension product_location_key {
+    label: 'Product Location Key'
+    type: 'text'
+    definition: @sql {{ #SOURCE.product_id }}::text || ':' || {{ #SOURCE.location_id }}::text;;
+    description: 'Unique product/location entity key used by the closing-stock semi-additive metric.'
+  }
+  dimension balance_date {
+    label: 'Balance Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.balance_date }};;
+  }
+  dimension stock_units {
+    label: 'Stock Units'
+    type: 'number'
+    definition: @sql {{ #SOURCE.stock_units }};;
+  }
+  dimension source_snapshot_date {
+    label: 'Source Snapshot Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.source_snapshot_date }};;
+    description: 'Observed stock snapshot date that supplied the carried-forward balance.'
+  }
+  dimension synthetic_scenario {
+    label: 'Synthetic Scenario'
+    type: 'text'
+    definition: @sql {{ #SOURCE.synthetic_scenario }};;
+  }
+}

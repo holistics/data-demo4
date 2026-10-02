@@ -1,0 +1,53 @@
+Model wc_teams {
+  type: 'table'
+  label: 'Teams'
+  description: 'World Cup 2026 national teams (48). Dimension spine for flags, kit colors, names.'
+  data_source_name: 'demo_worldcup'
+  dimension code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.code }};;
+    primary_key: true
+  }
+  dimension name {
+    label: 'Team'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension group_code {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.group_code }};;
+  }
+  dimension group_order {
+    label: 'Group Order'
+    type: 'number'
+    hidden: true
+    description: 'Numeric lane index for the group A–L (A=1 … L=12). Drives small-multiple/lane positioning where a CSS template needs a number rather than the letter.'
+    definition: @sql ascii({{ #SOURCE.group_code }}) - 64;;
+  }
+  dimension flag_url {
+    label: 'Flag URL'
+    type: 'text'
+    definition: @sql {{ #SOURCE.flag_url }};;
+  }
+  dimension color_hex {
+    label: 'Team Color'
+    type: 'text'
+    definition: @sql {{ #SOURCE.color_hex }};;
+  }
+  dimension fifa_team_id {
+    label: 'FIFA Team Id'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.fifa_team_id }};;
+  }
+  dimension cohost_tag {
+    label: 'Co-host Tag'
+    type: 'text'
+    description: 'Driver field: "Co-host" pill for the three 2026 host nations, empty otherwise (hides via :empty). SQL (not AQL) so the wc_home/away/opponent_teams extends inherit it without a fan-out — a qualified wc_teams.code ref breaks inside the aliases.'
+    definition: @sql case when {{ #SOURCE.code }} in ('MEX', 'USA', 'CAN') then 'Co-host' else '' end;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_teams"'
+}

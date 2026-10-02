@@ -1,0 +1,52 @@
+Model lb_dim_country {
+  type: 'table'
+  label: 'Dim Country'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_country"'
+
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension iso2_code {
+    label: 'Iso2 Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.iso2_code }};;
+  }
+  dimension iso3_code {
+    label: 'Iso3 Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.iso3_code }};;
+  }
+  dimension country_name {
+    label: 'Country Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_name }};;
+  }
+  dimension region_name {
+    label: 'Region Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.region_name }};;
+  }
+  dimension subregion_name {
+    label: 'Subregion Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.subregion_name }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+}

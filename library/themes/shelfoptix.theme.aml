@@ -1,0 +1,121 @@
+// =====================================================================
+// ShelfOptix — reusable brand theme
+// Brand: robot-powered shelf intelligence. Crimson-red primary, dark-navy
+// header/ink, light-gray surfaces, white cards, Inter typeface.
+// Tagline: "Actionable Shelf Intelligence at Scale".
+// Apply from a dashboard with:  theme: shelfoptix
+// =====================================================================
+
+const so_red        = "#E11B22"
+const so_red_dark   = "#B3141A"
+const so_navy       = "#1E2A38"
+const so_ink        = "#1F2937"
+const so_muted      = "#5A6470"
+const so_page_bg    = "#F4F5F7"
+const so_canvas_bg  = "#EAECEF"
+const so_card       = "#FFFFFF"
+const so_border     = "#E3E6EA"
+const so_grid       = "#ECEEF1"
+const so_hover      = "#FCECEA"
+const so_band       = "#FAFBFC"
+const so_font       = "Inter, Helvetica Neue, Helvetica, Arial, sans-serif"
+
+ColorPalette shelfoptix_palette {
+  title: "ShelfOptix"
+  categorical {
+    colors: [
+      "#E11B22", "#1E2A38", "#16A34A", "#F59E0B",
+      "#3B82F6", "#0EA5A4", "#9333EA", "#6B7280"
+    ]
+  }
+}
+
+PageTheme shelfoptix {
+  title: 'ShelfOptix'
+
+  color {
+    data: shelfoptix_palette
+  }
+
+  background {
+    bg_color: so_page_bg
+  }
+
+  canvas {
+    background {
+      bg_color: so_canvas_bg
+    }
+    border {
+      border_radius: 6
+      border_color: so_border
+    }
+    shadow: 'sm'
+  }
+
+  block {
+    background {
+      bg_color: so_card
+    }
+    label {
+      font_family: so_font
+      font_color: so_ink
+      font_weight: 'bold'
+      font_size: 14
+    }
+    text {
+      font_family: so_font
+      font_color: so_muted
+      font_size: 13
+    }
+    border {
+      border_width: 1
+      border_radius: 8
+      border_color: so_border
+      border_style: 'solid'
+    }
+    padding: 16
+    shadow: 'sm'
+  }
+
+  viz {
+    table {
+      general {
+        hover_color: so_hover
+        banding_color: so_band
+        font_color: so_ink
+        font_size: 13
+        font_family: so_font
+        border_color: so_border
+        grid_color: so_grid
+      }
+      header {
+        bg_color: so_navy
+        font_color: '#FFFFFF'
+        font_weight: 'bold'
+      }
+      sub_header {
+        bg_color: so_hover
+        font_color: so_red_dark
+        font_weight: 'semibold'
+      }
+      sub_title {
+        font_color: so_muted
+        font_size: 11
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    /* KPI period-over-period diff chips in brand colors */
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: #EAF7F0;
+      color: #16A34A;
+    }
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: #FCECEA;
+      color: #B3141A;
+    }
+  ;;
+}

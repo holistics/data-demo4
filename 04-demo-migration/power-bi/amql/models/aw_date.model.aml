@@ -1,0 +1,45 @@
+Model aw_date {
+  type: 'table'
+  label: 'Date'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.date'
+
+  dimension date_key {
+    label: 'Date Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.DateKey }};;
+  }
+  dimension date {
+    label: 'Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.Date }};;
+  }
+  dimension fiscal_year {
+    label: 'Fiscal Year'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Fiscal Year }};;
+  }
+  dimension fiscal_quarter {
+    label: 'Fiscal Quarter'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Fiscal Quarter }};;
+  }
+  dimension month {
+    label: 'Month'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Month }};;
+  }
+  dimension full_date {
+    label: 'Full Date'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Full Date }};;
+  }
+  dimension month_key {
+    label: 'Month Key'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.MonthKey }};;
+  }
+}

@@ -1,0 +1,101 @@
+Model dbt_finance_bills_usd {
+  type: 'table'
+  label: 'Supplier Bills (USD, dbt)'
+  description: 'FX-normalised supplier bills from the dbt mart mart_finance__bills_usd (as-of join to weekday-only fx_rates).'
+  data_source_name: 'demo_dbt_test'
+
+  dimension bill_id {
+    label: 'Bill Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.bill_id }};;
+  }
+  dimension vendor_id {
+    label: 'Vendor Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.vendor_id }};;
+  }
+  dimension merchant_id {
+    label: 'Merchant Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.merchant_id }};;
+  }
+  dimension expense_category_id {
+    label: 'Expense Category Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.expense_category_id }};;
+  }
+  dimension bill_status {
+    label: 'Bill Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bill_status }};;
+  }
+  dimension bill_type {
+    label: 'Bill Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bill_type }};;
+  }
+  dimension bill_department {
+    label: 'Bill Department'
+    type: 'text'
+    definition: @sql {{ #SOURCE.bill_department }};;
+  }
+  dimension currency_code {
+    label: 'Currency Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.currency_code }};;
+  }
+  dimension bill_date {
+    label: 'Bill Date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.bill_date }};;
+  }
+  dimension bill_month {
+    label: 'Bill Month'
+    type: 'date'
+    definition: @sql {{ #SOURCE.bill_month }};;
+  }
+  dimension due_date {
+    label: 'Due Date'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.due_date }};;
+  }
+  dimension currency_code_amount {
+    label: 'Bill Amount (local)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.bill_amount }};;
+  }
+  dimension paid_amount {
+    label: 'Paid Amount (local)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.paid_amount }};;
+  }
+  dimension remaining_amount {
+    label: 'Remaining Amount (local)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.remaining_amount }};;
+  }
+  dimension fx_rate_used {
+    label: 'FX Rate Used'
+    type: 'number'
+    definition: @sql {{ #SOURCE.fx_rate_used }};;
+  }
+  dimension bill_amount_usd {
+    label: 'Bill Amount (USD)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.bill_amount_usd }};;
+  }
+  dimension paid_amount_usd {
+    label: 'Paid Amount (USD)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.paid_amount_usd }};;
+  }
+  dimension remaining_amount_usd {
+    label: 'Remaining Amount (USD)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.remaining_amount_usd }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '"dbt_marts"."mart_finance__bills_usd"'
+}

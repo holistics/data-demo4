@@ -1,0 +1,22 @@
+Model claude_granularity {
+  type: 'query'
+  label: 'Time Granularity'
+  description: 'Parameter model exposing a selectable time granularity (Day/Week/Month/Quarter/Year) used to drive dynamic time-series bucketing on the Claude Dashboard.'
+  data_source_name: 'demodb'
+  owner: 'janice@holistics.io'
+  query: @sql select 1 as dummy;;
+  models: [
+  ]
+
+  param period {
+    label: 'Time Granularity'
+    type: 'text'
+    allowed_values: [
+      'Day',
+      'Week',
+      'Month',
+      'Quarter',
+      'Year'
+    ]
+  }
+}

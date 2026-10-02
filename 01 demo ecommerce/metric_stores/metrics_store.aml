@@ -1,5 +1,26 @@
 PartialDataset revenue_metrics_khai {
-  
+
+  // `revenue` and `aov` below depend on these two, which previously existed only
+  // in demo_ecommerce_version_2 — not in base_ecommerce_dataset_khai, the dataset
+  // this store is actually composed onto. Defined here (matching the canonical
+  // definitions in demo_ecommerce_version_2) so the store stands on its own.
+  metric revenue_commission {
+    label: "Revenue Commission Rate (Demo from May 2025)"
+    type: "number"
+    hidden: false
+    description: "Fixed demo commission rate."
+    definition: @aql 0.5;;
+    format: "#,###%"
+  }
+
+  metric total_orders {
+    label: "Total Orders"
+    type: "number"
+    hidden: false
+    description: "Count of orders."
+    definition: @aql count(orders.id);;
+  }
+
   metric gmv {
     label: "GMV (Gross Merchandise Value)"
     type: "number"

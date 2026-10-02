@@ -1,0 +1,9 @@
+Dataset huyvu_dataset {
+  label: 'huyvu_dataset',
+  description: ''
+  data_source_name: 'demo_marlin_mangrove_sample'
+  models: [
+    public_dim_staff
+  ]
+  relationships: []
+}

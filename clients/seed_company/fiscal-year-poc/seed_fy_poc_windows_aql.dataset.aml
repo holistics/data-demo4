@@ -1,0 +1,66 @@
+// Dataset for the AQL replica tab.
+//
+// The @sql tab's dataset wraps ONE hand-written query model that already
+// carries GMV as a column. This one carries no query at all: it joins the
+// AQL date model to the shared ecommerce facts and lets an AQL metric do
+// the aggregation, which is the ordinary Holistics shape.
+//
+// No `gmv_window` twin is needed here. The @sql model repeats every fact
+// once per grain, so its KPI has to read a de-duplicated measure; the
+// dynamic-dimension approach keeps one row per date, so a plain sum is
+// correct whatever the grain param holds.
+Dataset seed_fy_poc_windows_aql {
+  label: 'Seed Company Fiscal Windows — AQL Replica (Alternative)'
+  description: 'Isolated dataset for the AQL replica tab. Same six relative windows and five reporting grains as the @sql tab, with no hand-written query model.'
+  data_source_name: 'demodb'
+
+  models: [
+    ecommerce_orders,
+    ecommerce_order_items,
+    ecommerce_products,
+    seed_fy_poc_dates_aql,
+  ]
+
+  relationships: [
+    relationship(ecommerce_order_items.order_id > ecommerce_orders.id, true),
+    relationship(ecommerce_order_items.product_id > ecommerce_products.id, true),
+
+    // Same join key and same warehouse-side cast as Solution C: a DATE
+    // to a DATE, so nothing crosses the 30 Sep / 1 Oct line.
+    relationship(ecommerce_orders.created_date > seed_fy_poc_dates_aql.date_key, true),
+  ]
+
+  metric gmv {
+    label: 'GMV'
+    type: 'number'
+    description: 'Gross value of items ordered. One row per date, so this is correct at every grain with no de-duplication.'
+    definition: @aql ecommerce_order_items | sum(ecommerce_order_items.quantity * ecommerce_products.price) ;;
+    format: '#,###0'
+  }
+
+  // ── the selected window's live edges ──
+  //
+  // These replace the @sql tab's per-card boundary dimensions, which AQL
+  // cannot reproduce: `date_trunc` accepts a dimension but not the
+  // `@today` literal, and AQL has no `date_add`, so there is no way to
+  // build "the first day of the previous quarter" as a constant column.
+  //
+  // min/max over the current filter is strictly better for a demo anyway:
+  // it reports the window that is actually selected rather than restating
+  // a boundary the model already computed, so a card and its chart cannot
+  // silently disagree.
+
+  metric window_start {
+    label: 'Window starts'
+    type: 'date'
+    description: 'First date in the selected window. Unfiltered, this is the spine start.'
+    definition: @aql min(seed_fy_poc_dates_aql.date_key) ;;
+  }
+
+  metric window_end {
+    label: 'Window ends'
+    type: 'date'
+    description: 'Last date in the selected window.'
+    definition: @aql max(seed_fy_poc_dates_aql.date_key) ;;
+  }
+}

@@ -1,0 +1,76 @@
+Model lb_dim_iap_product {
+  type: 'table'
+  label: 'Dim Iap Product'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_iap_product"'
+
+  dimension iap_product_key {
+    label: 'Iap Product Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.iap_product_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension product_sku {
+    label: 'Product Sku'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_sku }};;
+  }
+  dimension product_name {
+    label: 'Product Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_name }};;
+  }
+  dimension product_type {
+    label: 'Product Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_type }};;
+  }
+  dimension product_category {
+    label: 'Product Category'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_category }};;
+  }
+  dimension list_price {
+    label: 'List Price'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.list_price }};;
+  }
+  dimension list_price_currency {
+    label: 'List Price Currency'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.list_price_currency }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}

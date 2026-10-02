@@ -1,0 +1,416 @@
+Project App_Structure {
+  database_type: 'PostgreSQL'
+}
+
+Table version_history{
+  version string
+  release_date timestamp
+  os varchar
+  notes string
+  active boolean
+}
+
+Table managers {
+  manager_id integer
+  manager_user_id integer
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+  role varchar
+  company integer
+  last_accessed timestamp
+  last_access_ip string
+  status status
+}
+
+Table users {
+  id integer [primary key]
+  firstname varchar
+  middlename varchar
+  // common for users to have multiple "middle" names
+  lastname varchar
+  fullname varchar
+  ethnicity varchar
+  religion varchar
+  role varchar
+  assignment varchar
+  company integer
+  date_of_birth date
+  gender varchar
+  created_at timestamp
+  status status
+  deleted_at timestamp
+  last_accessed timestamp
+  last_access_ip string
+  last_app_version string
+  anonymous boolean
+   // anonymous user created via speakup when submitted anonymously
+   // anonymous name is [company.nameshort]-[date(created_at)]-[speakup.id]
+   // PII will be set to null so it does not affect reporting
+}
+
+Table user_groups {
+  id integer
+  name varchar
+  company_id integer
+  status status
+  created_at timestamp
+  updated_at timestamp
+  created_by integer
+  notes string
+  users string
+
+}
+
+Table company {
+  id integer [primary key]
+  namelong varchar
+  nameshort varchar
+    //Usually 3-4 character acronym e.g. ABC,XYZ
+    //decent chance that future companies will share acronyms, BI customers must know when showing shortname to select unique company ID
+  month_start_hc integer
+  status status
+  adoption_rate_current decimal
+  created_at timestamp
+  updated_at timestamp
+  country country
+}
+
+enum country {
+  BD
+  VN
+}
+
+Table company_hc {
+  company_id integer [primary key]
+  entry_created_at timestamp
+  headcount integer
+  app_user_hc integer
+  month_start_hc integer
+}
+
+Table announcements {
+  id integer [primary key]
+  created_at timestamp
+  published_at timestamp
+  deleted_at timestamp
+  company_id integer
+  status status
+  approver_id integer
+  creator_id integer
+  push_enabled boolean
+  attachments boolean
+  title string
+  contents string
+  views integer
+  read_rate decimal
+  target_group integer
+}
+
+Table news {
+  id integer [primary key]
+  created_at timestamp
+  published_at timestamp
+  removed_at timestamp
+  company_id integer
+  status status
+  approver_id integer
+  creator_id integer
+  push_enabled boolean
+  attachments binary
+  title string
+  contents string
+  views integer
+  read_rate decimal
+}
+
+Table survey {
+ id integer [primary key]
+ created_at timestamp
+ first_published_at timestamp
+ first_closed_at timestamp
+ deleted_at timestamp
+ status status
+ survey_url string
+ company_id integer 
+ author_id integer
+ approver_id integer
+ target_group integer
+ completion_rate decimal
+ num_pages integer
+ num_questions integer
+}
+
+Table survey_events {
+  id integer
+  user id
+  survey_id integer
+  created_at timestamp
+  event_type survey_event_type
+  user_id integer
+  admin_action boolean
+}
+enum survey_event_type{
+
+  accessed
+  submitted
+  completed
+  reject
+  error
+  create
+  edit
+  pending_approval
+  approve
+  delete
+  open
+  close
+  reopen
+}
+
+enum status {
+  pending
+  submitted
+  active
+  closed
+  deleted
+  under_review
+}
+
+Table elearning {
+  id integer [primary key]
+  created_at timestamp
+  published_at timestamp
+  deleted_at timestamp
+  company_id integer
+  status status
+  approver_id integer
+  creator_id integer
+  attachments binary
+  title string
+  contents string
+  views integer
+  read_rate decimal
+  completion_rate decimal
+  target_group integer  
+}
+
+Table elearning_events {
+  id integer
+  elearning_id integer
+  created_at timestamp
+  event_type elearning_event_type
+  user_id integer
+  admin_action boolean
+}
+
+enum elearning_event_type {
+  accessed
+  completed
+  reject
+  error
+  create
+  edit
+  pending_approval
+  approve
+  delete
+  open
+  close
+  reopen
+}
+
+Table speakup {
+  id integer
+  user_id integer
+  company integer
+  status status
+  anonymous boolean
+  manager_id integer
+  speakup_type speakup_type
+  title string
+  title_eng string
+  details string
+  details_eng string
+  // speakup comes in ENG, VN, KR, Hindi, and other languages, need to translate to English for reporting purposes
+  created_at timestamp
+  submitted_at timestamp
+  deleted_at timestamp
+  closed_at timestamp
+  rejected_at timestamp
+  object_type varchar 
+ //speakup has ticket and reponses, responses are sub-objects of the ticket object
+}
+
+enum speakup_type {
+  feedback
+  code_violation
+  grievance
+  suggestion 
+}
+
+table speakup_events{
+  id integer
+  speakup_id integer
+  speakup_object_type varchar
+  user_id integer
+  created_at timestamp
+  speakup_event_type speakup_event_type
+  admin_action boolean
+  details string
+}
+
+enum speakup_event_type {
+  draft
+  publish
+  read
+  rate
+  close
+  reopen
+  error
+  edit
+  approve
+  reject
+  delete
+}
+
+Table cases {
+  id integer
+  manager_id integer
+  created_at timestamp
+  last_updated_at timestamp
+  status case_status
+  reporter_id integer
+  reference_SI integer
+  channel case_channel
+  reported_case varchar
+  // open field, will be periodically reviewed, updated, standardized. current known: Abuse - Physical, Abuse- Mental, Abuse - Verbal, Abuse - Sexual, Retaliation, Workers' Right Abuse
+  outcome_actual varchar
+  // result of investigation of reported case
+  allegation_status allegation_status
+  accused_id integer
+  action_taken varchar
+  // e.g. Allegation not proved, Warning letter, Dismissed, Cautionary letter, Advisory letter
+  target_closure_date date
+  remarks string
+}
+
+enum case_status {
+  "Not assigned"
+  "Not started"
+  "In progress"
+  "Taking action"
+  "Action taken"
+  "Closing"
+  "Closed"
+}
+
+enum allegation_status {
+  "Proved"
+  "Not Proved"
+  "In progress"
+  "Not started"
+  "Not assigned"
+}
+
+enum case_channel{
+  suggestion_box
+  hotline
+  counsellor_grievance_log
+  open_door_policy
+}
+
+Table cases_events {
+  id integer
+  case_id integer
+  user_id integer
+  admin_action boolean
+  event_type cases_event_type
+  created_at timestamp
+  details string
+}
+
+enum cases_event_type {
+  draft
+  publish
+  read
+  rate
+  close
+  reopen
+  error
+  edit
+  approve
+  reject
+  delete
+}
+
+Ref: "company"."id" < "company_hc"."company_id"
+
+Ref: "users"."company" > "company"."id"
+
+Ref: "company"."id" < "managers"."company"
+
+
+Ref: "company"."id" < "announcements"."company_id"
+
+Ref: "managers"."manager_id" < "announcements"."approver_id"
+
+Ref: "managers"."manager_id" < "announcements"."creator_id"
+
+Ref: "users"."id" < "managers"."manager_user_id"
+
+Ref: "company"."id" < "news"."company_id"
+
+Ref: "company"."id" < "survey"."company_id"
+
+
+
+Ref: "users"."id" < "survey_events"."user_id"
+
+Ref: "company"."id" < "user_groups"."company_id"
+
+Ref: "survey"."target_group" > "user_groups"."id"
+
+Ref: "version_history"."version" < "users"."last_app_version"
+
+Ref: "survey"."id" < "survey_events"."survey_id"
+
+Ref: "elearning"."id" < "elearning_events"."elearning_id"
+
+Ref: "users"."id" < "elearning_events"."user_id"
+
+Ref: "managers"."manager_id" < "elearning"."approver_id"
+
+Ref: "managers"."manager_id" < "elearning"."creator_id"
+
+Ref: "company"."id" < "elearning"."company_id"
+
+Ref: "users"."id" < "survey_events"."user"
+
+Ref: "managers"."manager_user_id" < "survey"."author_id"
+
+Ref: "managers"."manager_user_id" < "survey"."approver_id"
+
+Ref: "user_groups"."id" < "elearning"."target_group"
+
+Ref: "managers"."manager_user_id" < "news"."approver_id"
+
+Ref: "managers"."manager_user_id" < "news"."creator_id"
+
+Ref: "users"."id" < "speakup"."user_id"
+
+Ref: "managers"."manager_id" < "speakup"."manager_id"
+
+Ref: "company"."id" < "speakup"."company"
+
+Ref: "speakup"."id" < "speakup_events"."speakup_id"
+
+Ref: "users"."id" < "speakup_events"."user_id"
+
+Ref: "speakup"."object_type" < "speakup_events"."speakup_object_type"
+
+Ref: "users"."id" < "cases"."reporter_id"
+
+Ref: "managers"."manager_id" < "cases"."manager_id"
+
+Ref: "cases"."id" < "cases_events"."case_id"
+
+Ref: "users"."id" < "cases_events"."user_id"

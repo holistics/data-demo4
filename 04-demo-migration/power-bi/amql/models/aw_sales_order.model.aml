@@ -1,0 +1,29 @@
+Model aw_sales_order {
+  type: 'table'
+  label: 'Sales Order'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.sales_order'
+
+  dimension sales_order_line_key {
+    label: 'Sales Order Line Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.SalesOrderLineKey }};;
+  }
+  dimension channel {
+    label: 'Channel'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Channel }};;
+  }
+  dimension sales_order {
+    label: 'Sales Order'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Sales Order }};;
+  }
+  dimension sales_order_line {
+    label: 'Sales Order Line'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Sales Order Line }};;
+  }
+}

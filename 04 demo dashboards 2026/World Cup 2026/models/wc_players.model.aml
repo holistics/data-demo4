@@ -1,0 +1,56 @@
+Model wc_players {
+  type: 'table'
+  label: 'Players'
+  description: 'World Cup 2026 squad players (populated by live sync from match-detail squads).'
+  data_source_name: 'demo_worldcup'
+  dimension fifa_player_id {
+    label: 'FIFA Player Id'
+    type: 'text'
+    definition: @sql {{ #SOURCE.fifa_player_id }};;
+    primary_key: true
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension name {
+    label: 'Player'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension shirt_number {
+    label: 'Shirt Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.shirt_number }};;
+  }
+  dimension position {
+    label: 'Position Code'
+    type: 'number'
+    definition: @sql {{ #SOURCE.position }};;
+  }
+  dimension picture_url {
+    label: 'Picture URL'
+    type: 'text'
+    definition: @sql {{ #SOURCE.picture_url }};;
+  }
+  dimension is_goalkeeper {
+    label: 'Is Goalkeeper'
+    type: 'truefalse'
+    definition: @aql wc_players.position == 0 ;;
+  }
+  dimension position_group {
+    label: 'Position Group'
+    type: 'text'
+    description: 'FIFA position code mapped to squad-sheet groups: 0=GK, 1=DF, 2=MF, 3=FW.'
+    definition: @aql case(
+      when: wc_players.position == 0, then: 'GK',
+      when: wc_players.position == 1, then: 'DF',
+      when: wc_players.position == 2, then: 'MF',
+      when: wc_players.position == 3, then: 'FW',
+      else: '—'
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_players"'
+}

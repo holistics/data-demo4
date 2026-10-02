@@ -1,0 +1,141 @@
+// =====================================================================
+// Solution A - shifted Fiscal Date on the fact table
+//
+// Marcus's answer from the Slack thread: add 3 months to the close date
+// so the SHIFTED date's calendar year equals the fiscal year, and leave
+// it a date field. It still gets date filters, date drills and date
+// transformations for free.
+//
+// Self-contained. This folder shares no AML object with Solutions B, C
+// or D - only the untouchable core-demo base models (`ecommerce_orders`,
+// `ecommerce_order_items`, `ecommerce_products`), which every solution
+// extends and none of them edits.
+//
+// `created_at` stands in for Seed's HubSpot `closedate`.
+// =====================================================================
+Model seed_a_orders = ecommerce_orders.extend({
+  label: 'Seed Orders (Solution A)'
+  description: 'Ecommerce orders extended with Seed Company fiscal-period fields. FY runs 1 Oct - 30 Sep, named by the calendar year it ends in: FY2026 = Oct 2025 - Sep 2026.'
+
+  // -------------------------------------------------------------------
+  // Solution A (Marcus): shift the date forward 3 months so the calendar
+  // year of the shifted date equals the fiscal year. Still a date field,
+  // so it still gets date filters, date drills and date transformations.
+  // -------------------------------------------------------------------
+  dimension fiscal_date {
+    label: 'Fiscal Date (Solution A)'
+    type: 'datetime'
+    description: 'Close date shifted +3 months. Day grain. Its calendar year is the fiscal year, but the day and month it shows are NOT the real close date - 15 Nov 2025 renders as 15 Feb 2026.'
+    definition: @aql seed_a_orders.created_at + interval(3 month) ;;
+  }
+
+  dimension fiscal_date_month_start {
+    label: 'Fiscal Month Start (Solution A)'
+    type: 'datetime'
+    description: 'Close date truncated to month, then shifted +3 months. Month grain, so the misleading day-of-month is gone. This is the field to filter on for Solution A.'
+    definition: @aql date_trunc(seed_a_orders.created_at, 'month') + interval(3 month) ;;
+  }
+
+  // -------------------------------------------------------------------
+  // Inherited fields, re-pointed at this model.
+  //
+  // `extend()` clones the base model but does NOT rewrite the field
+  // definitions it copies: every inherited field that spelled out
+  // `ecommerce_orders.<field>` still says `ecommerce_orders`, which is not
+  // in scope in a dataset that only includes `seed_a_orders`. Each one
+  // has to be re-declared here, and `extend()` cannot delete a field -
+  // the most you can do is override and hide it.
+  //
+  // Eleven fields for one fact table. That is the concrete cost of
+  // putting a fiscal calendar on fact tables instead of on the date
+  // dimension: it is per-model work, and it is per-model work forever.
+  // Solution B pays the same eleven again in its own folder. Solutions C
+  // and D pay zero, because they extend the date dimension instead.
+  // -------------------------------------------------------------------
+  dimension created_at_fy {
+    label: 'Created At FY (base)'
+    type: 'datetime'
+    hidden: true
+    description: 'Inherited from the base orders model - same +3 month shift as Fiscal Date. Hidden so the demo has one obvious Solution A field instead of two identical ones.'
+    definition: @aql seed_a_orders.created_at + interval(3 month) ;;
+  }
+
+  measure cumm_orders {
+    label: 'Cumulative Orders'
+    type: 'number'
+    hidden: true
+    description: 'The cumulative total of orders.'
+    definition: @aql running_total(seed_a_orders.total_order, seed_a_orders.order_month) ;;
+    aggregation_type: "custom"
+  }
+
+  measure delivered_orders_count {
+    label: 'Delivered Orders Count'
+    type: 'number'
+    description: 'The total number of orders we delivered this period.'
+    definition: @aql count(seed_a_orders.id) | where(seed_a_orders.status == 'delivered') ;;
+  }
+
+  measure cancelled_orders_count {
+    label: 'Cancelled Orders Count'
+    type: 'number'
+    description: 'The total number of orders we canceled this period.'
+    definition: @aql count(seed_a_orders.id) | where(seed_a_orders.status == 'cancelled') ;;
+  }
+
+  measure refunded_orders_count {
+    label: 'Refunded Orders Count'
+    type: 'number'
+    description: 'The total number of orders we refunded this period.'
+    definition: @aql count_distinct(seed_a_orders.id) | where(seed_a_orders.status == 'refunded') ;;
+  }
+
+  measure total_order {
+    label: 'Total Orders Count'
+    type: 'number'
+    description: 'The total number of orders.'
+    definition: @aql count(seed_a_orders.id) ;;
+  }
+
+  measure total_orders_count {
+    label: 'Total Orders Count'
+    type: 'number'
+    hidden: true
+    description: 'Duplicate of Total Orders Count, inherited from the base model.'
+    definition: @aql count(seed_a_orders.id) ;;
+  }
+
+  measure first_order_date {
+    label: 'First Order Date'
+    type: 'datetime'
+    description: 'The date and time of the earliest order in scope.'
+    definition: @aql min(seed_a_orders.created_at) ;;
+  }
+
+  // The only `@now` in the Seed folders, and it is not on the fiscal path.
+  // It comes from the base orders model, which has to be re-declared to
+  // compile. Hidden, because `@now` inlines a live timestamp: the SQL text
+  // changes on every run and the query cache never hits. The fiscal fields
+  // above use max() instead, on purpose.
+  measure days_since_last_order {
+    label: 'Days Since Last Order'
+    type: 'number'
+    hidden: true
+    description: 'Inherited from the base orders model. Not used by the fiscal demo.'
+    definition: @aql date_diff('day', max(seed_a_orders.created_at), @now) ;;
+  }
+
+  measure orders_2023 {
+    label: '2023'
+    type: 'number'
+    hidden: true
+    definition: @aql count(seed_a_orders.id) | where(seed_a_orders.created_at matches @2023) ;;
+  }
+
+  measure orders_2024 {
+    label: '2024'
+    type: 'number'
+    hidden: true
+    definition: @aql count(seed_a_orders.id) | where(seed_a_orders.created_at matches @2024) ;;
+  }
+})

@@ -1,0 +1,106 @@
+Model lb_dim_date {
+  type: 'table'
+  label: 'Dim Date'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_date"'
+
+  dimension date_key {
+    label: 'Date Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.date_key }};;
+  }
+  dimension full_date {
+    label: 'Full Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.full_date }};;
+  }
+  dimension calendar_year {
+    label: 'Calendar Year'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.calendar_year }};;
+  }
+  dimension calendar_quarter {
+    label: 'Calendar Quarter'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.calendar_quarter }};;
+  }
+  dimension calendar_month {
+    label: 'Calendar Month'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.calendar_month }};;
+  }
+  dimension month_name {
+    label: 'Month Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.month_name }};;
+  }
+  dimension iso_year {
+    label: 'Iso Year'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iso_year }};;
+  }
+  dimension iso_week {
+    label: 'Iso Week'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.iso_week }};;
+  }
+  dimension day_of_month {
+    label: 'Day Of Month'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.day_of_month }};;
+  }
+  dimension day_of_week {
+    label: 'Day Of Week'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.day_of_week }};;
+  }
+  dimension day_name {
+    label: 'Day Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.day_name }};;
+  }
+  dimension week_start_date {
+    label: 'Week Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.week_start_date }};;
+  }
+  dimension month_start_date {
+    label: 'Month Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.month_start_date }};;
+  }
+  dimension quarter_start_date {
+    label: 'Quarter Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.quarter_start_date }};;
+  }
+  dimension year_start_date {
+    label: 'Year Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.year_start_date }};;
+  }
+  dimension is_weekend {
+    label: 'Is Weekend'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_weekend }};;
+  }
+}

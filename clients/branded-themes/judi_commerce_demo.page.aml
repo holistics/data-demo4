@@ -1,0 +1,191 @@
+Dashboard judi_commerce_demo {
+  title: 'Judi.ai — Commerce Overview'
+  description: 'Judi.ai-branded sample dashboard on the ecommerce dataset — demonstrates the judi theme (palette, Nunito type, logo header/footer).'
+  owner: 'dong.ln@holistics.io'
+
+  // ===================== HEADER (logo banner) =====================
+  block header: TextBlock {
+    content: @md <div style="display:flex; align-items:center; gap:18px; height:100%; padding:0 28px; box-sizing:border-box; background:#1B233D; border-radius:10px; border-left:6px solid #7DAC32;">
+<img src="https://judi.ai/wp-content/uploads/2020/01/JudiAI-Logo-Color-White-160.png" style="height:38px; width:auto;" />
+<div style="display:flex; flex-direction:column; justify-content:center;">
+<span style="font-family:Nunito,sans-serif; font-size:22px; font-weight:800; color:#ffffff; line-height:1.15;">Commerce Overview</span>
+<span style="font-family:Nunito,sans-serif; font-size:13px; font-weight:500; color:#9FB46B;">Sales, revenue &amp; order performance</span>
+</div>
+</div>;;
+    theme: judi_banner
+  }
+
+  // ===================== KPIs =====================
+  block kpi_gmv: VizBlock {
+    label: 'GMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'GMV'
+        ref: r(demo_ecommerce_version_2.gmv)
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value { font_size: 26 }
+      }
+    }
+    settings { hide_label: true }
+  }
+  block kpi_nmv: VizBlock {
+    label: 'NMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'NMV'
+        ref: r(demo_ecommerce_version_2.nmv)
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value { font_size: 26 }
+      }
+    }
+    settings { hide_label: true }
+  }
+  block kpi_revenue: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(demo_ecommerce_version_2.revenue)
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value { font_size: 26 }
+      }
+    }
+    settings { hide_label: true }
+  }
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Orders'
+        ref: r(demo_ecommerce_version_2.total_orders)
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value { font_size: 26 }
+      }
+    }
+    settings { hide_label: true }
+  }
+
+  // ===================== CHARTS =====================
+  block trend: VizBlock {
+    label: 'GMV & NMV by Month'
+    viz: LineChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series { field: VizFieldFull { label: 'GMV' ref: r(demo_ecommerce_version_2.gmv) format { type: 'number' pattern: 'inherited' } } }
+        series { field: VizFieldFull { label: 'NMV' ref: r(demo_ecommerce_version_2.nmv) format { type: 'number' pattern: 'inherited' } } }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block by_country: VizBlock {
+    label: 'Revenue by Country'
+    viz: BarChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_countries.name)
+        format { type: 'text' }
+      }
+      y_axis {
+        settings { show_data_label_by: 'value' }
+        series { field: VizFieldFull { label: 'Revenue' ref: r(demo_ecommerce_version_2.revenue) format { type: 'number' pattern: 'inherited' } } }
+      }
+      settings {
+        row_limit: 12
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block by_category: VizBlock {
+    label: 'Orders by Category'
+    viz: BarChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(map_categories.category)
+        format { type: 'text' }
+      }
+      y_axis {
+        settings { show_data_label_by: 'value' }
+        series { field: VizFieldFull { label: 'Orders' ref: r(demo_ecommerce_version_2.total_orders) format { type: 'number' pattern: 'inherited' } } }
+      }
+      settings {
+        row_limit: 12
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+  block detail_table: VizBlock {
+    label: 'Country detail'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull { ref: r(ecommerce_countries.name) format { type: 'text' } },
+        VizFieldFull { ref: r(demo_ecommerce_version_2.gmv) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { ref: r(demo_ecommerce_version_2.revenue) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { ref: r(demo_ecommerce_version_2.total_orders) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { ref: r(demo_ecommerce_version_2.aov) format { type: 'number' pattern: 'inherited' } },
+      ]
+      settings { row_limit: 5000 }
+    }
+  }
+
+  // ===================== FOOTER (logo banner) =====================
+  block footer: TextBlock {
+    content: @md <div style="display:flex; align-items:center; justify-content:space-between; height:100%; padding:0 24px; box-sizing:border-box; background:#1B233D; border-radius:10px;">
+<img src="https://judi.ai/wp-content/uploads/2020/01/JudiAI-Logo-Color-White-160.png" style="height:22px; width:auto; opacity:0.95;" />
+<span style="font-family:Nunito,sans-serif; font-size:12px; color:#8B94A8;">Powered by Judi.ai · demo data · © 2026</span>
+</div>;;
+    theme: judi_banner
+  }
+
+  // ===================== LAYOUT =====================
+  view: CanvasLayout {
+    label: 'Overview'
+    width: 1440
+    height: 968
+
+    block header { position: pos(0, 0, 1440, 96) }
+
+    block kpi_gmv { position: pos(0, 112, 348, 132) }
+    block kpi_nmv { position: pos(364, 112, 348, 132) }
+    block kpi_revenue { position: pos(728, 112, 348, 132) }
+    block kpi_orders { position: pos(1092, 112, 348, 132) }
+
+    block trend { position: pos(0, 260, 912, 300) }
+    block by_country { position: pos(928, 260, 512, 300) }
+
+    block by_category { position: pos(0, 576, 608, 300) }
+    block detail_table { position: pos(624, 576, 816, 300) }
+
+    block footer { position: pos(0, 892, 1440, 60) }
+  }
+
+  theme: judi
+}

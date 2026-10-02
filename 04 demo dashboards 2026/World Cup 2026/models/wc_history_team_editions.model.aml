@@ -1,0 +1,99 @@
+Model wc_history_team_editions {
+  type: 'table'
+  label: 'WC History Team Editions'
+  description: 'Per (edition, team) rollup 1930–2022: record, goals, pedigree flags (in_semi/in_final/champion). Shootouts count as draws.'
+  data_source_name: 'demo_worldcup'
+  dimension edition_team {
+    label: 'Edition Team Key'
+    type: 'text'
+    definition: @sql {{ #SOURCE.year }} || '-' || {{ #SOURCE.team_code }};;
+    primary_key: true
+    hidden: true
+  }
+  dimension year {
+    label: 'Edition'
+    type: 'number'
+    definition: @sql {{ #SOURCE.year }};;
+  }
+  dimension year_text {
+    label: 'Edition Label'
+    type: 'text'
+    description: 'Ungrouped edition year for display ("1998", never "1,998") — cast in SQL because AQL cast() reapplies digit grouping.'
+    definition: @sql ({{ #SOURCE.year }})::text;;
+  }
+  dimension team_code {
+    label: 'Team Code'
+    type: 'text'
+    description: 'Historical code — join via wc_team_aliases for the modern successor.'
+    definition: @sql {{ #SOURCE.team_code }};;
+  }
+  dimension played {
+    label: 'Played'
+    type: 'number'
+    definition: @sql {{ #SOURCE.played }};;
+  }
+  dimension won {
+    label: 'Won'
+    type: 'number'
+    definition: @sql {{ #SOURCE.won }};;
+  }
+  dimension drawn {
+    label: 'Drawn'
+    type: 'number'
+    definition: @sql {{ #SOURCE.drawn }};;
+  }
+  dimension lost {
+    label: 'Lost'
+    type: 'number'
+    definition: @sql {{ #SOURCE.lost }};;
+  }
+  dimension gf {
+    label: 'Goals For'
+    type: 'number'
+    definition: @sql {{ #SOURCE.gf }};;
+  }
+  dimension ga {
+    label: 'Goals Against'
+    type: 'number'
+    definition: @sql {{ #SOURCE.ga }};;
+  }
+  dimension in_semi {
+    label: 'Reached Semis'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.in_semi }};;
+  }
+  dimension in_final {
+    label: 'Reached Final'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.in_final }};;
+  }
+  dimension champion {
+    label: 'Champion'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.champion }};;
+  }
+  dimension finish_label {
+    label: 'Finish'
+    type: 'text'
+    description: 'Best-stage badge for the campaign ledger (champion ⊃ final ⊃ semi).'
+    definition: @aql case(
+      when: wc_history_team_editions.champion, then: 'Champions',
+      when: wc_history_team_editions.in_final, then: 'Final',
+      when: wc_history_team_editions.in_semi, then: 'Semi-final',
+      else: '—'
+    ) ;;
+  }
+  dimension finish_color {
+    label: 'Finish Color'
+    type: 'text'
+    description: 'Driver field: campaign badge color (champion=gold, final=silver, semi=bronze, else muted).'
+    definition: @aql case(
+      when: wc_history_team_editions.champion, then: '#C8920A',
+      when: wc_history_team_editions.in_final, then: '#8b979d',
+      when: wc_history_team_editions.in_semi, then: '#a9714b',
+      else: '#9AA4B2'
+    ) ;;
+  }
+  owner: 'hung.dd@holistics.io'
+  table_name: '"public"."wc_history_team_editions"'
+}

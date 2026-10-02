@@ -1,0 +1,47 @@
+// One row per training SEGMENT for the Vega-Lite Gantt custom chart.
+// Each training yields an "Ongoing" segment (dt_start -> dt_end) and, if it ran
+// late, a "Late" segment (dt_end -> validated/today). No tick columns, no % math —
+// Vega-Lite's temporal axis handles ticks / month-day / range automatically.
+Model training_gantt_segments {
+  type: 'query'
+  label: 'Training Gantt Segments'
+  data_source_name: 'demodb'
+
+  query: @sql
+    with t (training_name, trainer, dt_start, dt_end, dt_validated) as (
+      values
+        ('Forklift Safety',         'Marc Dubois',     date '2026-01-06', date '2026-02-28', date '2026-02-25'),
+        ('First Aid & CPR',         'Sophie Laurent',  date '2026-02-02', date '2026-03-31', date '2026-05-15'),
+        ('Fire Safety Drill',       'Marc Dubois',     date '2026-05-04', date '2026-07-31', null::date),
+        ('Data Protection (GDPR)',  'Elise Moreau',    date '2026-03-02', date '2026-05-29', null::date),
+        ('Machine Operation',       'Thomas Bernard',  date '2026-01-12', date '2026-04-30', date '2026-04-28'),
+        ('Quality Control ISO',     'Sophie Laurent',  date '2026-02-16', date '2026-04-30', date '2026-06-10'),
+        ('Leadership Essentials',   'Elise Moreau',    date '2026-06-01', date '2026-08-31', null::date),
+        ('Compliance Refresher',    'Thomas Bernard',  date '2026-01-05', date '2026-03-31', null::date)
+    ),
+    calc as (
+      select
+        training_name, trainer, dt_start, dt_end,
+        case
+          when dt_validated is not null and dt_validated > dt_end then dt_validated
+          when dt_validated is null     and current_date > dt_end then current_date
+          else null
+        end as red_end
+      from t
+    )
+    -- ongoing (blue) segment
+    select training_name, trainer, dt_start as seg_start, dt_end as seg_end, 'Ongoing' as status from calc
+    union all
+    -- late (red) segment, only when overdue / validated late
+    select training_name, trainer, dt_end as seg_start, red_end as seg_end, 'Late' as status
+    from calc where red_end is not null
+  ;;
+
+  dimension training_name { label: 'Training Name' type: 'text' definition: @sql {{ #SOURCE.training_name }};; }
+  dimension trainer       { label: 'Trainer'       type: 'text' definition: @sql {{ #SOURCE.trainer }};; }
+  dimension seg_start     { label: 'Segment Start' type: 'date' definition: @sql {{ #SOURCE.seg_start }};; }
+  dimension seg_end       { label: 'Segment End'   type: 'date' definition: @sql {{ #SOURCE.seg_end }};; }
+  dimension status        { label: 'Status'        type: 'text' definition: @sql {{ #SOURCE.status }};; }
+
+  models: []
+}

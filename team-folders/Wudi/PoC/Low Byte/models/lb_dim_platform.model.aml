@@ -1,0 +1,40 @@
+Model lb_dim_platform {
+  type: 'table'
+  label: 'Dim Platform'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_platform"'
+
+  dimension platform_key {
+    label: 'Platform Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.platform_key }};;
+  }
+  dimension platform_code {
+    label: 'Platform Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.platform_code }};;
+  }
+  dimension platform_name {
+    label: 'Platform Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.platform_name }};;
+  }
+  dimension store_name {
+    label: 'Store Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_name }};;
+  }
+  dimension is_mobile {
+    label: 'Is Mobile'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_mobile }};;
+  }
+}

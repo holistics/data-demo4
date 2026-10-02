@@ -269,7 +269,13 @@ Dashboard my_first_dashboard {
       }
       calculation repeat_customer_gmv_pct {
         label: 'Repeat Customer Gmv Pct'
-        formula: @aql safe_divide(repeat_customer_gmv_last_quarter, total_gmv_last_quarter) * 100.0;;
+        formula: @aql safe_divide(
+  gmv | where(
+      ecommerce_users.total_orders_all_time > 1,
+      ecommerce_orders.created_at is @(last quarter)
+    ),
+  total_gmv_last_quarter
+) * 100.0;;
         calc_type: 'measure'
         data_type: 'number'
       }
@@ -334,7 +340,13 @@ Dashboard my_first_dashboard {
       }
       calculation repeat_customer_gmv_pct {
         label: 'Repeat Customer Gmv Pct'
-        formula: @aql safe_divide(repeat_customer_gmv_last_quarter, total_gmv_last_quarter) * 100.0;;
+        formula: @aql safe_divide(
+  gmv | where(
+      ecommerce_users.total_orders_all_time > 1,
+      ecommerce_orders.created_at is @(last quarter)
+    ),
+  total_gmv_last_quarter
+) * 100.0;;
         calc_type: 'measure'
         data_type: 'number'
       }

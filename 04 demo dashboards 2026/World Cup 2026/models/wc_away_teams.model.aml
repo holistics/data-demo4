@@ -1,0 +1,13 @@
+// Role-playing alias of wc_teams for the AWAY side of a match.
+Model wc_away_teams = wc_teams.extend({
+  label: 'Away Team'
+  dimension name {
+    label: 'Away Team'
+  }
+  dimension flag_url {
+    label: 'Away Flag'
+  }
+  dimension color_hex {
+    label: 'Away Color'
+  }
+})

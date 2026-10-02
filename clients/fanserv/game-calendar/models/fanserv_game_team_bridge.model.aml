@@ -1,0 +1,94 @@
+Model fanserv_game_team_bridge {
+  type: 'query'
+  label: 'FanServ Game Teams'
+  description: 'CSV-backed bridge at calendar-board game-by-participating-team grain so the native Team filter matches either side exactly.'
+  data_source_name: 'demodb'
+
+  dimension game_team_key {
+    label: 'Game Team Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+
+  dimension board_game_id {
+    label: 'Board Game ID'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension game_id {
+    label: 'Game ID'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension team_code {
+    label: 'Team UUID'
+    type: 'text'
+    hidden: true
+  }
+
+  dimension team_name {
+    label: 'Team'
+    type: 'text'
+  }
+
+  dimension team_role {
+    label: 'Team Role'
+    type: 'text'
+  }
+
+  query: @sql
+    with source_bounds as (
+      select
+        least(
+          date_trunc('month', min(((scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as first_month
+        , greatest(
+          date_trunc('month', max(((scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as last_month
+      from "dbt_khai"."holistics_fanserv_games_d2418_202607160936"
+    )
+    , board_months as (
+      select
+        board_month_start::date
+        , (
+            board_month_start::date
+            - (extract(isodow from board_month_start)::integer - 1)
+          )::date as grid_start
+      from source_bounds
+      cross join lateral generate_series(
+        first_month
+        , last_month
+        , interval '1 month'
+      ) as board_month_start
+    )
+
+    select
+      to_char(board_month_start, 'YYYY-MM-DD') || '|' || games.uuid::text || ':' || teams.uuid::text as game_team_key
+      , to_char(board_month_start, 'YYYY-MM-DD') || '|' || games.uuid::text as board_game_id
+      , games.uuid::text as game_id
+      , teams.uuid::text as team_code
+      , leagues.alias::text || ' · ' || coalesce(
+          nullif(teams.full_name::text, '')
+          , nullif(concat_ws(' ', nullif(teams.market::text, ''), nullif(teams.name::text, '')), '')
+          , teams.alias::text
+        ) as team_name
+      , participant.team_role::text as team_role
+    from "dbt_khai"."holistics_fanserv_games_d2418_202607160936" as games
+    cross join lateral (
+      values
+        (games.home_id, 'home')
+        , (games.away_id, 'away')
+    ) as participant(team_id, team_role)
+    join board_months
+      on ((games.scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date
+        between board_months.grid_start and board_months.grid_start + 41
+    join "dbt_khai"."holistics_fanserv_teams_3d44f_202607160945" as teams
+      on participant.team_id = teams.id
+    join "dbt_khai"."holistics_fanserv_leagu_2a159_202607160936" as leagues
+      on teams.league_id = leagues.id;;
+}

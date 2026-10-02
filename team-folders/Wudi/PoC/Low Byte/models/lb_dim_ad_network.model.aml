@@ -1,0 +1,52 @@
+Model lb_dim_ad_network {
+  type: 'table'
+  label: 'Dim Ad Network'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_ad_network"'
+
+  dimension ad_network_key {
+    label: 'Ad Network Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.ad_network_key }};;
+  }
+  dimension network_code {
+    label: 'Network Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.network_code }};;
+  }
+  dimension network_name {
+    label: 'Network Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.network_name }};;
+  }
+  dimension network_type {
+    label: 'Network Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.network_type }};;
+  }
+  dimension is_mediation_platform {
+    label: 'Is Mediation Platform'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_mediation_platform }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

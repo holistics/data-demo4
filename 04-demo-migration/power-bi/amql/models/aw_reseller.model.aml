@@ -1,0 +1,49 @@
+Model aw_reseller {
+  type: 'table'
+  label: 'Reseller'
+  data_source_name: 'md_adventure_works_sales'
+  table_name: 'main.reseller'
+
+  dimension reseller_key {
+    label: 'Reseller Key'
+    type: 'number'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.ResellerKey }};;
+  }
+  dimension reseller_id {
+    label: 'Reseller ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Reseller ID }};;
+  }
+  dimension business_type {
+    label: 'Business Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Business Type }};;
+  }
+  dimension reseller {
+    label: 'Reseller'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Reseller }};;
+  }
+  dimension city {
+    label: 'City'
+    type: 'text'
+    definition: @sql {{ #SOURCE.City }};;
+  }
+  dimension state_province {
+    label: 'State-Province'
+    type: 'text'
+    definition: @sql {{ #SOURCE.State-Province }};;
+  }
+  dimension country_region {
+    label: 'Country-Region'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Country-Region }};;
+  }
+  dimension postal_code {
+    label: 'Postal Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.Postal Code }};;
+  }
+}

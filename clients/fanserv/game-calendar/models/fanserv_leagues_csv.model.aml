@@ -1,0 +1,137 @@
+Model fanserv_leagues_csv {
+  type: 'table'
+  label: 'FanServ Leagues — CSV Source'
+  description: 'Source league extract imported from clients/fanserv/game-calendar/data/leaguedata.csv.'
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension created {
+    label: 'Created'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created }};;
+  }
+  dimension modified {
+    label: 'Modified'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.modified }};;
+  }
+  dimension uuid {
+    label: 'Uuid'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.uuid }};;
+  }
+  dimension is_active {
+    label: 'Is active'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension alias {
+    label: 'Alias'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.alias }};;
+  }
+  dimension name {
+    label: 'Name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension logo_url {
+    label: 'Logo url'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.logo_url }};;
+  }
+  dimension has_teams {
+    label: 'Has teams'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.has_teams }};;
+  }
+  dimension season_end {
+    label: 'Season end'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.season_end }};;
+  }
+  dimension season_start {
+    label: 'Season start'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.season_start }};;
+  }
+  dimension is_sr_league {
+    label: 'Is sr league'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_sr_league }};;
+  }
+  dimension peerdb_synced_at {
+    label: 'Peerdb synced at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.peerdb_synced_at }};;
+  }
+  dimension peerdb_is_deleted {
+    label: 'Peerdb is deleted'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.peerdb_is_deleted }};;
+  }
+  dimension peerdb_version {
+    label: 'Peerdb version'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.peerdb_version }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'leaguedata.csv'
+    uploaded_at: '2026-07-16 09:36:52'
+    hash: 'fa78ffff40c600bf6b4a3fa38a75ea47502a9109c1c64d5cd21c8967c33f13b1'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("created", "created", "datetime"),
+      H.imports.column_config("modified", "modified", "datetime"),
+      H.imports.column_config("uuid", "uuid", "text"),
+      H.imports.column_config("is_active", "is_active", "truefalse"),
+      H.imports.column_config("alias", "alias", "text"),
+      H.imports.column_config("name", "name", "text"),
+      H.imports.column_config("logo_url", "logo_url", "text"),
+      H.imports.column_config("has_teams", "has_teams", "truefalse"),
+      H.imports.column_config("season_end", "season_end", "text"),
+      H.imports.column_config("season_start", "season_start", "text"),
+      H.imports.column_config("is_sr_league", "is_sr_league", "truefalse"),
+      H.imports.column_config("peerdb_synced_at", "peerdb_synced_at", "datetime"),
+      H.imports.column_config("peerdb_is_deleted", "peerdb_is_deleted", "number"),
+      H.imports.column_config("peerdb_version", "peerdb_version", "number")
+    ]
+  }
+  owner: 'chinh.dm+demo4@holistics.io'
+  table_name: '"dbt_khai"."holistics_fanserv_leagu_2a159_202607160936"'
+}

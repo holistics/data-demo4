@@ -1,0 +1,25 @@
+// This is a library dashboard block. For more details, visit https://docs.holistics.io/docs/canvas-dashboard/guides/build-library-blocks
+// Branded dashboard footer for Seed Company. All-mono, three-up layout
+// mirroring the brand guide's own page furniture (year left / context centre /
+// mark right), above a Stone rule. Uses `seed_company_bare` so it reads as
+// page furniture rather than another content card.
+@template(
+  title='Seed Company - Dashboard Footer',
+  description='Branded dashboard footer: copyright, source note and owner, in Red Hat Mono.',
+  thumbnail='',
+  metadata={
+    group: 'Seed Company'
+    block_width: 1400
+    block_height: 80
+  }
+)
+Func block_seed_company_footer(source_note: String, owner_note: String) {
+  TextBlock {
+    content: @md <div style="display:flex; justify-content:space-between; align-items:center; height:100%; width:100%; padding:12px 8px 0 8px; box-sizing:border-box; border-top:1px solid #CDC3B0; font-family:'Red Hat Mono', ui-monospace, Menlo, monospace; font-size:11px; letter-spacing:0.06em; color:#636466;">
+  <span>© 2026 SEED COMPANY</span>
+  <span style="text-transform:uppercase;">${source_note}</span>
+  <span style="text-transform:uppercase;">${owner_note} · seedcompany.com</span>
+</div>;;
+    theme: seed_company_bare
+  }
+}

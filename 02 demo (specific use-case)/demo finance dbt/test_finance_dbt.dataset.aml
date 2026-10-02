@@ -1,0 +1,74 @@
+Dataset test_finance_dbt {
+  label: 'Test Finance (dbt-powered)'
+  description: 'Pilot dataset on the dbt-backed FX-normalised finance marts (data source: demo_dbt_test). Parallel to demo_finance_version_2; does not touch the live demo.'
+  data_source_name: 'demo_dbt_test'
+  owner: 'dong.ln@holistics.io'
+  models: [
+    dbt_finance_bills_usd,
+    dbt_finance_invoices_usd,
+    dbt_finance_vendors,
+    dbt_finance_expense_categories,
+  ]
+
+  relationships: [
+    relationship(dbt_finance_bills_usd.vendor_id > dbt_finance_vendors.vendor_id, true),
+    relationship(dbt_finance_bills_usd.expense_category_id > dbt_finance_expense_categories.category_id, true),
+    relationship(dbt_finance_vendors.default_category_id > dbt_finance_expense_categories.category_id, true),
+  ]
+
+  metric total_revenue_usd {
+    label: 'Total Revenue (USD)'
+    type: 'number'
+    description: 'Sum of invoice amounts normalised to USD via the dbt as-of FX join.'
+    definition: @aql sum(dbt_finance_invoices_usd.invoice_amount_usd);;
+    format: "[\$\$]#,###0"
+  }
+
+  metric total_revenue_local {
+    label: 'Total Revenue (local, unconverted)'
+    type: 'number'
+    description: 'Sum of raw local-currency invoice amounts (NOT FX-converted) — shown to contrast with the USD figure.'
+    definition: @aql sum(dbt_finance_invoices_usd.invoice_amount);;
+    format: "#,###0"
+  }
+
+  metric total_collected_usd {
+    label: 'Total Collected (USD)'
+    type: 'number'
+    description: 'Sum of paid invoice amounts in USD.'
+    definition: @aql sum(dbt_finance_invoices_usd.paid_amount_usd);;
+    format: "[\$\$]#,###0"
+  }
+
+  metric total_accounts_receivable_usd {
+    label: 'Outstanding AR (USD)'
+    type: 'number'
+    description: 'Outstanding customer receivables (open/partial invoices) in USD.'
+    definition: @aql sum(dbt_finance_invoices_usd.remaining_amount_usd) | where(dbt_finance_invoices_usd.invoice_status in ['open', 'partial']);;
+    format: "[\$\$]#,###0"
+  }
+
+  metric total_supplier_cost_usd {
+    label: 'Total Supplier Cost (USD)'
+    type: 'number'
+    description: 'Sum of supplier bill amounts in USD.'
+    definition: @aql sum(dbt_finance_bills_usd.bill_amount_usd);;
+    format: "[\$\$]#,###0"
+  }
+
+  metric total_accounts_payable_usd {
+    label: 'Outstanding AP (USD)'
+    type: 'number'
+    description: 'Outstanding supplier payables (open/partial bills) in USD.'
+    definition: @aql sum(dbt_finance_bills_usd.remaining_amount_usd) | where(dbt_finance_bills_usd.bill_status in ['open', 'partial']);;
+    format: "[\$\$]#,###0"
+  }
+
+  metric total_invoices {
+    label: 'Total Invoices'
+    type: 'number'
+    description: 'Count of customer invoices.'
+    definition: @aql count(dbt_finance_invoices_usd.invoice_id);;
+    format: "#,###0"
+  }
+}

@@ -1,0 +1,74 @@
+Dashboard business_users_metric_promotion {
+  title: 'Business Users Metric Promotion'
+  owner: 'nam.tran@holistics.io'
+  interactions: []
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'Submission'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block v_m825 {
+        position: pos(20, 20, 620, 420)
+      }
+    }
+    tab tab_7zvv: CanvasLayout {
+      label: 'Approved'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_sl2x: CanvasLayout {
+      label: 'Denied'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+  theme: H.themes.vanilla
+  settings {
+    autorun_on_open: true
+  }
+  block v_m825: VizBlock {
+    label: 'Running total of Total Revenue'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      calculation running_total_of_total_revenue {
+        label: 'Running total of Total Revenue'
+        formula: @aql revenue | running_total();;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: 'running_total_of_total_revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+}
