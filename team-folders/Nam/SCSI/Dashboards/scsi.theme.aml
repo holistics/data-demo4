@@ -1,0 +1,125 @@
+PageTheme scsi_theme {
+  title: "SCSI"
+  background {
+    bg_color: "#020617"
+  }
+  canvas {
+    background {
+      bg_color: "#0f172a"
+    }
+    border {
+      border_radius: 6
+      border_color: "#1e293b"
+    }
+    shadow: "lg"
+  }
+  block {
+    background {
+      bg_color: "#1e293b"
+    }
+    label {
+      font_family: "Outfit, sans-serif"
+      font_size: 11
+      font_color: "#f8fafc"
+      font_weight: "semibold"
+      letter_spacing: 1.5
+      text_transform: "uppercase"
+    }
+    text {
+      font_family: "Outfit, sans-serif"
+      font_color: "#94a3b8"
+    }
+    border {
+      border_radius: 6
+      border_width: 1
+      border_color: "#334155"
+      border_style: "solid"
+    }
+    padding: 16
+    shadow: "lg"
+  }
+  viz {
+    table {
+      general {
+        bg_color: "#0f172a"
+        hover_color: "#1e293b"
+        banding_color: "#1e293b"
+        font_color: "#f8fafc"
+        font_family: "Outfit, sans-serif"
+        border_color: "#1e293b"
+        grid_color: "#1e293b"
+      }
+      header {
+        bg_color: "#0f172a"
+        font_color: "#f8fafc"
+        font_size: 11
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: "#1e293b"
+        font_color: "#f8fafc"
+        font_size: 11
+      }
+      sub_title {
+        font_color: "#94a3b8"
+        font_size: 11
+      }
+    }
+    metric_kpi {
+      label {
+        font_family: "Outfit, sans-serif"
+        font_size: 14
+        font_color: "#94a3b8"
+        font_weight: "medium"
+        letter_spacing: 0
+      }
+      value {
+        font_family: "Outfit, sans-serif"
+        font_size: 32
+        font_color: "#f8fafc"
+        letter_spacing: 0
+      }
+      progress {
+        text {
+          font_family: "Outfit, sans-serif"
+          font_color: "#94a3b8"
+        }
+        indicator {
+          bg_color: "#0284c7"
+        }
+        track {
+          bg_color: "#2c3c56"
+        }
+      }
+      trend {
+        positive {
+          text {
+            font_color: "#a7f3d0"
+          }
+          background {
+            bg_color: "#064e3b"
+          }
+        }
+        negative {
+          text {
+            font_color: "#fecaca"
+          }
+          background {
+            bg_color: "#7f1d1d"
+          }
+        }
+        neutral {
+          text {
+            font_color: "#e0e5eb"
+          }
+          background {
+            bg_color: "#2c3c56"
+          }
+        }
+      }
+    }
+  }
+  custom_css: @css
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
+  ;;
+}
