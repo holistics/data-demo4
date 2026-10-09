@@ -2,7 +2,7 @@ Model public_collectors {
   type: 'table'
   label: 'Collectors'
   description: 'Collection agents employed by the agency. One row per collector; accounts are assigned to a collector via collector_id.'
-  data_source_name: 'demo_scsi_nam'
+  data_source_name: 'demodb'
 
   dimension collector_id {
     label: 'Collector Id'

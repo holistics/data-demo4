@@ -2,7 +2,7 @@ Model public_properties {
   type: 'table'
   label: 'Properties'
   description: 'Individual hotels operating the Laasie rewards programme. One row per property, each belonging to exactly one owner group. This model carries the geography of the portfolio (city, state) and its physical capacity (room count), and it is the join hop that connects every booking to its owner group.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension property_id {
     label: 'Property Id'

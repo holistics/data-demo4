@@ -2,7 +2,7 @@ Model public_loyalty_transactions {
   type: 'table'
   label: 'Loyalty Transactions'
   description: 'The loyalty ledger: every reward value earned or spent by a member. One row per transaction, so a single booking can generate several. Grain is FINER than bookings — joining this model fans out booking rows, so always count `bookings.booking_id` distinctly when the two appear in the same query. This model answers what the programme is issuing; `public_redemptions` answers what members actually took.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension transaction_id {
     label: 'Transaction Id'

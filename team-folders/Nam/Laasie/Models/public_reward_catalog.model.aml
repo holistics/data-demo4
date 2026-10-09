@@ -2,7 +2,7 @@ Model public_reward_catalog {
   type: 'table'
   label: 'Reward Catalog'
   description: 'The menu of rewards a member can claim. One row per catalogue item — a dimension, not a fact. It carries list value, so joining it to redemptions lets you separate what a reward is nominally worth from what was actually paid out. Because it is a small dimension, aggregate its own columns over this model alone; summed alongside redemptions it multiplies by the number of times each reward was claimed.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension reward_id {
     label: 'Reward Id'

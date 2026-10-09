@@ -2,7 +2,7 @@ Model public_clients {
   type: 'table'
   label: 'Clients'
   description: 'Creditor organisations that place delinquent accounts with the agency for collection. One row per client; referenced by accounts via client_id.'
-  data_source_name: 'demo_scsi_nam'
+  data_source_name: 'demodb'
 
   dimension client_id {
     label: 'Client Id'

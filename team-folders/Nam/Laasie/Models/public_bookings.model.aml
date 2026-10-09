@@ -10,7 +10,7 @@ Model public_bookings {
   type: 'table'
   label: 'Bookings'
   description: 'Guest stays at properties running the Laasie programme. One row per booking, at the grain of a single stay: who stayed (guest), where (property), when (check-in to check-out), through which channel, at what rate, and how much they spent in total. This is the revenue fact of the dataset and the model every commercial question starts from.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension booking_id {
     label: 'Booking Id'

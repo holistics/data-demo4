@@ -2,7 +2,7 @@ Model public_contact_attempts {
   type: 'table'
   label: 'Contact Attempts'
   description: 'Every attempt made to reach a debtor about a placed account. One row per attempt, so an account may have many attempts across several channels. Grain is finer than accounts — count accounts distinctly when querying across this model.'
-  data_source_name: 'demo_scsi_nam'
+  data_source_name: 'demodb'
 
   dimension attempt_id {
     label: 'Attempt Id'

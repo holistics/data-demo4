@@ -2,7 +2,7 @@ Model public_payments {
   type: 'table'
   label: 'Payments'
   description: 'Individual payments received against placed accounts. One row per payment, so an account may have many payments (payment plans) or none. Grain is finer than accounts — always count accounts distinctly when querying across this model.'
-  data_source_name: 'demo_scsi_nam'
+  data_source_name: 'demodb'
 
   dimension payment_id {
     label: 'Payment Id'

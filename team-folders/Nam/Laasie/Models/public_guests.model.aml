@@ -24,7 +24,7 @@ Model public_guests {
   type: 'table'
   label: 'Guests'
   description: 'Enrolled members of the Laasie loyalty programme. One row per guest, independent of any single hotel — a guest can stay across several properties and owner groups. This model carries the membership attributes used for segmentation: tier, traveler segment, reward preference and enrollment date. Note that guests are a platform-wide entity, so in the client-scoped dataset a viewer sees only guests who have stayed at one of their own properties.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension guest_id {
     label: 'Guest Id'

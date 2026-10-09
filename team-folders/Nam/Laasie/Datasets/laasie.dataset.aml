@@ -54,7 +54,7 @@ This is synthetic demo data. Revenue is attributed wholly to the check-in date r
 spread across the nights of a stay, so a stay spanning a month boundary sits entirely in its
 check-in month.
 '''
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   models: [
     public_bookings,
