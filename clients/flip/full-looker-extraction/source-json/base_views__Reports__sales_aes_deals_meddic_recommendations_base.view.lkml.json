@@ -1,0 +1,5 @@
+{
+ "original_path": "base_views/Reports/sales_aes_deals_meddic_recommendations_base.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "view: sales_aes_deals_meddic_recommendations_base {\n  sql_table_name: `fl-bi-p-poc.reports_poc.sales_aes_deals_meddic_recomendations` ;;\n\n  dimension: deal_id {\n    type: string\n    sql: ${TABLE}.deal_id ;;\n  }\n  dimension: meddic_element {\n    type: string\n    sql: ${TABLE}.meddic_element ;;\n  }\n  dimension: meddic_metrics_recommendations {\n    type: string\n    sql: ${TABLE}.meddic_metrics_recommendations ;;\n  }\n  measure: count {\n    type: count\n  }\n}\n"
+}

@@ -1,0 +1,312 @@
+// Lionel Messi's senior international career with Argentina, 2005–2026.
+//
+// JOIN PATH NOTE: `tournament_id` is denormalised onto goals. Only ONE route from a goal to its
+// tournament is active — goals > matches > tournaments — so the dataset has no ambiguous join
+// paths. The denormalised column is declared as an INACTIVE relationship below.
+Dataset messi_argentina {
+  label: 'Messi Argentina Career'
+  description: '''
+Lionel Messi's senior international career with Argentina, built on the `demo_nam_leo_messi` data source:
+207 caps and 125 goals from his debut on 17 Aug 2005 to the 2026 World Cup final on 19 Jul 2026.
+
+## What this dataset can answer
+- Appearances and results: caps, wins, draws, losses and win rate by competition, stage, opponent, confederation, venue, coach and year.
+- Scoring: goals, goals per match, penalties, hat-tricks and Messi's share of Argentina's goals — by any match attribute.
+- Tournaments: how Argentina finished and what Messi produced at each World Cup, Copa América, the Finalissima and every qualifying cycle.
+- Silverware: team trophies (senior and youth) and individual awards, plus a timeline of career milestones.
+
+## Grain and joins
+`messi_matches` is the central model, one row per cap. `messi_goals` is finer (one row per goal),
+so a hat-trick match appears three times once goals are joined. Count `messi_matches.match_id`
+distinctly for caps — the `messi_caps` metric already does.
+
+Matches, honours and awards all reach `messi_tournaments` on `tournament_id`. Friendlies, youth
+honours and IFFHS awards have no tournament.
+
+## Result convention
+`messi_matches.result` (and `result_label`) is the result after 90/120 minutes: a match decided
+on penalties is a **draw**, with the shootout outcome in `shootout_result`. That is the FIFA
+convention and gives 134 W / 43 D / 30 L. Use `result_incl_shootout` to see who advanced.
+
+## Non-additive fields
+- `messi_tournaments.messi_apps`, `messi_goals`, `messi_penalty_goals` are pre-aggregated per tournament — never sum them alongside match or goal rows.
+- `messi_career_summary` is a standalone key-value table with text values; it is for display and reconciliation, not aggregation. Assists exist only there.
+
+## Caveats
+Messi retired from international football on 31 Aug 2026; the data is complete and will not grow.
+The "4 senior trophies" headline excludes the 2019 Superclásico de las Américas friendly, which
+`team_honours.counts_as_trophy` does count.
+'''
+  data_source_name: 'demo_nam_leo_messi'
+
+  models: [
+    messi_matches,
+    messi_goals,
+    messi_tournaments,
+    messi_milestones,
+    messi_team_honours,
+    messi_individual_awards,
+    messi_career_summary,
+    messi_params
+  ]
+
+  relationships: [
+    // Active spine
+    relationship(messi_goals.match_id > messi_matches.match_id, true),
+    relationship(messi_matches.tournament_id > messi_tournaments.tournament_id, true),
+    relationship(messi_milestones.match_id > messi_matches.match_id, true),
+    relationship(messi_team_honours.tournament_id > messi_tournaments.tournament_id, true),
+    relationship(messi_individual_awards.tournament_id > messi_tournaments.tournament_id, true),
+
+    // Inactive — denormalised shortcut that would create a second path from goals to tournaments
+    relationship(messi_goals.tournament_id > messi_tournaments.tournament_id, false)
+  ]
+
+  // ---------------------------------------------------------------------------------
+  // APPEARANCES
+  // ---------------------------------------------------------------------------------
+  metric messi_caps {
+    label: 'Caps'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id);;
+    description: 'Senior Argentina appearances (caps) in the selected context. Counted distinctly so that joining goals — one row per goal — cannot inflate it. 207 across the career.'
+  }
+
+  metric messi_competitive_caps {
+    label: 'Competitive Caps'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.is_competitive is true);;
+    description: 'Caps in competitive matches — World Cup, qualifiers, Copa América and Finalissima. Excludes friendlies. 146 across the career.'
+  }
+
+  metric messi_friendly_caps {
+    label: 'Friendly Caps'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.is_competitive is false);;
+    description: 'Caps in friendlies. 61 across the career.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // RESULTS (90/120 minutes; shootouts count as draws)
+  // ---------------------------------------------------------------------------------
+  metric messi_wins {
+    label: 'Wins'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.result == 'W');;
+    description: 'Matches Argentina won after 90/120 minutes. Shootout wins are draws here (FIFA convention). 134 across the career.'
+  }
+
+  metric messi_draws {
+    label: 'Draws'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.result == 'D');;
+    description: 'Matches drawn after 90/120 minutes, including those then decided on penalties. 43 across the career.'
+  }
+
+  metric messi_losses {
+    label: 'Losses'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.result == 'L');;
+    description: 'Matches Argentina lost after 90/120 minutes. Shootout defeats are draws here. 30 across the career.'
+  }
+
+  metric messi_win_rate {
+    label: 'Win Rate'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(messi_wins * 1.0, messi_caps);;
+    description: 'Share of caps that Argentina won after 90/120 minutes. Shootout wins are not counted as wins.'
+  }
+
+  metric messi_shootout_wins {
+    label: 'Shootout Wins'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.shootout_result == 'W');;
+    description: 'Drawn matches Argentina then won on penalties — including the 2022 World Cup final and 2021 Copa América semi-final.'
+  }
+
+  metric messi_shootout_losses {
+    label: 'Shootout Losses'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.shootout_result == 'L');;
+    description: 'Drawn matches Argentina then lost on penalties — including the 2015 and 2016 Copa América finals.'
+  }
+
+  metric messi_unbeaten_rate {
+    label: 'Unbeaten Rate'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide((messi_wins + messi_draws) * 1.0, messi_caps);;
+    description: 'Share of caps Argentina did not lose after 90/120 minutes (wins plus draws).'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // ARGENTINA SCORELINES
+  // ---------------------------------------------------------------------------------
+  metric argentina_goals_for {
+    label: 'Argentina Goals For'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql sum(messi_matches.argentina_score);;
+    description: 'Goals Argentina scored in matches Messi played, after extra time where played, excluding shootout kicks.'
+  }
+
+  metric argentina_goals_against {
+    label: 'Argentina Goals Against'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql sum(messi_matches.opponent_score);;
+    description: 'Goals Argentina conceded in matches Messi played, excluding shootout kicks.'
+  }
+
+  metric argentina_clean_sheets {
+    label: 'Clean Sheets'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.opponent_score == 0);;
+    description: 'Matches Messi played in which Argentina conceded no goals.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // MESSI SCORING
+  // ---------------------------------------------------------------------------------
+  metric messi_total_goals {
+    label: 'Messi Goals'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count(messi_goals.goal_id);;
+    description: 'Goals Messi scored for Argentina, penalties included, shootout kicks excluded. Counted from the goal model, so it slices by goal attributes (penalty, score after goal) as well as any match or tournament attribute. 125 across the career.'
+  }
+
+  metric messi_penalty_goals {
+    label: 'Penalty Goals'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count(messi_goals.goal_id) | where(messi_goals.is_penalty is true);;
+    description: 'Goals Messi scored from in-game penalties. 25 across the career.'
+  }
+
+  metric messi_non_penalty_goals {
+    label: 'Non-Penalty Goals'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count(messi_goals.goal_id) | where(messi_goals.is_penalty is false);;
+    description: 'Goals Messi scored from open play and free kicks — total goals minus penalties.'
+  }
+
+  metric messi_penalty_share {
+    label: 'Penalty Share of Goals'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(messi_penalty_goals * 1.0, messi_total_goals);;
+    description: 'Share of Messi goals that were penalties.'
+  }
+
+  metric messi_goals_per_match {
+    label: 'Goals per Match'
+    type: 'number'
+    format: '0.00'
+    definition: @aql safe_divide(messi_total_goals * 1.0, messi_caps);;
+    description: 'Messi goals divided by caps — his scoring rate. Every cap counts, including substitute appearances and matches where he did not score.'
+  }
+
+  metric messi_matches_scored_in {
+    label: 'Matches Scored In'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.messi_goals > 0);;
+    description: 'Caps in which Messi scored at least once.'
+  }
+
+  metric messi_scoring_match_rate {
+    label: 'Scoring Match Rate'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(messi_matches_scored_in * 1.0, messi_caps);;
+    description: 'Share of caps in which Messi scored at least once.'
+  }
+
+  metric messi_hat_tricks {
+    label: 'Hat-tricks'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_matches.match_id) | where(messi_matches.messi_goals >= 3);;
+    description: 'Matches in which Messi scored three or more goals (includes his five-goal game vs Estonia, 2022). 11 across the career.'
+  }
+
+  metric messi_share_of_team_goals {
+    label: 'Share of Argentina Goals'
+    type: 'number'
+    format: '0.0%'
+    definition: @aql safe_divide(sum(messi_matches.messi_goals) * 1.0, argentina_goals_for);;
+    description: 'Messi goals as a share of all goals Argentina scored in the matches he played. Both sides come from the match model, so the ratio is unaffected by goal-row fan-out.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // TOURNAMENTS AND SILVERWARE
+  // ---------------------------------------------------------------------------------
+  metric messi_tournaments_played {
+    label: 'Tournaments Played'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_tournaments.tournament_id);;
+    description: 'Distinct tournaments and qualifying cycles in context. 20 across the career (6 World Cups, 6 Copa Américas, 1 Finalissima, 6 qualifying cycles + Centenario counted among Copas).'
+  }
+
+  metric messi_tournaments_won {
+    label: 'Tournaments Won'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_tournaments.tournament_id) | where(messi_tournaments.argentina_finish == 'Champion');;
+    description: 'Tournaments Argentina won with Messi: Copa América 2021 and 2024, Finalissima 2022, World Cup 2022.'
+  }
+
+  metric messi_team_trophies {
+    label: 'Team Trophies'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_team_honours.honour_id) | where(messi_team_honours.counts_as_trophy is true);;
+    description: 'Team trophies won at any level — senior, U-20 and Olympic — including the 2019 Superclásico de las Américas friendly. 7 across the career. Slice by `messi_team_honours.level` for senior only.'
+  }
+
+  metric messi_major_senior_trophies {
+    label: 'Major Senior Trophies'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_team_honours.honour_id)
+      | where(messi_team_honours.counts_as_trophy is true and messi_team_honours.level == 'Senior' and messi_team_honours.tournament_id is not null);;
+    description: 'Senior trophies won in official tournaments, excluding the 2019 Superclásico friendly. Matches the "4 senior trophies" headline in the career summary.'
+  }
+
+  metric messi_individual_award_count {
+    label: 'Individual Awards'
+    type: 'number'
+    format: '#,##0'
+    definition: @aql count_distinct(messi_individual_awards.award_id);;
+    description: 'Individual awards won with Argentina — World Cup and Copa América player and scorer awards, U-20 awards and IFFHS titles. 15 across the career, including the 2015 Copa América Best Player award he declined.'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // METRIC SWITCHER (dashboard helper)
+  // ---------------------------------------------------------------------------------
+  metric messi_selected_metric {
+    label: 'Selected Metric'
+    type: 'number'
+    definition: @aql case(
+      when: 'Caps' in messi_params.metric_selector, then: messi_caps * 1.0,
+      when: 'Penalty Goals' in messi_params.metric_selector, then: coalesce(messi_penalty_goals, 0) * 1.0,
+      when: 'Goals per Match' in messi_params.metric_selector, then: safe_divide(sum(messi_matches.messi_goals) * 1.0, messi_caps),
+      when: 'Win Rate' in messi_params.metric_selector, then: messi_win_rate,
+      else: sum(messi_matches.messi_goals) * 1.0
+    );;
+    description: 'Returns the metric chosen in the `messi_params.metric_selector` parameter (Goals, Caps, Penalty Goals, Goals per Match or Win Rate). Defaults to Goals. Goals are summed from the match model so a tournament where Messi did not score (2010) shows 0 instead of dropping out. Dashboard helper — for analysis, use the underlying metric directly.'
+  }
+}

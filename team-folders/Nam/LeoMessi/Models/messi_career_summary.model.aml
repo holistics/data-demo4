@@ -1,0 +1,34 @@
+// Key-value table of headline career figures. Values are stored as TEXT (numbers and dates
+// mixed), so it is for display and reconciliation only — compute figures from the fact models.
+Model messi_career_summary {
+  type: 'table'
+  label: 'Career Summary'
+  description: "Headline figures of Messi's Argentina career as key-value pairs (17 rows), e.g. caps 207, goals 125, wins 134, senior trophies 4, first and last cap dates, assists. Values marked `computed` are derived from the match and goal tables and should reconcile with them; assists come from external sources and exist ONLY here, because the source has no assist-level data. Standalone — not joined to any other model."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."career_summary"'
+
+  dimension metric {
+    label: 'Summary Metric'
+    type: 'text'
+    description: "The **Summary Metric** is the name of the headline figure and the primary key, in snake_case: caps, goals, wins, draws, losses, penalty_goals, hat_tricks_or_more, world_cup_goals, world_cup_matches, world_cup_tournaments, official_assists, world_cup_assists, copa_america_assists, senior_trophies, first_cap, last_cap, retirement_announced."
+    hidden: false
+    definition: @sql {{ #SOURCE.metric }};;
+    primary_key: true
+  }
+
+  dimension value {
+    label: 'Summary Value'
+    type: 'text'
+    description: "The **Summary Value** of the figure, stored as text — counts such as `125` and dates such as `2026-07-19` share this column.  \nDo not aggregate it. For any figure that can be computed, use the dataset metrics instead (e.g. `messi_caps`, `messi_total_goals`)."
+    hidden: false
+    definition: @sql {{ #SOURCE.value }};;
+  }
+
+  dimension source {
+    label: 'Source'
+    type: 'text'
+    description: "The **Source** of the figure: `computed` (derived from this data source), or an external reference such as RSSSF, Wikipedia or ABC News.  \n`wins` notes the convention used (90/120 min; shootouts count as draws) and `senior_trophies` lists the four trophies it counts."
+    hidden: false
+    definition: @sql {{ #SOURCE.source }};;
+  }
+}

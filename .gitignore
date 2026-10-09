@@ -8,3 +8,4 @@
 *.Report/
 *.SemanticModel/
 .pbi/
+.amp

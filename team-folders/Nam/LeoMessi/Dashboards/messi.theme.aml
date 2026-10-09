@@ -1,0 +1,279 @@
+// Albiceleste theme for the Messi dashboard — celeste/white jersey, navy ink, Sol de Mayo gold.
+// Tokens mirror the source mockup ("Messi · Albiceleste 2005–2026.html"). Result colours are
+// fixed across every chart: Win #2a78d6, Draw #b7c3d1, Loss #eb6834.
+const messi_theme_tokens = {
+  celeste: "#75aadb",
+  navy: "#0b2545",
+  navy_2: "#123766",
+  gold: "#f6b40e",
+  gold_ink: "#3a2600",
+  background: "#f2f8fe",
+  canvas_bg: "#f2f8fe",
+  block_bg: "#ffffff",
+  surface_2: "#e7f1fb",
+  text_primary: "#0b2545",
+  text_muted: "#36506f",
+  text_subtle: "#5d7694",
+  border: "#d3e3f3",
+  win: "#2a78d6",
+  loss: "#eb6834",
+  font_body: "Rubik, system-ui, -apple-system, sans-serif",
+  font_display: "'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif"
+}
+
+ColorPalette messi_palette {
+  title: "Messi · Albiceleste"
+  categorical {
+    colors: [
+      "#2a78d6",
+      "#eb6834",
+      "#1baf7a",
+      "#eda100",
+      "#e87ba4",
+      "#75aadb",
+      "#0b2545",
+      "#9fb0c3"
+    ]
+  }
+}
+
+PageTheme messi_theme {
+  title: "Messi · Albiceleste"
+  color {
+    data: messi_palette
+  }
+  background {
+    bg_color: messi_theme_tokens("background")
+  }
+  canvas {
+    background {
+      bg_color: messi_theme_tokens("canvas_bg")
+    }
+    border {
+      border_width: 0
+      border_radius: 14
+      border_color: messi_theme_tokens("border")
+      border_style: "none"
+    }
+    shadow: "none"
+    opacity: 1
+  }
+  block {
+    background {
+      bg_color: messi_theme_tokens("block_bg")
+    }
+    border {
+      border_width: 1
+      border_style: "solid"
+      border_radius: 14
+      border_color: messi_theme_tokens("border")
+    }
+    shadow: "sm"
+    padding: 16
+    opacity: 1
+    label {
+      font_family: messi_theme_tokens("font_display")
+      font_size: 18
+      font_color: messi_theme_tokens("text_primary")
+      font_weight: "bold"
+      font_style: "normal"
+      letter_spacing: "0.02em"
+    }
+    text {
+      font_family: messi_theme_tokens("font_body")
+      font_size: 13
+      font_color: messi_theme_tokens("text_muted")
+      font_weight: "normal"
+      font_style: "normal"
+    }
+  }
+  viz {
+    table {
+      general {
+        bg_color: messi_theme_tokens("block_bg")
+        font_color: messi_theme_tokens("text_muted")
+        font_family: messi_theme_tokens("font_body")
+        font_size: 13
+        border_color: messi_theme_tokens("border")
+        grid_color: messi_theme_tokens("border")
+        border_width: 1
+        hover_color: "#d6e8f8"
+        banding_color: "#f7fbff"
+        cell_padding: DetailedSpacing {
+          top: 8
+          right: 14
+          bottom: 8
+          left: 14
+        }
+        borders {
+          outer: true
+          vertical: false
+          horizontal: true
+          header: true
+          row_header: false
+        }
+      }
+      header {
+        bg_color: messi_theme_tokens("navy")
+        font_color: "#ffffff"
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: messi_theme_tokens("surface_2")
+        font_color: messi_theme_tokens("text_primary")
+        font_size: 12
+        font_weight: "medium"
+      }
+      sub_title {
+        font_color: messi_theme_tokens("text_subtle")
+        font_size: 12
+        font_weight: "medium"
+      }
+      sparkline {
+        line {
+          color: messi_theme_tokens("win")
+        }
+        column {
+          color: messi_theme_tokens("win")
+        }
+      }
+    }
+    metric_kpi {
+      alignment: "left"
+      label {
+        font_family: messi_theme_tokens("font_body")
+        font_size: 14
+        font_color: messi_theme_tokens("text_subtle")
+      }
+      value {
+        font_family: messi_theme_tokens("font_display")
+        font_size: 48
+        font_color: messi_theme_tokens("text_primary")
+      }
+      progress {
+        indicator {
+          bg_color: messi_theme_tokens("celeste")
+        }
+        track {
+          bg_color: messi_theme_tokens("border")
+        }
+        text {
+          font_color: messi_theme_tokens("text_muted")
+        }
+      }
+      trend {
+        positive {
+          text {
+            font_color: messi_theme_tokens("win")
+            font_weight: "medium"
+          }
+          background {
+            bg_color: "#d6e8f8"
+          }
+        }
+        negative {
+          text {
+            font_color: messi_theme_tokens("loss")
+            font_weight: "medium"
+          }
+          background {
+            bg_color: "#fde6dc"
+          }
+        }
+        neutral {
+          text {
+            font_color: messi_theme_tokens("text_muted")
+            font_weight: "normal"
+          }
+          background {
+            bg_color: messi_theme_tokens("surface_2")
+          }
+        }
+      }
+    }
+  }
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Rubik:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+    .dac-text-block {
+      font-family: Rubik, system-ui, sans-serif;
+      font-size: 14px;
+      color: #36506f;
+      line-height: 1.55;
+    }
+    .dac-text-block h1, .dac-text-block h2, .dac-text-block h3 {
+      font-family: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+      color: #0b2545;
+      text-transform: uppercase;
+      line-height: 1;
+      margin: 0 0 .25em;
+      font-weight: 900;
+    }
+
+    /* Hero: the shirt — nine celeste/white stripes behind a white plate */
+    .mx-hero {
+      height: 100%; box-sizing: border-box; border-radius: 14px; overflow: hidden;
+      background: repeating-linear-gradient(90deg, #75aadb 0 11.111%, #ffffff 11.111% 22.222%);
+      padding: 22px; display: flex; align-items: center; gap: 22px;
+    }
+    .mx-plate {
+      background: rgba(255,255,255,.93); border-radius: 18px; padding: 20px 24px; flex: 1.4;
+      box-shadow: 0 20px 50px -24px rgba(11,37,69,.45);
+    }
+    .mx-eyebrow, .mx-kicker {
+      font: 500 12px/1 'DM Mono', ui-monospace, monospace; letter-spacing: .14em;
+      text-transform: uppercase; color: #2a78d6;
+    }
+    .mx-eyebrow { color: #1c5a96; }
+    .mx-h1 {
+      font: 900 92px/.84 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase;
+      color: #0b2545; margin: 10px 0 8px;
+    }
+    .mx-h1 .ten { color: #75aadb; -webkit-text-stroke: 2px #0b2545; paint-order: stroke fill; }
+    .mx-dek { font: 500 17px/1.4 Rubik, sans-serif; color: #0b2545; margin: 0; max-width: 620px; }
+    .mx-stars { display: flex; gap: 8px; margin-top: 14px; }
+    .mx-star {
+      font: 500 12px/1 'DM Mono', monospace; background: #f6b40e; color: #3a2600;
+      border-radius: 999px; padding: 6px 10px;
+    }
+    .mx-hero-stats { flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+    .mx-hero-stat { background: #0b2545; color: #fff; border-radius: 14px; padding: 14px 16px; }
+    .mx-hero-stat b { display: block; font: 900 46px/.9 'Big Shoulders Display', Impact, sans-serif; color: #f6b40e; }
+    .mx-hero-stat span { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #a9c8ea; }
+
+    /* Chapter header */
+    .mx-tabhead { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap: 8px 28px; align-items: end; height: 100%; }
+    .mx-tabhead h2 { font: 900 56px/.9 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; color: #0b2545; margin: 8px 0 0; }
+    .mx-tabhead p { margin: 0; font-size: 15px; color: #36506f; }
+
+    /* Photo / GIF slot — striped jersey panel until a real image URL is dropped in */
+    .mx-media {
+      height: 100%; box-sizing: border-box; border-radius: 14px; position: relative; overflow: hidden;
+      background: repeating-linear-gradient(90deg, #d6e8f8 0 28px, #ffffff 28px 56px);
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+    }
+    .mx-media .tag {
+      position: absolute; top: 14px; left: 14px; font: 500 11px/1 'DM Mono', monospace; letter-spacing: .12em;
+      background: #0b2545; color: #fff; border-radius: 999px; padding: 6px 10px;
+    }
+    .mx-media .cap { background: rgba(255,255,255,.92); border-radius: 10px; padding: 10px 12px; font: 600 14px/1.35 Rubik, sans-serif; color: #0b2545; }
+    .mx-media .src { display: block; margin-top: 4px; font: 400 11px/1.3 'DM Mono', monospace; color: #5d7694; }
+
+    /* Gold callout card (static figures that do not respond to filters) */
+    .mx-gold { height: 100%; box-sizing: border-box; background: #fff2cc; border: 1px solid #e9b42a; border-radius: 14px; padding: 14px 16px; }
+    .mx-gold .l { font: 500 14px/1.2 Rubik, sans-serif; color: #3a2600; }
+    .mx-gold .v { display: block; font: 900 48px/1 'Big Shoulders Display', Impact, sans-serif; color: #3a2600; margin: 6px 0 2px; }
+    .mx-gold .n { font: 400 12px/1.3 Rubik, sans-serif; color: #6b4e00; }
+
+    .mx-note { font: 400 13px/1.5 Rubik, sans-serif; color: #36506f; }
+    .mx-note b { color: #0b2545; }
+
+    /* Footer */
+    .mx-footer { height: 100%; box-sizing: border-box; border-radius: 14px; background: #0b2545; color: #c0d5ec; padding: 26px 28px; }
+    .mx-footer h2 { font: 900 64px/.9 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; color: #ffffff; margin: 0 0 10px; }
+    .mx-footer h2 span { color: #f6b40e; }
+    .mx-footer p { margin: 0 0 8px; font-size: 15px; color: #e7f1fb; }
+    .mx-footer small { font: 400 11px/1.4 'DM Mono', monospace; color: #8eaacb; }
+  ;;
+}
