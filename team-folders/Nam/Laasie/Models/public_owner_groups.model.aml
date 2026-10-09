@@ -9,7 +9,7 @@ Model public_owner_groups {
   type: 'table'
   label: 'Owner Groups'
   description: 'Hotel owner and management companies that contract with Laasie. One row per owner group. This is the client/tenant entity of the platform: properties belong to an owner group, and every booking, loyalty transaction and redemption rolls up to one through its property. It is also the anchor of row-level scoping in the client-facing dataset.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension owner_group_id {
     label: 'Owner Group Id'

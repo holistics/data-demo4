@@ -35,7 +35,7 @@ Always state which lens a figure uses.
 This is synthetic demo data. `original_balance` is fixed at placement and does not amortise, so
 remaining balance is not directly available — derive it as original balance minus payments received.
 '''
-  data_source_name: 'demo_scsi_nam'
+  data_source_name: 'demodb'
 
   models: [
     public_accounts,

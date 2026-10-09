@@ -2,7 +2,7 @@ Model public_redemptions {
   type: 'table'
   label: 'Redemptions'
   description: 'Rewards a member actually claimed. One row per redemption, linked to the reward taken and the stay it was taken on. Grain is FINER than bookings — a stay can carry several redemptions — so count `bookings.booking_id` distinctly whenever this model is in the query. This is the realised-cost side of programme economics: what the owner group genuinely paid out, as opposed to what was issued.'
-  data_source_name: 'demo_laasie_nam'
+  data_source_name: 'demodb'
 
   dimension redemption_id {
     label: 'Redemption Id'
