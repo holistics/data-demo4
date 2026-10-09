@@ -13,7 +13,7 @@ cosmetic: `public_matches` already exists elsewhere in the repo.
 ## Scope boundary
 
 Keep every change inside `team-folders/Nam/LeoMessi/`. Do not touch `01 demo ecommerce/`,
-`library/`, `Datasets Library/`, `clients/`, or the sibling `Laasie/` and `SCSI/` folders.
+`library/`, `Datasets Library/`, `clients/`, or sibling folders under `team-folders/Nam/`.
 
 ## Layout
 
@@ -55,7 +55,7 @@ Keep every change inside `team-folders/Nam/LeoMessi/`. Do not touch `01 demo eco
   `python3 team-folders/Nam/LeoMessi/tools/build_messi_dashboard.py team-folders/Nam/LeoMessi/Dashboards/messi_albiceleste.page.aml`,
   then validate. Edit the script rather than the AML, or the next regeneration will overwrite
   your edits. Close the dashboard in Studio before editing this
-  file, because the syncer and Studio both write it (see `../Laasie/AGENTS.md`).
+  file, because the syncer and Studio both write it.
 
 ## Modelling rules
 
