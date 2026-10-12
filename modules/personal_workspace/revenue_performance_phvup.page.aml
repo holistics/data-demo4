@@ -1,5 +1,5 @@
 Dashboard revenue_performance_phvup {
-  title: 'Revenue Performance'
+  title: 'Detailed text spec'
   owner: 'di.hoang@holistics.io'
   block title: TextBlock {
     content: @md # Revenue Performance
