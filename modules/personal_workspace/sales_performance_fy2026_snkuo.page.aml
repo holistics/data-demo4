@@ -1,5 +1,5 @@
 Dashboard sales_performance_fy2026_snkuo {
-  title: 'Sales Performance FY2026'
+  title: 'Vague spec'
   owner: 'di.hoang@holistics.io'
   block title: TextBlock {
     content: @md # Sales Performance FY2026
