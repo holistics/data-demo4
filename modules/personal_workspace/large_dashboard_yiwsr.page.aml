@@ -1,0 +1,861 @@
+Dashboard large_dashboard_yiwsr {
+  title: 'Large dashboard'
+  owner: 'di.hoang@holistics.io'
+  block title: TextBlock {
+    content: @md # Ecommerce Performance Dashboard
+Sales performance monitoring for marketplace demand, fulfillment value, and platform commission. ;;
+  }
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+  }
+  block f_product_category: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(map_categories.category)
+    }
+  }
+  block f_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+  }
+  block p_period_comparison: PopBlock {
+    label: 'Period Comparison'
+  }
+  block v_gmv: VizBlock {
+    label: 'GMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        ref: r(demo_ecommerce_version_2.gmv)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_orders.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_nmv: VizBlock {
+    label: 'NMV'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'NMV'
+        ref: r(demo_ecommerce_version_2.nmv)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_platform_revenue: VizBlock {
+    label: 'Platform Revenue'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Platform Revenue'
+        ref: r(demo_ecommerce_version_2.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(ecommerce_orders.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_empty_gmv_rate: VizBlock {
+    label: 'Empty GMV Rate'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Empty GMV Rate'
+        ref: r(demo_ecommerce_version_2.cancelled_value_ratio)
+        format {
+          type: 'number'
+          pattern: '#,###0.00%'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_monthly_marketplace_trend: VizBlock {
+    label: 'Monthly Marketplace Financials'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Order Month'
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Marketplace Financials'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'GMV'
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'NMV'
+            ref: r(demo_ecommerce_version_2.nmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Platform Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Order Month'
+      }
+    }
+  }
+  block v_gmv_by_category: VizBlock {
+    label: 'Top 10 Categories by GMV'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      calculation category_gmv_rank {
+        label: 'Category GMV Rank'
+        formula: @aql rank(order: gmv | desc(), partition: []);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Category'
+        ref: r(map_categories.category)
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            label: 'GMV'
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Rank'
+            ref: 'category_gmv_rank'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+      ]
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Category'
+      }
+    }
+  }
+  block v_nmv_by_country: VizBlock {
+    label: 'Top 10 Countries by NMV'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Country Name'
+        ref: r(ecommerce_countries.name)
+      }
+      y_axis {
+        label: 'NMV'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            label: 'NMV'
+            ref: r(demo_ecommerce_version_2.nmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Country Name'
+      }
+    }
+  }
+  block v_order_status_mix: VizBlock {
+    label: 'Order Status Value Mix'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Order Status'
+        ref: r(ecommerce_orders.status)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'GMV'
+            ref: r(demo_ecommerce_version_2.gmv)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Order Status'
+      }
+    }
+  }
+  block h_financial_trend: TextBlock {
+    content: @md ## Financial trend
+GMV is marketplace demand, NMV is fulfilled value, and platform revenue is commission on fulfilled NMV. ;;
+  }
+  block h_sales_rankings: TextBlock {
+    content: @md ## Category and market rankings
+Identify where demand and fulfilled value are concentrated. ;;
+  }
+  block h_status_mix: TextBlock {
+    content: @md ## Value at risk by order status
+Empty GMV reflects the GMV lost to cancelled orders; refunded value remains visible in the status mix. ;;
+  }
+  block customers_title: TextBlock {
+    content: @md # Customers
+Customer acquisition, buyer loyalty, cohort retention, and demographic reach. ;;
+  }
+  block f_customer_sign_up_date: FilterBlock {
+    label: 'Sign-up Date'
+    type: 'date'
+  }
+  block f_customer_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+  }
+  block f_customer_age_demographic: FilterBlock {
+    label: 'Age Demographic'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_users.age_group)
+    }
+  }
+  block p_customer_period_comparison: PopBlock {
+    label: 'Period Comparison'
+  }
+  block v_customer_new_signups: VizBlock {
+    label: 'New Sign-ups'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'New Sign-ups'
+        ref: r(ecommerce_users.users_signed_up_count)
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_customer_total_buyers: VizBlock {
+    label: 'Total Buyers'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Buyers'
+        ref: r(demo_ecommerce_version_2.total_buyers)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_customer_repeat_buyers: VizBlock {
+    label: 'Total Repeat Buyers'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Repeat Buyers'
+        ref: r(demo_ecommerce_version_2.total_repeated_buyers)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_customer_repeat_buyer_rate: VizBlock {
+    label: 'Repeat Buyer Rate'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      calculation repeat_buyer_rate {
+        label: 'Repeat Buyer Rate'
+        formula: @aql total_repeated_buyers / total_buyers;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: 'Repeat Buyer Rate'
+        ref: 'repeat_buyer_rate'
+        format {
+          type: 'number'
+          pattern: '#,###0.00%'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_customer_monthly_signups: VizBlock {
+    label: 'Monthly Sign-up Trend'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_users.sign_up_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Num Signups'
+            ref: r(demo_ecommerce_version_2.num_signups)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        legend_label: 'hidden'
+        x_axis_label: 'Sign-Up Month'
+      }
+    }
+  }
+  block h_customer_acquisition: TextBlock {
+    content: @md ## Acquisition and loyalty
+Track sign-up volume, buyer reach, and repeat-purchase strength. ;;
+  }
+  block h_customer_retention: TextBlock {
+    content: @md ## Cohort retention
+Each row is a first-order cohort; columns show months since cohort entry. ;;
+  }
+  block v_customer_cohort_retention: VizBlock {
+    label: 'Cohort Retention'
+    viz: PivotTable {
+      dataset: demo_ecommerce_version_2
+      rows: [
+        VizFieldFull {
+          label: 'Cohort Month'
+          ref: r(demo_ecommerce_version_2, ecommerce_users.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Month Number Since Cohort'
+          ref: r(demo_ecommerce_version_2, ecommerce_orders.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Retention'
+          ref: r(demo_ecommerce_version_2.retention)
+          format {
+            type: 'number'
+            pattern: '#,###0.00%'
+          }
+        }
+      ]
+      settings {
+        wrap_header_text: true
+        pagination_size: 100
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_customer_buyers_by_age: VizBlock {
+    label: 'Buyers by Age Demographic'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Age Demographic'
+        ref: r(ecommerce_users.age_group)
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            label: 'Total Buyers'
+            ref: r(demo_ecommerce_version_2.total_buyers)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Age Demographic'
+      }
+    }
+  }
+  block v_customer_top_buyers_by_country: VizBlock {
+    label: 'Top 10 Buyers by Country'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Country'
+        ref: r(ecommerce_countries.name)
+      }
+      y_axis {
+        label: 'Top 10 Countries by Total Buyers'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            label: 'Total Buyers'
+            ref: r(demo_ecommerce_version_2.total_buyers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Country'
+      }
+    }
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        'v_gmv',
+        'v_nmv',
+        'v_platform_revenue',
+        'v_empty_gmv_rate',
+        'v_monthly_marketplace_trend',
+        'v_gmv_by_category',
+        'v_nmv_by_country',
+        'v_order_status_mix'
+      ]
+      field: r(ecommerce_orders.created_at)
+    },
+    FilterInteraction {
+      from: 'f_product_category'
+      to: [
+        'v_gmv',
+        'v_nmv',
+        'v_platform_revenue',
+        'v_empty_gmv_rate',
+        'v_monthly_marketplace_trend',
+        'v_gmv_by_category',
+        'v_nmv_by_country',
+        'v_order_status_mix'
+      ]
+      field: r(map_categories.category)
+    },
+    FilterInteraction {
+      from: 'f_country'
+      to: [
+        'v_gmv',
+        'v_nmv',
+        'v_platform_revenue',
+        'v_empty_gmv_rate',
+        'v_monthly_marketplace_trend',
+        'v_gmv_by_category',
+        'v_nmv_by_country',
+        'v_order_status_mix'
+      ]
+      field: r(ecommerce_countries.name)
+    },
+    FilterInteraction {
+      from: 'f_customer_sign_up_date'
+      to: [
+        'v_customer_new_signups',
+        'v_customer_total_buyers',
+        'v_customer_repeat_buyers',
+        'v_customer_repeat_buyer_rate',
+        'v_customer_monthly_signups',
+        'v_customer_buyers_by_age',
+        'v_customer_top_buyers_by_country'
+      ]
+      field: r(ecommerce_users.sign_up_date)
+    },
+    FilterInteraction {
+      from: 'f_customer_country'
+      to: [
+        'v_customer_new_signups',
+        'v_customer_total_buyers',
+        'v_customer_repeat_buyers',
+        'v_customer_repeat_buyer_rate',
+        'v_customer_monthly_signups',
+        'v_customer_cohort_retention',
+        'v_customer_buyers_by_age',
+        'v_customer_top_buyers_by_country'
+      ]
+      field: r(ecommerce_countries.name)
+    },
+    FilterInteraction {
+      from: 'f_customer_age_demographic'
+      to: [
+        'v_customer_new_signups',
+        'v_customer_total_buyers',
+        'v_customer_repeat_buyers',
+        'v_customer_repeat_buyer_rate',
+        'v_customer_monthly_signups',
+        'v_customer_cohort_retention',
+        'v_customer_buyers_by_age',
+        'v_customer_top_buyers_by_country'
+      ]
+      field: r(ecommerce_users.age_group)
+    },
+    PopInteraction {
+      from: 'p_period_comparison'
+      to: [
+        'v_gmv',
+        'v_nmv',
+        'v_platform_revenue',
+        'v_empty_gmv_rate'
+      ]
+      field: r(ecommerce_orders.created_at)
+    },
+    PopInteraction {
+      from: 'p_customer_period_comparison'
+      to: [
+        'v_customer_new_signups',
+        'v_customer_total_buyers',
+        'v_customer_repeat_buyers',
+        'v_customer_repeat_buyer_rate'
+      ]
+      field: r(ecommerce_users.sign_up_date)
+    }
+  ]
+  view: TabLayout {
+    label: 'View 1'
+    tab sales: CanvasLayout {
+      label: 'Sales'
+      width: 1220
+      height: 1780
+      grid_size: 20
+      auto_expand_vertically: true
+      block title {
+        position: pos(20, 20, 1180, 80)
+        layer: 1
+      }
+      block v_gmv {
+        position: pos(20, 220, 280, 150)
+        layer: 1
+      }
+      block v_nmv {
+        position: pos(320, 220, 280, 150)
+        layer: 1
+      }
+      block f_country {
+        position: pos(620, 120, 280, 80)
+        layer: 1
+      }
+      block f_order_date {
+        position: pos(20, 120, 280, 80)
+        layer: 1
+      }
+      block h_status_mix {
+        position: pos(20, 1310, 1180, 60)
+        layer: 1
+      }
+      block h_sales_rankings {
+        position: pos(20, 850, 1180, 60)
+        layer: 1
+      }
+      block v_empty_gmv_rate {
+        position: pos(920, 220, 280, 150)
+        layer: 1
+      }
+      block v_nmv_by_country {
+        position: pos(620, 930, 580, 360)
+        layer: 1
+      }
+      block h_financial_trend {
+        position: pos(20, 390, 1180, 60)
+        layer: 1
+      }
+      block v_gmv_by_category {
+        position: pos(20, 930, 580, 360)
+        layer: 1
+      }
+      block f_product_category {
+        position: pos(320, 120, 280, 80)
+        layer: 1
+      }
+      block v_order_status_mix {
+        position: pos(20, 1390, 1180, 320)
+        layer: 1
+      }
+      block v_platform_revenue {
+        position: pos(620, 220, 280, 150)
+        layer: 1
+      }
+      block p_period_comparison {
+        position: pos(920, 120, 280, 80)
+        layer: 1
+      }
+      block v_monthly_marketplace_trend {
+        position: pos(20, 470, 1180, 360)
+        layer: 1
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab customers: CanvasLayout {
+      label: 'Customers'
+      width: 1220
+      height: 1780
+      grid_size: 20
+      auto_expand_vertically: true
+      block customers_title {
+        position: pos(20, 20, 1180, 80)
+        layer: 1
+      }
+      block f_customer_country {
+        position: pos(320, 120, 280, 80)
+        layer: 1
+      }
+      block h_customer_retention {
+        position: pos(20, 810, 1180, 60)
+        layer: 1
+      }
+      block h_customer_acquisition {
+        position: pos(20, 390, 1180, 60)
+        layer: 1
+      }
+      block v_customer_new_signups {
+        position: pos(20, 220, 280, 150)
+        layer: 1
+      }
+      block f_customer_sign_up_date {
+        position: pos(20, 120, 280, 80)
+        layer: 1
+      }
+      block v_customer_total_buyers {
+        position: pos(320, 220, 280, 150)
+        layer: 1
+      }
+      block v_customer_buyers_by_age {
+        position: pos(20, 1390, 580, 320)
+        layer: 1
+      }
+      block v_customer_repeat_buyers {
+        position: pos(620, 220, 280, 150)
+        layer: 1
+      }
+      block f_customer_age_demographic {
+        position: pos(620, 120, 280, 80)
+        layer: 1
+      }
+      block v_customer_monthly_signups {
+        position: pos(20, 470, 1180, 320)
+        layer: 1
+      }
+      block v_customer_cohort_retention {
+        position: pos(20, 890, 1180, 400)
+        layer: 1
+      }
+      block p_customer_period_comparison {
+        position: pos(920, 120, 280, 80)
+        layer: 1
+      }
+      block v_customer_repeat_buyer_rate {
+        position: pos(920, 220, 280, 150)
+        layer: 1
+      }
+      block v_customer_top_buyers_by_country {
+        position: pos(620, 1390, 580, 320)
+        layer: 1
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+  theme: H.themes.classic
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}
