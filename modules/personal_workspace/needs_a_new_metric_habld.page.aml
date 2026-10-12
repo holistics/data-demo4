@@ -1,0 +1,257 @@
+Dashboard needs_a_new_metric_habld {
+  title: 'Needs a new metric'
+  owner: 'di.hoang@holistics.io'
+  block title: TextBlock {
+    content: @md # Customer Repeat Purchase & Cohort Retention
+Repeat-purchase rate = buyers with **2+ lifetime orders** ÷ buyers with **1+ lifetime order**. Monitor loyalty by signup cohort and demographic segment. ;;
+  }
+  block f_signup_date: FilterBlock {
+    label: 'Signup Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_users.sign_up_date)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_countries.name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_age_demographic: FilterBlock {
+    label: 'Age Demographic'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_users.age_group)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block v_repeat_purchase_rate: VizBlock {
+    label: 'Repeat Purchase Rate'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      calculation repeat_purchase_rate {
+        label: 'Repeat Purchase Rate'
+        formula: @aql safe_divide(total_repeated_buyers, total_buyers);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: 'Repeat Purchase Rate'
+        ref: 'repeat_purchase_rate'
+        format {
+          type: 'number'
+          pattern: '#,###0.00%'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block h_headline_rate: TextBlock {
+    content: @md ## Headline repeat-purchase rate ;;
+  }
+  block h_signup_month: TextBlock {
+    content: @md ## Repeat-purchase rate by signup month ;;
+  }
+  block h_cohort_retention: TextBlock {
+    content: @md ## Cohort retention — first-purchase cohort lens
+Repeat-purchase trend above is grouped by **signup month**. This heatmap groups buyers by **first-order month** (`ecommerce_users.cohort_month`) and shows retention by **months since that first purchase** — not registration date. ;;
+  }
+  block v_repeat_purchase_trend: VizBlock {
+    label: 'Repeat Purchase Rate by Signup Month'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      calculation repeat_purchase_rate {
+        label: 'Repeat Purchase Rate'
+        formula: @aql total_repeated_buyers * 1.0 / total_buyers;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Signup Month'
+        ref: r(ecommerce_users.sign_up_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Repeat Purchase Rate'
+            ref: 'repeat_purchase_rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.00%'
+            }
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        legend_label: 'hidden'
+        x_axis_label: 'Signup Month'
+      }
+    }
+  }
+  block v_cohort_retention: VizBlock {
+    label: 'Cohort Retention Heatmap'
+    viz: RetentionHeatmap {
+      dataset: demo_ecommerce_version_2
+      cohort: VizFieldFull {
+        label: 'Acquisition Cohort'
+        ref: r(demo_ecommerce_version_2, ecommerce_users.cohort_month)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'yyyy-MM'
+        }
+      }
+      cohort_size: VizFieldFull {
+        ref: r(demo_ecommerce_version_2, ecommerce_orders.cohort_size)
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      cohort_duration: VizFieldFull {
+        label: 'Months Since Signup'
+        ref: r(demo_ecommerce_version_2, ecommerce_orders.month_number)
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      cohort_value: VizFieldFull {
+        label: 'Cohort Retention'
+        ref: r(demo_ecommerce_version_2.retention)
+        format {
+          type: 'number'
+          pattern: '#,###0.00%'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_signup_date'
+      to: [
+        'v_repeat_purchase_rate',
+        'v_repeat_purchase_trend'
+      ]
+      field: r(ecommerce_users.sign_up_date)
+    },
+    FilterInteraction {
+      from: 'f_country'
+      to: [
+        'v_repeat_purchase_rate',
+        'v_repeat_purchase_trend',
+        'v_cohort_retention'
+      ]
+      field: r(ecommerce_countries.name)
+    },
+    FilterInteraction {
+      from: 'f_age_demographic'
+      to: [
+        'v_repeat_purchase_rate',
+        'v_repeat_purchase_trend',
+        'v_cohort_retention'
+      ]
+      field: r(ecommerce_users.age_group)
+    }
+  ]
+  view: CanvasLayout {
+    label: 'Customer Loyalty'
+    width: 1300
+    height: 1600
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 100)
+      layer: 1
+    }
+    block f_country {
+      position: pos(440, 140, 400, 80)
+      layer: 1
+    }
+    block f_signup_date {
+      position: pos(20, 140, 400, 80)
+      layer: 1
+    }
+    block h_signup_month {
+      position: pos(20, 500, 1260, 40)
+      layer: 1
+    }
+    block h_headline_rate {
+      position: pos(20, 250, 1260, 40)
+      layer: 1
+    }
+    block f_age_demographic {
+      position: pos(860, 140, 420, 80)
+      layer: 1
+    }
+    block h_cohort_retention {
+      position: pos(20, 950, 1260, 60)
+      layer: 1
+    }
+    block v_cohort_retention {
+      position: pos(20, 1030, 1260, 520)
+      layer: 1
+    }
+    block v_repeat_purchase_rate {
+      position: pos(20, 310, 400, 160)
+      layer: 1
+    }
+    block v_repeat_purchase_trend {
+      position: pos(20, 560, 1260, 360)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.classic
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}
