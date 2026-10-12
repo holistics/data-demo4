@@ -111,7 +111,6 @@ Monitor platform revenue, orders, order value, and fulfillment using fiscal repo
         }
       }
       y_axis {
-        label: 'Platform Revenue'
         series {
           mark_type: 'column'
           field: VizFieldFull {
@@ -147,7 +146,11 @@ Monitor platform revenue, orders, order value, and fulfillment using fiscal repo
           direction: 'asc'
           type: 'xaxis'
         }
-        x_axis_label: 'Fiscal Month'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -434,7 +437,7 @@ Monitor platform revenue, orders, order value, and fulfillment using fiscal repo
       layer: 1
     }
     block category_mix {
-      position: pos(960, 180, 320, 340)
+      position: pos(800, 180, 480, 340)
       layer: 1
     }
     block top_products {
@@ -454,7 +457,7 @@ Monitor platform revenue, orders, order value, and fulfillment using fiscal repo
       layer: 1
     }
     block monthly_performance {
-      position: pos(280, 180, 660, 340)
+      position: pos(280, 180, 500, 340)
       layer: 1
     }
     mobile {
