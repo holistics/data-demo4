@@ -1,0 +1,349 @@
+Dashboard revenue_performance_phvup {
+  title: 'Revenue Performance'
+  owner: 'di.hoang@holistics.io'
+  block title: TextBlock {
+    content: @md # Revenue Performance
+Track platform revenue, order volume, value, and cancellations. ;;
+  }
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_product_category: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: demo_ecommerce_version_2
+      field: r(map_categories.category)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block p_last_year: PopBlock {
+    label: 'Compare to Last Year'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'year'
+      show_growth_rate: true
+    }
+  }
+  block v_revenue: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Revenue'
+        ref: r(demo_ecommerce_version_2.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_total_orders: VizBlock {
+    label: 'Total Orders'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Total Orders'
+        ref: r(demo_ecommerce_version_2.total_orders)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Average Order Value'
+        ref: r(demo_ecommerce_version_2.aov)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_cancelled_order_ratio: VizBlock {
+    label: 'Cancelled Order Ratio'
+    viz: MetricKpi {
+      dataset: demo_ecommerce_version_2
+      value: VizFieldFull {
+        label: 'Cancelled Order Ratio'
+        ref: r(demo_ecommerce_version_2.cancelled_order_ratio)
+        format {
+          type: 'number'
+          pattern: '#,###0.00%'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_monthly_revenue: VizBlock {
+    label: 'Monthly Revenue Trend'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Order Month'
+        ref: r(ecommerce_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Platform Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Order Month'
+      }
+    }
+  }
+  block h_trend: TextBlock {
+    content: @md ## Revenue trend
+Monthly platform revenue from fulfilled orders. ;;
+  }
+  block h_drivers: TextBlock {
+    content: @md ## Revenue drivers
+Identify the products and countries contributing most to platform revenue. ;;
+  }
+  block v_top_products: VizBlock {
+    label: 'Top 10 Products by Revenue'
+    viz: CombinationChart {
+      dataset: demo_ecommerce_version_2
+      x_axis: VizFieldFull {
+        label: 'Product Name'
+        ref: r(ecommerce_products.name)
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(demo_ecommerce_version_2.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_label: 'Product Name'
+      }
+    }
+  }
+  block v_revenue_by_country: VizBlock {
+    label: 'Revenue by Country'
+    viz: DataTable {
+      dataset: demo_ecommerce_version_2
+      fields: [
+        VizFieldFull {
+          label: 'Country Name'
+          ref: r(ecommerce_countries.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(demo_ecommerce_version_2.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        sorts: [
+          SortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        'v_revenue',
+        'v_total_orders',
+        'v_aov',
+        'v_cancelled_order_ratio',
+        'v_monthly_revenue',
+        'v_top_products',
+        'v_revenue_by_country'
+      ]
+      field: r(ecommerce_orders.created_at)
+    },
+    FilterInteraction {
+      from: 'f_product_category'
+      to: [
+        'v_revenue',
+        'v_total_orders',
+        'v_aov',
+        'v_cancelled_order_ratio',
+        'v_monthly_revenue',
+        'v_top_products',
+        'v_revenue_by_country'
+      ]
+      field: r(map_categories.category)
+    },
+    PopInteraction {
+      from: 'p_last_year'
+      to: [
+        'v_revenue',
+        'v_total_orders',
+        'v_aov',
+        'v_cancelled_order_ratio'
+      ]
+      field: r(ecommerce_orders.created_at)
+    }
+  ]
+  view: CanvasLayout {
+    label: 'Revenue Performance'
+    height: 1280
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1160, 70)
+      layer: 1
+    }
+    block v_aov {
+      position: pos(620, 220, 280, 130)
+      layer: 1
+    }
+    block h_trend {
+      position: pos(20, 370, 1160, 40)
+      layer: 1
+    }
+    block h_drivers {
+      position: pos(20, 810, 1160, 40)
+      layer: 1
+    }
+    block v_revenue {
+      position: pos(20, 220, 280, 130)
+      layer: 1
+    }
+    block p_last_year {
+      position: pos(620, 110, 280, 90)
+      layer: 1
+    }
+    block f_order_date {
+      position: pos(20, 110, 280, 90)
+      layer: 1
+    }
+    block v_top_products {
+      position: pos(20, 870, 570, 360)
+      layer: 1
+    }
+    block v_total_orders {
+      position: pos(320, 220, 280, 130)
+      layer: 1
+    }
+    block v_monthly_revenue {
+      position: pos(20, 430, 1160, 360)
+      layer: 1
+    }
+    block f_product_category {
+      position: pos(320, 110, 280, 90)
+      layer: 1
+    }
+    block v_revenue_by_country {
+      position: pos(610, 870, 570, 360)
+      layer: 1
+    }
+    block v_cancelled_order_ratio {
+      position: pos(920, 220, 260, 130)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: H.themes.classic
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+}
