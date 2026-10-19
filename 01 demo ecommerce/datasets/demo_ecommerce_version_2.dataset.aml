@@ -483,18 +483,6 @@ Note: this can pair with `total_buyers` or `total_users` for a ratio.
     format: "#,###%"
     description: 'Fixed demo commission rate.'
   }
-  metric metric_a1cdc7b {
-    label: "Classification of Total Users"
-    type: "number"
-    hidden: false
-    description: ""
-    definition: @aql case(
-  when: thong_test.period == 'Week',
-  then: total_buyers,
-  else: total_users
-);;
-  }
-
   metric metric_67076ce {
     label: "PoP Comparison of Total Orders"
     type: "number"

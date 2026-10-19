@@ -1,4 +1,4 @@
-Model shelfoptix_dim_store_sample {
+Model shelfoptix_dim_store_sample1 {
   type: 'table'
   label: 'Shelfoptix dim store sample'
   description: ''

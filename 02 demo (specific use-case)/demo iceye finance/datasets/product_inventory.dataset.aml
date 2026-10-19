@@ -1,0 +1,40 @@
+Dataset product_inventory {
+  label: 'Product Inventory'
+  description: 'Production and inventory data linked to accounts and departments.'
+  data_source_name: 'demo_dbt_test'
+  owner: 'dong.ln@holistics.io'
+  models: [
+    iceye_dim_accounts,
+    iceye_dim_departments,
+    iceye_account_hierarchy_map,
+    iceye_department_hierarchy_map,
+    iceye_fact_production_inventory,
+  ]
+
+  relationships: [
+    relationship(iceye_fact_production_inventory.department_id > iceye_dim_departments.department_id, true),
+    relationship(iceye_fact_production_inventory.account_id > iceye_dim_accounts.id, true),
+    relationship(iceye_account_hierarchy_map.account_number > iceye_dim_accounts.acct_number, true),
+    relationship(iceye_department_hierarchy_map.department_number > iceye_dim_departments.department_number, true),
+  ]
+
+  // --- metrics added to power the demo dashboard (ICEYE's spec defines none here) ---
+  metric total_production_value_eur {
+    label: 'Total Production Value EUR'
+    type: 'number'
+    definition: @aql sum(iceye_fact_production_inventory.accounting_line_debit_amount_eur);;
+    format: '[€]#,###0.00'
+  }
+  metric total_quantity {
+    label: 'Total Quantity'
+    type: 'number'
+    definition: @aql sum(iceye_fact_production_inventory.tl_quantity);;
+    format: '#,###0'
+  }
+  metric total_work_order_lines {
+    label: 'Work Order Lines'
+    type: 'number'
+    definition: @aql count(iceye_fact_production_inventory.transaction_line_id);;
+    format: '#,###0'
+  }
+}

@@ -1,0 +1,231 @@
+CustomChartDef centered_simple_table_13_columns {
+  label: 'Centered Simple Table (13 Columns)'
+  description: 'A reusable centered table with up to 13 predefined columns.'
+  icon: 'hicon:chart-bar-2'
+
+  fields {
+    field col_1 {
+      label: 'Column 1'
+      type: 'dimension'
+      sort { apply_order: 1 direction: 'asc' }
+    }
+    field col_2 {
+      label: 'Column 2'
+      type: 'dimension'
+      sort { apply_order: 2 direction: 'asc' }
+    }
+    field col_3 {
+      label: 'Column 3'
+      type: 'dimension'
+      sort { apply_order: 3 direction: 'asc' }
+    }
+    field col_4 {
+      label: 'Column 4'
+      type: 'dimension'
+      sort { apply_order: 4 direction: 'asc' }
+    }
+    field col_5 {
+      label: 'Column 5'
+      type: 'dimension'
+      sort { apply_order: 5 direction: 'asc' }
+    }
+    field col_6 {
+      label: 'Column 6'
+      type: 'dimension'
+      sort { apply_order: 6 direction: 'asc' }
+    }
+    field col_7 {
+      label: 'Column 7'
+      type: 'dimension'
+      sort { apply_order: 7 direction: 'asc' }
+    }
+    field col_8 {
+      label: 'Column 8'
+      type: 'dimension'
+      sort { apply_order: 8 direction: 'asc' }
+    }
+    field col_9 {
+      label: 'Column 9'
+      type: 'dimension'
+      sort { apply_order: 9 direction: 'asc' }
+    }
+    field col_10 {
+      label: 'Column 10'
+      type: 'dimension'
+      sort { apply_order: 10 direction: 'asc' }
+    }
+    field col_11 {
+      label: 'Column 11'
+      type: 'dimension'
+      sort { apply_order: 11 direction: 'asc' }
+    }
+    field col_12 {
+      label: 'Column 12'
+      type: 'dimension'
+      sort { apply_order: 12 direction: 'asc' }
+    }
+    field col_13 {
+      label: 'Column 13'
+      type: 'dimension'
+      sort { apply_order: 13 direction: 'asc' }
+    }
+  }
+
+  template: @vg {
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    "autosize": { "type": "fit-x", "contains": "padding" },
+    "padding": 0,
+    "signals": [
+      { "name": "rowHeight", "value": 36 },
+      { "name": "headerHeight", "value": 40 },
+      { "name": "colWidth", "value": 160 },
+      { "name": "columnCount", "value": 13 },
+      { "name": "tableWidth", "update": "colWidth * columnCount" },
+      { "name": "tableHeight", "update": "headerHeight + length(data('table')) * rowHeight" }
+    ],
+    "width": { "signal": "tableWidth" },
+    "height": { "signal": "tableHeight" },
+    "data": [
+      {
+        "name": "table",
+        "values": @{values},
+        "transform": [
+          { "type": "window", "ops": ["row_number"], "as": ["row_number"] },
+          { "type": "formula", "as": "row_index", "expr": "datum.row_number - 1" }
+        ]
+      },
+      {
+        "name": "header",
+        "values": [
+          { "label": "Column 1", "x": 0 },
+          { "label": "Column 2", "x": 160 },
+          { "label": "Column 3", "x": 320 },
+          { "label": "Column 4", "x": 480 },
+          { "label": "Column 5", "x": 640 },
+          { "label": "Column 6", "x": 800 },
+          { "label": "Column 7", "x": 960 },
+          { "label": "Column 8", "x": 1120 },
+          { "label": "Column 9", "x": 1280 },
+          { "label": "Column 10", "x": 1440 },
+          { "label": "Column 11", "x": 1600 },
+          { "label": "Column 12", "x": 1760 },
+          { "label": "Column 13", "x": 1920 }
+        ]
+      }
+    ],
+    "marks": [
+      {
+        "type": "rect",
+        "from": { "data": "header" },
+        "encode": {
+          "enter": {
+            "x": { "field": "x" },
+            "y": { "value": 0 },
+            "width": { "signal": "colWidth" },
+            "height": { "signal": "headerHeight" },
+            "fill": { "value": "#F3F4F6" },
+            "stroke": { "value": "#D1D5DB" }
+          }
+        }
+      },
+      {
+        "type": "text",
+        "from": { "data": "header" },
+        "encode": {
+          "enter": {
+            "x": { "signal": "datum.x + colWidth / 2" },
+            "y": { "signal": "headerHeight / 2" },
+            "align": { "value": "center" },
+            "baseline": { "value": "middle" },
+            "fontSize": { "value": 12 },
+            "fontWeight": { "value": "bold" },
+            "fill": { "value": "#111827" },
+            "text": { "field": "label" }
+          }
+        }
+      },
+      {
+        "type": "rect",
+        "from": { "data": "table" },
+        "encode": {
+          "enter": {
+            "x": { "value": 0 },
+            "y": { "signal": "headerHeight + datum.row_index * rowHeight" },
+            "width": { "signal": "tableWidth" },
+            "height": { "signal": "rowHeight" },
+            "fill": [
+              { "test": "datum.row_index % 2 === 0", "value": "#FFFFFF" },
+              { "value": "#F9FAFB" }
+            ],
+            "stroke": { "value": "#E5E7EB" }
+          }
+        }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 0 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_1.name}']) ? toString(datum['@{fields.col_1.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 1 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_2.name}']) ? toString(datum['@{fields.col_2.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 2 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_3.name}']) ? toString(datum['@{fields.col_3.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 3 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_4.name}']) ? toString(datum['@{fields.col_4.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 4 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_5.name}']) ? toString(datum['@{fields.col_5.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 5 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_6.name}']) ? toString(datum['@{fields.col_6.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 6 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_7.name}']) ? toString(datum['@{fields.col_7.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 7 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_8.name}']) ? toString(datum['@{fields.col_8.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 8 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_9.name}']) ? toString(datum['@{fields.col_9.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 9 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_10.name}']) ? toString(datum['@{fields.col_10.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 10 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_11.name}']) ? toString(datum['@{fields.col_11.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 11 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_12.name}']) ? toString(datum['@{fields.col_12.name}']) : ''" } } }
+      },
+      {
+        "type": "text",
+        "from": { "data": "table" },
+        "encode": { "enter": { "x": { "signal": "colWidth * 12 + colWidth / 2" }, "y": { "signal": "headerHeight + datum.row_index * rowHeight + rowHeight / 2" }, "align": { "value": "center" }, "baseline": { "value": "middle" }, "fontSize": { "value": 12 }, "fill": { "value": "#111827" }, "text": { "signal": "isValid(datum['@{fields.col_13.name}']) ? toString(datum['@{fields.col_13.name}']) : ''" } } }
+      }
+    ]
+  };;
+}

@@ -1,0 +1,124 @@
+Model fanserv_calendar_days {
+  type: 'query'
+  label: 'FanServ Game Calendar Days'
+  description: 'Monday-start 42-day scaffold generated for every available Game Calendar month.'
+  data_source_name: 'demodb'
+
+  dimension board_calendar_date_key {
+    label: 'Board Calendar Date Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+  }
+
+  dimension calendar_date {
+    label: 'Calendar Date'
+    type: 'date'
+  }
+
+  dimension board_month_start {
+    label: 'Board Month Start'
+    type: 'date'
+  }
+
+  dimension calendar_day_index {
+    label: 'Calendar Day Index'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension calendar_week_index {
+    label: 'Calendar Week Index'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension calendar_weekday_index {
+    label: 'Calendar Weekday Index'
+    type: 'number'
+    hidden: true
+  }
+
+  dimension calendar_day_number {
+    label: 'Day'
+    type: 'number'
+  }
+
+  dimension is_in_board_month {
+    label: 'In Board Month'
+    type: 'truefalse'
+  }
+
+  dimension is_board_today {
+    label: 'Today'
+    description: 'Marks the current date in the dashboard calendar.'
+    type: 'truefalse'
+  }
+
+  dimension cell_state_class {
+    label: 'Cell State Class'
+    type: 'text'
+    hidden: true
+  }
+
+  query: @sql
+    with source_bounds as (
+      select
+        least(
+          date_trunc('month', min(((scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as first_month
+        , greatest(
+          date_trunc('month', max(((scheduled::timestamp at time zone 'UTC') at time zone 'America/Los_Angeles')::date))::date
+          , date_trunc('month', (current_timestamp at time zone 'America/Los_Angeles')::date)::date
+        ) as last_month
+        , (current_timestamp at time zone 'America/Los_Angeles')::date as today_date
+      from "dbt_khai"."holistics_fanserv_games_d2418_202607160936"
+    )
+    , board_months as (
+      select
+        board_month_start::date
+        , (
+            board_month_start::date
+            - (extract(isodow from board_month_start)::integer - 1)
+          )::date as grid_start
+        , today_date
+      from source_bounds
+      cross join lateral generate_series(
+        first_month
+        , last_month
+        , interval '1 month'
+      ) as board_month_start
+    )
+    , calendar_days as (
+      select
+        board_month_start
+        , grid_start
+        , today_date
+        , calendar_date::date
+      from board_months
+      cross join lateral generate_series(
+        grid_start
+        , grid_start + 41
+        , interval '1 day'
+      ) as calendar_date
+    )
+
+    select
+      to_char(board_month_start, 'YYYY-MM-DD') || '|' || to_char(calendar_date, 'YYYY-MM-DD') as board_calendar_date_key
+      , calendar_date
+      , board_month_start
+      , (calendar_date - grid_start)::integer as calendar_day_index
+      , floor((calendar_date - grid_start) / 7.0)::integer as calendar_week_index
+      , (extract(isodow from calendar_date)::integer - 1) as calendar_weekday_index
+      , extract(day from calendar_date)::integer as calendar_day_number
+      , date_trunc('month', calendar_date)::date = board_month_start as is_in_board_month
+      , calendar_date = today_date as is_board_today
+      , case
+          when calendar_date = today_date then 'is-today'
+          when date_trunc('month', calendar_date)::date <> board_month_start then 'is-padding'
+          when calendar_date < today_date then 'is-past'
+          else 'is-future'
+        end as cell_state_class
+    from calendar_days;;
+}

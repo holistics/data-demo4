@@ -1,0 +1,13 @@
+@tag('onboarding')
+Dataset tp_ecommerce_order_user {
+  label: 'tp_ecommerce_order_user'
+  description: 'Q: Which users made an order on Nov 2022?'
+  data_source_name: 'demodb'
+  models: [
+    tp_ecommerce_orders,
+    tp_ecommerce_users
+  ]
+  relationships: [
+    relationship(tp_ecommerce_orders.user_id > tp_ecommerce_users.id, true)
+  ]
+}

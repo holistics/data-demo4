@@ -1,0 +1,271 @@
+// =====================================================================
+// Seed Company - Solution A: shift the date, keep it a date.
+//
+// Marcus's suggestion on Slack: add a derived date that is the close date
+// plus 3 months, so the CALENDAR year of the shifted date equals the
+// FISCAL year. Then `this year` on that field means the current fiscal
+// year and the KPI cards "know the timeframe" without anyone typing
+// 1 Oct 2025 - 30 Sep 2026 anywhere.
+//
+// It works, and this dashboard shows it working. It also shows the three
+// things that go wrong, which is why the dashboard is laid out as
+// answer-on-top / catch-underneath. Walk it top to bottom on the call.
+//
+// Self-contained: everything this page needs is in this folder
+// (`seed_a_orders`, `seed_a`). Solution B is the same shift kept hidden
+// behind text labels; C and D move it off the fact table entirely.
+// =====================================================================
+Dashboard seed_fy_solution_a {
+  title: 'Seed Company - Solution A (Shifted Fiscal Date)'
+  description: 'Fiscal year via a +3 month date shift. Shows what it solves and what it breaks.'
+
+  block t_intro: TextBlock {
+    content: @md
+### Solution A - the fiscal calendar as a shifted date
+
+`Fiscal Month Start` = close month **+ 3 months**. October 2025 becomes January
+2026, so the shifted date's calendar year *is* the fiscal year.
+
+The filter on the right is set to **`this year`** on that field. It is
+resolving to 1 Oct 2025 - 30 Sep 2026 right now, and it will resolve to
+FY2027 on 1 October without anyone editing this dashboard. That is the part
+Seed asked for.
+
+Now look at the bottom half.
+    ;;
+  }
+
+  block f_fiscal_period: FilterBlock {
+    label: 'Fiscal Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_a
+      field: ref('seed_a_orders', 'fiscal_date_month_start')
+    }
+    default {
+      operator: 'matches'
+      value: 'this year'
+    }
+  }
+
+  block f_close_date: FilterBlock {
+    label: 'Close Date (real calendar date)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: seed_a
+      field: ref('seed_a_orders', 'created_at')
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block kpi_gmv: VizBlock {
+    label: 'GMV (Fiscal Period)'
+    viz: MetricKpi {
+      dataset: seed_a
+      value: VizFieldFull {
+        ref: r(seed_a.gmv)
+        label: 'GMV (Fiscal Period)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders (Fiscal Period)'
+    viz: MetricKpi {
+      dataset: seed_a
+      value: VizFieldFull {
+        ref: r(seed_a.total_orders)
+        label: 'Orders (Fiscal Period)'
+        format {
+          type: 'number'
+          pattern: '#,##0'
+        }
+      }
+      settings {
+        alignment: 'left'
+        metric_value {
+          font_size: 30
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+  }
+
+  block t_problem: TextBlock {
+    content: @md
+### What breaks
+
+**1. The axis labels are wrong.** The chart on the left is grouped by quarter
+of the *shifted* date. Holistics correctly says `Jan 2026` - because the
+shifted date really is January 2026. But the deals in that bar closed in
+**Oct-Dec 2025**. Every date label on this dashboard is three months late,
+and nothing on screen says so.
+
+**2. Two date filters, and only one of them is honest.** `Fiscal Period` takes
+relative ranges like `this year` and gets the fiscal year right. But type an
+absolute range into it - say `1 Oct 2025 to 31 Dec 2025` - and you get
+**Jul-Sep 2025** instead, silently. So you need the second filter,
+`Close Date`, for anything absolute. Two date filters on one dashboard, and
+the user has to know which one to reach for.
+
+**3. Day grain is lost.** The table on the right shows it: `+ 3 months` on a
+day-grain date clamps at month ends. 29, 30 and 31 November all land on
+28 February. You can never drill from a fiscal month back to the real days.
+
+**4. You cannot pin a "prior FY" card beside a `this year` filter.** A metric
+built on `Fiscal Year Offset` uses `max(fiscal_year_num)`, and `max()` is
+evaluated *inside* the filter scope: the generated SQL puts the dashboard
+filter in the first CTE and every later CTE, the max() included, reads from
+it. With `this year` selected exactly one fiscal year is in scope, so
+`offset == -1` matches nothing and the card comes back blank. The clean fix on
+this shape is a dashboard UI setting - unmapping the filter from the block. That
+is why the relative-year KPIs are on Solution B, where the year dropdown is left
+open, and not here.
+
+AQL does have a filter-bypass, `of_all()`, and on this shape it fills the card
+rather than fixing it. Dropping the filter puts every fiscal year back in scope,
+so `max()` has something to re-base against - but it re-bases onto the newest
+fiscal year *present in the data*, not onto the fiscal year containing today.
+Those are the same thing right up until the warehouse lags into a new fiscal year
+or runs ahead of one, and then the card is quietly wrong rather than blank, which
+is worse. The offset has to stop being an aggregate to be anchored to the
+calendar. **Solution C** in this folder does that - the offset is a row-level
+comparison against `CURRENT_DATE` on the date dimension - so its pinned cards
+depend on the date, not on how far the load has got.
+
+Solution A is fine for a KPI card with a relative range. It is not a fiscal
+calendar.
+    ;;
+  }
+
+  block v_by_quarter: VizBlock {
+    label: 'GMV by Quarter of the Shifted Date'
+    viz: ColumnChart {
+      dataset: seed_a
+      x_axis: VizFieldFull {
+        ref: r(seed_a_orders.fiscal_date_month_start)
+        transformation: 'datetrunc quarter'
+        label: 'Quarter (of shifted date - reads 3 months late)'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(seed_a.gmv)
+            label: 'GMV'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+      }
+    }
+  }
+
+  block v_daygrain: VizBlock {
+    label: 'Day Grain: real close date vs shifted fiscal date'
+    viz: DataTable {
+      dataset: seed_a
+      fields: [
+        VizFieldFull {
+          ref: r(seed_a_orders.created_at)
+          transformation: 'datetrunc day'
+          label: 'Real Close Date'
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(seed_a_orders.fiscal_date)
+          transformation: 'datetrunc day'
+          label: 'Fiscal Date (+3 months)'
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(seed_a.total_orders)
+          label: 'Orders'
+          format {
+            type: 'number'
+            pattern: '#,##0'
+          }
+        }
+      ]
+      settings {
+        row_limit: 500
+        show_row_number: false
+        sorts: [
+          SortSetting {
+            field_index: 0
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1460
+    grid_size: 20
+    block t_intro {
+      position: pos(40, 20, 900, 220)
+    }
+    block f_fiscal_period {
+      position: pos(960, 20, 440, 100)
+    }
+    block f_close_date {
+      position: pos(960, 120, 440, 100)
+    }
+    block kpi_gmv {
+      position: pos(20, 260, 700, 120)
+    }
+    block kpi_orders {
+      position: pos(740, 260, 700, 120)
+    }
+    block t_problem {
+      position: pos(20, 400, 1400, 380)
+    }
+    block v_by_quarter {
+      position: pos(20, 800, 700, 400)
+    }
+    block v_daygrain {
+      position: pos(740, 800, 700, 400)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

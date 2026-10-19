@@ -1,0 +1,14 @@
+EmbedPortal brainstorm_apac_embed_portal {
+  description: 'Brainstorm APAC POC dashboard with company-scoped adoption, Cases, and SpeakUp reporting.'
+  objects: [
+    brainstorm_apac_dashboard,
+    brainstorm_adoption,
+    brainstorm_cases_dataset,
+    brainstorm_speakup_dataset,
+  ]
+  required_permissions: [
+    brainstorm_adoption.permission.company_access,
+    brainstorm_cases_dataset.permission.company_access,
+    brainstorm_speakup_dataset.permission.company_access,
+  ]
+}

@@ -1,0 +1,70 @@
+Model lb_bridge_player_identity {
+  type: 'table'
+  label: 'Bridge Player Identity'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."bridge_player_identity"'
+
+  dimension player_identity_key {
+    label: 'Player Identity Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.player_identity_key }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension identity_type {
+    label: 'Identity Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.identity_type }};;
+  }
+  dimension identity_value_hash {
+    label: 'Identity Value Hash'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.identity_value_hash }};;
+  }
+  dimension valid_from {
+    label: 'Valid From'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.valid_from }};;
+  }
+  dimension valid_to {
+    label: 'Valid To'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.valid_to }};;
+  }
+  dimension is_primary {
+    label: 'Is Primary'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_primary }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

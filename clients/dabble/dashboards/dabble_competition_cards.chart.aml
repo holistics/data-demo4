@@ -1,0 +1,164 @@
+// Vega-Lite click-to-filter metric cards.
+// Why a custom chart and not a Markdown/Text block: text blocks render dynamic
+// content but cannot emit a filter. Custom charts are the only documented way to
+// turn a click into a dashboard cross-filter - a point selection declared in
+// `params` and exposed through `holisticsConfig.crossFilterSignals`.
+// See https://docs.holistics.io/guides/create-interactive-custom-charts
+//
+// One card per row returned by the block query, so the caller decides which
+// competitions appear (block-level filter) and this def stays reusable.
+// Click a card -> cross-filter on the card dimension. Double-click -> clear.
+CustomChartDef dabble_competition_cards {
+  label: 'Click-to-Filter Metric Cards'
+  description: 'Card row for a handful of key entities: headline turnover plus two supporting stats. Clicking a card cross-filters the rest of the dashboard on that entity; double-clicking clears it.'
+
+  fields {
+    field entity {
+      label: 'Card'
+      type: 'dimension'
+    }
+    field headline {
+      label: 'Headline Metric'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field stat_left {
+      label: 'Left Stat'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field stat_right {
+      label: 'Right Stat'
+      type: 'measure'
+      data_type: 'number'
+    }
+  }
+
+  template: @vgl {
+    "width": "container",
+    "height": "container",
+    "data": {"values": @{values}},
+    "layer": [
+      {
+        "params": [
+          {
+            "name": "card_click",
+            "select": {"type": "point", "fields": [@{fields.entity.name}], "on": "click", "clear": "dblclick"}
+          }
+        ],
+        "mark": {"type": "rect", "cornerRadius": 10, "cursor": "pointer", "tooltip": true},
+        "encoding": {
+          "x": {
+            "field": @{fields.entity.name},
+            "type": "nominal",
+            "axis": null,
+            "scale": {"paddingInner": 0.045, "paddingOuter": 0.005}
+          },
+          "fill": {
+            "condition": {"param": "card_click", "empty": false, "value": "#21099B"},
+            "value": "#FBFAFE"
+          },
+          "stroke": {
+            "condition": {"param": "card_click", "empty": false, "value": "#21099B"},
+            "value": "#DDD8EA"
+          },
+          "strokeWidth": {"value": 1},
+          "tooltip": [
+            {"field": @{fields.entity.name}, "type": "nominal", "title": "Competition"},
+            {"field": @{fields.headline.name}, "type": "quantitative", "title": "Combined Stake", "format": "$,.0f"},
+            {"field": @{fields.stat_left.name}, "type": "quantitative", "title": "Gross Win %", "format": ".1%"},
+            {"field": @{fields.stat_right.name}, "type": "quantitative", "title": "Bets", "format": ",.0f"}
+          ]
+        }
+      },
+      {
+        "mark": {"type": "text", "fontSize": 13, "fontWeight": 700, "baseline": "middle", "cursor": "pointer", "limit": 330},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.86, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "text": {"field": @{fields.entity.name}, "type": "nominal"},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#FFFFFF"},
+            "value": "#180666"
+          }
+        }
+      },
+      {
+        "mark": {"type": "text", "fontSize": 26, "fontWeight": 700, "baseline": "middle", "cursor": "pointer"},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.58, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "text": {"field": @{fields.headline.name}, "type": "quantitative", "format": "$,.0f"},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#FFFFFF"},
+            "value": "#21099B"
+          }
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "COMBINED STAKE", "fontSize": 9, "fontWeight": 600, "baseline": "middle", "cursor": "pointer"},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.40, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#C0B6DE"},
+            "value": "#8078A0"
+          }
+        }
+      },
+      {
+        "mark": {"type": "text", "fontSize": 13, "fontWeight": 600, "baseline": "middle", "dx": -90, "cursor": "pointer"},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.19, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "text": {"field": @{fields.stat_left.name}, "type": "quantitative", "format": ".1%"},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#FFFFFF"},
+            "value": "#180666"
+          }
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "GROSS WIN %", "fontSize": 8.5, "fontWeight": 600, "baseline": "middle", "dx": -90, "cursor": "pointer"},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.05, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#C0B6DE"},
+            "value": "#8078A0"
+          }
+        }
+      },
+      {
+        "mark": {"type": "text", "fontSize": 13, "fontWeight": 600, "baseline": "middle", "dx": 90, "cursor": "pointer"},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.19, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "text": {"field": @{fields.stat_right.name}, "type": "quantitative", "format": ",.0f"},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#FFFFFF"},
+            "value": "#180666"
+          }
+        }
+      },
+      {
+        "mark": {"type": "text", "text": "BETS", "fontSize": 8.5, "fontWeight": 600, "baseline": "middle", "dx": 90, "cursor": "pointer"},
+        "encoding": {
+          "x": {"field": @{fields.entity.name}, "type": "nominal", "axis": null},
+          "y": {"datum": 0.05, "type": "quantitative", "scale": {"domain": [0, 1], "nice": false}, "axis": null},
+          "color": {
+            "condition": {"param": "card_click", "empty": false, "value": "#C0B6DE"},
+            "value": "#8078A0"
+          }
+        }
+      }
+    ],
+    "holisticsConfig": {
+      "crossFilterSignals": ["card_click"]
+    },
+    "config": {
+      "view": {"stroke": null},
+      "font": "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+    }
+  };;
+}

@@ -1,0 +1,2111 @@
+Dashboard messi_albiceleste {
+  title: 'Messi · Albiceleste 2005–2026'
+  description: '''Lionel Messi's senior international career with Argentina in five chapters: the whole career, six World Cups, 125 goals, rivals, and nine finals. Reads dataset messi_argentina (data source demo_nam_leo_messi).'''
+  owner: 'nam.tran@holistics.io'
+  block f1_year: FilterBlock {
+    label: 'Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.year)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f1_comp: FilterBlock {
+    label: 'Competition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.competition_type)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f1_coach: FilterBlock {
+    label: 'Coach'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.coach)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block k1_kpis: VizBlock {
+    label: 'Career KPIs'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: []
+      values: [
+        VizFieldFull {
+          label: 'Caps'
+          ref: r(messi_argentina.messi_caps)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(messi_argentina.messi_total_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Win rate'
+          ref: r(messi_argentina.messi_win_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Per match'
+          ref: r(messi_argentina.messi_goals_per_match)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Won'
+          ref: r(messi_argentina.messi_wins)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Drawn'
+          ref: r(messi_argentina.messi_draws)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Lost'
+          ref: r(messi_argentina.messi_losses)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  {% map(rows) %}<div class="mx" style="display:grid;grid-template-rows:auto 1fr;gap:14px">
+  <div class="mx-kpis">
+  <div class="mx-kpi"><span class="l">Caps</span><span class="v">{{ values.`Caps`.formatted }}</span><span class="n">Matches in the selection</span></div>
+  <div class="mx-kpi"><span class="l">Goals</span><span class="v">{{ values.`Goals`.formatted }}</span><span class="n">{{ values.`Per match`.formatted }} per match</span></div>
+  <div class="mx-kpi"><span class="l">Win rate</span><span class="v">{{ values.`Win rate`.formatted }}</span><span class="n">After 90/120 minutes</span></div>
+  <div class="mx-kpi gold"><span class="l">Assists</span><span class="v">65</span><span class="n">Career total, the provider too. Not filterable.</span></div>
+  </div>
+  <div class="mx-card"><h3>Won, drawn, lost</h3>
+  <div class="mx-split"><span class="w" style="flex:{{ values.`Won`.raw }}">{{ values.`Won`.formatted }}</span><span class="d" style="flex:{{ values.`Drawn`.raw }}">{{ values.`Drawn`.formatted }}</span><span class="l" style="flex:{{ values.`Lost`.raw }}">{{ values.`Lost`.formatted }}</span></div>
+  <div class="mx-legend"><span><i style="background:#2a78d6"></i>Won</span><span><i style="background:#b7c3d1"></i>Drawn</span><span><i style="background:#eb6834"></i>Lost</span><span>Shootouts count as draws</span></div>
+  </div></div>{% end %}
+  ;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+  block v1_year: VizBlock {
+    label: 'Every year, every goal'
+    description: 'His best year: 18 goals in 2022, the year he won the World Cup. Click a column to filter the chapter.'
+    viz: ColumnChart {
+      dataset: messi_argentina
+      x_axis: VizFieldFull {
+        label: 'Year'
+        ref: r(messi_matches.year)
+        format {
+          type: 'number'
+          pattern: 'none'
+        }
+      }
+      legend: VizFieldFull {
+        label: 'Competition'
+        ref: r(messi_matches.competition_type)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Messi goals'
+            ref: r(messi_argentina.messi_total_goals)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Year'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v1_coach: VizBlock {
+    label: 'Nine coaches, one constant'
+    viz: DataTable {
+      dataset: messi_argentina
+      fields: [
+        VizFieldFull {
+          label: 'Coach'
+          ref: r(messi_matches.coach)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Caps'
+          ref: r(messi_argentina.messi_caps)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Won'
+          ref: r(messi_argentina.messi_wins)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Drawn'
+          ref: r(messi_argentina.messi_draws)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Lost'
+          ref: r(messi_argentina.messi_losses)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Win rate'
+          ref: r(messi_argentina.messi_win_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Messi goals'
+          ref: r(messi_argentina.messi_total_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals / match'
+          ref: r(messi_argentina.messi_goals_per_match)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 10
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(messi_argentina.messi_win_rate)
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#ffffff'
+              }
+              max {
+                type: 'percentage'
+                value: 1
+                color: '#75aadb'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+  block v1_log: VizBlock {
+    label: 'The match log'
+    viz: DataTable {
+      dataset: messi_argentina
+      fields: [
+        VizFieldFull {
+          label: 'Cap'
+          ref: r(messi_matches.cap_no)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+        },
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_matches.match_date)
+          format {
+            type: 'date'
+            pattern: 'LLL dd yyyy'
+          }
+        },
+        VizFieldFull {
+          label: 'Opponent'
+          ref: r(messi_matches.opponent)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Competition'
+          ref: r(messi_matches.competition_type)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Stage'
+          ref: r(messi_matches.stage)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(messi_matches.scoreline)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Result'
+          ref: r(messi_matches.result_label)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Messi goals'
+          ref: r(messi_matches.messi_goals)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+        },
+        VizFieldFull {
+          label: 'Coach'
+          ref: r(messi_matches.coach)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 15
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(messi_matches.result_label)
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Win'
+              }
+              text_color: '#ffffff'
+              background_color: '#2a78d6'
+            }
+          },
+          ConditionalFormat {
+            ref: r(messi_matches.result_label)
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Draw'
+              }
+              text_color: '#0b2545'
+              background_color: '#b7c3d1'
+            }
+          },
+          ConditionalFormat {
+            ref: r(messi_matches.result_label)
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Loss'
+              }
+              text_color: '#ffffff'
+              background_color: '#eb6834'
+            }
+          }
+        ]
+      }
+    }
+  }
+  block f2_wc: FilterBlock {
+    label: 'World Cup'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_tournaments.world_cup)
+    }
+    default {
+      operator: 'is'
+      value: '2022 · Qatar'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block f2_metric: FilterBlock {
+    label: 'Compare by'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_params.metric_selector)
+    }
+    default {
+      operator: 'is'
+      value: [
+        'Goals'
+      ]
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block k2_kpis: VizBlock {
+    label: 'World Cup KPIs'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      filter {
+        field: r(messi_tournaments.tournament_name)
+        operator: 'is'
+        value: 'FIFA World Cup'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'World Cup'
+          ref: r(messi_tournaments.world_cup)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Finish'
+          ref: r(messi_tournaments.argentina_finish)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Award'
+          ref: r(messi_tournaments.messi_individual_awards)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Matches'
+          ref: r(messi_argentina.messi_caps)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(messi_argentina.messi_total_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Penalties'
+          ref: r(messi_argentina.messi_penalty_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  {% map(rows) %}<div class="mx mx-kpis">
+  <div class="mx-kpi"><span class="l">Matches</span><span class="v">{{ values.`Matches`.formatted }}</span><span class="n">{{ `World Cup`.formatted }}</span></div>
+  <div class="mx-kpi"><span class="l">Goals</span><span class="v">{{ values.`Goals`.formatted }}</span><span class="n">Argentina finish: {{ `Finish`.formatted }}</span></div>
+  <div class="mx-kpi"><span class="l">Penalties</span><span class="v">{{ values.`Penalties`.formatted }}</span><span class="n">Of his goals at this World Cup</span></div>
+  <div class="mx-kpi gold"><span class="l">Award</span><span class="v" style="font-size:30px;line-height:1.05">{{ `Award`.formatted }}</span><span class="n">Individual honours at the tournament</span></div>
+  </div>{% end %}
+  ;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+  block v2_road: VizBlock {
+    label: 'The road through the tournament'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: [
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_matches.match_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'road_date'
+        },
+        VizFieldFull {
+          label: 'Stage'
+          ref: r(messi_matches.stage)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Opponent'
+          ref: r(messi_matches.opponent)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(messi_matches.city)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(messi_matches.scoreline)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Result'
+          ref: r(messi_matches.result_incl_shootout)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Messi goals'
+          ref: r(messi_matches.messi_goals)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  <style>
+  .mx-road { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .mx-step { background: #fff; border: 1px solid #d3e3f3; border-top: 5px solid #b7c3d1; border-radius: 12px; padding: 12px; }
+  .mx-step.Win { border-top-color: #2a78d6; } .mx-step.Loss { border-top-color: #eb6834; }
+  .mx-step b { display: block; font: 800 20px/1.05 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 6px 0 4px; }
+  .mx-step .score { font: 900 30px/1 'Big Shoulders Display', Impact, sans-serif; }
+  .mx-step .goals { font: 500 12px/1.3 Rubik, sans-serif; color: #3a2600; background: #fff2cc; border-radius: 6px; padding: 3px 6px; display: inline-block; margin-top: 6px; }
+  </style>
+  <div class="mx mx-card"><h3>The road through the tournament</h3><p class="sub">One card per match, coloured by the result after penalties.</p><div class="mx-road">
+  {% map(rows) %}<div class="mx-step {{ `Result`.raw }}"><span class="mx-mono">{{ `Stage`.formatted }} · {{ `Date`.formatted }}</span><b>vs {{ `Opponent`.formatted }}</b><span class="score">{{ `Score`.formatted }}</span> <span class="mx-pill {{ `Result`.raw }}">{{ `Result`.formatted }}</span><br><span class="goals">Messi ⚽ {{ `Messi goals`.formatted }}</span><div class="mx-mono" style="margin-top:6px">{{ `City`.formatted }}</div></div>{% end %}
+  </div></div>
+  ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'road_date'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 10
+        row_limit: 10
+      }
+    }
+  }
+  block v2_summers: VizBlock {
+    label: 'Six summers side by side'
+    description: 'Use "Compare by" to switch the metric. Not affected by the World Cup picker.'
+    viz: ColumnChart {
+      dataset: messi_argentina
+      filter {
+        field: r(messi_tournaments.tournament_name)
+        operator: 'is'
+        value: 'FIFA World Cup'
+      }
+      x_axis: VizFieldFull {
+        label: 'World Cup'
+        ref: r(messi_tournaments.world_cup)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Selected metric'
+            ref: r(messi_argentina.messi_selected_metric)
+            format {
+              type: 'number'
+              pattern: '#,##0.##'
+            }
+          }
+          settings {
+            color: '#0b2545'
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block f3_comp: FilterBlock {
+    label: 'Competition'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.competition_type)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f3_type: FilterBlock {
+    label: 'Goal type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_goals.goal_type)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f3_opp: FilterBlock {
+    label: 'Opponent'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.opponent)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block k3_kpis: VizBlock {
+    label: 'Goal KPIs'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: []
+      values: [
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(messi_argentina.messi_total_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Penalties'
+          ref: r(messi_argentina.messi_penalty_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Hat-tricks or better'
+          ref: r(messi_argentina.messi_hat_tricks)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Matches scored in'
+          ref: r(messi_argentina.messi_matches_scored_in)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  {% map(rows) %}<div class="mx mx-kpis"><div class="mx-kpi"><span class="l">Goals</span><span class="v">{{ values.`Goals`.formatted }}</span><span class="n">In the selection</span></div><div class="mx-kpi"><span class="l">Penalties</span><span class="v">{{ values.`Penalties`.formatted }}</span><span class="n">From the spot, in play</span></div><div class="mx-kpi"><span class="l">Hat-tricks or better</span><span class="v">{{ values.`Hat-tricks or better`.formatted }}</span><span class="n">Three or more in a match</span></div><div class="mx-kpi"><span class="l">Matches scored in</span><span class="v">{{ values.`Matches scored in`.formatted }}</span><span class="n">Caps with at least one goal</span></div></div>{% end %}
+  ;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+  block v3_heat: VizBlock {
+    label: 'Twenty-one years of goals'
+    description: 'Annual goals, stacked by competition. Hover a year to see the exact breakdown.'
+    viz: CombinationChart {
+      dataset: messi_argentina
+      conditions: [
+        'messi_matches.year > 2004',
+        'messi_matches.year < 2027'
+      ]
+      x_axis: VizFieldFull {
+        label: 'Year'
+        ref: r(messi_matches.year)
+        format {
+          type: 'number'
+          pattern: 'none'
+        }
+      }
+      legend: VizFieldFull {
+        label: 'Competition'
+        ref: r(messi_matches.competition_type)
+      }
+      y_axis {
+        label: 'Goals'
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Goals'
+            ref: r(messi_argentina.messi_total_goals)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Year'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v3_victims: VizBlock {
+    label: 'His favourite victims'
+    description: 'Top 15 opponents by Messi goals. Click a bar to filter the chapter.'
+    viz: BarChart {
+      dataset: messi_argentina
+      x_axis: VizFieldFull {
+        label: 'Opponent'
+        ref: r(messi_matches.opponent)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Messi goals'
+            ref: r(messi_argentina.messi_total_goals)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2a78d6'
+          }
+        }
+      }
+      settings {
+        row_limit: 15
+        legend_label: 'hidden'
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+  block v3_climb: VizBlock {
+    label: 'The climb to 125'
+    description: 'Career goal number by date. Goal 55 (21 Jun 2016) passed Batistuta; goal 100 came against Curaçao in 2023.'
+    viz: LineChart {
+      dataset: messi_argentina
+      calculation goal_no {
+        label: 'Career goal no.'
+        formula: @aql max(messi_goals.career_goal_no);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Date'
+        ref: r(messi_goals.match_date)
+        transformation: 'datetrunc day'
+        format {
+          type: 'date'
+          pattern: 'LLL dd yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Career goal no.'
+            ref: 'goal_no'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#2a78d6'
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v3_hat: VizBlock {
+    label: 'Eleven hat-tricks'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      filter {
+        field: r(messi_matches.is_hat_trick)
+        operator: 'is'
+        value: true
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_matches.match_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'hat_date'
+        },
+        VizFieldFull {
+          label: 'Opponent'
+          ref: r(messi_matches.opponent)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Competition'
+          ref: r(messi_matches.competition_type)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(messi_matches.scoreline)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(messi_matches.messi_goals)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  <style>
+  .mx-hats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .mx-hat { border: 1px solid #e9b42a; background: #fff2cc; border-radius: 12px; padding: 10px 12px; }
+  .mx-hat .n { font: 900 40px/1 'Big Shoulders Display', Impact, sans-serif; color: #3a2600; }
+  .mx-hat b { display: block; font: 700 15px/1.2 Rubik, sans-serif; color: #0b2545; }
+  </style>
+  <div class="mx mx-card"><h3>Eleven hat-tricks</h3><p class="sub">Every match with three or more Messi goals.</p><div class="mx-hats">
+  {% map(rows) %}<div class="mx-hat"><span class="n">{{ `Goals`.formatted }}</span><b>vs {{ `Opponent`.formatted }}</b><span class="mx-mono">{{ `Date`.formatted }} · {{ `Score`.formatted }}</span><div class="mx-mono">{{ `Competition`.formatted }}</div></div>{% end %}
+  </div></div>
+  ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'hat_date'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 20
+        row_limit: 20
+      }
+    }
+  }
+  block f4_conf: FilterBlock {
+    label: 'Confederation'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.opponent_confederation)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f4_opp: FilterBlock {
+    label: 'Opponent'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: messi_argentina
+      field: r(messi_matches.opponent)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block k4_kpis: VizBlock {
+    label: 'Rival KPIs'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: []
+      values: [
+        VizFieldFull {
+          label: 'Matches'
+          ref: r(messi_argentina.messi_caps)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'W'
+          ref: r(messi_argentina.messi_wins)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'D'
+          ref: r(messi_argentina.messi_draws)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'L'
+          ref: r(messi_argentina.messi_losses)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Messi goals'
+          ref: r(messi_argentina.messi_total_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals per match'
+          ref: r(messi_argentina.messi_goals_per_match)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  {% map(rows) %}<div class="mx mx-kpis">
+  <div class="mx-kpi"><span class="l">Matches</span><span class="v">{{ values.`Matches`.formatted }}</span><span class="n">Meetings in the selection</span></div>
+  <div class="mx-kpi"><span class="l">W–D–L</span><span class="v">{{ values.`W`.formatted }}–{{ values.`D`.formatted }}–{{ values.`L`.formatted }}</span><span class="n">Shootouts count as draws</span></div>
+  <div class="mx-kpi"><span class="l">Messi goals</span><span class="v">{{ values.`Messi goals`.formatted }}</span><span class="n">Against this selection</span></div>
+  <div class="mx-kpi"><span class="l">Goals per match</span><span class="v">{{ values.`Goals per match`.formatted }}</span><span class="n">Career rate: 0.60</span></div>
+  </div>{% end %}
+  ;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+      }
+    }
+  }
+  block v4_tiles: VizBlock {
+    label: 'Every meeting'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: [
+        VizFieldFull {
+          ref: r(messi_matches.cap_no)
+          label: 'Cap'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(messi_matches.match_date)
+          label: 'Date'
+          format {
+            type: 'date'
+            pattern: 'LLL dd, yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(messi_matches.opponent)
+          label: 'Opponent'
+        },
+        VizFieldFull {
+          ref: r(messi_matches.scoreline)
+          label: 'Score'
+        },
+        VizFieldFull {
+          ref: r(messi_matches.result_label)
+          label: 'Result'
+        },
+        VizFieldFull {
+          ref: r(messi_matches.messi_goals)
+          label: 'Goals'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      content: @md
+<style>
+.mx-rival-card { box-sizing: border-box; height: 340px; overflow: hidden; padding: 0.75rem; }
+.mx-rival-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem; }
+.mx-rival-title { margin: 0; color: #0b2545; font: 800 20px/1 'Big Shoulders Display', Impact, sans-serif; letter-spacing: .02em; text-transform: uppercase; }
+.mx-rival-subtitle { margin: 0.2rem 0 0; color: #5d7694; font: 400 11px/1.3 Rubik, sans-serif; }
+.mx-rival-legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.38rem; color: #5d7694; font: 500 10px/1 'DM Mono', monospace; white-space: nowrap; }
+.mx-rival-legend-item { display: inline-flex; align-items: center; gap: 0.2rem; }
+.mx-rival-legend-dot { width: 0.45rem; height: 0.45rem; border-radius: 999px; }
+.mx-rival-legend-win { background: #2a78d6; }.mx-rival-legend-draw { background: #b7c3d1; }.mx-rival-legend-loss { background: #eb6834; }
+.mx-rival-grid-wrap { height: calc(100% - 3.1rem); overflow-y: auto; padding: 0.15rem 0.15rem 0.35rem; }
+.mx-rival-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0.32rem; }
+.mx-rival-tile { position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; aspect-ratio: 1 / 1; border: 1px solid rgba(11,37,69,.12); border-radius: 0.35rem; color: #fff; cursor: help; font: 600 12px/1 'DM Mono', monospace; box-shadow: inset 0 1px 0 rgba(255,255,255,.16); transition: transform .12s ease, box-shadow .12s ease; }
+.mx-rival-tile:hover { transform: scale(1.1); box-shadow: 0 5px 12px rgba(11,37,69,.24); z-index: 5; }
+.mx-rival-tile:after { content: attr(data-tooltip); position: absolute; left: 50%; bottom: calc(100% + 9px); z-index: 10; width: 190px; padding: 8px 10px; border-radius: 8px; background: #0b2545; color: #fff; box-shadow: 0 6px 18px rgba(11,37,69,.3); font: 500 10px/1.35 Rubik, sans-serif; letter-spacing: 0; text-align: left; white-space: normal; opacity: 0; pointer-events: none; transform: translate(-50%, 4px); transition: opacity .12s ease, transform .12s ease; visibility: hidden; }
+.mx-rival-tile:hover:after { opacity: 1; transform: translate(-50%, 0); visibility: visible; }
+.mx-rival-tile:nth-child(-n + 12):after { top: calc(100% + 9px); bottom: auto; transform: translate(-50%, -4px); }
+.mx-rival-tile:nth-child(-n + 12):hover:after { transform: translate(-50%, 0); }
+.mx-rival-result-Win { background: #2a78d6; }.mx-rival-result-Draw { background: #b7c3d1; color: #0b2545; }.mx-rival-result-Loss { background: #eb6834; }
+.mx-rival-goals { position: absolute; right: 0.16rem; bottom: 0.13rem; min-width: 0.68rem; height: 0.68rem; padding: 0 0.12rem; border-radius: 999px; background: rgba(255,255,255,.94); color: #0b2545; font: 800 9px/.68rem 'DM Mono', monospace; text-align: center; }
+.mx-rival-goals-0 { display: none; }
+@media (max-width: 900px) { .mx-rival-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .mx-rival-card { padding: 0.62rem; }.mx-rival-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }.mx-rival-heading { gap: 0.4rem; }.mx-rival-legend { gap: 0.25rem; } }
+</style>
+<section class="mx-rival-card">
+  <header class="mx-rival-heading">
+    <div>
+      <h3 class="mx-rival-title">Every meeting</h3>
+      <p class="mx-rival-subtitle">207 caps in chronological order · hover a tile for match detail</p>
+    </div>
+    <div class="mx-rival-legend" aria-label="Match result legend">
+      <span class="mx-rival-legend-item"><i class="mx-rival-legend-dot mx-rival-legend-win"></i>Win</span>
+      <span class="mx-rival-legend-item"><i class="mx-rival-legend-dot mx-rival-legend-draw"></i>Draw</span>
+      <span class="mx-rival-legend-item"><i class="mx-rival-legend-dot mx-rival-legend-loss"></i>Loss</span>
+    </div>
+  </header>
+  <div class="mx-rival-grid-wrap"><div class="mx-rival-grid">{% map(rows) %}<span class="mx-rival-tile mx-rival-result-{{ `Result`.raw }}" data-tooltip="Cap {{ `Cap`.formatted }} · {{ `Date`.formatted }} · Argentina vs {{ `Opponent`.raw }} · {{ `Score`.raw }} · {{ `Result`.raw }} · Messi goals: {{ `Goals`.formatted }}" title="Cap {{ `Cap`.formatted }} · {{ `Date`.formatted }} · Argentina vs {{ `Opponent`.raw }} · {{ `Score`.raw }} · {{ `Result`.raw }} · Messi goals: {{ `Goals`.formatted }}">{{ `Cap`.formatted }}<i class="mx-rival-goals mx-rival-goals-{{ `Goals`.raw }}">{{ `Goals`.formatted }}</i></span>{% end %}</div></div>
+</section>
+;;
+      settings {
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 0
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 250
+        row_limit: 250
+      }
+    }
+  }
+  block v4_conf: VizBlock {
+    label: 'He beats every continent'
+    description: 'Share of matches won, drawn and lost by opponent confederation. Click a bar to filter.'
+    viz: BarChart {
+      dataset: messi_argentina
+      x_axis: VizFieldFull {
+        label: 'Confederation'
+        ref: r(messi_matches.opponent_confederation)
+        format {
+          type: 'text'
+        }
+      }
+      legend: VizFieldFull {
+        label: 'Result'
+        ref: r(messi_matches.result_label)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'percentage'
+          stack_series_by: 'percentage'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Caps'
+            ref: r(messi_argentina.messi_caps)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            point {
+              value: 'Win'
+              color: '#2a78d6'
+            }
+            point {
+              value: 'Draw'
+              color: '#b7c3d1'
+            }
+            point {
+              value: 'Loss'
+              color: '#eb6834'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        x_axis_label: 'Confederation'
+        x_axis_show_null_datetime: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v4_country: VizBlock {
+    label: '36 countries, one shirt'
+    description: 'Caps by the country the match was played in.'
+    viz: BarChart {
+      dataset: messi_argentina
+      x_axis: VizFieldFull {
+        label: 'Venue country'
+        ref: r(messi_matches.country)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Caps'
+            ref: r(messi_argentina.messi_caps)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#75aadb'
+          }
+        }
+      }
+      settings {
+        row_limit: 40
+        legend_label: 'hidden'
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+      }
+    }
+  }
+  block v4_meetings: VizBlock {
+    label: 'Every meeting, in order'
+    viz: DataTable {
+      dataset: messi_argentina
+      fields: [
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_matches.match_date)
+          format {
+            type: 'date'
+            pattern: 'LLL dd yyyy'
+          }
+        },
+        VizFieldFull {
+          label: 'Opponent'
+          ref: r(messi_matches.opponent)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Competition'
+          ref: r(messi_matches.competition_type)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(messi_matches.scoreline)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Result'
+          ref: r(messi_matches.result_label)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Messi goals'
+          ref: r(messi_matches.messi_goals)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 12
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 0
+            direction: 'asc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(messi_matches.result_label)
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Win'
+              }
+              text_color: '#ffffff'
+              background_color: '#2a78d6'
+            }
+          },
+          ConditionalFormat {
+            ref: r(messi_matches.result_label)
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Draw'
+              }
+              text_color: '#0b2545'
+              background_color: '#b7c3d1'
+            }
+          },
+          ConditionalFormat {
+            ref: r(messi_matches.result_label)
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Loss'
+              }
+              text_color: '#ffffff'
+              background_color: '#eb6834'
+            }
+          }
+        ]
+      }
+    }
+  }
+  block v5_finals: VizBlock {
+    label: 'Nine finals'
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      filter {
+        field: r(messi_matches.stage)
+        operator: 'is'
+        value: 'Final'
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_matches.match_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'final_date'
+        },
+        VizFieldFull {
+          label: 'Tournament'
+          ref: r(messi_tournaments.tournament_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Year'
+          ref: r(messi_tournaments.year)
+          format {
+            type: 'number'
+            pattern: 'none'
+          }
+        },
+        VizFieldFull {
+          label: 'Opponent'
+          ref: r(messi_matches.opponent)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'City'
+          ref: r(messi_matches.city)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(messi_matches.scoreline)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Result'
+          ref: r(messi_matches.result_incl_shootout)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(messi_matches.messi_goals)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+        }
+      ]
+      content: @md <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+.mx * { box-sizing: border-box; }
+.mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+.mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+.mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+.mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+.mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+.mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+.mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+.mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+.mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+.mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+.mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+.mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+.mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+.mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+.mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+.mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+.mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+<style>
+.mx-finals { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.mx-final { border-radius: 14px; padding: 14px; background: #e7f1fb; border: 1px solid #d3e3f3; color: #36506f; }
+.mx-final.Win { background: #fff2cc; border-color: #e9b42a; color: #3a2600; }
+.mx-final .yr { font: 900 44px/.9 'Big Shoulders Display', Impact, sans-serif; color: #9fb0c3; }
+.mx-final.Win .yr { color: #f6b40e; }
+.mx-final b { display: block; font: 700 15px/1.25 Rubik, sans-serif; color: #0b2545; margin: 6px 0 2px; }
+.mx-final .score { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; }
+.mx-tag { float: right; font: 600 11px/1 'DM Mono', monospace; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; background: #9fb0c3; color: #0b2545; }
+.mx-final.Win .mx-tag { background: #f6b40e; color: #3a2600; }
+</style>
+<div class="mx mx-card"><h3>Nine finals</h3><p class="sub">Four finals lost. Then four won in a row.</p><div class="mx-finals">
+{% map(rows) %}<div class="mx-final {{ `Result`.raw }}"><span class="mx-tag">{{ `Result`.formatted }}</span><span class="yr">{{ `Year`.formatted }}</span><b>{{ `Tournament`.formatted }}</b><span class="mx-mono">vs {{ `Opponent`.formatted }} · {{ `City`.formatted }}</span><div class="score" style="margin-top:8px">{{ `Score`.formatted }}</div><span class="mx-mono">{{ `Date`.formatted }} · Messi goals {{ `Goals`.formatted }}</span></div>{% end %}
+</div></div>  ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'final_date'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    theme {
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      background {
+        bg_color: 'transparent'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+  }
+  block v5_shootouts: VizBlock {
+    label: 'Nerves of steel'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      filter {
+        field: r(messi_matches.went_to_shootout)
+        operator: 'is'
+        value: true
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_matches.match_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'so_date'
+        },
+        VizFieldFull {
+          label: 'Opponent'
+          ref: r(messi_matches.opponent)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Stage'
+          ref: r(messi_matches.stage)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Score'
+          ref: r(messi_matches.scoreline)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Result'
+          ref: r(messi_matches.result_incl_shootout)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  <style>
+  .mx-so { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+  .mx-so div { border-left: 5px solid #eb6834; background: #f7fbff; border-radius: 8px; padding: 8px 10px; }
+  .mx-so div.Win { border-left-color: #2a78d6; }
+  .mx-so b { display: block; font: 700 14px/1.2 Rubik, sans-serif; }
+  </style>
+  <div class="mx mx-card"><h3>Nerves of steel</h3><p class="sub">Matches decided on penalties. They count as draws in the results; the shootout outcome is shown here.</p><div class="mx-so">
+  {% map(rows) %}<div class="{{ `Result`.raw }}"><span class="mx-pill {{ `Result`.raw }}">{{ `Result`.formatted }}</span><b style="margin-top:6px">vs {{ `Opponent`.formatted }}</b><span class="mx-mono">{{ `Stage`.formatted }} · {{ `Date`.formatted }} · {{ `Score`.formatted }}</span></div>{% end %}
+  </div></div>
+  ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'so_date'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 20
+        row_limit: 20
+      }
+    }
+  }
+  block v5_awards: VizBlock {
+    label: 'The honours'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: [
+        VizFieldFull {
+          label: 'Year'
+          ref: r(messi_individual_awards.year)
+          format {
+            type: 'number'
+            pattern: 'none'
+          }
+          uname: 'aw_year'
+        },
+        VizFieldFull {
+          label: 'Event'
+          ref: r(messi_individual_awards.awarding_body_or_event)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Award'
+          ref: r(messi_individual_awards.award)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Notes'
+          ref: r(messi_individual_awards.notes)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Id'
+          ref: r(messi_individual_awards.award_id)
+          format {
+            type: 'number'
+            pattern: '0'
+          }
+          uname: 'aw_id'
+          hidden: true
+        }
+      ]
+      content: @md <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+.mx * { box-sizing: border-box; }
+.mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+.mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+.mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+.mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+.mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+.mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+.mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+.mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+.mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+.mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+.mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+.mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+.mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+.mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+.mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+.mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+.mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+<style>
+.mx-awards { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.mx-award { border: 1px solid #e9b42a; border-radius: 14px; padding: 14px; background: linear-gradient(180deg, #fff2cc, #ffffff 70%); }
+.mx-award .yr { font: 900 34px/.9 'Big Shoulders Display', Impact, sans-serif; color: #f6b40e; }
+.mx-award b { display: block; font: 800 20px/1.05 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; color: #0b2545; margin: 6px 0 4px; }
+.mx-award p { margin: 6px 0 0; font: 400 12px/1.35 Rubik, sans-serif; color: #36506f; }
+</style>
+<div class="mx mx-card"><h3>The honours</h3><p class="sub">Fifteen individual awards won in the sky-blue and white.</p><div class="mx-awards">
+{% map(rows) %}<div class="mx-award"><span class="yr">{{ `Year`.formatted }}</span><b>{{ `Award`.formatted }}</b><span class="mx-mono">{{ `Event`.formatted }}</span><p>{{ `Notes`.formatted }}</p></div>{% end %}
+</div></div> ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'aw_year'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'aw_id'
+            direction: 'asc'
+          }
+        ]
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v5_timeline: VizBlock {
+    label: 'Milestones'
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      rows: [
+        VizFieldFull {
+          label: 'Date'
+          ref: r(messi_milestones.event_date)
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+          uname: 'ms_date'
+        },
+        VizFieldFull {
+          label: 'Milestone'
+          ref: r(messi_milestones.milestone)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Detail'
+          ref: r(messi_milestones.detail)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      content: @md
+  <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+  .mx * { box-sizing: border-box; }
+  .mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+  .mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+  .mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+  .mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+  .mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+  .mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+  .mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+  .mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+  .mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+  .mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+  .mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+  .mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+  .mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+  .mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+  .mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+  .mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+  .mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+  <style>
+  .mx-tl { position: relative; margin: 0; padding: 0 0 0 22px; list-style: none; }
+  .mx-tl:before { content: ""; position: absolute; left: 6px; top: 4px; bottom: 4px; width: 3px; background: #75aadb; border-radius: 3px; }
+  .mx-tl li { position: relative; padding: 0 0 14px; }
+  .mx-tl li:before { content: ""; position: absolute; left: -21px; top: 3px; width: 11px; height: 11px; border-radius: 50%; background: #f6b40e; border: 2px solid #0b2545; }
+  .mx-tl b { display: block; font: 700 15px/1.25 Rubik, sans-serif; color: #0b2545; }
+  .mx-tl p { margin: 2px 0 0; font: 400 13px/1.4 Rubik, sans-serif; color: #36506f; }
+  </style>
+  <div class="mx mx-card"><h3>Milestone by milestone</h3><p class="sub">From a red card on debut to a farewell in a World Cup final.</p><ul class="mx-tl">
+  {% map(rows) %}<li><span class="mx-mono">{{ `Date`.formatted }}</span><b>{{ `Milestone`.formatted }}</b><p>{{ `Detail`.formatted }}</p></li>{% end %}
+  </ul></div>
+  ;;
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'ms_date'
+            direction: 'asc'
+          }
+        ]
+        pagination_size: 30
+        row_limit: 30
+      }
+    }
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f1_year'
+      to: [
+        'k1_kpis',
+        'v1_year',
+        'v1_coach',
+        'v1_log'
+      ]
+      field: r(messi_matches.year)
+    },
+    FilterInteraction {
+      from: 'f1_comp'
+      to: [
+        'k1_kpis',
+        'v1_year',
+        'v1_coach',
+        'v1_log'
+      ]
+      field: r(messi_matches.competition_type)
+    },
+    FilterInteraction {
+      from: 'f1_coach'
+      to: [
+        'k1_kpis',
+        'v1_year',
+        'v1_coach',
+        'v1_log'
+      ]
+      field: r(messi_matches.coach)
+    },
+    FilterInteraction {
+      from: 'f2_wc'
+      to: [
+        'k2_kpis',
+        'v2_road'
+      ]
+      field: r(messi_tournaments.world_cup)
+    },
+    FilterInteraction {
+      from: 'f2_metric'
+      to: [
+        'v2_summers'
+      ]
+      field: r(messi_params.metric_selector)
+    },
+    FilterInteraction {
+      from: 'f3_comp'
+      to: [
+        'k3_kpis',
+        'v3_heat',
+        'v3_victims',
+        'v3_climb',
+        'v3_hat'
+      ]
+      field: r(messi_matches.competition_type)
+    },
+    FilterInteraction {
+      from: 'f3_type'
+      to: [
+        'k3_kpis',
+        'v3_heat',
+        'v3_victims',
+        'v3_climb'
+      ]
+      field: r(messi_goals.goal_type)
+    },
+    FilterInteraction {
+      from: 'f3_opp'
+      to: [
+        'k3_kpis',
+        'v3_heat',
+        'v3_victims',
+        'v3_climb',
+        'v3_hat'
+      ]
+      field: r(messi_matches.opponent)
+    },
+    FilterInteraction {
+      from: 'f4_conf'
+      to: [
+        'k4_kpis',
+        'v4_tiles',
+        'v4_conf',
+        'v4_country',
+        'v4_meetings'
+      ]
+      field: r(messi_matches.opponent_confederation)
+    },
+    FilterInteraction {
+      from: 'f4_opp'
+      to: [
+        'k4_kpis',
+        'v4_tiles',
+        'v4_conf',
+        'v4_country',
+        'v4_meetings'
+      ]
+      field: r(messi_matches.opponent)
+    }
+  ]
+  view: HTMLLayout {
+    content: @html
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@400;500&family=Rubik:wght@400;500;600;700&display=swap');
+:root { --bg:#f2f8fe; --surface:#fff; --surface2:#e7f1fb; --ink:#0b2545; --ink2:#36506f; --muted:#5d7694; --line:#d3e3f3; --celeste:#75aadb; --navy:#0b2545; --navy2:#123766; --gold:#f6b40e; --goldsoft:#fff2cc; --shadow:0 1px 2px rgba(11,37,69,.06),0 8px 24px -12px rgba(11,37,69,.18); --display:'Big Shoulders Display',Impact,sans-serif; --body:Rubik,system-ui,sans-serif; --mono:'DM Mono',monospace; }
+.mxl { max-width:1240px; width:100%; margin:0 auto; padding:0 20px 56px; background:var(--bg); color:var(--ink); font-family:var(--body); overflow:hidden; }
+.mxl * { box-sizing:border-box; } .mxl h-block { display:block; width:100%; height:100%; min-width:0; } .mxl-slot { min-width:0; }
+.mx-hero { position:relative; isolation:isolate; margin:0 -20px; overflow:hidden; padding:34px max(20px,calc((100vw - 1200px)/2)) 30px; color:var(--ink); background:repeating-linear-gradient(90deg,var(--celeste) 0 calc(100%/9),#fff calc(100%/9) calc(200%/9)); }
+.mx-hero:after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 55%,rgba(255,255,255,.72)); }
+.mx-hero-in { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr); gap:24px; align-items:center; max-width:1200px; margin:0 auto; }
+.mx-plate { background:rgba(255,255,255,.93); padding:22px 24px; border-radius:18px; box-shadow:0 20px 50px -24px rgba(11,37,69,.45); }
+.mx-eyebrow,.mx-kicker { font:500 12px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:#1c5a96; }
+.mx-h1 { margin:.12em 0 .06em; font:900 clamp(56px,10vw,118px)/.84 var(--display); letter-spacing:-.01em; text-transform:uppercase; } .mx-h1 .ten { color:var(--celeste); -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; }
+.mx-dek { margin:.5em 0 0; max-width:52ch; font:500 clamp(16px,2vw,19px)/1.45 var(--body); color:#22406a; }.mx-byline { margin-top:14px; font:500 11px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.mx-sun-wrap { display:grid; place-items:center; gap:12px; }.mx-stars { display:grid; grid-template-columns:repeat(3,76px); gap:8px; align-items:start; font:700 12px/1.15 var(--mono); color:var(--ink); text-align:center; }.mx-stars span { display:grid; grid-template-rows:44px auto; justify-items:center; align-items:center; min-width:76px; gap:5px; text-shadow:0 1px 0 #fff; }.mx-stars span:before { content:'★'; display:grid; place-items:center; width:44px; height:44px; font-size:37px; line-height:1; color:#ffd35c; text-shadow:0 0 0 2px var(--ink),0 0 12px rgba(246,180,14,.9); }.mx-stars .third:before { font-size:37px; filter:drop-shadow(0 0 8px rgba(246,180,14,.95)); }
+.mx-sun { width:min(280px,100%); aspect-ratio:1; display:grid; place-items:center; border-radius:50%; color:var(--ink); font:900 104px/1 var(--display); background:radial-gradient(circle,#f6b40e 0 31%,transparent 32%),repeating-conic-gradient(from 0deg,#f6b40e 0 4deg,transparent 4deg 11.25deg); filter:drop-shadow(0 12px 24px rgba(196,135,0,.34)); animation:mx-spin 90s linear infinite; }.mx-sun b { display:grid; place-items:center; width:46%; aspect-ratio:1; border-radius:50%; background:var(--gold); border:2px solid #b07f00; animation:mx-unspin 90s linear infinite; }
+.mx-score { margin:0 -20px; background:var(--navy); color:#fff; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); }.mx-score div { padding:14px 10px; text-align:center; border-left:1px solid rgba(255,255,255,.12); }.mx-score div:first-child { border-left:0; }.mx-score b { display:block; font:900 clamp(30px,4.6vw,48px)/1 var(--display); font-variant-numeric:tabular-nums; }.mx-score div:last-child b { color:var(--gold); }.mx-score span { display:block; margin-top:5px; color:#a9c8ea; font:500 10.5px/1.2 var(--mono); letter-spacing:.12em; text-transform:uppercase; }
+.mx-ticker { margin:0 -20px; overflow:hidden; white-space:nowrap; border-block:2px solid var(--navy); color:#3a2600; background:var(--gold); }.mx-ticker span { display:inline-block; padding:8px 18px; font:800 16px/1 var(--display); letter-spacing:.06em; text-transform:uppercase; animation:mx-marquee 45s linear infinite; }
+.mx-nav { position:sticky; top:0; z-index:4; margin:0 -20px; padding:0 20px; display:flex; gap:4px; overflow-x:auto; background:var(--navy2); box-shadow:0 6px 18px -10px rgba(0,0,0,.5); }.mx-nav a { flex:0 0 auto; padding:15px 12px 12px; color:#a9c8ea; text-decoration:none; border-bottom:4px solid transparent; font:800 16px/1 var(--display); letter-spacing:.06em; text-transform:uppercase; }.mx-nav a b { color:var(--celeste); margin-right:4px; }.mx-nav a:hover,.mx-nav a:focus { color:#fff; border-color:var(--gold); outline:0; }.mx-nav a:hover b,.mx-nav a:focus b { color:var(--gold); }
+.mx-confetti { height:0; position:relative; z-index:5; pointer-events:none; }.mx-confetti:after { content:'◆  •  ▰  ✦  ◆  ▰  •  ✦  ◆  •  ▰  ✦  ◆  ▰  •  ✦'; position:absolute; inset:12px 0 auto; color:var(--gold); letter-spacing:3.2vw; font-size:20px; white-space:nowrap; animation:mx-confetti 3.5s ease-out both; }
+/* CSS-only tabs: the URL hash chooses the visible chapter, without a page-length anchor jump. */
+.mx-chapter { display:none; scroll-margin-top:58px; padding-top:30px; animation:mx-panel-in .28s ease both; }.mx-chapter:target { display:block; }.mxl:not(:has(.mx-chapter:target)) #ch1 { display:block; }.mxl:has(#ch1:target) .mx-nav a[href='#ch1'],.mxl:has(#ch2:target) .mx-nav a[href='#ch2'],.mxl:has(#ch3:target) .mx-nav a[href='#ch3'],.mxl:has(#ch4:target) .mx-nav a[href='#ch4'],.mxl:has(#ch5:target) .mx-nav a[href='#ch5'],.mxl:not(:has(.mx-chapter:target)) .mx-nav a[href='#ch1'] { color:#fff; border-color:var(--gold); }.mxl:has(#ch5:target) .mx-footer { display:block; }.mxl:not(:has(#ch5:target)) .mx-footer { display:none; }.mx-tabhead { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:8px 28px; align-items:end; margin:0 0 16px; }.mx-tabhead h2 { margin:.2em 0 0; font:900 clamp(36px,5vw,54px)/.92 var(--display); letter-spacing:.005em; text-transform:uppercase; }.mx-tabhead p { margin:0; max-width:62ch; color:var(--ink2); font-size:15.5px; }
+.mx-filters { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; padding:10px 14px; margin-bottom:16px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:var(--shadow); }.mx-filters .mxl-slot { min-height:64px; }
+.mx-grid { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:16px; margin-bottom:16px; }.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.mx-media { height:100%; min-height:190px; position:relative; display:flex; align-items:flex-end; overflow:hidden; padding:12px; border-radius:14px; color:var(--ink); background:radial-gradient(circle at 78% 30%,rgba(246,180,14,.55) 0 34px,transparent 35px),repeating-linear-gradient(90deg,var(--celeste) 0 26px,#fff 26px 52px); box-shadow:var(--shadow); }.mx-media:before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 35%,rgba(255,255,255,.92)); }.mx-media>* { position:relative; }.mx-media.mx-media-photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }.mx-media.mx-media-photo:before { z-index:1; background:linear-gradient(180deg,rgba(11,37,69,.04) 20%,rgba(255,255,255,.96) 88%); }.mx-media.mx-media-photo .tag,.mx-media.mx-media-photo .media-copy { z-index:2; }.mx-media-tall { min-height:380px; }.mx-media .tag { position:absolute; inset:10px auto auto 10px; padding:6px 8px; border-radius:999px; background:var(--navy); color:#fff; font:500 10px/1 var(--mono); letter-spacing:.12em; }.mx-media .cap { max-width:30ch; font:800 22px/1.02 var(--display); letter-spacing:.02em; text-transform:uppercase; }.mx-media .src { display:block; margin-top:5px; color:var(--ink2); font:400 11px/1.4 var(--mono); }
+.mx-footer { max-width:84ch; margin-top:34px; color:var(--muted); font-size:12.5px; }.mx-footer h2 { margin:0; color:var(--ink); font:900 clamp(40px,7vw,72px)/.9 var(--display); text-transform:uppercase; }.mx-footer h2 span { color:var(--celeste); }
+@keyframes mx-spin{to{transform:rotate(360deg)}} @keyframes mx-unspin{to{transform:rotate(-360deg)}} @keyframes mx-marquee{to{transform:translateX(-50%)}} @keyframes mx-confetti{0%{transform:translateY(-38px) rotate(-4deg);opacity:0}15%,75%{opacity:1}100%{transform:translateY(430px) rotate(4deg);opacity:0}} @keyframes mx-panel-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){.mx-hero-in,.mx-tabhead{grid-template-columns:1fr}.mx-sun-wrap{order:-1;max-width:220px;justify-self:center}.mx-grid>*{grid-column:1/-1}.mx-filters{grid-template-columns:1fr 1fr}.mx-score{grid-template-columns:repeat(3,minmax(0,1fr))}.mx-score div:nth-child(4){border-left:0}} @media(max-width:560px){.mxl{padding-inline:12px}.mx-hero,.mx-score,.mx-ticker,.mx-nav{margin-inline:-12px}.mx-hero{padding:24px 12px}.mx-plate{padding:18px}.mx-filters{grid-template-columns:1fr}.mx-score div{padding:12px 7px}.mx-score span{font-size:9px}.mxl-slot[style]{height:auto!important;min-height:300px}.mx-nav{padding-inline:12px}.mx-nav a{font-size:14px}} @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important}}
+</style>
+<div class="mxl">
+  <header class="mx-hero"><div class="mx-hero-in"><div class="mx-plate"><span class="mx-eyebrow">Special report · Selección Argentina · 2005–2026</span><div class="mx-h1">Gracias,<br>Leo <span class="ten">10</span></div><p class="mx-dek">Twenty-one years, 207 caps, 125 goals and the World Cup he was always destined to lift. Lionel Messi leaves the albiceleste as its most-capped and highest-scoring player.</p><div class="mx-byline">Five chapters · every number from his 207 matches</div></div><div class="mx-sun-wrap"><div class="mx-stars"><span>1978</span><span>1986</span><span class="third">2022</span></div><div class="mx-sun" aria-label="Sol de Mayo"><b>10</b></div></div></div></header>
+  <div class="mx-score"><div><b>207</b><span>Caps · national record</span></div><div><b>125</b><span>Goals · national record</span></div><div><b>65</b><span>Assists</span></div><div><b>6</b><span>World Cups played</span></div><div><b>4</b><span>Senior titles</span></div></div>
+  <div class="mx-ticker" aria-hidden="true"><span>★ Mundial 2026 · Subcampeón · 8 goles · Balón de Plata　 ★ Copa América 2021 · Campeones　 ★ Qatar 2022 · Campeones del mundo　 ★ Copa América 2024 · Campeones　 ★ 207 partidos　 ★ 125 goles　 ★ Gracias, Leo!　 ★ Mundial 2026 · Subcampeón · 8 goles · Balón de Plata　 ★ Copa América 2021 · Campeones　 ★ Qatar 2022 · Campeones del mundo　 ★ Copa América 2024 · Campeones　 ★ 207 partidos　 ★ 125 goles　 ★ Gracias, Leo!</span></div>
+  <nav class="mx-nav" aria-label="Report chapters"><a href="#ch1"><b>01</b>The Last Dance</a><a href="#ch2"><b>02</b>Six World Cups</a><a href="#ch3"><b>03</b>Goal Machine</a><a href="#ch4"><b>04</b>Rivals</a><a href="#ch5"><b>05</b>Heartbreak to Glory</a></nav><div class="mx-confetti" aria-hidden="true"></div>
+  <section id="ch1" class="mx-chapter"><div class="mx-tabhead"><div><span class="mx-kicker">Chapter 1 · El último baile</span><h2>The Last Dance</h2></div><p>From a 2005 debut in Budapest to a farewell in the 2026 World Cup final, Messi won 134 of his 207 games in the sky-blue and white. Select any years, competition or coach to focus the chapter.</p></div><div class="mx-filters"><div class="mxl-slot"><h-block name="f1_year" /></div><div class="mxl-slot"><h-block name="f1_comp" /></div><div class="mxl-slot"><h-block name="f1_coach" /></div></div><div class="mx-grid"><div class="c4"><div class="mx-media mx-media-photo"><img src="https://www.wruf.com/wp-content/uploads/2022/12/AP22352771883200.jpg" alt="Lionel Messi lifts the FIFA World Cup in Lusail" loading="lazy" /><div class="media-copy"><div class="cap">18 December 2022: the captain lifts the World Cup in Lusail</div><span class="src">Photo: AP</span></div></div></div><div class="c8"><div class="mxl-slot" style="height:330px"><h-block name="k1_kpis" /></div></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:420px"><h-block name="v1_year" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:440px"><h-block name="v1_coach" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:620px"><h-block name="v1_log" /></div></div></section>
+  <section id="ch2" class="mx-chapter"><div class="mx-tabhead"><div><span class="mx-kicker">Chapter 2 · Seis Mundiales</span><h2>Six World Cups</h2></div><p>Six tournaments over twenty years, from an 18-year-old scoring in Gelsenkirchen to world champion in Lusail. Choose a summer to relive it.</p></div><div class="mx-filters"><div class="mxl-slot"><h-block name="f2_wc" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:160px"><h-block name="k2_kpis" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:420px"><h-block name="v2_road" /></div></div><div class="mx-filters"><div class="mxl-slot"><h-block name="f2_metric" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:400px"><h-block name="v2_summers" /></div></div></section>
+  <section id="ch3" class="mx-chapter"><div class="mx-tabhead"><div><span class="mx-kicker">Chapter 3 · Máquina de goles</span><h2>Goal Machine</h2></div><p>Messi passed Gabriel Batistuta’s record of 54 goals in 2016, then scored 70 more. Explore all 125 goals and eleven hat-tricks.</p></div><div class="mx-filters"><div class="mxl-slot"><h-block name="f3_comp" /></div><div class="mxl-slot"><h-block name="f3_type" /></div><div class="mxl-slot"><h-block name="f3_opp" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:160px"><h-block name="k3_kpis" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:320px"><h-block name="v3_heat" /></div></div><div class="mx-grid"><div class="mxl-slot c5" style="height:460px"><h-block name="v3_victims" /></div><div class="mxl-slot c7" style="height:460px"><h-block name="v3_climb" /></div></div><div class="mx-grid"><div class="c4"><div class="mx-media mx-media-photo"><img src="https://media.tenor.com/pEhjnQFgvlUAAAAM/leo-messi-lionel-messi.gif" alt="Lionel Messi celebrates his two goals in the 2022 World Cup final" loading="lazy" /><div class="media-copy"><div class="cap">Goals 97 and 98: two in a World Cup final</div><span class="src">GIF: Tenor</span></div></div></div><div class="mxl-slot c8" style="height:380px"><h-block name="v3_hat" /></div></div></section>
+  <section id="ch4" class="mx-chapter"><div class="mx-tabhead"><div><span class="mx-kicker">Chapter 4 · Rivales</span><h2>Rivals</h2></div><p>Across two decades he faced 63 national teams in five continents and played in 36 countries. Pick a rival and trace every meeting.</p></div><div class="mx-filters"><div class="mxl-slot"><h-block name="f4_conf" /></div><div class="mxl-slot"><h-block name="f4_opp" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:160px"><h-block name="k4_kpis" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:340px"><h-block name="v4_tiles" /></div></div><div class="mx-grid"><div class="mxl-slot c6" style="height:420px"><h-block name="v4_conf" /></div><div class="mxl-slot c6" style="height:420px"><h-block name="v4_country" /></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:560px"><h-block name="v4_meetings" /></div></div></section>
+  <section id="ch5" class="mx-chapter"><div class="mx-tabhead"><div><span class="mx-kicker">Chapter 5 · Del dolor a la gloria</span><h2>Heartbreak to Glory</h2></div><p>He lost four finals and walked away from the team in 2016, then returned to win the next four finals he played between 2021 and 2024.</p></div><div class="mx-grid"><div class="mxl-slot c12" style="height:550px"><h-block name="v5_finals" /></div></div><div class="mx-grid"><div class="c6"><div class="mx-media mx-media-photo mx-media-tall"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxHrgRRwsSDYh1b32iIgBUsVCZt-QfgRMhIDW_5c2V0rzz4ylqaKey5gL2&s=10" alt="Lionel Messi after the 2016 Copa América Centenario final at MetLife Stadium" loading="lazy" /><div class="media-copy"><div class="cap">2016, MetLife: the night he said goodbye</div></div></div></div><div class="c6"><div class="mx-media mx-media-photo mx-media-tall"><img src="https://npr.brightspotcdn.com/dims4/default/6fd3cd9/2147483647/strip/true/crop/5372x3578+0+0/resize/880x586!/quality/90/?url=https%3A%2F%2Fmedia.npr.org%2Fassets%2Fimg%2F2022%2F12%2F19%2Fgettyimages-1450300260_custom-c5af9bcf4c0a466c8d8bf155c5917cc4ee5b1d62.jpg" alt="Lionel Messi celebrates Argentina's World Cup victory in Lusail" loading="lazy" /><div class="media-copy"><div class="cap">2022, Lusail: the night it all came true</div></div></div></div></div><div class="mx-grid"><div class="mxl-slot c12" style="height:300px"><h-block name="v5_shootouts" /></div></div><div class="mx-grid"><div class="mxl-slot c7" style="height:760px"><h-block name="v5_awards" /></div><div class="mxl-slot c5" style="height:760px"><h-block name="v5_timeline" /></div></div></section>
+  <footer class="mx-footer"><h2>¡Gracias, <span>Leo!</span></h2><p>207 caps, 125 goals, a World Cup, two Copas América, a Finalissima, and the third star on the shirt. Messi announced his retirement from the national team on 31 August 2026.</p><p>Sources: RSSSF, Wikipedia goal and achievement lists, and FIFA World Cup records. Striped panels mark intended media slots.</p></footer>
+</div>
+;;
+  }
+  theme: messi_theme
+}

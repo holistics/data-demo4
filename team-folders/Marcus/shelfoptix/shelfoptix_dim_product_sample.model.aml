@@ -1,0 +1,65 @@
+Model shelfoptix_dim_product_sample {
+  type: 'table'
+  label: 'Shelfoptix dim product sample'
+  description: ''
+  data_source_name: 'demo_bigquery'
+  dimension primary_sku_no {
+    label: 'Primary sku no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_sku_no }};;
+  }
+  dimension primary_sku_description {
+    label: 'Primary sku description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_sku_description }};;
+  }
+  dimension class_id_no {
+    label: 'Class id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.class_id_no }};;
+  }
+  dimension class_description {
+    label: 'Class description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.class_description }};;
+  }
+  dimension brand {
+    label: 'Brand'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.brand }};;
+  }
+  dimension manufacturer_id {
+    label: 'Manufacturer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.manufacturer_id }};;
+  }
+  dimension sub_category {
+    label: 'Sub category'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.sub_category }};;
+  }
+  dimension pack_size {
+    label: 'Pack size'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.pack_size }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '${schema_name}.dim_product'
+}

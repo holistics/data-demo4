@@ -1,0 +1,120 @@
+// ============================================================================
+//  Custom Chart : Order Outcomes by Category  (Vega-Lite / @vgl, responsive)
+//  Styled to match the prospect's "Quality Outcomes by Tier" layout:
+//  slim columns + % labels, no y-axis labels, category names under the bars,
+//  a divider, then the Fulfillment / Cancellation / Refund rate rows.
+// ============================================================================
+CustomChartDef field_nation {
+  label: 'Field Nation'
+  description: 'Share of orders per category (bars), category names, then fulfillment / cancellation / refund rates.'
+
+  fields {
+    field category    { type: 'dimension'  label: 'Category (x-axis)' }
+    field orders      { type: 'measure'     label: 'Orders — count (drives the bars)' }
+    field fulfillment { type: 'measure'     label: 'Fulfillment (rate or count)' }
+    field cancellation{ type: 'measure'     label: 'Cancellation (rate or count)' }
+    field refund      { type: 'measure'     label: 'Refund (rate or count)' }
+  }
+
+  // Rate rows auto-handle either binding: a value > 1.5 is a COUNT (divided by
+  // orders); a value <= 1.5 is used as-is. So count OR ratio measures both work.
+  template: @vgl {
+    "config": { "view": { "stroke": null } },
+    "width": "container",
+    "height": "container",
+    "background": "transparent",
+
+    "data": { "values": @{values} },
+    "transform": [
+      {"fold": [@{fields.orders.name}],   "as": ["__ok", "ord"]},
+      {"fold": [@{fields.category.name}], "as": ["__ck", "catname"]},
+      {"joinaggregate": [{"op": "sum", "field": "ord", "as": "tot"}]},
+      {"calculate": "datum.ord / datum.tot", "as": "shr"},
+      {"joinaggregate": [{"op": "max", "field": "shr", "as": "smax"}]}
+    ],
+
+    "layer": [
+      {"mark": {"type": "bar", "size": 46, "cornerRadiusEnd": 2},
+       "encoding": {
+         "x": {"field": "catname", "type": "nominal", "sort": {"field": "ord", "op": "max", "order": "descending"},
+               "scale": {"rangeMin": 150, "paddingInner": 0.3, "paddingOuter": 0.2}, "axis": null},
+         "y": {"field": "shr", "type": "quantitative", "title": null,
+               "axis": {"grid": true, "tickCount": 3, "gridDash": [2, 3],
+                        "gridColor": {"condition": {"test": "datum.value <= 0", "value": "transparent"}, "value": "#e5e5e5"},
+                        "labels": false, "domain": false, "ticks": false}},
+         "color": {"field": "catname", "type": "nominal",
+                   "sort": {"field": "ord", "op": "max", "order": "descending"}, "legend": null,
+                   "scale": {"range": ["#4e79c7", "#e8763c", "#3aa76d", "#e0a52e", "#57b0a8", "#5aa843"]}}}},
+
+      {"mark": {"type": "text", "dy": -7, "fontWeight": "bold", "fontSize": 13, "color": "#222"},
+       "encoding": {
+         "x": {"field": "catname", "type": "nominal", "sort": {"field": "ord", "op": "max", "order": "descending"},
+               "scale": {"rangeMin": 150, "paddingInner": 0.3, "paddingOuter": 0.2}, "axis": null},
+         "y": {"field": "shr", "type": "quantitative"},
+         "text": {"field": "shr", "type": "quantitative", "format": ".0%"}}},
+
+      {"mark": {"type": "rule", "color": "#333333", "size": 1, "clip": true},
+       "encoding": {"y": {"datum": 0}, "x": {"value": 150}, "x2": {"value": 5000}}},
+
+      {"transform": [{"calculate": "-datum.smax * 0.14", "as": "cy"}],
+       "mark": {"type": "text", "fontSize": 13, "color": "#333333", "baseline": "top", "align": "center"},
+       "encoding": {
+         "x": {"field": "catname", "type": "nominal", "sort": {"field": "ord", "op": "max", "order": "descending"},
+               "scale": {"rangeMin": 150, "paddingInner": 0.3, "paddingOuter": 0.2}, "axis": null},
+         "y": {"field": "cy", "type": "quantitative"},
+         "text": {"field": "catname", "type": "nominal"}}},
+
+      {"transform": [{"aggregate": [{"op": "max", "field": "smax", "as": "smax"}]},
+                     {"calculate": "-datum.smax * 0.35", "as": "dy"}],
+       "mark": {"type": "rule", "color": "#333333", "size": 1, "clip": true},
+       "encoding": {"y": {"field": "dy", "type": "quantitative"}, "x": {"value": 150}, "x2": {"value": 5000}}},
+
+      {"transform": [{"fold": [@{fields.fulfillment.name}], "as": ["__mk", "v"]},
+                     {"calculate": "datum.v > 1.5 ? datum.v / datum.ord : datum.v", "as": "rate"},
+                     {"calculate": "-datum.smax * 0.52", "as": "ry"},
+                     {"calculate": "format(datum.rate, '.1%')", "as": "disp"}],
+       "mark": {"type": "text", "fontSize": 13, "color": "#333333"},
+       "encoding": {
+         "x": {"field": "catname", "type": "nominal", "sort": {"field": "ord", "op": "max", "order": "descending"},
+               "scale": {"rangeMin": 150, "paddingInner": 0.3, "paddingOuter": 0.2}, "axis": null},
+         "y": {"field": "ry", "type": "quantitative"}, "text": {"field": "disp", "type": "nominal"}}},
+
+      {"transform": [{"fold": [@{fields.cancellation.name}], "as": ["__mk", "v"]},
+                     {"calculate": "datum.v > 1.5 ? datum.v / datum.ord : datum.v", "as": "rate"},
+                     {"calculate": "-datum.smax * 0.82", "as": "ry"},
+                     {"calculate": "format(datum.rate, '.2%')", "as": "disp"}],
+       "mark": {"type": "text", "fontSize": 13, "color": "#333333"},
+       "encoding": {
+         "x": {"field": "catname", "type": "nominal", "sort": {"field": "ord", "op": "max", "order": "descending"},
+               "scale": {"rangeMin": 150, "paddingInner": 0.3, "paddingOuter": 0.2}, "axis": null},
+         "y": {"field": "ry", "type": "quantitative"}, "text": {"field": "disp", "type": "nominal"}}},
+
+      {"transform": [{"fold": [@{fields.refund.name}], "as": ["__mk", "v"]},
+                     {"calculate": "datum.v > 1.5 ? datum.v / datum.ord : datum.v", "as": "rate"},
+                     {"calculate": "-datum.smax * 1.12", "as": "ry"},
+                     {"calculate": "format(datum.rate, '.1%')", "as": "disp"}],
+       "mark": {"type": "text", "fontSize": 13, "color": "#333333"},
+       "encoding": {
+         "x": {"field": "catname", "type": "nominal", "sort": {"field": "ord", "op": "max", "order": "descending"},
+               "scale": {"rangeMin": 150, "paddingInner": 0.3, "paddingOuter": 0.2}, "axis": null},
+         "y": {"field": "ry", "type": "quantitative"}, "text": {"field": "disp", "type": "nominal"}}},
+
+      {"transform": [{"aggregate": [{"op": "max", "field": "smax", "as": "smax"}]},
+                     {"calculate": "-datum.smax * 0.52", "as": "ry"}],
+       "mark": {"type": "text", "fontSize": 13, "fontWeight": "bold", "color": "#3a4a5a", "align": "left"},
+       "encoding": {"x": {"value": 4}, "y": {"field": "ry", "type": "quantitative"}, "text": {"value": "Fulfillment Rate"}}},
+
+      {"transform": [{"aggregate": [{"op": "max", "field": "smax", "as": "smax"}]},
+                     {"calculate": "-datum.smax * 0.82", "as": "ry"}],
+       "mark": {"type": "text", "fontSize": 13, "fontWeight": "bold", "color": "#3a4a5a", "align": "left"},
+       "encoding": {"x": {"value": 4}, "y": {"field": "ry", "type": "quantitative"}, "text": {"value": "Cancellation Rate"}}},
+
+      {"transform": [{"aggregate": [{"op": "max", "field": "smax", "as": "smax"}]},
+                     {"calculate": "-datum.smax * 1.12", "as": "ry"}],
+       "mark": {"type": "text", "fontSize": 13, "fontWeight": "bold", "color": "#3a4a5a", "align": "left"},
+       "encoding": {"x": {"value": 4}, "y": {"field": "ry", "type": "quantitative"}, "text": {"value": "Refund Rate"}}}
+    ],
+
+    "resolve": {"scale": {"y": "shared"}}
+  };;
+}

@@ -1,0 +1,172 @@
+// Vega-Lite trading P&L waterfall: Combined Stake -> Gross Win -> Trading Net Win -> Trading Net Revenue.
+//
+// Built as a custom chart because Holistics has no native waterfall viz type, and because the
+// built-in ColumnChart cannot do the three things a board audience needs here:
+//   1. Show the chain as one connected story rather than eight unrelated bars, so
+//      "turnover is not revenue" lands in a single look.
+//   2. Mix subtotal bars (Gross Win, Trading Net Win, Trading Net Revenue) with floating
+//      delta bars (payout, Rocket Boost, BRG, COGS) on one axis with different colour roles.
+//   3. Label every step in both dollars and percent of turnover, so the margin chain
+//      (Gross Win % -> Trading Net Win % -> Trading Net Revenue %) reads without a second chart.
+//
+// The block passes eight measures and no dimension, so the query returns exactly one row.
+//
+// Why the leading chain of single-field `fold` transforms:
+//   `@{fields.x.name}` interpolates as a *quoted JSON string*, so it can only appear where the
+//   spec wants a field-name value ("field": @{...}). It cannot be embedded inside a `calculate`
+//   expression string - that would emit broken JSON. Folding one field at a time lets the `as`
+//   clause rename each runtime field to a name this template controls (m_stake, m_payout, ...),
+//   after which every downstream `calculate` can reference datum.m_* directly. Fold on a
+//   single-row, single-field input yields one row and preserves the other columns, so chaining
+//   eight of them collapses to one row carrying all eight aliases.
+//
+// Chain: Combined Stake - Combined Payout + Rocket Boost = Gross Win
+//        Gross Win - BRG                                 = Trading Net Win
+//        Trading Net Win - COGS                          = Trading Net Revenue
+// All figures are on the settled reporting-date lens, in Australian dollars.
+CustomChartDef dabble_pnl_waterfall {
+  label: 'Trading P&L Waterfall'
+  description: 'Turnover to Trading Net Revenue as a connected waterfall on the settled-date lens. Deep purple is the opening total, violet bars are subtotals, coral bars are deductions, green is the Rocket Boost addition. Each step is labelled in dollars and as a percentage of turnover.'
+
+  fields {
+    field stake {
+      label: 'Combined Stake'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field payout {
+      label: 'Combined Payout'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field boost {
+      label: 'Rocket Boost'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field gross_win {
+      label: 'Gross Win'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field brg {
+      label: 'BRG (Generosity)'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field trading_net_win {
+      label: 'Trading Net Win'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field cogs {
+      label: 'COGS'
+      type: 'measure'
+      data_type: 'number'
+    }
+    field trading_net_revenue {
+      label: 'Trading Net Revenue'
+      type: 'measure'
+      data_type: 'number'
+    }
+  }
+
+  template: @vgl {
+    "width": "container",
+    "height": "container",
+    "data": {"values": @{values}},
+    "transform": [
+      {"fold": [@{fields.stake.name}], "as": ["k_stake", "m_stake"]},
+      {"fold": [@{fields.payout.name}], "as": ["k_payout", "m_payout"]},
+      {"fold": [@{fields.boost.name}], "as": ["k_boost", "m_boost"]},
+      {"fold": [@{fields.gross_win.name}], "as": ["k_gw", "m_gw"]},
+      {"fold": [@{fields.brg.name}], "as": ["k_brg", "m_brg"]},
+      {"fold": [@{fields.trading_net_win.name}], "as": ["k_tnw", "m_tnw"]},
+      {"fold": [@{fields.cogs.name}], "as": ["k_cogs", "m_cogs"]},
+      {"fold": [@{fields.trading_net_revenue.name}], "as": ["k_tnr", "m_tnr"]},
+      {
+        "calculate": "[{'step':'Combined Stake','order':1,'kind':'open','amount':datum.m_stake,'lo':0,'hi':datum.m_stake},{'step':'less Combined Payout','order':2,'kind':'deduct','amount':-datum.m_payout,'lo':datum.m_stake - datum.m_payout,'hi':datum.m_stake},{'step':'plus Rocket Boost','order':3,'kind':'add','amount':datum.m_boost,'lo':datum.m_stake - datum.m_payout,'hi':datum.m_stake - datum.m_payout + datum.m_boost},{'step':'Gross Win','order':4,'kind':'subtotal','amount':datum.m_gw,'lo':0,'hi':datum.m_gw},{'step':'less BRG','order':5,'kind':'deduct','amount':-datum.m_brg,'lo':datum.m_tnw,'hi':datum.m_gw},{'step':'Trading Net Win','order':6,'kind':'subtotal','amount':datum.m_tnw,'lo':0,'hi':datum.m_tnw},{'step':'less COGS','order':7,'kind':'deduct','amount':-datum.m_cogs,'lo':datum.m_tnr,'hi':datum.m_tnw},{'step':'Trading Net Revenue','order':8,'kind':'subtotal','amount':datum.m_tnr,'lo':0,'hi':datum.m_tnr}]",
+        "as": "steps"
+      },
+      {"flatten": ["steps"]},
+      {"calculate": "datum.steps.step", "as": "step"},
+      {"calculate": "datum.steps.order", "as": "order"},
+      {"calculate": "datum.steps.kind", "as": "kind"},
+      {"calculate": "datum.steps.amount", "as": "amount"},
+      {"calculate": "datum.steps.lo", "as": "bar_lo"},
+      {"calculate": "datum.steps.hi", "as": "bar_hi"},
+      {"calculate": "datum.m_stake == 0 ? null : datum.steps.amount / datum.m_stake", "as": "pct_of_turnover"},
+      {"calculate": "max(datum.steps.lo, datum.steps.hi)", "as": "label_y"}
+    ],
+    "encoding": {
+      "x": {
+        "field": "step",
+        "type": "nominal",
+        "sort": {"field": "order", "order": "ascending"},
+        "axis": {
+          "title": null,
+          "labelAngle": -30,
+          "labelFontSize": 10,
+          "labelColor": "#21099B",
+          "labelLimit": 140
+        }
+      }
+    },
+    "layer": [
+      {
+        "mark": {"type": "bar", "size": 52, "cornerRadius": 2, "tooltip": true},
+        "encoding": {
+          "y": {
+            "field": "bar_lo",
+            "type": "quantitative",
+            "scale": {"zero": true, "nice": true},
+            "axis": {
+              "title": "AUD (settled date)",
+              "format": "$,.2s",
+              "grid": true,
+              "gridColor": "#EEE9FA",
+              "labelFontSize": 10,
+              "titleFontSize": 11,
+              "titleColor": "#180666"
+            }
+          },
+          "y2": {"field": "bar_hi"},
+          "color": {
+            "field": "kind",
+            "type": "nominal",
+            "scale": {
+              "domain": ["open", "subtotal", "deduct", "add"],
+              "range": ["#21099B", "#8A5DFF", "#FE8885", "#28AC26"]
+            },
+            "legend": null
+          },
+          "tooltip": [
+            {"field": "step", "type": "nominal", "title": "Step"},
+            {"field": "amount", "type": "quantitative", "title": "Amount (AUD)", "format": "$,.0f"},
+            {"field": "pct_of_turnover", "type": "quantitative", "title": "% of turnover", "format": ".1%"},
+            {"field": "bar_hi", "type": "quantitative", "title": "Running total (AUD)", "format": "$,.0f"}
+          ]
+        }
+      },
+      {
+        "mark": {"type": "text", "dy": -21, "fontSize": 10, "fontWeight": "bold", "color": "#180666"},
+        "encoding": {
+          "y": {"field": "label_y", "type": "quantitative"},
+          "text": {"field": "amount", "type": "quantitative", "format": "$,.3s"}
+        }
+      },
+      {
+        "mark": {"type": "text", "dy": -8, "fontSize": 9, "color": "#4D4566"},
+        "encoding": {
+          "y": {"field": "label_y", "type": "quantitative"},
+          "text": {"field": "pct_of_turnover", "type": "quantitative", "format": ".1%"}
+        }
+      }
+    ],
+    "config": {
+      "view": {"stroke": null},
+      "axis": {"domainColor": "#DDD8EA", "tickColor": "#DDD8EA", "labelColor": "#21099B"},
+      "legend": {"labelColor": "#21099B", "titleColor": "#180666"}
+    }
+  };;
+}

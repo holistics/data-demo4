@@ -1,0 +1,172 @@
+// =====================================================================
+// Judi.ai — reusable brand theme
+// Brand: AI-powered small-business lending. Signature lime-green primary,
+// deep-navy ink/headers, clean white cards on soft neutral surfaces,
+// friendly Nunito typeface. Inferred from judi.ai (Avada site):
+//   accent green #7DAC32 (buttons/hover), navy #1B233D (headings/links).
+// Apply from a dashboard with:  theme: judi
+// =====================================================================
+
+const ju_green      = "#7DAC32"   // primary / accent (buttons, hover)
+const ju_green_dark = "#5F8A24"   // hover / emphasis
+const ju_green_soft = "#EEF5E1"   // light green tint (row hover)
+const ju_navy       = "#1B233D"   // ink / headers / links
+const ju_ink        = "#313131"   // body text
+const ju_muted      = "#5B6472"   // secondary text
+const ju_page_bg    = "#F5F7F2"   // page background (faint green-neutral)
+const ju_canvas_bg  = "#EAEEE4"   // canvas surface
+const ju_card       = "#FFFFFF"   // cards
+const ju_border     = "#E4E8DE"
+const ju_grid       = "#EDF0E9"
+const ju_band       = "#FAFBF6"
+const ju_font       = "Nunito, Inter, Helvetica Neue, Helvetica, Arial, sans-serif"
+
+ColorPalette judi_palette {
+  title: "Judi.ai"
+  categorical {
+    colors: [
+      "#7DAC32", "#1B233D", "#0E9F6E", "#F5A524",
+      "#3B82F6", "#14B8A6", "#8B5CF6", "#64748B"
+    ]
+  }
+}
+
+PageTheme judi {
+  title: 'Judi.ai'
+
+  color {
+    data: judi_palette
+  }
+
+  background {
+    bg_color: ju_page_bg
+  }
+
+  canvas {
+    background {
+      bg_color: ju_canvas_bg
+    }
+    border {
+      border_radius: 8
+      border_color: ju_border
+    }
+    shadow: 'sm'
+  }
+
+  block {
+    background {
+      bg_color: ju_card
+    }
+    label {
+      font_family: ju_font
+      font_color: ju_navy
+      font_weight: 'bold'
+      font_size: 14
+    }
+    text {
+      font_family: ju_font
+      font_color: ju_muted
+      font_size: 13
+    }
+    border {
+      border_width: 1
+      border_radius: 10
+      border_color: ju_border
+      border_style: 'solid'
+    }
+    padding: 16
+    shadow: 'sm'
+  }
+
+  viz {
+    table {
+      general {
+        hover_color: ju_green_soft
+        banding_color: ju_band
+        font_color: ju_ink
+        font_size: 13
+        font_family: ju_font
+        border_color: ju_border
+        grid_color: ju_grid
+      }
+      header {
+        bg_color: ju_navy
+        font_color: '#FFFFFF'
+        font_weight: 'bold'
+      }
+      sub_header {
+        bg_color: ju_green_soft
+        font_color: ju_green_dark
+        font_weight: 'semibold'
+      }
+      sub_title {
+        font_color: ju_muted
+        font_size: 11
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+    /* KPI period-over-period diff chips in brand colors */
+    .h-kpi-metric-diff .friendly-diff:not(.negative) {
+      background: #EEF5E1;
+      color: #5F8A24;
+    }
+    .h-kpi-metric-diff .friendly-diff.negative {
+      background: #FCECEA;
+      color: #B3141A;
+    }
+  ;;
+}
+
+// Optional dark KPI card — navy fill for hero metrics (echoes the brand's
+// dark headers). Apply on a KPI VizBlock with:  theme: judi_kpi_dark
+BlockTheme judi_kpi_dark {
+  background {
+    bg_color: ju_navy
+  }
+  border {
+    border_width: 0
+    border_radius: 10
+  }
+}
+
+// Navy header bar with white Nunito text. Pair a static logo block with an
+// editable PLAIN-MARKDOWN title block so the title is click-to-type (no HTML
+// to edit). Apply with: theme: judi_header
+BlockTheme judi_header {
+  background {
+    bg_color: ju_navy
+  }
+  label {
+    font_family: ju_font
+    font_color: '#FFFFFF'
+    font_weight: 'bold'
+    font_size: 22
+  }
+  text {
+    font_family: ju_font
+    font_color: '#FFFFFF'
+    font_size: 13
+  }
+  border {
+    border_width: 0
+    border_radius: 0
+  }
+  padding: 18
+}
+
+// Transparent, chrome-free block for full-bleed header/footer banners
+// (the banner's own <div> provides the background). Apply with: theme: judi_banner
+BlockTheme judi_banner {
+  background {
+    bg_color: 'transparent'
+  }
+  border {
+    border_width: 0
+    border_radius: 0
+  }
+  padding: 0
+}

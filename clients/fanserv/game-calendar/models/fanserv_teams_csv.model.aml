@@ -1,0 +1,169 @@
+Model fanserv_teams_csv {
+  type: 'table'
+  label: 'FanServ Teams — CSV Source'
+  description: 'Source team extract imported from clients/fanserv/game-calendar/data/TeamData.csv.'
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension created {
+    label: 'Created'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created }};;
+  }
+  dimension modified {
+    label: 'Modified'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.modified }};;
+  }
+  dimension uuid {
+    label: 'Uuid'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.uuid }};;
+  }
+  dimension is_active {
+    label: 'Is active'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension alias {
+    label: 'Alias'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.alias }};;
+  }
+  dimension name {
+    label: 'Name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension market {
+    label: 'Market'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.market }};;
+  }
+  dimension league_id {
+    label: 'League'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.league_id }};;
+  }
+  dimension venue_id {
+    label: 'Venue'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.venue_id }};;
+  }
+  dimension logo_url {
+    label: 'Logo url'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.logo_url }};;
+  }
+  dimension full_name {
+    label: 'Full name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+  dimension conference_id {
+    label: 'Conference'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.conference_id }};;
+  }
+  dimension division_id {
+    label: 'Division'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.division_id }};;
+  }
+  dimension primary_color {
+    label: 'Primary color'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_color }};;
+  }
+  dimension secondary_color {
+    label: 'Secondary color'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.secondary_color }};;
+  }
+  dimension peerdb_synced_at {
+    label: 'Peerdb synced at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.peerdb_synced_at }};;
+  }
+  dimension peerdb_is_deleted {
+    label: 'Peerdb is deleted'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.peerdb_is_deleted }};;
+  }
+  dimension peerdb_version {
+    label: 'Peerdb version'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.peerdb_version }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'teamdata.csv'
+    uploaded_at: '2026-07-16 09:45:15'
+    hash: '523382aee092c2f0a5060ed946f8ccda1f3bb6042e7904b6c3520db0f0b12510'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("created", "created", "datetime"),
+      H.imports.column_config("modified", "modified", "datetime"),
+      H.imports.column_config("uuid", "uuid", "text"),
+      H.imports.column_config("is_active", "is_active", "truefalse"),
+      H.imports.column_config("alias", "alias", "text"),
+      H.imports.column_config("name", "name", "text"),
+      H.imports.column_config("market", "market", "text"),
+      H.imports.column_config("league_id", "league_id", "number"),
+      H.imports.column_config("venue_id", "venue_id", "number"),
+      H.imports.column_config("logo_url", "logo_url", "text"),
+      H.imports.column_config("full_name", "full_name", "text"),
+      H.imports.column_config("conference_id", "conference_id", "number"),
+      H.imports.column_config("division_id", "division_id", "number"),
+      H.imports.column_config("primary_color", "primary_color", "text"),
+      H.imports.column_config("secondary_color", "secondary_color", "text"),
+      H.imports.column_config("peerdb_synced_at", "peerdb_synced_at", "datetime"),
+      H.imports.column_config("peerdb_is_deleted", "peerdb_is_deleted", "number"),
+      H.imports.column_config("peerdb_version", "peerdb_version", "text")
+    ]
+  }
+  owner: 'chinh.dm+demo4@holistics.io'
+  table_name: '"dbt_khai"."holistics_fanserv_teams_3d44f_202607160945"'
+}

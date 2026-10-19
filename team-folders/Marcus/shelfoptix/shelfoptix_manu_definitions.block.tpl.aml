@@ -1,0 +1,25 @@
+// Definitions panel for the manufacturer cross-retailer dashboard.
+// Metric descriptions are pulled live from the shelfoptix_manufacturer semantic layer,
+// so editing a metric description flows through to the dashboard automatically.
+@template(
+  title='ShelfOptix — Definitions',
+  description='OSA/OOS metric definitions for the manufacturer view, pulled live from the semantic layer.',
+  thumbnail='',
+  metadata={
+    group: 'ShelfOptix'
+    block_width: 920
+    block_height: 140
+  }
+)
+Func block_shelfoptix_manu_definitions() {
+  TextBlock {
+    content: @md On-shelf availability from ShelfOptix scans - metric definitions below are pulled live from the semantic layer:
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 28px; font-size:12px; line-height:1.35; color:#374151; margin-top:4px;">
+  <div><b>⋅ Availability %</b>: ${shelfoptix_manufacturer.metric.availability_rate.description}</div>
+  <div><b>⋅ OOS Count</b>: ${shelfoptix_manufacturer.metric.oos_count.description}</div>
+  <div><b>⋅ Retailers Covered</b>: ${shelfoptix_manufacturer.metric.retailers_covered.description}</div>
+  <div><b>⋅ OOS Rate %</b>: ${shelfoptix_manufacturer.metric.oos_rate.description}</div>
+</div> ;;
+  }
+}

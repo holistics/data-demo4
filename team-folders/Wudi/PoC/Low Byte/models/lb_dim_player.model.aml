@@ -1,0 +1,82 @@
+Model lb_dim_player {
+  type: 'table'
+  label: 'Dim Player'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_player"'
+
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension canonical_player_id_hash {
+    label: 'Canonical Player Id Hash'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.canonical_player_id_hash }};;
+  }
+  dimension first_seen_at {
+    label: 'First Seen At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.first_seen_at }};;
+  }
+  dimension last_seen_at {
+    label: 'Last Seen At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.last_seen_at }};;
+  }
+  dimension account_created_at {
+    label: 'Account Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.account_created_at }};;
+  }
+  dimension first_country_key {
+    label: 'First Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.first_country_key }};;
+  }
+  dimension is_registered_user {
+    label: 'Is Registered User'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_registered_user }};;
+  }
+  dimension is_test_user {
+    label: 'Is Test User'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_test_user }};;
+  }
+  dimension consent_status {
+    label: 'Consent Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.consent_status }};;
+  }
+  dimension player_attributes {
+    label: 'Player Attributes'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_attributes }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}

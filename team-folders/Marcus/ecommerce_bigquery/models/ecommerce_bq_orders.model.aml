@@ -1,0 +1,68 @@
+Model ecommerce_bq_orders {
+  type: 'table'
+  label: 'Orders'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.fct_orders'
+
+  dimension order_id {
+    label: 'Order ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+  }
+
+  dimension is_fulfilled {
+    label: 'Is Fulfilled'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_fulfilled }};;
+  }
+
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  dimension order_date {
+    label: 'Order Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+
+  dimension discount {
+    label: 'Discount'
+    type: 'number'
+    definition: @sql {{ #SOURCE.discount }};;
+  }
+
+  dimension delivery_attempts {
+    label: 'Delivery Attempts'
+    type: 'number'
+    definition: @sql {{ #SOURCE.delivery_attempts }};;
+  }
+
+  dimension is_multi_attempt_delivery {
+    label: 'Is Multi Attempt Delivery'
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_multi_attempt_delivery }};;
+  }
+
+  dimension promo_code_count {
+    label: 'Promo Code Count'
+    type: 'number'
+    definition: @sql {{ #SOURCE.promo_code_count }};;
+  }
+}

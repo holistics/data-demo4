@@ -1,0 +1,67 @@
+// P&G RetailFocus — weekly shelf-availability totals across the whole reporting
+// population (~278 stores). Lifted from the customer's own Executive Summary export
+// (2026-08-03), so these are ShelfOptix's real figures, not synthetic.
+//
+// NOTE: fixed schema, not ${schema_name}. This is P&G programme data shared with us
+// for the POC, not one of the per-retailer DDS schemas.
+//
+// Stored as raw counts only. base_osa_pct and adj_osa_pct are deliberately NOT stored:
+// they are derived in the semantic layer so the definition lives in exactly one place.
+Model shelfoptix_pg_osa_weekly {
+  type: 'table'
+  label: 'PG OSA Weekly'
+  description: 'Weekly on-shelf availability counts for the P&G RetailFocus programme, all reporting stores.'
+  data_source_name: 'demo_bigquery'
+
+  dimension week_date {
+    label: 'Week'
+    description: 'Week commencing (Monday).'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.week_date }};;
+  }
+  dimension observed_ct {
+    label: 'Observed Facings'
+    description: 'Facings scanned in the week. Denominator for both OSA measures.'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.observed_ct }};;
+  }
+  dimension instock_ct {
+    label: 'In-Stock Facings'
+    description: 'Facings scanned with stock present.'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.instock_ct }};;
+  }
+  dimension oos_ct {
+    label: 'OOS Facings'
+    description: 'Facings scanned empty.'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.oos_ct }};;
+  }
+  dimension ghost_ct {
+    label: 'Ghost Facings'
+    description: 'Phantom inventory: system shows stock, shelf scan disagrees. Subtracted from in-stock to get adjusted OSA.'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.ghost_ct }};;
+  }
+  dimension negoh_ct {
+    label: 'Negative On-Hand Facings'
+    description: 'Facings whose system on-hand is negative.'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.negoh_ct }};;
+  }
+  dimension store_count {
+    label: 'Stores Reporting'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_count }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: 'shelfoptix_pg.pg_osa_weekly'
+}

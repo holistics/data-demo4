@@ -101,7 +101,7 @@ Model dim_dates {
     definition: @sql {{ #SOURCE.year }};;
   }
 
-  owner: 'ha.pham+demo4@holistics.io'
+  owner: 'huy@holistics.io'
   query: @sql
     SELECT 
           date_key

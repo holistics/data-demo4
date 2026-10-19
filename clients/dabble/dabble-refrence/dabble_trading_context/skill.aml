@@ -1,0 +1,81 @@
+Skill dabble_trading_context {
+  label: 'Dabble AU Trading — Business Context'
+  description: "Australian wagering domain context for Dabble: the trading P&L chain (turnover to gross win to trading net revenue), racing vs sport dynamics, Rocket copy-betting, risk-factor management, the AU regulatory overlay, and which decision each Dabble dashboard tab owns. Use whenever the question touches a Dabble dashboard, page or dataset whose name contains 'dabble' (e.g. 'Dabble AU Trading Performance', dataset dabble_trading), or whenever the user asks about turnover, stake, gross win, hold, margin, BRG, COGS, trading net revenue, dividend, overround, Rocket, restricted stake, risk factor, actives, racing vs sport, or AU wagering more generally. Typical phrasings: 'why is margin down', 'how did the AU book do last week', 'which sports should we prioritise', 'is Rocket working', 'walk me through the trading scorecard'."
+  invocation: 'auto'
+  content: @md
+    Speak as a Big 4 / McKinsey-caliber consultant embedded in Dabble's trading floor: commercially fluent, numerate, and blunt about what the data can and cannot support. Dabble is an Australian social betting operator — customers place bets, then share, follow and copy each other's bets in a feed. Only the AU book is modelled; UK and US are on the roadmap, so never write logic that assumes AU is the only market.
+
+    ## The trading P&L chain — the spine of every answer
+
+    ```
+    Combined Stake ("turnover", cash + bonus)
+      − Combined Payout  + Rocket Boost   →  Gross Win        (the book's hold)
+      − BRG                               →  Trading Net Win  (hold after generosity)
+      − COGS (product & racing fees, POCT, GST)
+                                          →  Trading Net Revenue (what Finance recognises)
+    ```
+
+    Four consequences worth stating out loud when they apply:
+
+    - Turnover is not revenue. Never report a stake move without the margin beside it.
+    - A gap that opens between Gross Win % and Trading Net Revenue % is a **cost** story (generosity or COGS), not a pricing story — different owner, different fix.
+    - The `%` chain should decline monotonically down the stack. If it doesn't, distrust the slice before the book.
+    - Rocket Boost sits *inside* Gross Win as engagement spend. Rising Rocket Boost is cost, not good news, until you show the turnover and actives it bought.
+
+    ## Domain mechanics that actually move the numbers
+
+    - **Racing and sport are two businesses in one app.** Racing (thoroughbred, harness, greyhound, futures) is high-frequency and structurally wider-margin; sport is event-driven and thinner. Racing is ~57% of turnover here. Split on `is_racing` / `sport_category` before concluding anything about "our margin".
+    - **Multi-leg bets are the margin engine.** Each leg carries its own overround and combining them multiplies it, so a shift in leg-count or bet-type mix moves blended margin with zero pricing change. Check mix before diagnosing price.
+    - **Priced vs realised beats last year.** `Expected Gross Win %` is the margin the book was priced to hold (from leg dividends/overround); `Margin Variance (pts)` is realised minus priced. "Did we hold what we priced?" is the question a trading exec actually asks — YoY conflates pricing, mix, result variance and growth into one uninterpretable number.
+    - **Generosity is a deliberate lever.** Bonus cash stake, BRG and Rocket Boost are give-back. `Bonus Cash %` shows how much of turnover is promotional. Marketing owns the spend, Trading owns the diluted margin.
+    - **Risk factor is the sharp-customer defence.** `risk_rating` / `risk_factor` / `risk_factor_bracket` express how much of a customer's money the book trusts; `Restricted Stake` is turnover accepted under a limit. A working framework shows a **monotonic** relationship between bracket and realised margin. Flat or random means the framework is decorative — escalate that, don't quietly publish it.
+    - **Copy betting concentrates liability.** One popular selection copied hundreds of times is a single position, not hundreds of independent ones. Treat Rocket turnover growth as both engagement win and risk concentration.
+
+    ## Two date lenses — always say which one
+
+    - **Settled Date** (`dabble_fact_bet.reporting_date`) governs every financial metric. This is the default.
+    - **Event Date** (`dabble_dim_fixture.advertised_start`) governs event-shaped questions ("how did Saturday's card go").
+
+    A bet placed Friday on a Sunday fixture and settled Monday falls in three different windows.
+
+    ## Regulatory overlay — what this constrains
+
+    Australian online wagering is tightly regulated; treat specifics as directional and route confirmation to Legal/Compliance and Finance.
+
+    - **Point of Consumption Tax** is levied by the **customer's state of residence**, at rates that have ratcheted upward and now sit broadly in a 10–20% band by state. So `home_state` is a financial dimension: state mix change moves net revenue with no trading change at all. Never quote a specific rate without verification.
+    - **Racing product / race-field fees and sports controlling-body fees** are the bulk of COGS and scale with racing turnover — which is why racing's wider gross margin does not flow one-for-one to net revenue.
+    - **National Consumer Protection Framework** obligations (the BetStop self-exclusion register, activity statements, deposit limits, the credit-betting ban, gambling-harm messaging, verification timeframes) plus AUSTRAC AML/CTF duties make customer-level financial views sensitive by default.
+
+    Practical rules:
+
+    1. No direct PII. Customers are identified by alias only; source IDs and aliases in this project are generated.
+    2. A high-turnover, high-loss customer is a **responsible-gambling** question before it is a profitability question. Phrase customer findings in risk and pricing language, and never recommend increasing exposure to a customer showing harm indicators.
+    3. Customer profitability rankings are internal — Trading and Risk, not broad executive circulation.
+    4. Any margin or market comparison that ignores state mix is incomplete.
+
+    ## Audiences and what each one needs
+
+    - **Executives (~10):** one number, one direction, one decision. Consistent KPIs that will still be comparable when UK and US land. Density is the failure mode.
+    - **Business users, Strategy / Trading / Marketing / Finance (~20–40):** self-serve slicing and drill-through without queuing behind BI. Pre-building every possible table signals they can't ask their own questions.
+    - **BI analysts (5):** flexible querying and a governed metric layer they maintain rather than re-derive. Metric logic belongs in the semantic layer, never in a dashboard.
+
+    Cadence: daily trading huddle (price/limit calls) → weekly trading review (variance decomposition) → monthly commercial review (the cost chain, generosity envelope, forecast) → monthly risk & compliance review (restrictions, RG interventions) → quarterly board (market strategy).
+
+    ## What each Dabble dashboard owns
+
+    **`dabble_au_trading_performance_command_center` — "Dabble AU Trading Performance"** — a staged narrative, four tabs:
+
+    | Tab | Question it owns | Owner | Escalation trigger |
+    |---|---|---|---|
+    | Executive Pulse | Are turnover and margin where they should be? | Exec | Gross Win % outside band, or Net Revenue % falling while Gross Win % holds |
+    | Monthly Scorecard | How did the month close on scale, profitability, customer economics and risk? | Finance + Exec | The `%` chain failing to decline monotonically |
+    | Sport & Competition Drivers | Where is realised margin diverging from the priced book? | Trading | Material turnover with negative margin variance |
+    | Customer, Rocket & Risk | Who carries the exposure, and is the risk framework working? | Risk + Trading | Non-monotonic margin across risk brackets; Rocket Boost outgrowing the turnover it buys |
+
+    **`dabble_au_trading_kpi_prototype` — "Dabble AU Trading KPI Prototype"** — the parity baseline that mirrors today's reporting, plus a year-over-year addition. Its job is to be recognisable, not good; it is the "before" in a before/after.
+
+    Drill-through is wired on the sport, competition and fixture filters — that is the self-service answer, and it lands when demonstrated rather than described.
+
+    For measurement rules, aggregation traps, diagnosis playbooks and the known synthetic-data caveats, refer to @Skill:dabble_trading_measurement_rules.
+  ;;
+}

@@ -1,20 +1,19 @@
 @tag('Endorsed')
 Dashboard aggregate_awareness_demo_dashboard_lite {
   title: 'Aggregate Awareness - Simple Example'
-  description: @md
-    This demo illustrates the capability of Aggregate Awareness in Holistics
+  description: @md This demo illustrates the capability of Aggregate Awareness in Holistics
 
-    ---
+---
 
-    Aggregate Awareness is the capability of automatically identifying eligible pre-aggregates (transformed by tools like dbt, Airflow, BI like Holistics, etc.) and substituting them into queries, making the queries use smaller pre-aggregated tables while still producing accurate results. It can reduce the time to analyze gigabytes-to-terabytes of data from several minutes to a few seconds.
+Aggregate Awareness is the capability of automatically identifying eligible pre-aggregates (transformed by tools like dbt, Airflow, BI like Holistics, etc.) and substituting them into queries, making the queries use smaller pre-aggregated tables while still producing accurate results. It can reduce the time to analyze gigabytes-to-terabytes of data from several minutes to a few seconds.
 
-    This feature has impacts on everyone in the team:
+This feature has impacts on everyone in the team:
 
-    - Analysts can maintain the pre-aggregates better with less effort (improved process).
-    - Business users will get the same insights faster by pre-aggregated tables instead of raw data (improved timeliness).
+- Analysts can maintain the pre-aggregates better with less effort (improved process).
+- Business users will get the same insights faster by pre-aggregated tables instead of raw data (improved timeliness).
 
-    Aggregate Awareness is now in **Closed Beta**. You can [Request Beta Access](https://form.jotform.com/230511857392457/prefill/664c2fcc633961c7bed679d6969e) to try it out!
-    Learn about this feature on [Aggregate Awareness | Public Doc](https://docs.holistics.io/docs/aggregate-awareness) or different use cases on [Aggregate Awareness | Tutorial](https://docs.holistics.io/tutorials/using-aggregate-awareness).;;
+Aggregate Awareness is now in **Closed Beta**. You can [Request Beta Access](https://form.jotform.com/230511857392457/prefill/664c2fcc633961c7bed679d6969e) to try it out!
+Learn about this feature on [Aggregate Awareness | Public Doc](https://docs.holistics.io/docs/aggregate-awareness) or different use cases on [Aggregate Awareness | Tutorial](https://docs.holistics.io/tutorials/using-aggregate-awareness).;;
   block info_intro: TextBlock {
     content: @md
       ### Dataset <br/>
@@ -277,8 +276,7 @@ Dashboard aggregate_awareness_demo_dashboard_lite {
     }
   }
   settings {
-    timezone: 'America/Los_Angeles'
-    autorun: false
     cache_duration: 10
+    autorun_on_open: false
   }
 }

@@ -1,0 +1,112 @@
+Model lb_fact_session {
+  type: 'table'
+  label: 'Fact Session'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_session"'
+
+  dimension session_key {
+    label: 'Session Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.session_key }};;
+  }
+  dimension source_session_id {
+    label: 'Source Session Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_session_id }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension install_key {
+    label: 'Install Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.install_key }};;
+  }
+  dimension session_date_key {
+    label: 'Session Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.session_date_key }};;
+  }
+  dimension started_at {
+    label: 'Started At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.started_at }};;
+  }
+  dimension ended_at {
+    label: 'Ended At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.ended_at }};;
+  }
+  dimension duration_seconds {
+    label: 'Duration Seconds'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.duration_seconds }};;
+  }
+  dimension session_number {
+    label: 'Session Number'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.session_number }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension device_key {
+    label: 'Device Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.device_key }};;
+  }
+  dimension app_version_key {
+    label: 'App Version Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_version_key }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension session_properties {
+    label: 'Session Properties'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.session_properties }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

@@ -1,0 +1,113 @@
+Model lb_fact_level_funnel {
+  type: 'query'
+  label: 'Fact Level Funnel'
+  description: 'Level-progression funnel at (funnel step x player x app) grain, restricted to the level-1 starter cohort. Only players with a level_start event at level 1 enter the funnel, so every step measures that same cohort progressing deeper. "Reached level N" means the player has a level_start event at level N or beyond, making the funnel cumulative and monotonically decreasing by construction. Milestone list lives in the steps CTE — extend it to cover deeper level ranges (e.g. up to 500) as the level cap grows.'
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  models: [lb_fact_game_event, lb_dim_event, lb_dim_date]
+
+  dimension funnel_row_key {
+    label: 'Funnel Row Key'
+    type: 'text'
+    hidden: true
+    primary_key: true
+    definition: @sql {{ #SOURCE.funnel_row_key }};;
+  }
+  dimension step_level {
+    label: 'Step Level'
+    description: 'Numeric level of the funnel milestone (1, 2, 3, 4, 5, 10, 20, ...).'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.step_level }};;
+  }
+  dimension step_label {
+    label: 'Funnel Step'
+    description: 'Display label for the funnel step. Zero-padded so alphabetical order matches level order.'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.step_label }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension reached_date_key {
+    label: 'Reached Date Key'
+    description: 'Date key on which the player first reached this level milestone.'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.reached_date_key }};;
+  }
+  dimension started_month {
+    label: 'Month Started'
+    description: 'Month in which the player started level 1 — their funnel entry cohort. Constant across every step for a given player, so filtering by it selects a starting cohort and follows that cohort all the way down the funnel (rather than filtering each step by when that step was reached).'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.started_month }};;
+  }
+
+  query: @sql
+with steps as (
+  select *
+  from (
+    values
+        (1,  'Level 01')
+      , (2,  'Level 02')
+      , (3,  'Level 03')
+      , (4,  'Level 04')
+      , (5,  'Level 05')
+      , (10, 'Level 10')
+      , (20, 'Level 20')
+      , (30, 'Level 30')
+      , (40, 'Level 40')
+      , (50, 'Level 50')
+      , (60, 'Level 60')
+  ) as t(step_level, step_label)
+)
+, level_starts as (
+  select
+      {{ #e.player_key }}     as player_key
+    , {{ #e.app_key }}        as app_key
+    , {{ #e.level_number }}   as level_number
+    , {{ #e.event_date_key }} as event_date_key
+  from {{ #lb_fact_game_event e }}
+  left join {{ #lb_dim_event d }} on {{ #e.event_key }} = {{ #d.event_key }}
+  where {{ #d.event_name }} = 'level_start'
+    and {{ #e.level_number }} is not null
+)
+-- Funnel entry cohort: only players who actually started at level 1.
+-- Keyed on (player, app) so a player's progress in one app never leaks into another.
+, level_1_starters as (
+  select
+      player_key
+    , app_key
+    , min(event_date_key) as started_date_key
+  from level_starts
+  where level_number = 1
+  group by 1, 2
+)
+select
+    s.step_level                                                                          as step_level
+  , s.step_label                                                                          as step_label
+  , ls.player_key                                                                         as player_key
+  , ls.app_key                                                                            as app_key
+  , min(ls.event_date_key)                                                                as reached_date_key
+  , date_trunc('month', {{ #dd.full_date }})::date                                        as started_month
+  , s.step_level::text || '-' || ls.player_key::text || '-' || ls.app_key::text           as funnel_row_key
+from steps s
+join level_starts ls on ls.level_number >= s.step_level
+join level_1_starters l1
+  on  l1.player_key = ls.player_key
+  and l1.app_key    = ls.app_key
+left join {{ #lb_dim_date dd }} on {{ #dd.date_key }} = l1.started_date_key
+group by 1, 2, 3, 4, date_trunc('month', {{ #dd.full_date }})
+;;
+}

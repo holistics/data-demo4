@@ -1,0 +1,30 @@
+Model slb_order_items {
+  type: 'table'
+  label: 'SLB Order Items'
+  description: 'Line items within an order (Neon benchmark projection).'
+  data_source_name: 'slb_ecommerce_neon_h4'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"benchmark"."order_items"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension order_id {
+    label: 'Order Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+  dimension product_id {
+    label: 'Product Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+  dimension quantity {
+    label: 'Quantity'
+    type: 'number'
+    definition: @sql {{ #SOURCE.quantity }};;
+  }
+}

@@ -1,0 +1,166 @@
+Model lb_fact_install {
+  type: 'table'
+  label: 'Fact Install'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."fact_install"'
+
+  dimension install_key {
+    label: 'Install Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.install_key }};;
+  }
+  dimension player_key {
+    label: 'Player Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.player_key }};;
+  }
+  dimension app_key {
+    label: 'App Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_key }};;
+  }
+  dimension install_date_key {
+    label: 'Install Date Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.install_date_key }};;
+  }
+  dimension installed_at {
+    label: 'Installed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.installed_at }};;
+  }
+  dimension install_month {
+    label: 'Install Cohort (Month)'
+    type: 'date'
+    hidden: false
+    definition: @sql date_trunc('month', {{ #SOURCE.installed_at }})::date;;
+  }
+  dimension install_week {
+    label: 'Install Cohort (Week)'
+    type: 'date'
+    hidden: false
+    definition: @sql date_trunc('week', {{ #SOURCE.installed_at }})::date;;
+  }
+  dimension install_quarter {
+    label: 'Install Cohort (Quarter)'
+    type: 'date'
+    hidden: false
+    definition: @sql date_trunc('quarter', {{ #SOURCE.installed_at }})::date;;
+  }
+  dimension install_sequence {
+    label: 'Install Sequence'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.install_sequence }};;
+  }
+  dimension is_reinstall {
+    label: 'Is Reinstall'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_reinstall }};;
+  }
+  dimension is_retargeting {
+    label: 'Is Retargeting'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_retargeting }};;
+  }
+  dimension country_key {
+    label: 'Country Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_key }};;
+  }
+  dimension device_key {
+    label: 'Device Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.device_key }};;
+  }
+  dimension app_version_key {
+    label: 'App Version Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.app_version_key }};;
+  }
+  dimension acquisition_source_key {
+    label: 'Acquisition Source Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.acquisition_source_key }};;
+  }
+  dimension campaign_key {
+    label: 'Campaign Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.campaign_key }};;
+  }
+  dimension attribution_model {
+    label: 'Attribution Model'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.attribution_model }};;
+  }
+  dimension attribution_status {
+    label: 'Attribution Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.attribution_status }};;
+  }
+  dimension attributed_touch_type {
+    label: 'Attributed Touch Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.attributed_touch_type }};;
+  }
+  dimension click_at {
+    label: 'Click At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.click_at }};;
+  }
+  dimension impression_at {
+    label: 'Impression At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.impression_at }};;
+  }
+  dimension source_install_id {
+    label: 'Source Install Id'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_install_id }};;
+  }
+  dimension source_system_key {
+    label: 'Source System Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_system_key }};;
+  }
+  dimension etl_batch_id {
+    label: 'Etl Batch Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.etl_batch_id }};;
+  }
+  dimension source_payload {
+    label: 'Source Payload'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source_payload }};;
+  }
+  dimension loaded_at {
+    label: 'Loaded At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.loaded_at }};;
+  }
+}

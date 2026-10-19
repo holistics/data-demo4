@@ -65,7 +65,7 @@ Dataset movie_ratings_analysis {
     relationship(public_tags.movie_id > public_movies.id, true),
     relationship(public_links.movie_id - public_movies.id, true)
   ]
-  owner: 'huong.le+demo4@holistics.io'
+  owner: 'huy@holistics.io'
 
   pre_aggregates: {
     aggr_movie_rating_count: PreAggregate {

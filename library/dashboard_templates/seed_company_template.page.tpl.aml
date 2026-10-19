@@ -1,0 +1,73 @@
+// Dashboard template. Docs: https://docs.holistics.io/docs/dashboards/default-dashboard-template
+//
+// Seed Company starter template: branded header, footer and the Seed Company
+// theme, with two dashed placeholders where content goes.
+//
+// Requires (must exist in the same project):
+//   themes/seed_company.theme.aml               PageTheme seed_company + BlockTheme seed_company_bare
+//   blocks/seed_company_header.block.tpl.aml    block_seed_company_header()
+//   blocks/seed_company_footer.block.tpl.aml    block_seed_company_footer()
+//
+// A template file may contain a SINGLE Dashboard{} only. Any other object
+// (PageTheme, ColorPalette, BlockTheme) is ignored during template generation,
+// which is why the theme lives in its own file and is referenced by name.
+//
+// Deliberately contains NO VizBlocks: a default template whose viz blocks point
+// at datasets the creator cannot access renders those blocks invalid, and the
+// creator has to delete them before they can save.
+@template(
+  title='Seed Company - Dashboard',
+  description='Seed Company branded starter: header, footer, theme and placeholder layout.',
+  thumbnail=''
+)
+Dashboard seed_company_template {
+  title: 'Seed Company — Dashboard Template'
+  description: 'Starter template: branded header, footer and Seed Company theme. Replace the two placeholder blocks with real visualizations.'
+  theme: seed_company
+
+  block t_header: block_seed_company_header(
+    'Dashboard Title',
+    'Context line - e.g. FY2026 - updated daily'
+  )
+
+  block placeholder_kpis: TextBlock {
+    content: @md <div style="display:flex; align-items:center; justify-content:center; height:100%; width:100%; border:1px dashed #CDC3B0; border-radius:8px; background:#FBF8F2; font-family:'Red Hat Mono', ui-monospace, Menlo, monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#636466;">
+  KPI row - 4 to 5 MetricKpi blocks across
+</div>;;
+    theme: seed_company_bare
+  }
+
+  block placeholder_main: TextBlock {
+    content: @md <div style="display:flex; align-items:center; justify-content:center; height:100%; width:100%; border:1px dashed #CDC3B0; border-radius:8px; background:#FBF8F2; font-family:'Red Hat Mono', ui-monospace, Menlo, monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#636466;">
+  Main content - charts and tables
+</div>;;
+    theme: seed_company_bare
+  }
+
+  block t_footer: block_seed_company_footer(
+    'Source: field projects database',
+    'Data Analytics'
+  )
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1400
+    height: 760
+    grid_size: 20
+    block t_header {
+      position: pos(0, 0, 1400, 110)
+    }
+    block placeholder_kpis {
+      position: pos(0, 130, 1400, 130)
+    }
+    block placeholder_main {
+      position: pos(0, 280, 1400, 380)
+    }
+    block t_footer {
+      position: pos(0, 680, 1400, 80)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

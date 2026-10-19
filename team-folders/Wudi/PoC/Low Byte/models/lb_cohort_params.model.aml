@@ -1,0 +1,19 @@
+Model lb_cohort_params {
+  type: 'query'
+  label: 'Cohort Params'
+  description: 'Parameter model powering the dynamic cohort-granularity selector.'
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  query: @sql select 1;;
+  models: []
+
+  param cohort_grain {
+    label: 'Cohort Granularity'
+    type: 'text'
+    allowed_values: [
+      'Month',
+      'Week',
+      'Quarter'
+    ]
+  }
+}

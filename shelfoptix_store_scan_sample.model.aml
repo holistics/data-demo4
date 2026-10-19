@@ -1,4 +1,4 @@
-Model shelfoptix_store_scan_sample {
+Model shelfoptix_store_scan_sample1 {
   type: 'table'
   label: 'Shelfoptix store scan sample'
   description: ''

@@ -1,0 +1,41 @@
+Model dabble_dim_competition {
+  type: 'table'
+  label: 'Competitions'
+  data_source_name: 'dabble_neon'
+  table_name: '"dabble_demo"."dim_competition"'
+
+  dimension competition_id {
+    label: 'Competition ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.competition_id }};;
+  }
+  dimension source_competition_id {
+    label: 'Source Competition ID'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.source_competition_id }};;
+  }
+  dimension sport_id {
+    label: 'Sport ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.sport_id }};;
+  }
+  dimension competition_name {
+    label: 'Competition'
+    type: 'text'
+    definition: @sql {{ #SOURCE.competition_name }};;
+  }
+  dimension country_code {
+    label: 'Country Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+  dimension competition_state {
+    label: 'Competition State'
+    type: 'text'
+    definition: @sql {{ #SOURCE.competition_state }};;
+  }
+}

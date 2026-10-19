@@ -6,7 +6,6 @@ Dashboard ecommerce_dashboard_public {
     height: 900
   }
   settings {
-    timezone: 'America/Los_Angeles'
     cache_duration: 1440
   }
 }

@@ -1,0 +1,121 @@
+Model shelfoptix_store_scan_sample {
+  type: 'table'
+  label: 'Shelfoptix store scan sample'
+  description: ''
+  data_source_name: 'demo_bigquery'
+  dimension retailer_id {
+    label: 'Retailer id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.retailer_id }};;
+  }
+  dimension store_id_no {
+    label: 'Store id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_id_no }};;
+  }
+  dimension store_no {
+    label: 'Store no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.store_no }};;
+  }
+  dimension order_control_id_no {
+    label: 'Order control id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_control_id_no }};;
+  }
+  dimension scanned_upc {
+    label: 'Scanned upc'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.scanned_upc }};;
+  }
+  dimension order_date {
+    label: 'Order date'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_date }};;
+  }
+  dimension order_line_item_no {
+    label: 'Order line item no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_line_item_no }};;
+  }
+  dimension order_line_type {
+    label: 'Order line type'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_line_type }};;
+  }
+  dimension upc_no {
+    label: 'Upc no'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.upc_no }};;
+  }
+  dimension class_id_no {
+    label: 'Class id no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.class_id_no }};;
+  }
+  dimension class_description {
+    label: 'Class description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.class_description }};;
+  }
+  dimension primary_sku_no {
+    label: 'Primary sku no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_sku_no }};;
+  }
+  dimension primary_sku_description {
+    label: 'Primary sku description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.primary_sku_description }};;
+  }
+  dimension item_sku_no {
+    label: 'Item sku no'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.item_sku_no }};;
+  }
+  dimension item_sku_description {
+    label: 'Item sku description'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.item_sku_description }};;
+  }
+  dimension stocking_quantity {
+    label: 'Stocking quantity'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.stocking_quantity }};;
+  }
+
+  owner: 'dong.ln@holistics.io'
+  table_name: '${schema_name}.store_scan_sample'
+}

@@ -1,0 +1,102 @@
+// P&G RetailFocus — Shelf Availability Executive Summary, rebuilt in Holistics.
+//
+// Replicates the customer's own "RetailFocus | Shelf Availability Executive Summary"
+// dashboard (export v20260803_MDM) on their real numbers.
+//
+// The two OSA definitions were recovered from the embedded chart data in that export
+// and verified against all 40 rows with zero mismatches:
+//
+//   base_osa_pct = instock_ct / observed_ct
+//   adj_osa_pct  = (instock_ct - ghost_ct) / observed_ct
+//
+// Defining them here rather than in each widget is the whole point: one governed
+// definition, reused by every chart, dashboard and AI answer.
+//
+// The two models describe DIFFERENT populations (all reporting stores vs the matched
+// test/control arms), so they are deliberately not related. Each chart uses one or the
+// other; combining fields across them would be meaningless.
+Dataset shelfoptix_pg_exec {
+  label: 'ShelfOptix — P&G Exec Summary'
+  description: 'On-shelf availability for the P&G RetailFocus programme: weekly trend for all reporting stores, plus the treated/control arm comparison. Base OSA counts every in-stock facing; Adjusted OSA removes phantom (ghost) inventory.'
+  data_source_name: 'demo_bigquery'
+  models: [
+    shelfoptix_pg_osa_weekly,
+    shelfoptix_pg_osa_weekly_arms
+  ]
+  relationships: []
+
+  // ---- overall population ------------------------------------------------
+  metric observed_facings {
+    label: 'Observed Facings'
+    type: 'number'
+    description: 'Facings scanned. Denominator for both OSA measures.'
+    definition: @aql sum(shelfoptix_pg_osa_weekly.observed_ct) ;;
+  }
+  metric instock_facings {
+    label: 'In-Stock Facings'
+    type: 'number'
+    definition: @aql sum(shelfoptix_pg_osa_weekly.instock_ct) ;;
+  }
+  metric oos_facings {
+    label: 'OOS Facings'
+    type: 'number'
+    definition: @aql sum(shelfoptix_pg_osa_weekly.oos_ct) ;;
+  }
+  metric ghost_facings {
+    label: 'Ghost Facings'
+    type: 'number'
+    description: 'Phantom inventory: system says in stock, the shelf scan disagrees.'
+    definition: @aql sum(shelfoptix_pg_osa_weekly.ghost_ct) ;;
+  }
+  metric negoh_facings {
+    label: 'Negative On-Hand Facings'
+    type: 'number'
+    definition: @aql sum(shelfoptix_pg_osa_weekly.negoh_ct) ;;
+  }
+  metric stores_reporting {
+    label: 'Stores Reporting'
+    type: 'number'
+    description: 'Stores in the reporting population. Max, not sum, because the count is already per week.'
+    definition: @aql max(shelfoptix_pg_osa_weekly.store_count) ;;
+  }
+  metric base_osa_pct {
+    label: 'Base OSA %'
+    type: 'number'
+    description: 'In-stock facings / observed facings. The headline availability number before phantom inventory is removed.'
+    definition: @aql (sum(shelfoptix_pg_osa_weekly.instock_ct) * 100.0) / sum(shelfoptix_pg_osa_weekly.observed_ct) ;;
+  }
+  metric adj_osa_pct {
+    label: 'Adjusted OSA %'
+    type: 'number'
+    description: '(In-stock facings - ghost facings) / observed facings. Availability once phantom inventory is discounted. This is the number that reflects what a shopper actually finds.'
+    definition: @aql ((sum(shelfoptix_pg_osa_weekly.instock_ct) - sum(shelfoptix_pg_osa_weekly.ghost_ct)) * 100.0) / sum(shelfoptix_pg_osa_weekly.observed_ct) ;;
+  }
+  metric ghost_drag_pts {
+    label: 'Phantom Drag (pts)'
+    type: 'number'
+    description: 'Base OSA % minus Adjusted OSA %: how many percentage points of stated availability are phantom.'
+    definition: @aql (sum(shelfoptix_pg_osa_weekly.ghost_ct) * 100.0) / sum(shelfoptix_pg_osa_weekly.observed_ct) ;;
+  }
+
+  // ---- treated / control arms -------------------------------------------
+  metric arm_base_osa_pct {
+    label: 'Base OSA % (by Arm)'
+    type: 'number'
+    definition: @aql (sum(shelfoptix_pg_osa_weekly_arms.instock_ct) * 100.0) / sum(shelfoptix_pg_osa_weekly_arms.observed_ct) ;;
+  }
+  metric arm_adj_osa_pct {
+    label: 'Adjusted OSA % (by Arm)'
+    type: 'number'
+    definition: @aql ((sum(shelfoptix_pg_osa_weekly_arms.instock_ct) - sum(shelfoptix_pg_osa_weekly_arms.ghost_ct)) * 100.0) / sum(shelfoptix_pg_osa_weekly_arms.observed_ct) ;;
+  }
+  metric arm_matched_pairs {
+    label: 'Matched Pairs'
+    type: 'number'
+    definition: @aql sum(shelfoptix_pg_osa_weekly_arms.pair_count) ;;
+  }
+  metric arm_stores {
+    label: 'Stores in Arm'
+    type: 'number'
+    definition: @aql max(shelfoptix_pg_osa_weekly_arms.store_count) ;;
+  }
+}

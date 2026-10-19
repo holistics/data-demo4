@@ -1,0 +1,76 @@
+Model lb_dim_game {
+  type: 'table'
+  label: 'Dim Game'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_game"'
+
+  dimension game_key {
+    label: 'Game Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.game_key }};;
+  }
+  dimension game_code {
+    label: 'Game Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.game_code }};;
+  }
+  dimension game_name {
+    label: 'Game Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.game_name }};;
+  }
+  dimension studio_name {
+    label: 'Studio Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.studio_name }};;
+  }
+  dimension genre {
+    label: 'Genre'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.genre }};;
+  }
+  dimension lifecycle_status {
+    label: 'Lifecycle Status'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.lifecycle_status }};;
+  }
+  dimension launch_date {
+    label: 'Launch Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.launch_date }};;
+  }
+  dimension reporting_currency_code {
+    label: 'Reporting Currency Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reporting_currency_code }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension updated_at {
+    label: 'Updated At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.updated_at }};;
+  }
+}

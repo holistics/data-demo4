@@ -1,0 +1,70 @@
+Model lb_dim_device {
+  type: 'table'
+  label: 'Dim Device'
+  description: ''
+  data_source_name: 'demo_prospect_poc'
+  owner: 'chukwudi@holistics.io'
+  table_name: '"lowbyte_studio"."dim_device"'
+
+  dimension device_key {
+    label: 'Device Key'
+    type: 'number'
+    hidden: false
+    primary_key: true
+    definition: @sql {{ #SOURCE.device_key }};;
+  }
+  dimension device_natural_key {
+    label: 'Device Natural Key'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.device_natural_key }};;
+  }
+  dimension platform_key {
+    label: 'Platform Key'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.platform_key }};;
+  }
+  dimension device_category {
+    label: 'Device Category'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.device_category }};;
+  }
+  dimension manufacturer {
+    label: 'Manufacturer'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.manufacturer }};;
+  }
+  dimension model_name {
+    label: 'Model Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.model_name }};;
+  }
+  dimension os_name {
+    label: 'Os Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.os_name }};;
+  }
+  dimension os_version {
+    label: 'Os Version'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.os_version }};;
+  }
+  dimension locale_code {
+    label: 'Locale Code'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.locale_code }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+}

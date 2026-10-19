@@ -1,0 +1,98 @@
+// =====================================================================
+// Dedicated date spine for the fiscal-year PoC.
+//
+// This folder shares no AML object with `solution-a-shifted-date/` or
+// `solution-c-date-dimension/`, and it does not extend the shared
+// `dim_dates` either — it carries its own spine so the folder can be
+// opened, deployed and demoed on its own.
+//
+// ---------------------------------------------------------------------
+// This is the ONE thing on the AQL path that AQL cannot do
+// ---------------------------------------------------------------------
+// AQL queries rows; it cannot manufacture them. A calendar needs one
+// row per day whether or not a fact exists on that day, so the spine
+// has to come from somewhere: an existing date dimension the customer
+// already has, or the `generate_series` below. Everything ABOVE the
+// spine — the fiscal calendar, the relative windows, the reporting
+// grain — is pure AQL in `seed_fy_poc_dates_aql`.
+//
+// There is no fiscal logic in this file. It does not know when Seed's
+// year starts. It emits a calendar and nothing else.
+//
+// ---------------------------------------------------------------------
+// Why the parts are to_char() text and not date functions
+// ---------------------------------------------------------------------
+// The sibling solution folders document that Holistics date functions
+// applied to a DATE column are off by a whole month: the column is cast
+// to timestamptz and shifted by the tenant timezone, which rolls month
+// starts back into the previous month. These columns are evaluated in
+// the warehouse on the raw date, so they carry no such distortion, and
+// the AQL model does all its period arithmetic over them.
+//
+// Zero-padded throughout, so alphabetical order is chronological order.
+// =====================================================================
+Model seed_fy_poc_date_spine {
+  type: 'query'
+  label: 'Seed FY PoC — Date Spine'
+  description: 'One row per day for the last three years. Plain calendar parts as warehouse-side to_char() text. No fiscal logic.'
+  data_source_name: 'demodb'
+
+  query: @sql
+    SELECT
+      CAST(date_spine.date_key AS DATE)                AS date_key,
+      TO_CHAR(date_spine.date_key, 'YYYY')             AS year,
+      TO_CHAR(date_spine.date_key, 'MM')               AS month_number,
+      TO_CHAR(date_spine.date_key, 'DD')               AS day_of_month,
+      TO_CHAR(date_spine.date_key, 'YYYY-MM')          AS year_month,
+      TO_CHAR(date_spine.date_key, 'Mon')              AS month_name_abbr,
+      TO_CHAR(date_spine.date_key, 'IYYY')
+        || '-W' || TO_CHAR(date_spine.date_key, 'IW')  AS year_week_iso
+    FROM generate_series(
+      CURRENT_DATE - INTERVAL '3 years',
+      CURRENT_DATE,
+      '1 day'::interval
+    ) AS date_spine(date_key)
+  ;;
+
+  dimension date_key {
+    label: 'Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.date_key }} ;;
+  }
+
+  dimension year {
+    label: 'Year'
+    type: 'text'
+    definition: @sql {{ #SOURCE.year }} ;;
+  }
+
+  dimension month_number {
+    label: 'Month Number'
+    type: 'text'
+    definition: @sql {{ #SOURCE.month_number }} ;;
+  }
+
+  dimension day_of_month {
+    label: 'Day of Month'
+    type: 'text'
+    definition: @sql {{ #SOURCE.day_of_month }} ;;
+  }
+
+  dimension year_month {
+    label: 'Year-Month'
+    type: 'text'
+    definition: @sql {{ #SOURCE.year_month }} ;;
+  }
+
+  dimension month_name_abbr {
+    label: 'Month Name (Abbr)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.month_name_abbr }} ;;
+  }
+
+  dimension year_week_iso {
+    label: 'Year-Week (ISO)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.year_week_iso }} ;;
+  }
+}
