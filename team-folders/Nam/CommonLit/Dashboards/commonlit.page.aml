@@ -1416,7 +1416,7 @@ Cumulative teachers who have used each feature since launch (features launched s
     label: 'CommonLit'
     tab leadership: CanvasLayout {
       label: 'Leadership'
-      width: 1220
+      width: 1400
       height: 2060
       grid_size: 20
       auto_expand_vertically: true
@@ -1424,55 +1424,55 @@ Cumulative teachers who have used each feature since launch (features launched s
         mode: 'auto'
       }
       block l_t_header {
-        position: pos(20, 20, 1180, 120)
+        position: pos(20, 40, 1360, 120)
       }
       block f_school_year {
-        position: pos(20, 160, 280, 60)
+        position: pos(20, 180, 320, 60)
       }
       block f_state {
-        position: pos(325, 160, 285, 60)
+        position: pos(360, 180, 320, 60)
       }
       block f_district {
-        position: pos(630, 160, 285, 60)
+        position: pos(720, 180, 320, 60)
       }
       block f_program {
-        position: pos(935, 160, 265, 60)
+        position: pos(1080, 180, 300, 60)
       }
       block l_t_reach {
-        position: pos(20, 240, 1180, 60)
+        position: pos(20, 260, 1360, 60)
       }
       block l_tb_reach {
-        position: pos(20, 320, 1180, 220)
+        position: pos(20, 340, 1360, 240)
       }
       block l_c_teachers_month {
-        position: pos(20, 580, 580, 360)
+        position: pos(20, 600, 660, 360)
       }
       block l_c_assign_ytd {
-        position: pos(620, 580, 580, 360)
+        position: pos(700, 600, 680, 360)
       }
       block l_c_students_month {
-        position: pos(20, 960, 1180, 340)
+        position: pos(20, 980, 1360, 340)
       }
       block l_t_equity {
-        position: pos(20, 1320, 1180, 60)
+        position: pos(20, 1340, 1360, 60)
       }
       block l_tb_equity {
-        position: pos(20, 1400, 580, 240)
+        position: pos(20, 1420, 760, 240)
       }
       block l_c_title_i_month {
-        position: pos(620, 1400, 580, 240)
+        position: pos(800, 1420, 580, 240)
       }
       block l_t_partnerships {
-        position: pos(20, 1660, 1180, 100)
+        position: pos(20, 1680, 1360, 100)
       }
       block l_tb_partnerships {
-        position: pos(20, 1780, 580, 240)
+        position: pos(20, 1800, 760, 240)
       }
       block l_k_arr {
-        position: pos(620, 1780, 280, 240)
+        position: pos(800, 1800, 280, 240)
       }
       block l_k_arr_att {
-        position: pos(920, 1780, 280, 240)
+        position: pos(1100, 1800, 280, 240)
       }
       default_zoom: 1
       auto_expand_horizontally: true
