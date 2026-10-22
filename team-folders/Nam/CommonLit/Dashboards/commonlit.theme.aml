@@ -1,0 +1,221 @@
+// CommonLit theme — tokens taken from commonlit.org's Webflow design system (shared CSS):
+//   ink-950 #1f1727 (text), logo #292331, paper-50 #fffefc / paper-300 #f7f4ee (backgrounds),
+//   school-bus-400 #ffbf40 (primary button), brand ramps blue-gray / lavender / mint / pink.
+//   Fonts: Crimson Pro (serif headings), Open Sans (body). Radius sm 4px, lg 16px.
+const commonlit_theme_tokens = {
+  ink: "#1f1727",
+  ink_800: "#413a47",
+  ink_700: "#57515c",
+  ink_500: "#847f86",
+  paper: "#fffefc",
+  paper_300: "#f7f4ee",
+  paper_500: "#ebe6dd",
+  border: "#e5e0d5",
+  school_bus: "#ffbf40",
+  school_bus_100: "#fef5e6",
+  blue_gray: "#3f6e79",
+  blue_gray_100: "#f4f8f9",
+  mint: "#7d9326",
+  mint_100: "#f4f7ea",
+  pink: "#d24b58",
+  pink_100: "#ffeff1",
+  font_body: "'Open Sans', system-ui, -apple-system, sans-serif",
+  font_serif: "'Crimson Pro', Georgia, serif"
+}
+
+ColorPalette commonlit_palette {
+  title: "CommonLit"
+  categorical {
+    colors: [
+      "#3f6e79",
+      "#ffaa00",
+      "#9f5aa4",
+      "#7d9326",
+      "#ff6171",
+      "#6bb2c3",
+      "#996600",
+      "#c9a2cc"
+    ]
+  }
+}
+
+PageTheme commonlit_theme {
+  title: "CommonLit"
+  color {
+    data: commonlit_palette
+  }
+  background {
+    bg_color: commonlit_theme_tokens("paper_300")
+  }
+  canvas {
+    background {
+      bg_color: commonlit_theme_tokens("paper_300")
+    }
+    border {
+      border_width: 0
+      border_radius: 16
+      border_color: commonlit_theme_tokens("border")
+      border_style: "none"
+    }
+    shadow: "none"
+    opacity: 1
+  }
+  block {
+    background {
+      bg_color: commonlit_theme_tokens("paper")
+    }
+    border {
+      border_width: 1
+      border_style: "solid"
+      border_radius: 16
+      border_color: commonlit_theme_tokens("border")
+    }
+    shadow: "none"
+    padding: 16
+    opacity: 1
+    label {
+      font_family: commonlit_theme_tokens("font_serif")
+      font_size: 19
+      font_color: commonlit_theme_tokens("ink")
+      font_weight: "semibold"
+      font_style: "normal"
+    }
+    text {
+      font_family: commonlit_theme_tokens("font_body")
+      font_size: 13
+      font_color: commonlit_theme_tokens("ink_700")
+      font_weight: "normal"
+      font_style: "normal"
+    }
+  }
+  viz {
+    table {
+      general {
+        bg_color: commonlit_theme_tokens("paper")
+        font_color: commonlit_theme_tokens("ink_800")
+        font_family: commonlit_theme_tokens("font_body")
+        font_size: 13
+        border_color: commonlit_theme_tokens("border")
+        grid_color: commonlit_theme_tokens("border")
+        border_width: 1
+        hover_color: commonlit_theme_tokens("school_bus_100")
+        banding_color: "#fcfbf5"
+        cell_padding: DetailedSpacing {
+          top: 8
+          right: 12
+          bottom: 8
+          left: 12
+        }
+        borders {
+          outer: true
+          vertical: false
+          horizontal: true
+          header: true
+          row_header: false
+        }
+      }
+      header {
+        bg_color: commonlit_theme_tokens("ink")
+        font_color: "#ffffff"
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: commonlit_theme_tokens("paper_500")
+        font_color: commonlit_theme_tokens("ink")
+        font_size: 12
+        font_weight: "medium"
+      }
+      sub_title {
+        font_color: commonlit_theme_tokens("ink_500")
+        font_size: 12
+        font_weight: "medium"
+      }
+      sparkline {
+        line {
+          color: commonlit_theme_tokens("blue_gray")
+        }
+        column {
+          color: commonlit_theme_tokens("blue_gray")
+        }
+      }
+    }
+    metric_kpi {
+      alignment: "left"
+      label {
+        font_family: commonlit_theme_tokens("font_body")
+        font_size: 13
+        font_color: commonlit_theme_tokens("ink_700")
+      }
+      value {
+        font_family: commonlit_theme_tokens("font_serif")
+        font_size: 40
+        font_color: commonlit_theme_tokens("ink")
+      }
+      progress {
+        indicator {
+          bg_color: commonlit_theme_tokens("school_bus")
+        }
+        track {
+          bg_color: commonlit_theme_tokens("paper_500")
+        }
+        text {
+          font_color: commonlit_theme_tokens("ink_700")
+        }
+      }
+      trend {
+        positive {
+          text {
+            font_color: commonlit_theme_tokens("mint")
+            font_weight: "medium"
+          }
+          background {
+            bg_color: commonlit_theme_tokens("mint_100")
+          }
+        }
+        negative {
+          text {
+            font_color: commonlit_theme_tokens("pink")
+            font_weight: "medium"
+          }
+          background {
+            bg_color: commonlit_theme_tokens("pink_100")
+          }
+        }
+        neutral {
+          text {
+            font_color: commonlit_theme_tokens("ink_700")
+            font_weight: "normal"
+          }
+          background {
+            bg_color: commonlit_theme_tokens("paper_300")
+          }
+        }
+      }
+    }
+  }
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@500;600;700&family=Open+Sans:wght@400;600;700&display=swap');
+    .dac-text-block {
+      font-family: 'Open Sans', system-ui, sans-serif;
+      font-size: 14px;
+      color: #57515c;
+      line-height: 1.55;
+    }
+    .dac-text-block h1, .dac-text-block h2, .dac-text-block h3 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      color: #1f1727;
+      font-weight: 600;
+      line-height: 1.1;
+      margin: 0 0 .3em;
+    }
+    .dac-text-block h1 { font-size: 34px; }
+    .dac-text-block h2 {
+      font-size: 24px;
+      display: inline-block;
+      padding-bottom: 2px;
+      border-bottom: 4px solid #ffbf40;
+    }
+    .dac-text-block p { margin: 0; }
+  ;;
+}

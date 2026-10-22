@@ -1,0 +1,13 @@
+// Column-level masking for CommonLit PII / sensitive student fields.
+// Viewers whose `pii_access` user attribute is 1 see raw values; everyone else sees 'Restricted'.
+// Pattern: https://docs.holistics.io/docs/access-control/column-level-permission
+
+Func commonlit_mask_text(col: String) {
+  if (H.current_user.pii_access == 1) { '{{ #SOURCE.' + col + ' }}' } else { "'Restricted'" }
+}
+
+Func commonlit_mask_bool(col: String, yes: String, no: String) {
+  if (H.current_user.pii_access == 1) {
+    "case when {{ #SOURCE." + col + " }} then '" + yes + "' else '" + no + "' end"
+  } else { "'Restricted'" }
+}

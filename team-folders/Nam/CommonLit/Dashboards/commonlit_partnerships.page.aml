@@ -1,0 +1,564 @@
+Dashboard commonlit_partnerships {
+  title: 'CommonLit · Partnerships'
+  description: 'Pilot usage and at-risk accounts for the Partnerships and Customer Success teams. CSMs see only their own accounts (row-level permission on CSM).'
+  theme: commonlit_theme
+
+  block t_header: TextBlock {
+    content: @md
+# Partnerships
+
+How pilots are using CommonLit 360, and which partner accounts need attention before renewal.;;
+  }
+
+  block f_school_year: FilterBlock {
+    label: 'School Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_partnerships_health
+      field: r(dates.school_year)
+    }
+    default {
+      operator: 'is'
+      value: '2026-27'
+    }
+  }
+
+  block f_state: FilterBlock {
+    label: 'State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_partnerships_health
+      field: r(states.state_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block f_district: FilterBlock {
+    label: 'District'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_partnerships_health
+      field: r(districts.district_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block f_program: FilterBlock {
+    label: 'Program Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_partnerships_health
+      field: r(accounts.program_status)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block k_arr: VizBlock {
+    label: 'Partner ARR'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.arr)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_partners: VizBlock {
+    label: 'Active Partners'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.active_partners)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_pilots: VizBlock {
+    label: 'Active Pilots'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.active_pilots)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_at_risk: VizBlock {
+    label: 'At-Risk Accounts (Red)'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.at_risk_accounts)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_arr_risk: VizBlock {
+    label: 'ARR at Risk'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.arr_at_risk)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_watch: VizBlock {
+    label: 'Watch List (Yellow)'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.watch_accounts)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_renewal: VizBlock {
+    label: 'Renewal Rate'
+    description: 'Closed-won ÷ closed renewals with a close date in the selected school year.'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.renewal_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_pilot_conv: VizBlock {
+    label: 'Pilot Conversion Rate'
+    description: 'Closed-won ÷ closed pilot conversions with a close date in the selected school year.'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.pilot_conversion_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block t_pilot: TextBlock {
+    content: @md
+## Pilot usage;;
+  }
+
+  block c_pilot_teachers: VizBlock {
+    label: 'Pilot Teachers: Licensed vs Active by Month'
+    viz: ColumnChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.licensed_teachers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.account_active_teachers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+      }
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: ['Active Pilot']
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_pilot_adoption: VizBlock {
+    label: 'Pilot Teacher Adoption Rate by Month'
+    viz: LineChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.teacher_adoption_rate)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7d9326'
+          }
+        }
+      }
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: ['Active Pilot']
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block tb_pilots: VizBlock {
+    label: 'Active Pilots'
+    description: 'Teacher adoption and health over the selected school year; lowest adoption first.'
+    viz: DataTable {
+      dataset: commonlit_partnerships_health
+      fields: [
+        r(accounts.account_name),
+        r(accounts.csm_name),
+        r(accounts.segment),
+        r(states.state_name),
+        r(accounts.pilot_start_date),
+        r(accounts.pilot_end_date),
+        r(commonlit_partnerships_health.teacher_adoption_rate),
+        r(commonlit_partnerships_health.avg_health_score),
+        r(commonlit_partnerships_health.latest_health_status)
+      ]
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: ['Active Pilot']
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'teacher_adoption_rate'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  block t_risk: TextBlock {
+    content: @md
+## At-risk accounts
+
+Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
+  }
+
+  block tb_at_risk: VizBlock {
+    label: 'Partner Accounts at Risk (latest health Red or Yellow)'
+    viz: DataTable {
+      dataset: commonlit_partnerships_health
+      fields: [
+        r(accounts.account_name),
+        r(accounts.csm_name),
+        r(accounts.segment),
+        r(states.state_name),
+        r(accounts.next_renewal_date),
+        r(commonlit_fct_account_health_monthly.health_status),
+        r(commonlit_partnerships_health.latest_health_score),
+        r(commonlit_partnerships_health.arr_latest_health)
+      ]
+      filter {
+        field: r(commonlit_fct_account_health_monthly.is_latest_month)
+        operator: 'is'
+        value: true
+      }
+      filter {
+        field: r(commonlit_fct_account_health_monthly.health_status)
+        operator: 'is'
+        value: ['Red', 'Yellow']
+      }
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: ['Active Partner']
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'latest_health_score'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  block c_risk_csm: VizBlock {
+    label: 'At-Risk Accounts by CSM'
+    viz: BarChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(accounts.csm_name)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.at_risk_accounts)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#d24b58'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.watch_accounts)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#ffaa00'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_health_mix: VizBlock {
+    label: 'Account Health Mix by Month'
+    viz: ColumnChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(commonlit_fct_account_health_monthly.health_status)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.accounts_reporting_health)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_school_year'
+      to: ['k_renewal', 'k_pilot_conv', 'c_pilot_teachers', 'c_pilot_adoption', 'tb_pilots', 'c_health_mix']
+      field: r(dates.school_year)
+    },
+    FilterInteraction {
+      from: 'f_state'
+      to: ['k_arr', 'k_partners', 'k_pilots', 'k_at_risk', 'k_arr_risk', 'k_watch', 'k_renewal', 'k_pilot_conv', 'c_pilot_teachers', 'c_pilot_adoption', 'tb_pilots', 'tb_at_risk', 'c_risk_csm', 'c_health_mix']
+      field: r(states.state_name)
+    },
+    FilterInteraction {
+      from: 'f_district'
+      to: ['k_arr', 'k_partners', 'k_pilots', 'k_at_risk', 'k_arr_risk', 'k_watch', 'k_renewal', 'k_pilot_conv', 'c_pilot_teachers', 'c_pilot_adoption', 'tb_pilots', 'tb_at_risk', 'c_risk_csm', 'c_health_mix']
+      field: r(districts.district_name)
+    },
+    FilterInteraction {
+      from: 'f_program'
+      to: ['k_arr', 'k_partners', 'k_pilots', 'k_at_risk', 'k_arr_risk', 'k_watch', 'k_renewal', 'k_pilot_conv', 'c_pilot_teachers', 'c_pilot_adoption', 'tb_pilots', 'tb_at_risk', 'c_risk_csm', 'c_health_mix']
+      field: r(accounts.program_status)
+    }
+  ]
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 2460
+    grid_size: 20
+    auto_expand_vertically: true
+    block t_header {
+      position: pos(20, 20, 1180, 120)
+    }
+    block f_school_year {
+      position: pos(20, 160, 285, 80)
+    }
+    block f_state {
+      position: pos(325, 160, 285, 80)
+    }
+    block f_district {
+      position: pos(630, 160, 285, 80)
+    }
+    block f_program {
+      position: pos(935, 160, 265, 80)
+    }
+    block k_arr {
+      position: pos(20, 260, 285, 140)
+    }
+    block k_partners {
+      position: pos(325, 260, 285, 140)
+    }
+    block k_pilots {
+      position: pos(630, 260, 285, 140)
+    }
+    block k_at_risk {
+      position: pos(935, 260, 265, 140)
+    }
+    block k_arr_risk {
+      position: pos(20, 420, 285, 140)
+    }
+    block k_watch {
+      position: pos(325, 420, 285, 140)
+    }
+    block k_renewal {
+      position: pos(630, 420, 285, 140)
+    }
+    block k_pilot_conv {
+      position: pos(935, 420, 265, 140)
+    }
+    block t_pilot {
+      position: pos(20, 580, 1180, 60)
+    }
+    block c_pilot_teachers {
+      position: pos(20, 660, 580, 340)
+    }
+    block c_pilot_adoption {
+      position: pos(620, 660, 580, 340)
+    }
+    block tb_pilots {
+      position: pos(20, 1020, 1180, 420)
+    }
+    block t_risk {
+      position: pos(20, 1460, 1180, 100)
+    }
+    block tb_at_risk {
+      position: pos(20, 1580, 1180, 480)
+    }
+    block c_risk_csm {
+      position: pos(20, 2080, 580, 340)
+    }
+    block c_health_mix {
+      position: pos(620, 2080, 580, 340)
+    }
+  }
+
+  settings {
+    autorun_on_open: true
+  }
+}

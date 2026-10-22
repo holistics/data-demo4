@@ -1,0 +1,418 @@
+Dashboard commonlit_content {
+  title: 'CommonLit · Content Performance'
+  description: 'Lesson performance for the Library and Assessments team: what gets assigned, completed and how students score.'
+  theme: commonlit_theme
+
+  block t_header: TextBlock {
+    content: @md
+# Content Performance
+
+Which lessons teachers assign, how many students finish them, and where scores say a lesson needs work.;;
+  }
+
+  block f_school_year: FilterBlock {
+    label: 'School Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_content_performance
+      field: r(dates.school_year)
+    }
+    default {
+      operator: 'is'
+      value: '2025-26'
+    }
+  }
+
+  block f_state: FilterBlock {
+    label: 'State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_content_performance
+      field: r(states.state_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block f_district: FilterBlock {
+    label: 'District'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_content_performance
+      field: r(districts.district_name)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block f_program: FilterBlock {
+    label: 'Program Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_content_performance
+      field: r(school_program_years.program_status)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+
+  block k_assigned: VizBlock {
+    label: 'Times Assigned'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.times_assigned)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_subs: VizBlock {
+    label: 'Submissions'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.submissions)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_score: VizBlock {
+    label: 'Avg Score'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.avg_score)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_completion: VizBlock {
+    label: 'Completion Rate'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.completion_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block k_new: VizBlock {
+    label: 'New Releases Assigned'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.new_releases_assigned)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block t_improve: TextBlock {
+    content: @md
+## Lessons to improve
+
+Lowest average score first, among lessons assigned at least 20 times in the period.;;
+  }
+
+  block tb_improve: VizBlock {
+    label: 'Lessons to Improve'
+    viz: DataTable {
+      dataset: commonlit_content_performance
+      fields: [
+        r(content.title),
+        r(content.collection),
+        r(content.content_type),
+        r(content.grade_level),
+        r(content.lexile),
+        r(commonlit_content_performance.times_assigned),
+        r(commonlit_content_performance.submissions),
+        r(commonlit_content_performance.avg_score),
+        r(commonlit_content_performance.completion_rate)
+      ]
+      filter {
+        field: r(commonlit_content_performance.times_assigned)
+        operator: 'greater_than'
+        value: '19'
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'avg_score'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  block c_histogram: VizBlock {
+    label: 'Score Distribution (Submissions by Score Bucket)'
+    description: 'Submissions grouped into 10-point score buckets (0 = 0-9%, 90 = 90-99%, 100 = perfect).'
+    viz: ColumnChart {
+      dataset: commonlit_content_performance
+      x_axis: VizFieldFull {
+        ref: r(commonlit_fct_student_submissions.score_bucket)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.submissions)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block c_score_collection: VizBlock {
+    label: 'Avg Score and Completion by Collection'
+    viz: BarChart {
+      dataset: commonlit_content_performance
+      x_axis: VizFieldFull {
+        ref: r(content.collection)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.avg_score)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.completion_rate)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7d9326'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block c_assigned_month: VizBlock {
+    label: 'Times Assigned by Month and Collection'
+    viz: ColumnChart {
+      dataset: commonlit_content_performance
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(content.collection)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.times_assigned)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  block tb_new: VizBlock {
+    label: 'New Releases: Early Performance'
+    viz: DataTable {
+      dataset: commonlit_content_performance
+      fields: [
+        r(content.title),
+        r(content.collection),
+        r(content.publish_date),
+        r(commonlit_content_performance.times_assigned),
+        r(commonlit_content_performance.avg_score),
+        r(commonlit_content_performance.completion_rate)
+      ]
+      filter {
+        field: r(content.is_new_release)
+        operator: 'is'
+        value: true
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'times_assigned'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_school_year'
+      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      field: r(dates.school_year)
+    },
+    FilterInteraction {
+      from: 'f_state'
+      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      field: r(states.state_name)
+    },
+    FilterInteraction {
+      from: 'f_district'
+      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      field: r(districts.district_name)
+    },
+    FilterInteraction {
+      from: 'f_program'
+      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      field: r(school_program_years.program_status)
+    }
+  ]
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 2280
+    grid_size: 20
+    auto_expand_vertically: true
+    block t_header {
+      position: pos(20, 20, 1180, 120)
+    }
+    block f_school_year {
+      position: pos(20, 160, 285, 80)
+    }
+    block f_state {
+      position: pos(325, 160, 285, 80)
+    }
+    block f_district {
+      position: pos(630, 160, 285, 80)
+    }
+    block f_program {
+      position: pos(935, 160, 265, 80)
+    }
+    block k_assigned {
+      position: pos(20, 260, 220, 140)
+    }
+    block k_subs {
+      position: pos(260, 260, 220, 140)
+    }
+    block k_score {
+      position: pos(500, 260, 220, 140)
+    }
+    block k_completion {
+      position: pos(740, 260, 220, 140)
+    }
+    block k_new {
+      position: pos(980, 260, 220, 140)
+    }
+    block t_improve {
+      position: pos(20, 420, 1180, 100)
+    }
+    block tb_improve {
+      position: pos(20, 540, 1180, 520)
+    }
+    block c_histogram {
+      position: pos(20, 1080, 580, 360)
+    }
+    block c_score_collection {
+      position: pos(620, 1080, 580, 360)
+    }
+    block c_assigned_month {
+      position: pos(20, 1460, 1180, 360)
+    }
+    block tb_new {
+      position: pos(20, 1840, 1180, 400)
+    }
+  }
+
+  settings {
+    autorun_on_open: true
+  }
+}

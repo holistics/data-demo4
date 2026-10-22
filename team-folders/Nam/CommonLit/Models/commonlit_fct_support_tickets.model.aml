@@ -1,0 +1,98 @@
+Model commonlit_fct_support_tickets {
+  type: 'table'
+  label: "Support Tickets"
+  description: "User Support tickets from teachers."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_support_tickets"'
+
+  dimension ticket_id {
+    label: "Ticket Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.ticket_id }};;
+    primary_key: true
+  }
+
+  dimension teacher_id {
+    label: "Teacher Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.teacher_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension created_date {
+    label: "Created Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.created_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension channel {
+    label: "Channel"
+    type: 'text'
+    definition: @sql {{ #SOURCE.channel }};;
+  }
+
+  dimension category {
+    label: "Category"
+    type: 'text'
+    definition: @sql {{ #SOURCE.category }};;
+  }
+
+  dimension priority {
+    label: "Priority"
+    type: 'text'
+    definition: @sql {{ #SOURCE.priority }};;
+  }
+
+  dimension status {
+    label: "Status"
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+  }
+
+  dimension first_response_hours {
+    label: "First Response (hrs)"
+    type: 'number'
+    definition: @sql {{ #SOURCE.first_response_hours }};;
+    format: '#,###0.0'
+  }
+
+  dimension resolution_hours {
+    label: "Resolution (hrs)"
+    type: 'number'
+    definition: @sql {{ #SOURCE.resolution_hours }};;
+    format: '#,###0.0'
+  }
+
+  dimension csat_score {
+    label: "CSAT Score"
+    type: 'number'
+    description: "Customer satisfaction score left by the teacher (1-5)."
+    definition: @sql {{ #SOURCE.csat_score }};;
+    format: '#,###'
+  }
+
+  dimension school_year {
+    label: "School Year (derived)"
+    type: 'text'
+    description: "School year of created_date, derived with the same Jul 1 - Jun 30 rule as Dates.school_year. Used only to build the program-year key; filter on Dates.school_year instead."
+    hidden: true
+    definition: @sql case when extract(month from {{ #SOURCE.created_date }}) >= 7 then extract(year from {{ #SOURCE.created_date }})::int::text || '-' || lpad(((extract(year from {{ #SOURCE.created_date }})::int + 1) % 100)::text, 2, '0') else (extract(year from {{ #SOURCE.created_date }})::int - 1)::text || '-' || lpad((extract(year from {{ #SOURCE.created_date }})::int % 100)::text, 2, '0') end;;
+  }
+
+  dimension program_year_key {
+    label: "Program Year Key"
+    type: 'text'
+    description: "school_id|school_year. Joins this fact to School Program Years (composite key school_id + school_year)."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }}::text || '|' || (case when extract(month from {{ #SOURCE.created_date }}) >= 7 then extract(year from {{ #SOURCE.created_date }})::int::text || '-' || lpad(((extract(year from {{ #SOURCE.created_date }})::int + 1) % 100)::text, 2, '0') else (extract(year from {{ #SOURCE.created_date }})::int - 1)::text || '-' || lpad((extract(year from {{ #SOURCE.created_date }})::int % 100)::text, 2, '0') end);;
+  }
+}

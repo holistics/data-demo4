@@ -1,0 +1,56 @@
+Model commonlit_fct_org_goals {
+  type: 'table'
+  label: "Org Goals"
+  description: "Organization-wide annual targets for the Leadership scorecard. Actuals come from the fact tables."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_org_goals"'
+
+  dimension school_year {
+    label: "School Year"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_year }};;
+  }
+
+  dimension metric_key {
+    label: "Metric Key"
+    type: 'text'
+    description: "Machine key of the goal; matches a metric in the Leadership Scorecard dataset."
+    definition: @sql {{ #SOURCE.metric_key }};;
+  }
+
+  dimension metric_name {
+    label: "Metric Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.metric_name }};;
+  }
+
+  dimension owner_team {
+    label: "Owner Team"
+    type: 'text'
+    definition: @sql {{ #SOURCE.owner_team }};;
+  }
+
+  dimension unit {
+    label: "Unit"
+    type: 'text'
+    description: "Unit of the target: students, teachers, submissions, usd, percent or hours."
+    definition: @sql {{ #SOURCE.unit }};;
+  }
+
+  dimension target_value {
+    label: "Target Value"
+    type: 'number'
+    description: "Annual target. Percent targets are stored as 0-1."
+    definition: @sql {{ #SOURCE.target_value }};;
+    format: '#,###0.##'
+  }
+
+  dimension goal_key {
+    label: "Goal Key"
+    type: 'text'
+    description: "Surrogate primary key school_year|metric_key."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_year }} || '|' || {{ #SOURCE.metric_key }};;
+    primary_key: true
+  }
+}

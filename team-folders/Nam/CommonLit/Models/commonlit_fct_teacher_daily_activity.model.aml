@@ -1,0 +1,88 @@
+Model commonlit_fct_teacher_daily_activity {
+  type: 'table'
+  label: "Teacher Daily Activity"
+  description: "One row per teacher per day with any activity. An \"active teacher\" in a period = distinct teacher_id with a row in that period."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_teacher_daily_activity"'
+
+  dimension teacher_id {
+    label: "Teacher Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.teacher_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension activity_date {
+    label: "Activity Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.activity_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension sessions {
+    label: "Sessions"
+    type: 'number'
+    definition: @sql {{ #SOURCE.sessions }};;
+    format: '#,###'
+  }
+
+  dimension minutes_active {
+    label: "Minutes Active"
+    type: 'number'
+    definition: @sql {{ #SOURCE.minutes_active }};;
+    format: '#,###'
+  }
+
+  dimension assignments_created {
+    label: "Assignments Created"
+    type: 'number'
+    definition: @sql {{ #SOURCE.assignments_created }};;
+    format: '#,###'
+  }
+
+  dimension reports_viewed {
+    label: "Reports Viewed"
+    type: 'number'
+    definition: @sql {{ #SOURCE.reports_viewed }};;
+    format: '#,###'
+  }
+
+  dimension feedback_comments {
+    label: "Feedback Comments"
+    type: 'number'
+    definition: @sql {{ #SOURCE.feedback_comments }};;
+    format: '#,###'
+  }
+
+  dimension school_year {
+    label: "School Year (derived)"
+    type: 'text'
+    description: "School year of activity_date, derived with the same Jul 1 - Jun 30 rule as Dates.school_year. Used only to build the program-year key; filter on Dates.school_year instead."
+    hidden: true
+    definition: @sql case when extract(month from {{ #SOURCE.activity_date }}) >= 7 then extract(year from {{ #SOURCE.activity_date }})::int::text || '-' || lpad(((extract(year from {{ #SOURCE.activity_date }})::int + 1) % 100)::text, 2, '0') else (extract(year from {{ #SOURCE.activity_date }})::int - 1)::text || '-' || lpad((extract(year from {{ #SOURCE.activity_date }})::int % 100)::text, 2, '0') end;;
+  }
+
+  dimension program_year_key {
+    label: "Program Year Key"
+    type: 'text'
+    description: "school_id|school_year. Joins this fact to School Program Years (composite key school_id + school_year)."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }}::text || '|' || (case when extract(month from {{ #SOURCE.activity_date }}) >= 7 then extract(year from {{ #SOURCE.activity_date }})::int::text || '-' || lpad(((extract(year from {{ #SOURCE.activity_date }})::int + 1) % 100)::text, 2, '0') else (extract(year from {{ #SOURCE.activity_date }})::int - 1)::text || '-' || lpad((extract(year from {{ #SOURCE.activity_date }})::int % 100)::text, 2, '0') end);;
+  }
+
+  dimension activity_key {
+    label: "Activity Key"
+    type: 'text'
+    description: "Surrogate primary key teacher_id|activity_date."
+    hidden: true
+    definition: @sql {{ #SOURCE.teacher_id }}::text || '|' || {{ #SOURCE.activity_date }}::text;;
+    primary_key: true
+  }
+}

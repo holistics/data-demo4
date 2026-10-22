@@ -1,0 +1,69 @@
+# CommonLit — 45-minute PoC demo
+
+Demo for CommonLit, an edtech nonprofit (reading & writing curriculum). They are coming from
+Looker, moving business logic into dbt, and have about 115 staff, most of them non-technical. The demo shows
+Holistics semantic modelling, reusable metrics, row/column-level security and dashboards
+on a **synthetic** CommonLit warehouse.
+
+**Data source:** `demo_nam_commonlit` (Postgres on Neon, schema `"commonlit"."*"`, 20 tables).
+Never join these models onto `demodb` or any other source.
+
+**Naming:** dimension models use the bare table name without `dim_` (`accounts`, `schools`, `dates`, …;
+`dim_features` is `product_features` because `features` is taken elsewhere in the repo). Fact
+models, datasets, dashboards and the theme use the `commonlit_` prefix.
+
+**Validate:** `holistics aml validate` from the repo root after every edit.
+
+## Scope boundary
+
+Keep every change inside `team-folders/Nam/CommonLit/`. Do not touch `01 demo ecommerce/`,
+`library/`, `Datasets Library/`, `clients/`, or sibling folders under `team-folders/Nam/`.
+This PoC has no tenant-level AI routing in `settings/ai/context.aml`.
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| `Models/` | 20 table models, one per table, plus `commonlit_pii.aml` (column-masking functions) |
+| `Datasets/` | 6 datasets: teacher & student usage, partnerships & health, content performance, product adoption, assessments & growth, leadership scorecard |
+| `Dashboards/` | 4 canvas dashboards (partnerships, content, product, leadership) + `commonlit.theme.aml` |
+
+## Modelling rules
+
+- **Program status join (composite key).** Facts join `school_program_years` on school_id + school year.
+  AML relationships take one field per side, so each school-grain fact has a hidden
+  `program_year_key` = `school_id|school_year`, with the school year derived from the fact date
+  using the same Jul 1 – Jun 30 rule as `dates.school_year` (verified: 0 mismatches on all 1,095 days).
+- **All relationships are `one_way`** (galaxy schema). Links that would open a second path to
+  Schools / States (teacher → school, class → school, district → state, program year → school) are
+  declared inactive.
+- **Time:** always filter and group on `dates`. YoY metrics use
+  `relative_period(dates.date_day, interval(-1 year))`; school-year comparisons use
+  `dates.school_year_start_date`.
+- **Account-grain datasets** (partnerships, leadership ARR/renewals) use `accounts.program_status`
+  (Partner / Pilot / Free derived from account_status), not `school_program_years`.
+- **Leadership targets** relate `dates.school_year > fct_org_goals.school_year` (two_way) and use
+  `max(target_value)` so the date fan-out cannot inflate them. Targets are org-wide and ignore
+  state / district / program filters by design.
+
+## Security
+
+- **Row-level:** `commonlit_partnerships_health` has `permission csm_own_accounts` on
+  `accounts.csm_name` matched to user attribute **`csm_name`**. That attribute must exist in the
+  tenant (Settings → User Attributes, type text) with each CSM's name exactly as in the data
+  (Elena Ortiz, Marcus Green, Maya Patel, Priya Raman, Sam Whitaker). Admins are exempt; test with
+  an Explorer/Viewer.
+- **Column-level:** student first name / last initial, ELL / IEP / FRL flags and teacher email are
+  masked via `commonlit_mask_text` / `commonlit_mask_bool` unless the viewer's `pii_access` user
+  attribute is 1.
+
+## Known data caveats
+
+- Benchmarks hold **MOY and EOY only** (no BOY). Growth uses BOY when present, else MOY.
+- `dates` covers 2024-07-01 … 2027-06-30; 57 renewals closed earlier have no school year.
+- Health facts are pre-aggregated per account-month: sum across accounts, not across months.
+
+## Checked numbers
+
+Texas active teachers: Sept 2026 = **747**, Sept 2025 = **598** (`commonlit_teacher_student_usage`,
+`active_teachers` / `active_teachers_ly`, +24.9% YoY). Matches raw SQL.

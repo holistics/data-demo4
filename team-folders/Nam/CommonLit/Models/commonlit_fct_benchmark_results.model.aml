@@ -1,0 +1,95 @@
+Model commonlit_fct_benchmark_results {
+  type: 'table'
+  label: "Benchmark Results"
+  description: "Benchmark assessments (BOY/MOY/EOY) for schools on CommonLit 360 + Assessments or piloting. Used for growth."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_benchmark_results"'
+
+  dimension benchmark_result_id {
+    label: "Benchmark Result Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.benchmark_result_id }};;
+    primary_key: true
+  }
+
+  dimension student_id {
+    label: "Student Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.student_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension school_year {
+    label: "School Year"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_year }};;
+  }
+
+  dimension assessment_window {
+    label: "Assessment Window"
+    type: 'text'
+    description: "BOY, MOY or EOY benchmark window. This dataset currently contains MOY and EOY only."
+    definition: @sql {{ #SOURCE.assessment_window }};;
+  }
+
+  dimension window_order {
+    label: "Window Order"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.window_order }};;
+    format: '0'
+  }
+
+  dimension test_date {
+    label: "Test Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.test_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension grade_level {
+    label: "Grade Level"
+    type: 'number'
+    definition: @sql {{ #SOURCE.grade_level }};;
+    format: '0'
+  }
+
+  dimension scaled_score {
+    label: "Scaled Score"
+    type: 'number'
+    description: "Benchmark scaled score; grade-level proficiency cut = 458 + 14 * (grade - 3)."
+    definition: @sql {{ #SOURCE.scaled_score }};;
+    format: '#,###'
+  }
+
+  dimension performance_level {
+    label: "Performance Level"
+    type: 'text'
+    description: "Below Grade Level, Approaching, Meets or Exceeds."
+    definition: @sql {{ #SOURCE.performance_level }};;
+  }
+
+  dimension performance_level_rank {
+    label: "Performance Level Rank"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.performance_level_rank }};;
+    format: '0'
+  }
+
+  dimension program_year_key {
+    label: "Program Year Key"
+    type: 'text'
+    description: "school_id|school_year. Joins benchmark results to School Program Years."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }}::text || '|' || {{ #SOURCE.school_year }};;
+  }
+}

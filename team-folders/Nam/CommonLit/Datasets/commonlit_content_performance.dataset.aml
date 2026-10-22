@@ -1,0 +1,127 @@
+// CommonLit — Content Performance.
+//
+// Two facts share Content, Dates, Schools and School Program Years: submissions (by submitted
+// date) and assignments (by assigned date). All relationships are one_way so neither fact can
+// reach the other through a shared dimension.
+Dataset commonlit_content_performance {
+  label: 'CommonLit · Content Performance'
+  description: '''
+How each CommonLit lesson and assessment performs: how often teachers assign it, how many students
+complete it and how well they score. Used by the Library and Assessments team to find lessons to improve.
+
+## Definitions
+- **Times assigned**: assignments created for the content item.
+- **Submissions**: completed student assignments (one per student per assignment).
+- **Avg score**: average submission score, 0-100.
+- **Completion rate**: submissions ÷ assigned student-slots (assignment × students rostered).
+- **New releases assigned**: distinct new-release content items assigned in the period.
+'''
+  data_source_name: 'demo_nam_commonlit'
+
+  models: [
+    content,
+    commonlit_fct_student_submissions,
+    commonlit_fct_assignments,
+    classes,
+    dates,
+    schools,
+    districts,
+    states,
+    school_program_years
+  ]
+
+  relationships: [
+    relationship(commonlit_fct_student_submissions.content_id > content.content_id, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.submitted_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+
+    relationship(commonlit_fct_assignments.content_id > content.content_id, true, 'one_way'),
+    relationship(commonlit_fct_assignments.assigned_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_assignments.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_assignments.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+    relationship(commonlit_fct_assignments.class_id > classes.class_id, true, 'one_way'),
+
+    relationship(schools.district_id > districts.district_id, true, 'one_way'),
+    relationship(schools.state_code > states.state_code, true, 'one_way'),
+
+    // Inactive — second paths to Schools / States / Classes
+    relationship(commonlit_fct_student_submissions.assignment_id > commonlit_fct_assignments.assignment_id, false, 'one_way'),
+    relationship(commonlit_fct_student_submissions.class_id > classes.class_id, false, 'one_way'),
+    relationship(classes.school_id > schools.school_id, false, 'one_way'),
+    relationship(districts.state_code > states.state_code, false, 'one_way'),
+    relationship(school_program_years.school_id > schools.school_id, false, 'one_way')
+  ]
+
+  metric times_assigned {
+    label: 'Times Assigned'
+    type: 'number'
+    format: '#,###'
+    description: 'Assignments created for the content item.'
+    definition: @aql count(commonlit_fct_assignments.assignment_id);;
+  }
+
+  metric submissions {
+    label: 'Submissions'
+    type: 'number'
+    format: '#,###'
+    description: 'Completed student assignments.'
+    definition: @aql count(commonlit_fct_student_submissions.submission_id);;
+  }
+
+  metric avg_score {
+    label: 'Avg Score'
+    type: 'number'
+    format: '#,###0.0\\%'
+    description: 'Average submission score, 0-100.'
+    definition: @aql avg(commonlit_fct_student_submissions.score_pct);;
+  }
+
+  metric assigned_student_slots {
+    label: 'Assigned Student Slots'
+    type: 'number'
+    format: '#,###'
+    description: 'Each assignment × students rostered in its class. Denominator of Completion Rate.'
+    definition: @aql sum(commonlit_fct_assignments, classes.students_rostered);;
+  }
+
+  metric completion_rate {
+    label: 'Completion Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Submissions ÷ assigned student-slots in the same period.'
+    definition: @aql safe_divide(submissions * 1.0, assigned_student_slots);;
+  }
+
+  metric avg_minutes {
+    label: 'Avg Minutes Spent'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Average time a student spent on a submission.'
+    definition: @aql avg(commonlit_fct_student_submissions.time_spent_minutes);;
+  }
+
+  metric content_items_assigned {
+    label: 'Content Items Assigned'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct content items assigned at least once.'
+    definition: @aql count_distinct(commonlit_fct_assignments.content_id);;
+  }
+
+  metric new_releases_assigned {
+    label: 'New Releases Assigned'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct new-release content items assigned at least once in the period.'
+    definition: @aql count_distinct(commonlit_fct_assignments.content_id) | where(content.is_new_release == true);;
+  }
+
+  metric new_release_share {
+    label: 'New Release Share of Assignments'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Share of assignments that use a new-release content item.'
+    definition: @aql safe_divide((times_assigned | where(content.is_new_release == true)) * 1.0, times_assigned);;
+  }
+}
