@@ -1,0 +1,86 @@
+// PII / sensitive columns are masked through the `pii_access` user attribute (1 = may see).
+// Column-level permission pattern: https://docs.holistics.io/docs/access-control/column-level-permission
+
+Model students {
+  type: 'table'
+  label: "Students"
+  description: "Student roster, one row per student per school year (students are re-rostered each year in this demo). SENSITIVE: is_ell, has_iep, is_frl_eligible, names."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_students"'
+
+  dimension student_id {
+    label: "Student Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.student_id }};;
+    primary_key: true
+  }
+
+  dimension class_id {
+    label: "Class Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.class_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension school_year {
+    label: "School Year"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_year }};;
+  }
+
+  dimension grade_level {
+    label: "Grade Level"
+    type: 'number'
+    definition: @sql {{ #SOURCE.grade_level }};;
+    format: '0'
+  }
+
+  dimension first_name {
+    label: "First Name"
+    type: 'text'
+    description: "PII. Masked unless the viewer has the pii_access user attribute = 1."
+    definition: @sql ${commonlit_mask_text("first_name")};;
+  }
+
+  dimension last_initial {
+    label: "Last Initial"
+    type: 'text'
+    description: "PII. Masked unless the viewer has the pii_access user attribute = 1."
+    definition: @sql ${commonlit_mask_text("last_initial")};;
+  }
+
+  dimension gender {
+    label: "Gender"
+    type: 'text'
+    definition: @sql {{ #SOURCE.gender }};;
+  }
+
+  dimension is_ell {
+    label: "Is ELL"
+    type: 'text'
+    description: "SENSITIVE: English language learner. Masked unless pii_access = 1."
+    definition: @sql ${commonlit_mask_bool("is_ell", "ELL", "Non-ELL")};;
+  }
+
+  dimension has_iep {
+    label: "Has IEP"
+    type: 'text'
+    description: "SENSITIVE: has an Individualized Education Program (special education). Masked unless pii_access = 1."
+    definition: @sql ${commonlit_mask_bool("has_iep", "IEP", "No IEP")};;
+  }
+
+  dimension is_frl_eligible {
+    label: "Is FRL Eligible"
+    type: 'text'
+    description: "SENSITIVE: eligible for free/reduced-price lunch. Masked unless pii_access = 1."
+    definition: @sql ${commonlit_mask_bool("is_frl_eligible", "FRL", "Non-FRL")};;
+  }
+}

@@ -1,0 +1,27 @@
+Model states {
+  type: 'table'
+  label: "States"
+  description: "US states where CommonLit has users, with Partnerships region."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_states"'
+
+  dimension state_code {
+    label: "State"
+    type: 'text'
+    definition: @sql {{ #SOURCE.state_code }};;
+    primary_key: true
+  }
+
+  dimension state_name {
+    label: "State Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.state_name }};;
+  }
+
+  dimension region {
+    label: "Region"
+    type: 'text'
+    description: "Partnerships sales region."
+    definition: @sql {{ #SOURCE.region }};;
+  }
+}

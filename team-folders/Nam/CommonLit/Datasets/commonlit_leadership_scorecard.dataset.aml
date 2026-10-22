@@ -1,0 +1,236 @@
+// CommonLit — Leadership Scorecard: annual org goals vs actuals.
+//
+// Targets live in fct_org_goals (one row per school year × metric_key). Actuals come from the
+// fact tables. Dates relates to goals on school_year (two_way) so targets can sit next to
+// actuals on any Dates grouping; targets use max() so the date fan-out cannot inflate them.
+Dataset commonlit_leadership_scorecard {
+  label: 'CommonLit · Leadership Scorecard'
+  description: '''
+Organisation-wide annual goals and how CommonLit is tracking against them, school year to date.
+
+| Goal (metric_key) | Actual |
+|---|---|
+| active_teachers | distinct teachers with any activity |
+| active_students | distinct students with a submission |
+| assignments_completed | student submissions |
+| pct_title_i_students | share of submissions from Title I schools |
+| partner_arr | ARR of Active Partner accounts (current snapshot) |
+| gross_renewal_rate | closed-won ÷ closed Renewal opportunities |
+| pilot_conversion_rate | closed-won ÷ closed Pilot Conversion opportunities |
+| support_first_response_hours | median first response time on support tickets |
+
+Targets are annual. Compare them with school-year-to-date actuals (filter one school year).
+'''
+  data_source_name: 'demo_nam_commonlit'
+
+  models: [
+    commonlit_fct_org_goals,
+    dates,
+    schools,
+    districts,
+    states,
+    school_program_years,
+    accounts,
+    commonlit_fct_teacher_daily_activity,
+    commonlit_fct_student_submissions,
+    commonlit_fct_support_tickets,
+    commonlit_fct_opportunities
+  ]
+
+  relationships: [
+    // Targets ↔ calendar on school year
+    relationship(dates.school_year > commonlit_fct_org_goals.school_year, true, 'two_way'),
+
+    relationship(commonlit_fct_teacher_daily_activity.activity_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_teacher_daily_activity.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_teacher_daily_activity.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+
+    relationship(commonlit_fct_student_submissions.submitted_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+
+    relationship(commonlit_fct_support_tickets.created_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_support_tickets.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_support_tickets.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+
+    relationship(commonlit_fct_opportunities.close_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_opportunities.account_id > accounts.account_id, true, 'one_way'),
+
+    relationship(schools.district_id > districts.district_id, true, 'one_way'),
+    relationship(schools.state_code > states.state_code, true, 'one_way'),
+    relationship(accounts.district_id > districts.district_id, true, 'one_way'),
+    relationship(accounts.state_code > states.state_code, true, 'one_way'),
+
+    // Inactive — second paths to States / Schools
+    relationship(districts.state_code > states.state_code, false, 'one_way'),
+    relationship(school_program_years.school_id > schools.school_id, false, 'one_way')
+  ]
+
+  // ---------------------------------------------------------------------------------
+  // ACTUALS
+  // ---------------------------------------------------------------------------------
+  metric active_teachers {
+    label: 'Active Teachers'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count_distinct(commonlit_fct_teacher_daily_activity.teacher_id);;
+  }
+
+  metric active_students {
+    label: 'Active Students'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count_distinct(commonlit_fct_student_submissions.student_id);;
+  }
+
+  metric assignments_completed {
+    label: 'Assignments Completed'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count(commonlit_fct_student_submissions.submission_id);;
+  }
+
+  metric assignments_completed_ytd {
+    label: 'Assignments Completed (School YTD)'
+    type: 'number'
+    format: '#,###'
+    description: 'Running total of Assignments Completed within each school year. Group by Dates → Date | month.'
+    definition: @aql assignments_completed | running_total(dates.date_day, reset: dates.school_year);;
+  }
+
+  metric pct_title_i_work {
+    label: '% Student Work from Title I Schools'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql safe_divide((assignments_completed | where(schools.is_title_i == true)) * 1.0, assignments_completed);;
+  }
+
+  metric partner_arr {
+    label: 'Partner ARR'
+    type: 'number'
+    format: '[$$]#,###'
+    description: 'ARR of Active Partner accounts (current snapshot; not date-filtered).'
+    definition: @aql sum(accounts.arr_usd) | where(accounts.account_status == 'Active Partner');;
+  }
+
+  metric gross_renewal_rate {
+    label: 'Gross Renewal Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql
+      safe_divide(
+        (count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Renewal', commonlit_fct_opportunities.is_won == true)) * 1.0,
+        count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Renewal', commonlit_fct_opportunities.is_closed == true)
+      )
+    ;;
+  }
+
+  metric pilot_conversion_rate {
+    label: 'Pilot Conversion Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql
+      safe_divide(
+        (count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Pilot Conversion', commonlit_fct_opportunities.is_won == true)) * 1.0,
+        count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Pilot Conversion', commonlit_fct_opportunities.is_closed == true)
+      )
+    ;;
+  }
+
+  metric median_first_response_hours {
+    label: 'Median First Response (hrs)'
+    type: 'number'
+    format: '#,###0.0'
+    definition: @aql median(commonlit_fct_support_tickets.first_response_hours);;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // TARGETS (annual, from fct_org_goals)
+  // ---------------------------------------------------------------------------------
+  metric target_active_teachers {
+    label: 'Target · Active Teachers'
+    type: 'number'
+    format: '#,###'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'active_teachers');;
+  }
+
+  metric target_active_students {
+    label: 'Target · Active Students'
+    type: 'number'
+    format: '#,###'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'active_students');;
+  }
+
+  metric target_assignments_completed {
+    label: 'Target · Assignments Completed'
+    type: 'number'
+    format: '#,###'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'assignments_completed');;
+  }
+
+  metric target_pct_title_i_work {
+    label: 'Target · % Work from Title I'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'pct_title_i_students');;
+  }
+
+  metric target_partner_arr {
+    label: 'Target · Partner ARR'
+    type: 'number'
+    format: '[$$]#,###'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'partner_arr');;
+  }
+
+  metric target_gross_renewal_rate {
+    label: 'Target · Gross Renewal Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'gross_renewal_rate');;
+  }
+
+  metric target_pilot_conversion_rate {
+    label: 'Target · Pilot Conversion Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'pilot_conversion_rate');;
+  }
+
+  metric target_first_response_hours {
+    label: 'Target · Median First Response (hrs)'
+    type: 'number'
+    format: '#,###0.0'
+    definition: @aql max(commonlit_fct_org_goals.target_value) | where(commonlit_fct_org_goals.metric_key == 'support_first_response_hours');;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // ATTAINMENT (actual ÷ target)
+  // ---------------------------------------------------------------------------------
+  metric attainment_active_teachers {
+    label: 'Attainment · Active Teachers'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql safe_divide(active_teachers * 1.0, target_active_teachers);;
+  }
+
+  metric attainment_active_students {
+    label: 'Attainment · Active Students'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql safe_divide(active_students * 1.0, target_active_students);;
+  }
+
+  metric attainment_assignments_completed {
+    label: 'Attainment · Assignments Completed'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql safe_divide(assignments_completed * 1.0, target_assignments_completed);;
+  }
+
+  metric attainment_partner_arr {
+    label: 'Attainment · Partner ARR'
+    type: 'number'
+    format: '#,###0.0%'
+    definition: @aql safe_divide(partner_arr * 1.0, target_partner_arr);;
+  }
+}

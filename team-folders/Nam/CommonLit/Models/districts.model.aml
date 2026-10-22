@@ -1,0 +1,62 @@
+Model districts {
+  type: 'table'
+  label: "Districts"
+  description: "School districts (LEAs) with at least one CommonLit user. Synthetic NCES ids."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_districts"'
+
+  dimension district_id {
+    label: "District Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.district_id }};;
+    primary_key: true
+  }
+
+  dimension nces_district_id {
+    label: "NCES District Id"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.nces_district_id }};;
+  }
+
+  dimension district_name {
+    label: "District Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.district_name }};;
+  }
+
+  dimension state_code {
+    label: "State"
+    type: 'text'
+    definition: @sql {{ #SOURCE.state_code }};;
+  }
+
+  dimension locale {
+    label: "Locale"
+    type: 'text'
+    definition: @sql {{ #SOURCE.locale }};;
+  }
+
+  dimension total_enrollment {
+    label: "Total Enrollment"
+    type: 'number'
+    definition: @sql {{ #SOURCE.total_enrollment }};;
+    format: '#,###'
+  }
+
+  dimension pct_frl {
+    label: "% FRL"
+    type: 'number'
+    description: "Share of district students eligible for free/reduced-price lunch (0-100)."
+    definition: @sql {{ #SOURCE.pct_frl }};;
+    format: '#,###0.0\\%'
+  }
+
+  dimension is_high_poverty {
+    label: "Is High Poverty"
+    type: 'truefalse'
+    description: "High-poverty district flag."
+    definition: @sql {{ #SOURCE.is_high_poverty }};;
+  }
+}

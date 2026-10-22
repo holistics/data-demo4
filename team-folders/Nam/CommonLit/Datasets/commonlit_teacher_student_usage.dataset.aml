@@ -1,0 +1,220 @@
+// CommonLit — Teacher & Student Usage.
+//
+// JOIN PATH NOTE: every fact reaches Schools, Dates and School Program Years directly. The
+// dimension-to-dimension links that would open a second path to Schools or States (teacher →
+// school, class → school, district → state, program year → school) are declared INACTIVE.
+Dataset commonlit_teacher_student_usage {
+  label: 'CommonLit · Teacher & Student Usage'
+  description: '''
+How teachers and students use CommonLit: active teachers, active students, completed assignments,
+scores and completion — by school year, month, state, district, school and program status.
+
+## Definitions
+- **Active teacher**: distinct teacher with any activity (a row in Teacher Daily Activity) in the period.
+- **Active student**: distinct student with at least one submission in the period.
+- **Assignments completed**: student submissions (one per student per completed assignment).
+- **Completion rate**: submissions ÷ assigned student-slots (each assignment × students rostered in its class).
+- **Program Status**: Partner (paid), Pilot (trialing the paid program) or Free, for that school in that school year.
+
+## Time
+School years run Jul 1 – Jun 30 (e.g. 2025-26). Use Dates for every time filter and grouping;
+each fact joins Dates on its own event date. YoY metrics shift Dates.date_day back one year.
+'''
+  data_source_name: 'demo_nam_commonlit'
+
+  models: [
+    dates,
+    schools,
+    districts,
+    states,
+    school_program_years,
+    teachers,
+    classes,
+    content,
+    commonlit_fct_teacher_daily_activity,
+    commonlit_fct_student_submissions,
+    commonlit_fct_assignments
+  ]
+
+  relationships: [
+    // Teacher activity
+    relationship(commonlit_fct_teacher_daily_activity.activity_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_teacher_daily_activity.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_teacher_daily_activity.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+    relationship(commonlit_fct_teacher_daily_activity.teacher_id > teachers.teacher_id, true, 'one_way'),
+
+    // Student submissions
+    relationship(commonlit_fct_student_submissions.submitted_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.teacher_id > teachers.teacher_id, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.class_id > classes.class_id, true, 'one_way'),
+    relationship(commonlit_fct_student_submissions.content_id > content.content_id, true, 'one_way'),
+
+    // Assignments
+    relationship(commonlit_fct_assignments.assigned_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_assignments.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_assignments.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+    relationship(commonlit_fct_assignments.teacher_id > teachers.teacher_id, true, 'one_way'),
+    relationship(commonlit_fct_assignments.class_id > classes.class_id, true, 'one_way'),
+    relationship(commonlit_fct_assignments.content_id > content.content_id, true, 'one_way'),
+
+    // Geography
+    relationship(schools.district_id > districts.district_id, true, 'one_way'),
+    relationship(schools.state_code > states.state_code, true, 'one_way'),
+
+    // Inactive — each would open a second path from a fact to Schools / States / Dates
+    relationship(commonlit_fct_student_submissions.assignment_id > commonlit_fct_assignments.assignment_id, false, 'one_way'),
+    relationship(districts.state_code > states.state_code, false, 'one_way'),
+    relationship(teachers.school_id > schools.school_id, false, 'one_way'),
+    relationship(classes.school_id > schools.school_id, false, 'one_way'),
+    relationship(classes.teacher_id > teachers.teacher_id, false, 'one_way'),
+    relationship(school_program_years.school_id > schools.school_id, false, 'one_way')
+  ]
+
+  // ---------------------------------------------------------------------------------
+  // CORE USAGE
+  // ---------------------------------------------------------------------------------
+  metric active_teachers {
+    label: 'Active Teachers'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct teachers with any activity in the period (a row in Teacher Daily Activity).'
+    definition: @aql count_distinct(commonlit_fct_teacher_daily_activity.teacher_id);;
+  }
+
+  metric active_students {
+    label: 'Active Students'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct students with at least one submission in the period.'
+    definition: @aql count_distinct(commonlit_fct_student_submissions.student_id);;
+  }
+
+  metric assignments_completed {
+    label: 'Assignments Completed'
+    type: 'number'
+    format: '#,###'
+    description: 'Student submissions: one per student per completed assignment.'
+    definition: @aql count(commonlit_fct_student_submissions.submission_id);;
+  }
+
+  metric avg_score {
+    label: 'Avg Score'
+    type: 'number'
+    format: '#,###0.0\\%'
+    description: 'Average submission score, 0-100 (questions correct ÷ questions total).'
+    definition: @aql avg(commonlit_fct_student_submissions.score_pct);;
+  }
+
+  metric assigned_student_slots {
+    label: 'Assigned Student Slots'
+    type: 'number'
+    format: '#,###'
+    description: 'Each assignment × students rostered in its class: the number of submissions expected. Denominator of Completion Rate.'
+    definition: @aql sum(commonlit_fct_assignments, classes.students_rostered);;
+  }
+
+  metric completion_rate {
+    label: 'Completion Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Assignments Completed ÷ Assigned Student Slots, in the same period (submissions by submitted date, assignments by assigned date).'
+    definition: @aql safe_divide(assignments_completed * 1.0, assigned_student_slots);;
+  }
+
+  metric assignments_created {
+    label: 'Assignments Created'
+    type: 'number'
+    format: '#,###'
+    description: 'Assignments teachers created for a class.'
+    definition: @aql count(commonlit_fct_assignments.assignment_id);;
+  }
+
+  metric active_schools {
+    label: 'Active Schools'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct schools with at least one active teacher.'
+    definition: @aql count_distinct(commonlit_fct_teacher_daily_activity.school_id);;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // YEAR-OVER-YEAR (same period one year earlier on Dates.date_day)
+  // Works on any date grain: month, week, school-year start, or a date-range filter.
+  // ---------------------------------------------------------------------------------
+  metric active_teachers_ly {
+    label: 'Active Teachers (Last Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active Teachers in the same period one year earlier.'
+    definition: @aql active_teachers | relative_period(dates.date_day, interval(-1 year));;
+  }
+
+  metric active_teachers_yoy {
+    label: 'Active Teachers YoY %'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Change in Active Teachers versus the same period last year.'
+    definition: @aql safe_divide((active_teachers - active_teachers_ly) * 1.0, active_teachers_ly);;
+  }
+
+  metric active_students_ly {
+    label: 'Active Students (Last Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active Students in the same period one year earlier.'
+    definition: @aql active_students | relative_period(dates.date_day, interval(-1 year));;
+  }
+
+  metric active_students_yoy {
+    label: 'Active Students YoY %'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Change in Active Students versus the same period last year.'
+    definition: @aql safe_divide((active_students - active_students_ly) * 1.0, active_students_ly);;
+  }
+
+  metric assignments_completed_ly {
+    label: 'Assignments Completed (Last Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Assignments Completed in the same period one year earlier.'
+    definition: @aql assignments_completed | relative_period(dates.date_day, interval(-1 year));;
+  }
+
+  metric assignments_completed_yoy {
+    label: 'Assignments Completed YoY %'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Change in Assignments Completed versus the same period last year.'
+    definition: @aql safe_divide((assignments_completed - assignments_completed_ly) * 1.0, assignments_completed_ly);;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // SCHOOL-YEAR COMPARISON — group by Dates "School Year Start" (Jul 1 of each school year)
+  // ---------------------------------------------------------------------------------
+  metric active_teachers_prior_sy {
+    label: 'Active Teachers (Prior School Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active Teachers in the previous school year. Group by Dates → School Year Start.'
+    definition: @aql active_teachers | relative_period(dates.school_year_start_date, interval(-1 year));;
+  }
+
+  metric active_students_prior_sy {
+    label: 'Active Students (Prior School Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active Students in the previous school year. Group by Dates → School Year Start.'
+    definition: @aql active_students | relative_period(dates.school_year_start_date, interval(-1 year));;
+  }
+
+  metric assignments_completed_prior_sy {
+    label: 'Assignments Completed (Prior School Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Assignments Completed in the previous school year. Group by Dates → School Year Start.'
+    definition: @aql assignments_completed | relative_period(dates.school_year_start_date, interval(-1 year));;
+  }
+}
