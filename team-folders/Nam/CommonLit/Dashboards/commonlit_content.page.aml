@@ -21,6 +21,15 @@ Which lessons teachers assign, how many students finish them, and where scores s
       operator: 'is'
       value: '2025-26'
     }
+    settings {
+      input_type: 'single'
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
+    }
   }
 
   block f_state: FilterBlock {
@@ -32,7 +41,16 @@ Which lessons teachers assign, how many students finish them, and where scores s
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -45,7 +63,16 @@ Which lessons teachers assign, how many students finish them, and where scores s
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -58,7 +85,16 @@ Which lessons teachers assign, how many students finish them, and where scores s
     }
     default {
       operator: 'is'
-      value: []
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -336,22 +372,73 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
   explicit_interactions: [
     FilterInteraction {
       from: 'f_school_year'
-      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      to: [
+        'k_assigned',
+        'k_subs',
+        'k_score',
+        'k_completion',
+        'k_new',
+        'tb_improve',
+        'c_histogram',
+        'c_score_collection',
+        'c_assigned_month',
+        'tb_new'
+      ]
       field: r(dates.school_year)
     },
     FilterInteraction {
       from: 'f_state'
-      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      to: [
+        'k_assigned',
+        'k_subs',
+        'k_score',
+        'k_completion',
+        'k_new',
+        'tb_improve',
+        'c_histogram',
+        'c_score_collection',
+        'c_assigned_month',
+        'tb_new'
+      ]
+      field: r(states.state_name)
+    },
+    FilterInteraction {
+      from: 'f_state'
+      to: [
+        'f_district'
+      ]
       field: r(states.state_name)
     },
     FilterInteraction {
       from: 'f_district'
-      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      to: [
+        'k_assigned',
+        'k_subs',
+        'k_score',
+        'k_completion',
+        'k_new',
+        'tb_improve',
+        'c_histogram',
+        'c_score_collection',
+        'c_assigned_month',
+        'tb_new'
+      ]
       field: r(districts.district_name)
     },
     FilterInteraction {
       from: 'f_program'
-      to: ['k_assigned', 'k_subs', 'k_score', 'k_completion', 'k_new', 'tb_improve', 'c_histogram', 'c_score_collection', 'c_assigned_month', 'tb_new']
+      to: [
+        'k_assigned',
+        'k_subs',
+        'k_score',
+        'k_completion',
+        'k_new',
+        'tb_improve',
+        'c_histogram',
+        'c_score_collection',
+        'c_assigned_month',
+        'tb_new'
+      ]
       field: r(school_program_years.program_status)
     }
   ]
@@ -366,31 +453,31 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
       position: pos(20, 20, 1180, 120)
     }
     block f_school_year {
-      position: pos(20, 160, 285, 80)
+      position: pos(20, 160, 280, 60)
     }
     block f_state {
-      position: pos(325, 160, 285, 80)
+      position: pos(325, 160, 285, 60)
     }
     block f_district {
-      position: pos(630, 160, 285, 80)
+      position: pos(630, 160, 285, 60)
     }
     block f_program {
-      position: pos(935, 160, 265, 80)
+      position: pos(935, 160, 265, 60)
     }
     block k_assigned {
-      position: pos(20, 260, 220, 140)
+      position: pos(20, 240, 220, 140)
     }
     block k_subs {
-      position: pos(260, 260, 220, 140)
+      position: pos(260, 240, 220, 140)
     }
     block k_score {
-      position: pos(500, 260, 220, 140)
+      position: pos(500, 240, 220, 140)
     }
     block k_completion {
-      position: pos(740, 260, 220, 140)
+      position: pos(740, 240, 220, 140)
     }
     block k_new {
-      position: pos(980, 260, 220, 140)
+      position: pos(980, 240, 220, 140)
     }
     block t_improve {
       position: pos(20, 420, 1180, 100)

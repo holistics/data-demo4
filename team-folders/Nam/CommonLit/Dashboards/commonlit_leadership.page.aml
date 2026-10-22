@@ -21,6 +21,12 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       operator: 'is'
       value: '2025-26'
     }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
+    }
   }
 
   block f_state: FilterBlock {
@@ -33,6 +39,12 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
     default {
       operator: 'is'
       value: []
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -47,6 +59,12 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       operator: 'is'
       value: []
     }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
+    }
   }
 
   block f_program: FilterBlock {
@@ -59,6 +77,12 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
     default {
       operator: 'is'
       value: []
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -379,19 +403,19 @@ Partner ARR is the current snapshot; renewal and pilot conversion use opportunit
       position: pos(20, 20, 1180, 120)
     }
     block f_school_year {
-      position: pos(20, 160, 285, 80)
+      position: pos(20, 160, 285, 60)
     }
     block f_state {
-      position: pos(325, 160, 285, 80)
+      position: pos(325, 160, 285, 60)
     }
     block f_district {
-      position: pos(630, 160, 285, 80)
+      position: pos(630, 160, 285, 60)
     }
     block f_program {
-      position: pos(935, 160, 265, 80)
+      position: pos(935, 160, 265, 60)
     }
     block t_reach {
-      position: pos(20, 260, 1180, 60)
+      position: pos(20, 240, 1180, 60)
     }
     block tb_reach {
       position: pos(20, 340, 1180, 240)

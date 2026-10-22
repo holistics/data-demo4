@@ -21,6 +21,12 @@ How fast teachers adopt new features after launch, and which features they keep 
       operator: 'is'
       value: '2026-27'
     }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
+    }
   }
 
   block f_state: FilterBlock {
@@ -33,6 +39,12 @@ How fast teachers adopt new features after launch, and which features they keep 
     default {
       operator: 'is'
       value: []
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -47,6 +59,12 @@ How fast teachers adopt new features after launch, and which features they keep 
       operator: 'is'
       value: []
     }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
+    }
   }
 
   block f_program: FilterBlock {
@@ -59,6 +77,12 @@ How fast teachers adopt new features after launch, and which features they keep 
     default {
       operator: 'is'
       value: []
+    }
+    theme: BlockTheme {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 border_style: 'none' }
+      shadow: 'none'
+      padding: 0
     }
   }
 
@@ -273,28 +297,28 @@ Cumulative teachers who have used each feature since launch (features launched s
       position: pos(20, 20, 1180, 120)
     }
     block f_school_year {
-      position: pos(20, 160, 285, 80)
+      position: pos(20, 160, 285, 60)
     }
     block f_state {
-      position: pos(325, 160, 285, 80)
+      position: pos(325, 160, 285, 60)
     }
     block f_district {
-      position: pos(630, 160, 285, 80)
+      position: pos(630, 160, 285, 60)
     }
     block f_program {
-      position: pos(935, 160, 265, 80)
+      position: pos(935, 160, 265, 60)
     }
     block k_users {
-      position: pos(20, 260, 285, 140)
+      position: pos(20, 240, 285, 140)
     }
     block k_new {
-      position: pos(325, 260, 285, 140)
+      position: pos(325, 240, 285, 140)
     }
     block k_events {
-      position: pos(630, 260, 285, 140)
+      position: pos(630, 240, 285, 140)
     }
     block k_epu {
-      position: pos(935, 260, 265, 140)
+      position: pos(935, 240, 265, 140)
     }
     block t_ramp {
       position: pos(20, 420, 1180, 120)
