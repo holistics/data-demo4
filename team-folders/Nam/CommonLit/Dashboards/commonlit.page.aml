@@ -225,7 +225,8 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
     }
   }
   block l_c_students_month: VizBlock {
-    label: 'Active Students by Month'
+    label: 'Active Students by Month: This Year vs Last Year'
+    description: 'Each month compared with the same month one year earlier; selecting 2026-27 compares with 2025-26.'
     viz: ColumnChart {
       dataset: commonlit_leadership_scorecard
       x_axis: VizFieldFull {
@@ -239,6 +240,18 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       y_axis {
         series {
           field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.active_students_ly)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+        series {
+          field: VizFieldFull {
             ref: r(commonlit_leadership_scorecard.active_students)
             format {
               type: 'number'
@@ -248,6 +261,23 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
           settings {
             color: '#3f6e79'
           }
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.active_students_yoy)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#ffaa00'
+          }
+        }
+        settings {
+          alignment: 'right'
         }
       }
       settings {

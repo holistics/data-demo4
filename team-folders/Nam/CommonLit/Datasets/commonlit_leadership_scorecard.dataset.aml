@@ -83,6 +83,30 @@ Targets are annual. Compare them with school-year-to-date actuals (filter one sc
     definition: @aql count_distinct(commonlit_fct_student_submissions.student_id);;
   }
 
+  // Same period one year earlier. of_all(dates.school_year) lifts the School Year filter so the
+  // shifted dates are not filtered out (2026-27 selected -> compares with 2025-26); the case()
+  // keeps last year only on periods that have current data, so no extra months appear.
+  metric active_students_ly {
+    label: 'Active Students (Last Year)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active Students in the same period one year earlier. Group by Dates → Date | month.'
+    definition: @aql
+      case(
+        when: active_students is not null,
+        then: active_students | relative_period(dates.date_day, interval(-1 year)) | of_all(dates.school_year)
+      )
+    ;;
+  }
+
+  metric active_students_yoy {
+    label: 'Active Students YoY %'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Change in Active Students versus the same period last year.'
+    definition: @aql safe_divide((active_students - active_students_ly) * 1.0, active_students_ly);;
+  }
+
   metric assignments_completed {
     label: 'Assignments Completed'
     type: 'number'
