@@ -2,7 +2,6 @@ Dashboard commonlit {
   title: 'CommonLit'
   description: 'CommonLit demo: leadership scorecard, partnerships, content performance and product adoption in one dashboard. Filters are shared across tabs. CSMs see only their own accounts (row-level permission on CSM).'
   theme: commonlit_theme
-
   block f_school_year: FilterBlock {
     label: 'School Year'
     type: 'field'
@@ -12,19 +11,23 @@ Dashboard commonlit {
     }
     default {
       operator: 'is'
-      value: '2026-27'
+      value: '$H_NIL$'
     }
     settings {
-      input_type: 'single'
+      input_type: 'multiple'
     }
     theme: BlockTheme {
-      background { bg_color: 'transparent' }
-      border { border_width: 0 border_style: 'none' }
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
       shadow: 'none'
       padding: 0
     }
   }
-
   block f_state: FilterBlock {
     label: 'State'
     type: 'field'
@@ -40,13 +43,17 @@ Dashboard commonlit {
       input_type: 'multiple'
     }
     theme: BlockTheme {
-      background { bg_color: 'transparent' }
-      border { border_width: 0 border_style: 'none' }
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
       shadow: 'none'
       padding: 0
     }
   }
-
   block f_district: FilterBlock {
     label: 'District'
     type: 'field'
@@ -62,13 +69,17 @@ Dashboard commonlit {
       input_type: 'multiple'
     }
     theme: BlockTheme {
-      background { bg_color: 'transparent' }
-      border { border_width: 0 border_style: 'none' }
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
       shadow: 'none'
       padding: 0
     }
   }
-
   block f_program: FilterBlock {
     label: 'Program Status'
     type: 'field'
@@ -84,25 +95,27 @@ Dashboard commonlit {
       input_type: 'multiple'
     }
     theme: BlockTheme {
-      background { bg_color: 'transparent' }
-      border { border_width: 0 border_style: 'none' }
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
       shadow: 'none'
       padding: 0
     }
   }
-
   block l_t_header: TextBlock {
     content: @md
 # Leadership Scorecard
 
 Annual goals vs school-year-to-date actuals. Targets are org-wide and do not change with State, District or Program filters.;;
   }
-
   block l_t_reach: TextBlock {
     content: @md
 ## Reach;;
   }
-
   block l_tb_reach: VizBlock {
     label: 'Reach: Actual vs Goal'
     viz: DataTable {
@@ -125,7 +138,6 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       }
     }
   }
-
   block l_c_teachers_month: VizBlock {
     label: 'Active Teachers by Month vs Annual Goal'
     viz: LineChart {
@@ -169,7 +181,6 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       }
     }
   }
-
   block l_c_assign_ytd: VizBlock {
     label: 'Assignments Completed (School YTD) vs Goal'
     viz: LineChart {
@@ -213,7 +224,6 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       }
     }
   }
-
   block l_c_students_month: VizBlock {
     label: 'Active Students by Month'
     viz: ColumnChart {
@@ -245,12 +255,10 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       }
     }
   }
-
   block l_t_equity: TextBlock {
     content: @md
 ## Equity & support;;
   }
-
   block l_tb_equity: VizBlock {
     label: 'Equity & Support: Actual vs Goal'
     viz: DataTable {
@@ -268,7 +276,6 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       }
     }
   }
-
   block l_c_title_i_month: VizBlock {
     label: '% Student Work from Title I Schools by Month'
     viz: LineChart {
@@ -312,14 +319,12 @@ Annual goals vs school-year-to-date actuals. Targets are org-wide and do not cha
       }
     }
   }
-
   block l_t_partnerships: TextBlock {
     content: @md
 ## Partnerships
 
 Partner ARR is the current snapshot; renewal and pilot conversion use opportunities closing in the selected school year.;;
   }
-
   block l_tb_partnerships: VizBlock {
     label: 'Partnerships: Actual vs Goal'
     viz: DataTable {
@@ -337,7 +342,6 @@ Partner ARR is the current snapshot; renewal and pilot conversion use opportunit
       }
     }
   }
-
   block l_k_arr: VizBlock {
     label: 'Partner ARR (current)'
     viz: MetricKpi {
@@ -356,7 +360,6 @@ Partner ARR is the current snapshot; renewal and pilot conversion use opportunit
       }
     }
   }
-
   block l_k_arr_att: VizBlock {
     label: 'ARR vs Current-Year Goal'
     description: 'Partner ARR ÷ the Partner ARR goal of the selected school year.'
@@ -376,14 +379,12 @@ Partner ARR is the current snapshot; renewal and pilot conversion use opportunit
       }
     }
   }
-
   block p_t_header: TextBlock {
     content: @md
 # Partnerships
 
 How pilots are using CommonLit 360, and which partner accounts need attention before renewal.;;
   }
-
   block p_k_arr: VizBlock {
     label: 'Partner ARR'
     viz: MetricKpi {
@@ -402,7 +403,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_partners: VizBlock {
     label: 'Active Partners'
     viz: MetricKpi {
@@ -421,7 +421,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_pilots: VizBlock {
     label: 'Active Pilots'
     viz: MetricKpi {
@@ -440,7 +439,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_at_risk: VizBlock {
     label: 'At-Risk Accounts (Red)'
     viz: MetricKpi {
@@ -459,7 +457,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_arr_risk: VizBlock {
     label: 'ARR at Risk'
     viz: MetricKpi {
@@ -478,7 +475,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_watch: VizBlock {
     label: 'Watch List (Yellow)'
     viz: MetricKpi {
@@ -497,7 +493,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_renewal: VizBlock {
     label: 'Renewal Rate'
     description: 'Closed-won ÷ closed renewals with a close date in the selected school year.'
@@ -517,7 +512,6 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_k_pilot_conv: VizBlock {
     label: 'Pilot Conversion Rate'
     description: 'Closed-won ÷ closed pilot conversions with a close date in the selected school year.'
@@ -537,12 +531,10 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_t_pilot: TextBlock {
     content: @md
 ## Pilot usage;;
   }
-
   block p_c_pilot_teachers: VizBlock {
     label: 'Pilot Teachers: Licensed vs Active by Month'
     viz: ColumnChart {
@@ -584,14 +576,15 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       filter {
         field: r(accounts.account_status)
         operator: 'is'
-        value: ['Active Pilot']
+        value: [
+          'Active Pilot'
+        ]
       }
       settings {
         row_limit: 5000
       }
     }
   }
-
   block p_c_pilot_adoption: VizBlock {
     label: 'Pilot Teacher Adoption Rate by Month'
     viz: LineChart {
@@ -621,14 +614,15 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       filter {
         field: r(accounts.account_status)
         operator: 'is'
-        value: ['Active Pilot']
+        value: [
+          'Active Pilot'
+        ]
       }
       settings {
         row_limit: 5000
       }
     }
   }
-
   block p_tb_pilots: VizBlock {
     label: 'Active Pilots'
     description: 'Teacher adoption and health over the selected school year; lowest adoption first.'
@@ -648,7 +642,9 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       filter {
         field: r(accounts.account_status)
         operator: 'is'
-        value: ['Active Pilot']
+        value: [
+          'Active Pilot'
+        ]
       }
       settings {
         row_limit: 25
@@ -662,14 +658,12 @@ How pilots are using CommonLit 360, and which partner accounts need attention be
       }
     }
   }
-
   block p_t_risk: TextBlock {
     content: @md
 ## At-risk accounts
 
 Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
   }
-
   block p_tb_at_risk: VizBlock {
     label: 'Partner Accounts at Risk (latest health Red or Yellow)'
     viz: DataTable {
@@ -692,12 +686,17 @@ Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
       filter {
         field: r(commonlit_fct_account_health_monthly.health_status)
         operator: 'is'
-        value: ['Red', 'Yellow']
+        value: [
+          'Red',
+          'Yellow'
+        ]
       }
       filter {
         field: r(accounts.account_status)
         operator: 'is'
-        value: ['Active Partner']
+        value: [
+          'Active Partner'
+        ]
       }
       settings {
         row_limit: 25
@@ -711,7 +710,6 @@ Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
       }
     }
   }
-
   block p_c_risk_csm: VizBlock {
     label: 'At-Risk Accounts by CSM'
     viz: BarChart {
@@ -750,7 +748,6 @@ Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
       }
     }
   }
-
   block p_c_health_mix: VizBlock {
     label: 'Account Health Mix by Month'
     viz: ColumnChart {
@@ -785,14 +782,12 @@ Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
       }
     }
   }
-
   block c_t_header: TextBlock {
     content: @md
 # Content Performance
 
 Which lessons teachers assign, how many students finish them, and where scores say a lesson needs work.;;
   }
-
   block c_k_assigned: VizBlock {
     label: 'Times Assigned'
     viz: MetricKpi {
@@ -811,7 +806,6 @@ Which lessons teachers assign, how many students finish them, and where scores s
       }
     }
   }
-
   block c_k_subs: VizBlock {
     label: 'Submissions'
     viz: MetricKpi {
@@ -830,7 +824,6 @@ Which lessons teachers assign, how many students finish them, and where scores s
       }
     }
   }
-
   block c_k_score: VizBlock {
     label: 'Avg Score'
     viz: MetricKpi {
@@ -849,7 +842,6 @@ Which lessons teachers assign, how many students finish them, and where scores s
       }
     }
   }
-
   block c_k_completion: VizBlock {
     label: 'Completion Rate'
     viz: MetricKpi {
@@ -868,7 +860,6 @@ Which lessons teachers assign, how many students finish them, and where scores s
       }
     }
   }
-
   block c_k_new: VizBlock {
     label: 'New Releases Assigned'
     viz: MetricKpi {
@@ -887,14 +878,12 @@ Which lessons teachers assign, how many students finish them, and where scores s
       }
     }
   }
-
   block c_t_improve: TextBlock {
     content: @md
 ## Lessons to improve
 
 Lowest average score first, among lessons assigned at least 20 times in the period.;;
   }
-
   block c_tb_improve: VizBlock {
     label: 'Lessons to Improve'
     viz: DataTable {
@@ -927,7 +916,6 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
       }
     }
   }
-
   block c_c_histogram: VizBlock {
     label: 'Score Distribution (Submissions by Score Bucket)'
     description: 'Submissions grouped into 10-point score buckets (0 = 0-9%, 90 = 90-99%, 100 = perfect).'
@@ -959,7 +947,6 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
       }
     }
   }
-
   block c_c_score_collection: VizBlock {
     label: 'Avg Score and Completion by Collection'
     viz: BarChart {
@@ -998,7 +985,6 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
       }
     }
   }
-
   block c_c_assigned_month: VizBlock {
     label: 'Times Assigned by Month and Collection'
     viz: ColumnChart {
@@ -1033,7 +1019,6 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
       }
     }
   }
-
   block c_tb_new: VizBlock {
     label: 'New Releases: Early Performance'
     viz: DataTable {
@@ -1063,14 +1048,12 @@ Lowest average score first, among lessons assigned at least 20 times in the peri
       }
     }
   }
-
   block pr_t_header: TextBlock {
     content: @md
 # Product Adoption
 
 How fast teachers adopt new features after launch, and which features they keep using.;;
   }
-
   block pr_k_users: VizBlock {
     label: 'Teachers Using Any Feature'
     viz: MetricKpi {
@@ -1089,7 +1072,6 @@ How fast teachers adopt new features after launch, and which features they keep 
       }
     }
   }
-
   block pr_k_new: VizBlock {
     label: 'New Feature Adopters'
     viz: MetricKpi {
@@ -1108,7 +1090,6 @@ How fast teachers adopt new features after launch, and which features they keep 
       }
     }
   }
-
   block pr_k_events: VizBlock {
     label: 'Feature Events'
     viz: MetricKpi {
@@ -1127,7 +1108,6 @@ How fast teachers adopt new features after launch, and which features they keep 
       }
     }
   }
-
   block pr_k_epu: VizBlock {
     label: 'Events per Teacher'
     viz: MetricKpi {
@@ -1146,14 +1126,12 @@ How fast teachers adopt new features after launch, and which features they keep 
       }
     }
   }
-
   block pr_t_ramp: TextBlock {
     content: @md
 ## Adoption ramps
 
 Cumulative teachers who have used each feature since launch (features launched since Aug 2025). Ignores the School Year filter so every ramp starts at launch.;;
   }
-
   block pr_c_ramp: VizBlock {
     label: 'Adopters Since Launch: New Features'
     viz: LineChart {
@@ -1183,14 +1161,18 @@ Cumulative teachers who have used each feature since launch (features launched s
       filter {
         field: r(product_features.feature_name)
         operator: 'is'
-        value: ['Target Lessons', 'Assessment Reports 2.0', 'AI Writing Feedback', 'Lesson Planner']
+        value: [
+          'Target Lessons',
+          'Assessment Reports 2.0',
+          'AI Writing Feedback',
+          'Lesson Planner'
+        ]
       }
       settings {
         row_limit: 5000
       }
     }
   }
-
   block pr_c_weekly: VizBlock {
     label: 'Weekly Active Users by Feature'
     viz: LineChart {
@@ -1222,7 +1204,6 @@ Cumulative teachers who have used each feature since launch (features launched s
       }
     }
   }
-
   block pr_tb_features: VizBlock {
     label: 'Feature Scorecard'
     viz: DataTable {
@@ -1248,7 +1229,6 @@ Cumulative teachers who have used each feature since launch (features launched s
       }
     }
   }
-
   explicit_interactions: [
     FilterInteraction {
       from: 'f_state'
@@ -1432,7 +1412,6 @@ Cumulative teachers who have used each feature since launch (features launched s
       field: r(accounts.program_status)
     }
   ]
-
   view: TabLayout {
     label: 'CommonLit'
     tab leadership: CanvasLayout {
@@ -1463,7 +1442,7 @@ Cumulative teachers who have used each feature since launch (features launched s
         position: pos(20, 240, 1180, 60)
       }
       block l_tb_reach {
-        position: pos(20, 320, 1180, 240)
+        position: pos(20, 320, 1180, 220)
       }
       block l_c_teachers_month {
         position: pos(20, 580, 580, 360)
@@ -1496,6 +1475,7 @@ Cumulative teachers who have used each feature since launch (features launched s
         position: pos(920, 1780, 280, 240)
       }
       default_zoom: 1
+      auto_expand_horizontally: true
     }
     tab partnerships: CanvasLayout {
       label: 'Partnerships'
@@ -1681,7 +1661,6 @@ Cumulative teachers who have used each feature since launch (features launched s
       default_zoom: 1
     }
   }
-
   settings {
     autorun_on_open: true
   }
