@@ -2073,6 +2073,9 @@ Dashboard messi_albiceleste {
 .mxl * { box-sizing:border-box; } .mxl h-block { display:block; width:100%; height:100%; min-width:0; min-height:0; } /* A definite slot height keeps exported h-blocks from resolving their height against the export viewport. Inline heights retain each chart's designed size. */ .mxl-slot { min-width:0; height:220px; min-height:0; overflow:hidden; }
 .mx-hero { position:relative; isolation:isolate; margin:0 -20px; overflow:hidden; padding:34px max(20px,calc((100vw - 1200px)/2)) 30px; color:var(--ink); background:repeating-linear-gradient(90deg,var(--celeste) 0 calc(100%/9),#fff calc(100%/9) calc(200%/9)); }
 .mx-hero:after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 55%,rgba(255,255,255,.72)); }
+/* Prevent the export renderer's viewport-height hero from creating a blank PDF page. */
+.mx-hero { min-height:0!important; height:auto!important; }
+@media print { .mx-hero { min-height:0!important; height:auto!important; } }
 .mx-hero-in { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr); gap:24px; align-items:center; max-width:1200px; margin:0 auto; }
 .mx-plate { background:rgba(255,255,255,.93); padding:22px 24px; border-radius:18px; box-shadow:0 20px 50px -24px rgba(11,37,69,.45); }
 .mx-eyebrow,.mx-kicker { font:500 12px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:#1c5a96; }
