@@ -2081,6 +2081,13 @@ Dashboard messi_albiceleste {
     height:auto!important;
     max-height:none!important;
   }
+  /* Keep the first chapter flowing directly after the navigation in PDF. */
+  .mxl > section.mx-chapter {
+    break-before:auto!important;
+    break-after:auto!important;
+    page-break-before:auto!important;
+    page-break-after:auto!important;
+  }
 }
 .mx-hero-in { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr); gap:24px; align-items:center; max-width:1200px; margin:0 auto; }
 .mx-plate { background:rgba(255,255,255,.93); padding:22px 24px; border-radius:18px; box-shadow:0 20px 50px -24px rgba(11,37,69,.45); }
