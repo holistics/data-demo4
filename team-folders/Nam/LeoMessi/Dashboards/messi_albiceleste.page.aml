@@ -2075,7 +2075,13 @@ Dashboard messi_albiceleste {
 .mx-hero:after { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 55%,rgba(255,255,255,.72)); }
 /* Prevent the export renderer's viewport-height hero from creating a blank PDF page. */
 .mx-hero { min-height:0!important; height:auto!important; }
-@media print { .mx-hero { min-height:0!important; height:auto!important; } }
+@media print {
+  .mxl > header.mx-hero {
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+  }
+}
 .mx-hero-in { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr); gap:24px; align-items:center; max-width:1200px; margin:0 auto; }
 .mx-plate { background:rgba(255,255,255,.93); padding:22px 24px; border-radius:18px; box-shadow:0 20px 50px -24px rgba(11,37,69,.45); }
 .mx-eyebrow,.mx-kicker { font:500 12px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:#1c5a96; }
