@@ -196,6 +196,9 @@ PageTheme messi_theme {
   custom_css: @css
     @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Rubik:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
+    /* Exports render without a doctype, so height:100% on a content-sized element stretches to the
+       whole export page. The HTML layout styles .mx-hero itself; keep percentage heights off here. */
+
     .dac-text-block {
       font-family: Rubik, system-ui, sans-serif;
       font-size: 14px;
@@ -211,12 +214,6 @@ PageTheme messi_theme {
       font-weight: 900;
     }
 
-    /* Hero: the shirt — nine celeste/white stripes behind a white plate */
-    .mx-hero {
-      height: 100%; box-sizing: border-box; border-radius: 14px; overflow: hidden;
-      background: repeating-linear-gradient(90deg, #75aadb 0 11.111%, #ffffff 11.111% 22.222%);
-      padding: 22px; display: flex; align-items: center; gap: 22px;
-    }
     .mx-plate {
       background: rgba(255,255,255,.93); border-radius: 18px; padding: 20px 24px; flex: 1.4;
       box-shadow: 0 20px 50px -24px rgba(11,37,69,.45);
@@ -249,7 +246,7 @@ PageTheme messi_theme {
 
     /* Photo / GIF slot — striped jersey panel until a real image URL is dropped in */
     .mx-media {
-      height: 100%; box-sizing: border-box; border-radius: 14px; position: relative; overflow: hidden;
+      box-sizing: border-box; border-radius: 14px; position: relative; overflow: hidden;
       background: repeating-linear-gradient(90deg, #d6e8f8 0 28px, #ffffff 28px 56px);
       display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
     }
@@ -270,7 +267,7 @@ PageTheme messi_theme {
     .mx-note b { color: #0b2545; }
 
     /* Footer */
-    .mx-footer { height: auto; box-sizing: border-box; border-radius: 14px; background: #0b2545; color: #c0d5ec; padding: 26px 28px; }
+    .mx-footer { box-sizing: border-box; border-radius: 14px; background: #0b2545; color: #c0d5ec; padding: 26px 28px; }
     .mx-footer h2 { font: 900 64px/.9 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; color: #ffffff; margin: 0 0 10px; }
     .mx-footer h2 span { color: #f6b40e; }
     .mx-footer p { margin: 0 0 8px; font-size: 15px; color: #e7f1fb; }
