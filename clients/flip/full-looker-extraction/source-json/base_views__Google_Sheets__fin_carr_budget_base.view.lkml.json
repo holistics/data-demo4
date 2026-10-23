@@ -1,0 +1,5 @@
+{
+ "original_path": "base_views/Google_Sheets/fin_carr_budget_base.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "view: fin_carr_budget_base {\n  sql_table_name: `fl-bi-p-poc.source_google_sheets_poc.fin_carr_budget` ;;\n\n  dimension: budget_downsell_carr {\n    type: number\n    sql: ${TABLE}.budget_downsell_carr ;;\n  }\n  dimension: budget_upsell_carr {\n    type: number\n    sql: ${TABLE}.budget_upsell_carr ;;\n  }\n  dimension: period_grain {\n    type: string\n    sql: ${TABLE}.period_grain ;;\n  }\n  dimension_group: period_end {\n    type: time\n    timeframes: [raw, date, week, month, quarter, year]\n    convert_tz: no\n    datatype: date\n    sql: ${TABLE}.period_end ;;\n  }\n  dimension_group: period_start {\n    type: time\n    timeframes: [raw, date, week, month, quarter, year]\n    convert_tz: no\n    datatype: date\n    sql: ${TABLE}.period_start ;;\n  }\n  measure: count {\n    type: count\n  }\n}\n"
+}

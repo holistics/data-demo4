@@ -1,0 +1,118 @@
+// One row per tournament or World Cup qualifying cycle Messi played in (20 rows).
+//
+// Dimension table for matches, honours and awards. The `messi_apps`, `messi_goals` and
+// `messi_penalty_goals` columns are pre-aggregated per tournament; they reconcile with
+// `messi_matches` but must not be summed alongside match or goal rows — the join fans them out.
+Model messi_tournaments {
+  type: 'table'
+  label: 'Tournaments'
+  description: "Every major tournament and World Cup qualifying cycle Messi played in for Argentina, one row each: six World Cups (2006–2026), six Copa Américas including the 2016 Centenario, the 2022 Finalissima and six CONMEBOL qualifying cycles. Carries the host, how far Argentina went, and Messi's pre-computed appearances, goals and awards at that tournament."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."tournaments"'
+
+  dimension tournament_id {
+    label: 'Tournament Id'
+    type: 'text'
+    description: "The **Tournament Id** is a short code and the primary key: competition prefix + year.  \n`WC` = World Cup, `WCQ` = World Cup qualifying cycle (year of the finals it qualified for), `CA` = Copa América, `FIN` = Finalissima. E.g. `WC2022`, `WCQ2026`, `CA2021`."
+    hidden: false
+    definition: @sql {{ #SOURCE.tournament_id }};;
+    primary_key: true
+  }
+
+  dimension tournament_name {
+    label: 'Tournament Name'
+    type: 'text'
+    description: "The **Tournament Name**, e.g. FIFA World Cup, Copa América, Copa América Centenario, or `FIFA World Cup qualification (CONMEBOL) – 2018 cycle`.  \nNot unique on its own — combine with `year`, or use `tournament_id`."
+    hidden: false
+    definition: @sql {{ #SOURCE.tournament_name }};;
+  }
+
+  dimension world_cup {
+    label: 'World Cup'
+    type: 'text'
+    description: "The **World Cup** edition as `year · host`, e.g. `2022 · Qatar`. Set only for the six FIFA World Cup finals tournaments; empty for Copa América, the Finalissima and qualifying cycles.  \nUse it as a single-select picker for a World Cup."
+    hidden: false
+    definition: @sql CASE WHEN {{ #SOURCE.tournament_name }} = 'FIFA World Cup' THEN {{ #SOURCE.year }}::text || ' · ' || {{ #SOURCE.host }} END;;
+  }
+
+  dimension year {
+    label: 'Year'
+    type: 'number'
+    format: "0"
+    description: "The **Year** of the tournament. For qualifying cycles it is the year of the World Cup being qualified for, not the years the qualifiers were played."
+    hidden: false
+    definition: @sql {{ #SOURCE.year }};;
+  }
+
+  dimension host {
+    label: 'Host'
+    type: 'text'
+    description: "The **Host** nation(s), e.g. Qatar, Brazil, `United States / Canada / Mexico`. Qualifying cycles show `CONMEBOL home-and-away`."
+    hidden: false
+    definition: @sql {{ #SOURCE.host }};;
+  }
+
+  dimension argentina_finish {
+    label: 'Argentina Finish'
+    type: 'text'
+    description: "The **Argentina Finish** is how far Argentina went: Champion, Runner-up, Third place, Semi-final, Quarter-final, Round of 16, or Qualified for a qualifying cycle.  \nArgentina were champions four times with Messi: Copa América 2021 and 2024, Finalissima 2022 and World Cup 2022."
+    hidden: false
+    definition: @sql {{ #SOURCE.argentina_finish }};;
+  }
+
+  dimension is_champion {
+    label: 'Is Champion'
+    type: 'truefalse'
+    description: "The **Is Champion** flag is true when Argentina won the tournament (`argentina_finish` = Champion)."
+    hidden: false
+    definition: @aql messi_tournaments.argentina_finish == 'Champion';;
+  }
+
+  dimension messi_apps {
+    label: 'Messi Apps (Tournament)'
+    type: 'number'
+    description: "The **Messi Apps (Tournament)** is Messi's appearances at this tournament, pre-aggregated.  \nReconciles with a count of `messi_matches` per `tournament_id`. A tournament-level attribute — do not sum it in a query that also includes matches or goals, because the join repeats it on every row."
+    hidden: false
+    definition: @sql {{ #SOURCE.messi_apps }};;
+  }
+
+  dimension messi_goals {
+    label: 'Messi Goals (Tournament)'
+    type: 'number'
+    description: "The **Messi Goals (Tournament)** is Messi's goals at this tournament, pre-aggregated.  \nReconciles with `messi_matches.messi_goals` summed per tournament. Same fan-out caution as `messi_apps`."
+    hidden: false
+    definition: @sql {{ #SOURCE.messi_goals }};;
+  }
+
+  dimension messi_penalty_goals {
+    label: 'Messi Penalty Goals (Tournament)'
+    type: 'number'
+    description: "The **Messi Penalty Goals (Tournament)** is how many of his goals at this tournament were penalties (e.g. 4 of 7 at the 2022 World Cup). Same fan-out caution as `messi_apps`."
+    hidden: false
+    definition: @sql {{ #SOURCE.messi_penalty_goals }};;
+  }
+
+  dimension first_match {
+    label: 'First Match'
+    type: 'date'
+    description: "The **First Match** date of Messi's first appearance at this tournament or cycle."
+    hidden: false
+    definition: @sql {{ #SOURCE.first_match }};;
+  }
+
+  dimension last_match {
+    label: 'Last Match'
+    type: 'date'
+    description: "The **Last Match** date of Messi's last appearance at this tournament or cycle."
+    hidden: false
+    definition: @sql {{ #SOURCE.last_match }};;
+  }
+
+  dimension messi_individual_awards {
+    label: 'Messi Individual Awards'
+    type: 'text'
+    description: "The **Messi Individual Awards** won at this tournament as a semicolon-separated summary, e.g. `Golden Ball; Silver Boot`.  \nFor display only — to count or filter awards use `messi_individual_awards`, which has one row per award."
+    hidden: false
+    definition: @sql {{ #SOURCE.messi_individual_awards }};;
+  }
+}

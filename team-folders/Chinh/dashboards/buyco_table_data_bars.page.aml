@@ -1,0 +1,86 @@
+Dashboard buyco_table_data_bars {
+  title: 'BuyCo — HTML Data Bars in a Table'
+  description: @md
+    A focused example of rendering an Excel-style data bar from a text metric formatted as HTML.
+  ;;
+  theme: H.themes.classic
+
+  block b_intro: TextBlock {
+    content: @md
+# HTML data bars in a standard table
+
+The green bar is returned by the dataset as an HTML text metric. Its width is each merchant's **Total Value** relative to the largest value in the result. Because the cell background stays transparent, the table's native row-hover treatment remains visible.
+    ;;
+  }
+
+  block v_merchants: VizBlock {
+    label: 'Top 15 Merchants by Total Value'
+    viz: DataTable {
+      dataset: demo_cross_model_calculation
+      fields: [
+        VizFieldFull {
+          label: 'Merchant'
+          ref: r(ecommerce_merchants.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Total Value'
+          ref: r(demo_cross_model_calculation.total_value)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###'
+          }
+          uname: 'total_value'
+        },
+        VizFieldFull {
+          label: 'Total Value — Data Bar'
+          ref: r(demo_cross_model_calculation.total_value_data_bar)
+          format {
+            type: 'html'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 15
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'total_value'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 15
+        column_styles: [
+          ColumnStyle {
+            key: 'total_value'
+            width: 180
+          }
+        ]
+      }
+    }
+  }
+
+  interactions: []
+
+  view: TabLayout {
+    tab example: CanvasLayout {
+      label: 'Example'
+      width: 1220
+      height: 880
+      grid_size: 20
+      auto_expand_vertically: true
+      block b_intro {
+        position: pos(20, 20, 1180, 160)
+        layer: 1
+      }
+      block v_merchants {
+        position: pos(20, 200, 1180, 640)
+        layer: 1
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+}

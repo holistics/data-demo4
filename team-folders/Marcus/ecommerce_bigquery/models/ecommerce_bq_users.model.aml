@@ -1,0 +1,95 @@
+Model ecommerce_bq_users {
+  type: 'table'
+  label: 'Users'
+  data_source_name: 'demo_bigquery'
+  table_name: 'ecommerce_cleaned.dim_users'
+
+  dimension user_id {
+    label: 'User ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+
+  dimension full_name {
+    label: 'Full Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.full_name }};;
+  }
+
+  dimension first_name {
+    label: 'First Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.first_name }};;
+  }
+
+  dimension last_name {
+    label: 'Last Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.last_name }};;
+  }
+
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    definition: @sql {{ #SOURCE.email }};;
+  }
+
+  dimension gender {
+    label: 'Gender'
+    type: 'text'
+    definition: @sql {{ #SOURCE.gender }};;
+  }
+
+  dimension birth_date {
+    label: 'Birth Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.birth_date }};;
+  }
+
+  dimension sign_up_date {
+    label: 'Sign Up Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.sign_up_date }};;
+  }
+
+  dimension sign_up_at {
+    label: 'Sign Up At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.sign_up_at }};;
+  }
+
+  dimension city_id {
+    label: 'City ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.city_id }};;
+  }
+
+  dimension age {
+    label: 'Age'
+    type: 'number'
+    definition: @sql {{ #SOURCE.age }};;
+  }
+
+  dimension city_name {
+    label: 'City Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.city_name }};;
+  }
+
+  dimension country_name {
+    label: 'Country Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.country_name }};;
+  }
+
+  dimension continent_name {
+    label: 'Continent Name'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.continent_name }};;
+  }
+}

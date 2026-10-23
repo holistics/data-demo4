@@ -1,0 +1,57 @@
+Model product_features {
+  type: 'table'
+  label: "Features"
+  description: "Product features tracked in PostHog with launch / GA dates (Product & Design adoption)."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_features"'
+
+  dimension feature_id {
+    label: "Feature Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.feature_id }};;
+    primary_key: true
+  }
+
+  dimension feature_name {
+    label: "Feature Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.feature_name }};;
+  }
+
+  dimension feature_area {
+    label: "Feature Area"
+    type: 'text'
+    definition: @sql {{ #SOURCE.feature_area }};;
+  }
+
+  dimension launch_date {
+    label: "Launch Date"
+    type: 'date'
+    description: "First date the feature was available to any teacher (beta or GA)."
+    definition: @sql {{ #SOURCE.launch_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension ga_date {
+    label: "GA Date"
+    type: 'date'
+    description: "General-availability date."
+    definition: @sql {{ #SOURCE.ga_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension availability {
+    label: "Availability"
+    type: 'text'
+    description: "Who can use the feature (all teachers, or 360 partners and pilots only)."
+    definition: @sql {{ #SOURCE.availability }};;
+  }
+
+  dimension posthog_event {
+    label: "PostHog Event"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.posthog_event }};;
+  }
+}

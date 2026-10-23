@@ -1,0 +1,1697 @@
+Dashboard commonlit {
+  title: 'CommonLit'
+  description: 'CommonLit demo: leadership scorecard, partnerships, content performance and product adoption in one dashboard. Filters are shared across tabs. CSMs see only their own accounts (row-level permission on CSM).'
+  theme: commonlit_theme
+  block f_school_year: FilterBlock {
+    label: 'School Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_teacher_student_usage
+      field: r(dates.school_year)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      shadow: 'none'
+      padding: 0
+    }
+  }
+  block f_state: FilterBlock {
+    label: 'State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_teacher_student_usage
+      field: r(states.state_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      shadow: 'none'
+      padding: 0
+    }
+  }
+  block f_district: FilterBlock {
+    label: 'District'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_teacher_student_usage
+      field: r(districts.district_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      shadow: 'none'
+      padding: 0
+    }
+  }
+  block f_program: FilterBlock {
+    label: 'Program Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: commonlit_teacher_student_usage
+      field: r(school_program_years.program_status)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      shadow: 'none'
+      padding: 0
+    }
+  }
+  block l_t_header: TextBlock {
+    content: @md
+# Leadership Scorecard
+
+Annual goals vs school-year-to-date actuals. Targets are org-wide and do not change with State, District or Program filters.;;
+  }
+  block l_t_reach: TextBlock {
+    content: @md
+## Reach;;
+  }
+  block l_tb_reach: VizBlock {
+    label: 'Reach: Actual vs Goal'
+    viz: DataTable {
+      dataset: commonlit_leadership_scorecard
+      fields: [
+        r(dates.school_year),
+        r(commonlit_leadership_scorecard.active_teachers),
+        r(commonlit_leadership_scorecard.target_active_teachers),
+        r(commonlit_leadership_scorecard.attainment_active_teachers),
+        r(commonlit_leadership_scorecard.active_students),
+        r(commonlit_leadership_scorecard.target_active_students),
+        r(commonlit_leadership_scorecard.attainment_active_students),
+        r(commonlit_leadership_scorecard.assignments_completed),
+        r(commonlit_leadership_scorecard.target_assignments_completed),
+        r(commonlit_leadership_scorecard.attainment_assignments_completed)
+      ]
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+      }
+    }
+  }
+  block l_c_teachers_month: VizBlock {
+    label: 'Active Teachers by Month vs Annual Goal'
+    viz: LineChart {
+      dataset: commonlit_leadership_scorecard
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.active_teachers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.target_active_teachers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block l_c_assign_ytd: VizBlock {
+    label: 'Assignments Completed (School YTD) vs Goal'
+    viz: LineChart {
+      dataset: commonlit_leadership_scorecard
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.assignments_completed_ytd)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7d9326'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.target_assignments_completed)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block l_c_students_month: VizBlock {
+    label: 'Active Students by Month: This Year vs Last Year'
+    description: 'Each month compared with the same month one year earlier; selecting 2026-27 compares with 2025-26.'
+    viz: ColumnChart {
+      dataset: commonlit_leadership_scorecard
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.active_students_ly)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.active_students)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.active_students_yoy)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#ffaa00'
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block l_t_equity: TextBlock {
+    content: @md
+## Equity & support;;
+  }
+  block l_tb_equity: VizBlock {
+    label: 'Equity & Support: Actual vs Goal'
+    viz: DataTable {
+      dataset: commonlit_leadership_scorecard
+      fields: [
+        r(dates.school_year),
+        r(commonlit_leadership_scorecard.pct_title_i_work),
+        r(commonlit_leadership_scorecard.target_pct_title_i_work),
+        r(commonlit_leadership_scorecard.median_first_response_hours),
+        r(commonlit_leadership_scorecard.target_first_response_hours)
+      ]
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+      }
+    }
+  }
+  block l_c_title_i_month: VizBlock {
+    label: '% Student Work from Title I Schools by Month'
+    viz: LineChart {
+      dataset: commonlit_leadership_scorecard
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.pct_title_i_work)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7d9326'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_leadership_scorecard.target_pct_title_i_work)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block l_t_partnerships: TextBlock {
+    content: @md
+## Partnerships
+
+Partner ARR is the current snapshot; renewal and pilot conversion use opportunities closing in the selected school year.;;
+  }
+  block l_tb_partnerships: VizBlock {
+    label: 'Partnerships: Actual vs Goal'
+    viz: DataTable {
+      dataset: commonlit_leadership_scorecard
+      fields: [
+        r(dates.school_year),
+        r(commonlit_leadership_scorecard.gross_renewal_rate),
+        r(commonlit_leadership_scorecard.target_gross_renewal_rate),
+        r(commonlit_leadership_scorecard.pilot_conversion_rate),
+        r(commonlit_leadership_scorecard.target_pilot_conversion_rate)
+      ]
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+      }
+    }
+  }
+  block l_k_arr: VizBlock {
+    label: 'Partner ARR (current)'
+    viz: MetricKpi {
+      dataset: commonlit_leadership_scorecard
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_leadership_scorecard.partner_arr)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block l_k_arr_att: VizBlock {
+    label: 'ARR vs Current-Year Goal'
+    description: 'Partner ARR ÷ the Partner ARR goal of the selected school year.'
+    viz: MetricKpi {
+      dataset: commonlit_leadership_scorecard
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_leadership_scorecard.attainment_partner_arr)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_t_header: TextBlock {
+    content: @md
+# Partnerships
+
+How pilots are using CommonLit 360, and which partner accounts need attention before renewal.;;
+  }
+  block p_k_arr: VizBlock {
+    label: 'Partner ARR'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.arr)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_partners: VizBlock {
+    label: 'Active Partners'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.active_partners)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_pilots: VizBlock {
+    label: 'Active Pilots'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.active_pilots)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_at_risk: VizBlock {
+    label: 'At-Risk Accounts (Red)'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.at_risk_accounts)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_arr_risk: VizBlock {
+    label: 'ARR at Risk'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.arr_at_risk)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_watch: VizBlock {
+    label: 'Watch List (Yellow)'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.watch_accounts)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_renewal: VizBlock {
+    label: 'Renewal Rate'
+    description: 'Closed-won ÷ closed renewals with a close date in the selected school year.'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.renewal_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_k_pilot_conv: VizBlock {
+    label: 'Pilot Conversion Rate'
+    description: 'Closed-won ÷ closed pilot conversions with a close date in the selected school year.'
+    viz: MetricKpi {
+      dataset: commonlit_partnerships_health
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_partnerships_health.pilot_conversion_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block p_t_pilot: TextBlock {
+    content: @md
+## Pilot usage;;
+  }
+  block p_c_pilot_teachers: VizBlock {
+    label: 'Pilot Teachers: Licensed vs Active by Month'
+    viz: ColumnChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.licensed_teachers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#b1adb0'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.account_active_teachers)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+      }
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: [
+          'Active Pilot'
+        ]
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block p_c_pilot_adoption: VizBlock {
+    label: 'Pilot Teacher Adoption Rate by Month'
+    viz: LineChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.teacher_adoption_rate)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7d9326'
+          }
+        }
+      }
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: [
+          'Active Pilot'
+        ]
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block p_tb_pilots: VizBlock {
+    label: 'Active Pilots'
+    description: 'Teacher adoption and health over the selected school year; lowest adoption first.'
+    viz: DataTable {
+      dataset: commonlit_partnerships_health
+      fields: [
+        r(accounts.account_name),
+        r(accounts.csm_name),
+        r(accounts.segment),
+        r(states.state_name),
+        r(accounts.pilot_start_date),
+        r(accounts.pilot_end_date),
+        r(commonlit_partnerships_health.teacher_adoption_rate),
+        r(commonlit_partnerships_health.avg_health_score),
+        r(commonlit_partnerships_health.latest_health_status)
+      ]
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: [
+          'Active Pilot'
+        ]
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'teacher_adoption_rate'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block p_t_risk: TextBlock {
+    content: @md
+## At-risk accounts
+
+Latest health month per account. Red < 50, Yellow 50-69, Green >= 70.;;
+  }
+  block p_tb_at_risk: VizBlock {
+    label: 'Partner Accounts at Risk (latest health Red or Yellow)'
+    viz: DataTable {
+      dataset: commonlit_partnerships_health
+      fields: [
+        r(accounts.account_name),
+        r(accounts.csm_name),
+        r(accounts.segment),
+        r(states.state_name),
+        r(accounts.next_renewal_date),
+        r(commonlit_fct_account_health_monthly.health_status),
+        r(commonlit_partnerships_health.latest_health_score),
+        r(commonlit_partnerships_health.arr_latest_health)
+      ]
+      filter {
+        field: r(commonlit_fct_account_health_monthly.is_latest_month)
+        operator: 'is'
+        value: true
+      }
+      filter {
+        field: r(commonlit_fct_account_health_monthly.health_status)
+        operator: 'is'
+        value: [
+          'Red',
+          'Yellow'
+        ]
+      }
+      filter {
+        field: r(accounts.account_status)
+        operator: 'is'
+        value: [
+          'Active Partner'
+        ]
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'latest_health_score'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block p_c_risk_csm: VizBlock {
+    label: 'At-Risk Accounts by CSM'
+    viz: BarChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(accounts.csm_name)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.at_risk_accounts)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#d24b58'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.watch_accounts)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#ffaa00'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block p_c_health_mix: VizBlock {
+    label: 'Account Health Mix by Month'
+    viz: ColumnChart {
+      dataset: commonlit_partnerships_health
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(commonlit_fct_account_health_monthly.health_status)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_partnerships_health.accounts_reporting_health)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block c_t_header: TextBlock {
+    content: @md
+# Content Performance
+
+Which lessons teachers assign, how many students finish them, and where scores say a lesson needs work.;;
+  }
+  block c_k_assigned: VizBlock {
+    label: 'Times Assigned'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.times_assigned)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block c_k_subs: VizBlock {
+    label: 'Submissions'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.submissions)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block c_k_score: VizBlock {
+    label: 'Avg Score'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.avg_score)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block c_k_completion: VizBlock {
+    label: 'Completion Rate'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.completion_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block c_k_new: VizBlock {
+    label: 'New Releases Assigned'
+    viz: MetricKpi {
+      dataset: commonlit_content_performance
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_content_performance.new_releases_assigned)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block c_t_improve: TextBlock {
+    content: @md
+## Lessons to improve
+
+Lowest average score first, among lessons assigned at least 20 times in the period.;;
+  }
+  block c_tb_improve: VizBlock {
+    label: 'Lessons to Improve'
+    viz: DataTable {
+      dataset: commonlit_content_performance
+      fields: [
+        r(content.title),
+        r(content.collection),
+        r(content.content_type),
+        r(content.grade_level),
+        r(content.lexile),
+        r(commonlit_content_performance.times_assigned),
+        r(commonlit_content_performance.submissions),
+        r(commonlit_content_performance.avg_score),
+        r(commonlit_content_performance.completion_rate)
+      ]
+      filter {
+        field: r(commonlit_content_performance.times_assigned)
+        operator: 'greater_than'
+        value: '19'
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'avg_score'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block c_c_histogram: VizBlock {
+    label: 'Score Distribution (Submissions by Score Bucket)'
+    description: 'Submissions grouped into 10-point score buckets (0 = 0-9%, 90 = 90-99%, 100 = perfect).'
+    viz: ColumnChart {
+      dataset: commonlit_content_performance
+      x_axis: VizFieldFull {
+        ref: r(commonlit_fct_student_submissions.score_bucket)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.submissions)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block c_c_score_collection: VizBlock {
+    label: 'Avg Score and Completion by Collection'
+    viz: BarChart {
+      dataset: commonlit_content_performance
+      x_axis: VizFieldFull {
+        ref: r(content.collection)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.avg_score)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#3f6e79'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.completion_rate)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#7d9326'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block c_c_assigned_month: VizBlock {
+    label: 'Times Assigned by Month and Collection'
+    viz: ColumnChart {
+      dataset: commonlit_content_performance
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(content.collection)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_content_performance.times_assigned)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block c_tb_new: VizBlock {
+    label: 'New Releases: Early Performance'
+    viz: DataTable {
+      dataset: commonlit_content_performance
+      fields: [
+        r(content.title),
+        r(content.collection),
+        r(content.publish_date),
+        r(commonlit_content_performance.times_assigned),
+        r(commonlit_content_performance.avg_score),
+        r(commonlit_content_performance.completion_rate)
+      ]
+      filter {
+        field: r(content.is_new_release)
+        operator: 'is'
+        value: true
+      }
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'times_assigned'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block pr_t_header: TextBlock {
+    content: @md
+# Product Adoption
+
+How fast teachers adopt new features after launch, and which features they keep using.;;
+  }
+  block pr_k_users: VizBlock {
+    label: 'Teachers Using Any Feature'
+    viz: MetricKpi {
+      dataset: commonlit_product_adoption
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_product_adoption.feature_users)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block pr_k_new: VizBlock {
+    label: 'New Feature Adopters'
+    viz: MetricKpi {
+      dataset: commonlit_product_adoption
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_product_adoption.new_adopters)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block pr_k_events: VizBlock {
+    label: 'Feature Events'
+    viz: MetricKpi {
+      dataset: commonlit_product_adoption
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_product_adoption.feature_events)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block pr_k_epu: VizBlock {
+    label: 'Events per Teacher'
+    viz: MetricKpi {
+      dataset: commonlit_product_adoption
+      value: VizFieldFull {
+        label: ' '
+        ref: r(commonlit_product_adoption.events_per_user)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+  block pr_t_ramp: TextBlock {
+    content: @md
+## Adoption ramps
+
+Cumulative teachers who have used each feature since launch (features launched since Aug 2025). Ignores the School Year filter so every ramp starts at launch.;;
+  }
+  block pr_c_ramp: VizBlock {
+    label: 'Adopters Since Launch: New Features'
+    viz: LineChart {
+      dataset: commonlit_product_adoption
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc week'
+        format {
+          type: 'date'
+          pattern: 'LLL dd, yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(product_features.feature_name)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_product_adoption.adopters_since_launch)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      filter {
+        field: r(product_features.feature_name)
+        operator: 'is'
+        value: [
+          'Target Lessons',
+          'Assessment Reports 2.0',
+          'AI Writing Feedback',
+          'Lesson Planner'
+        ]
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block pr_c_weekly: VizBlock {
+    label: 'Weekly Active Users by Feature'
+    viz: LineChart {
+      dataset: commonlit_product_adoption
+      x_axis: VizFieldFull {
+        ref: r(dates.date_day)
+        transformation: 'datetrunc week'
+        format {
+          type: 'date'
+          pattern: 'LLL dd, yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(product_features.feature_name)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(commonlit_product_adoption.feature_users)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+  block pr_tb_features: VizBlock {
+    label: 'Feature Scorecard'
+    viz: DataTable {
+      dataset: commonlit_product_adoption
+      fields: [
+        r(product_features.feature_name),
+        r(product_features.feature_area),
+        r(product_features.launch_date),
+        r(product_features.availability),
+        r(commonlit_product_adoption.feature_users),
+        r(commonlit_product_adoption.new_adopters),
+        r(commonlit_product_adoption.events_per_user)
+      ]
+      settings {
+        row_limit: 25
+        wrap_header_text: true
+        sorts: [
+          SortSetting {
+            key: 'feature_users'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_state'
+      to: [
+        'f_district',
+        'l_tb_reach',
+        'l_c_teachers_month',
+        'l_c_assign_ytd',
+        'l_c_students_month',
+        'l_tb_equity',
+        'l_c_title_i_month',
+        'l_tb_partnerships',
+        'l_k_arr',
+        'l_k_arr_att',
+        'p_k_arr',
+        'p_k_partners',
+        'p_k_pilots',
+        'p_k_at_risk',
+        'p_k_arr_risk',
+        'p_k_watch',
+        'p_k_renewal',
+        'p_k_pilot_conv',
+        'p_c_pilot_teachers',
+        'p_c_pilot_adoption',
+        'p_tb_pilots',
+        'p_tb_at_risk',
+        'p_c_risk_csm',
+        'p_c_health_mix',
+        'c_k_assigned',
+        'c_k_subs',
+        'c_k_score',
+        'c_k_completion',
+        'c_k_new',
+        'c_tb_improve',
+        'c_c_histogram',
+        'c_c_score_collection',
+        'c_c_assigned_month',
+        'c_tb_new',
+        'pr_k_users',
+        'pr_k_new',
+        'pr_k_events',
+        'pr_k_epu',
+        'pr_c_ramp',
+        'pr_c_weekly',
+        'pr_tb_features'
+      ]
+      field: r(states.state_name)
+    },
+    FilterInteraction {
+      from: 'f_school_year'
+      to: [
+        'l_tb_reach',
+        'l_c_teachers_month',
+        'l_c_assign_ytd',
+        'l_c_students_month',
+        'l_tb_equity',
+        'l_c_title_i_month',
+        'l_tb_partnerships',
+        'l_k_arr_att',
+        'p_k_renewal',
+        'p_k_pilot_conv',
+        'p_c_pilot_teachers',
+        'p_c_pilot_adoption',
+        'p_tb_pilots',
+        'p_c_health_mix',
+        'c_k_assigned',
+        'c_k_subs',
+        'c_k_score',
+        'c_k_completion',
+        'c_k_new',
+        'c_tb_improve',
+        'c_c_histogram',
+        'c_c_score_collection',
+        'c_c_assigned_month',
+        'c_tb_new',
+        'pr_k_users',
+        'pr_k_new',
+        'pr_k_events',
+        'pr_k_epu',
+        'pr_c_weekly',
+        'pr_tb_features'
+      ]
+      field: r(dates.school_year)
+    },
+    FilterInteraction {
+      from: 'f_district'
+      to: [
+        'l_tb_reach',
+        'l_c_teachers_month',
+        'l_c_assign_ytd',
+        'l_c_students_month',
+        'l_tb_equity',
+        'l_c_title_i_month',
+        'l_tb_partnerships',
+        'l_k_arr',
+        'l_k_arr_att',
+        'p_k_arr',
+        'p_k_partners',
+        'p_k_pilots',
+        'p_k_at_risk',
+        'p_k_arr_risk',
+        'p_k_watch',
+        'p_k_renewal',
+        'p_k_pilot_conv',
+        'p_c_pilot_teachers',
+        'p_c_pilot_adoption',
+        'p_tb_pilots',
+        'p_tb_at_risk',
+        'p_c_risk_csm',
+        'p_c_health_mix',
+        'c_k_assigned',
+        'c_k_subs',
+        'c_k_score',
+        'c_k_completion',
+        'c_k_new',
+        'c_tb_improve',
+        'c_c_histogram',
+        'c_c_score_collection',
+        'c_c_assigned_month',
+        'c_tb_new',
+        'pr_k_users',
+        'pr_k_new',
+        'pr_k_events',
+        'pr_k_epu',
+        'pr_c_ramp',
+        'pr_c_weekly',
+        'pr_tb_features'
+      ]
+      field: r(districts.district_name)
+    },
+    FilterInteraction {
+      from: 'f_program'
+      to: [
+        'l_tb_reach',
+        'l_c_teachers_month',
+        'l_c_assign_ytd',
+        'l_c_students_month',
+        'l_tb_equity',
+        'l_c_title_i_month',
+        'c_k_assigned',
+        'c_k_subs',
+        'c_k_score',
+        'c_k_completion',
+        'c_k_new',
+        'c_tb_improve',
+        'c_c_histogram',
+        'c_c_score_collection',
+        'c_c_assigned_month',
+        'c_tb_new',
+        'pr_k_users',
+        'pr_k_new',
+        'pr_k_events',
+        'pr_k_epu',
+        'pr_c_ramp',
+        'pr_c_weekly',
+        'pr_tb_features'
+      ]
+      field: r(school_program_years.program_status)
+    },
+    FilterInteraction {
+      from: 'f_program'
+      to: [
+        'l_tb_partnerships',
+        'l_k_arr',
+        'l_k_arr_att',
+        'p_k_arr',
+        'p_k_partners',
+        'p_k_pilots',
+        'p_k_at_risk',
+        'p_k_arr_risk',
+        'p_k_watch',
+        'p_k_renewal',
+        'p_k_pilot_conv',
+        'p_c_pilot_teachers',
+        'p_c_pilot_adoption',
+        'p_tb_pilots',
+        'p_tb_at_risk',
+        'p_c_risk_csm',
+        'p_c_health_mix'
+      ]
+      field: r(accounts.program_status)
+    }
+  ]
+  view: TabLayout {
+    label: 'CommonLit'
+    tab leadership: CanvasLayout {
+      label: 'Leadership'
+      width: 1400
+      height: 2060
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block l_t_header {
+        position: pos(20, 40, 1360, 120)
+      }
+      block f_school_year {
+        position: pos(20, 180, 320, 60)
+      }
+      block f_state {
+        position: pos(360, 180, 320, 60)
+      }
+      block f_district {
+        position: pos(720, 180, 320, 60)
+      }
+      block f_program {
+        position: pos(1080, 180, 300, 60)
+      }
+      block l_t_reach {
+        position: pos(20, 260, 1360, 60)
+      }
+      block l_tb_reach {
+        position: pos(20, 340, 1360, 240)
+      }
+      block l_c_teachers_month {
+        position: pos(20, 600, 660, 360)
+      }
+      block l_c_assign_ytd {
+        position: pos(700, 600, 680, 360)
+      }
+      block l_c_students_month {
+        position: pos(20, 980, 1360, 340)
+      }
+      block l_t_equity {
+        position: pos(20, 1340, 1360, 60)
+      }
+      block l_tb_equity {
+        position: pos(20, 1420, 760, 240)
+      }
+      block l_c_title_i_month {
+        position: pos(800, 1420, 580, 240)
+      }
+      block l_t_partnerships {
+        position: pos(20, 1680, 1360, 100)
+      }
+      block l_tb_partnerships {
+        position: pos(20, 1800, 760, 240)
+      }
+      block l_k_arr {
+        position: pos(800, 1800, 280, 240)
+      }
+      block l_k_arr_att {
+        position: pos(1100, 1800, 280, 240)
+      }
+      default_zoom: 1
+      auto_expand_horizontally: true
+    }
+    tab partnerships: CanvasLayout {
+      label: 'Partnerships'
+      width: 1220
+      height: 2440
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block p_t_header {
+        position: pos(20, 20, 1180, 120)
+      }
+      block f_school_year {
+        position: pos(20, 160, 280, 60)
+      }
+      block f_state {
+        position: pos(325, 160, 285, 60)
+      }
+      block f_district {
+        position: pos(630, 160, 285, 60)
+      }
+      block f_program {
+        position: pos(935, 160, 265, 60)
+      }
+      block p_k_arr {
+        position: pos(20, 240, 285, 140)
+      }
+      block p_k_partners {
+        position: pos(325, 240, 285, 140)
+      }
+      block p_k_pilots {
+        position: pos(630, 240, 285, 140)
+      }
+      block p_k_at_risk {
+        position: pos(935, 240, 265, 140)
+      }
+      block p_k_arr_risk {
+        position: pos(20, 400, 285, 140)
+      }
+      block p_k_watch {
+        position: pos(325, 400, 285, 140)
+      }
+      block p_k_renewal {
+        position: pos(630, 400, 285, 140)
+      }
+      block p_k_pilot_conv {
+        position: pos(935, 400, 265, 140)
+      }
+      block p_t_pilot {
+        position: pos(20, 560, 1180, 60)
+      }
+      block p_c_pilot_teachers {
+        position: pos(20, 640, 580, 340)
+      }
+      block p_c_pilot_adoption {
+        position: pos(620, 640, 580, 340)
+      }
+      block p_tb_pilots {
+        position: pos(20, 1000, 1180, 420)
+      }
+      block p_t_risk {
+        position: pos(20, 1440, 1180, 100)
+      }
+      block p_tb_at_risk {
+        position: pos(20, 1560, 1180, 480)
+      }
+      block p_c_risk_csm {
+        position: pos(20, 2060, 580, 340)
+      }
+      block p_c_health_mix {
+        position: pos(620, 2060, 580, 340)
+      }
+      default_zoom: 1
+    }
+    tab content: CanvasLayout {
+      label: 'Content'
+      width: 1220
+      height: 2260
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block c_t_header {
+        position: pos(20, 20, 1180, 120)
+      }
+      block f_school_year {
+        position: pos(20, 160, 280, 60)
+      }
+      block f_state {
+        position: pos(325, 160, 285, 60)
+      }
+      block f_district {
+        position: pos(630, 160, 285, 60)
+      }
+      block f_program {
+        position: pos(935, 160, 265, 60)
+      }
+      block c_k_assigned {
+        position: pos(20, 240, 220, 140)
+      }
+      block c_k_subs {
+        position: pos(260, 240, 220, 140)
+      }
+      block c_k_score {
+        position: pos(500, 240, 220, 140)
+      }
+      block c_k_completion {
+        position: pos(740, 240, 220, 140)
+      }
+      block c_k_new {
+        position: pos(980, 240, 220, 140)
+      }
+      block c_t_improve {
+        position: pos(20, 400, 1180, 100)
+      }
+      block c_tb_improve {
+        position: pos(20, 520, 1180, 520)
+      }
+      block c_c_histogram {
+        position: pos(20, 1060, 580, 360)
+      }
+      block c_c_score_collection {
+        position: pos(620, 1060, 580, 360)
+      }
+      block c_c_assigned_month {
+        position: pos(20, 1440, 1180, 360)
+      }
+      block c_tb_new {
+        position: pos(20, 1820, 1180, 400)
+      }
+      default_zoom: 1
+    }
+    tab product: CanvasLayout {
+      label: 'Product'
+      width: 1220
+      height: 1800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block pr_t_header {
+        position: pos(20, 20, 1180, 120)
+      }
+      block f_school_year {
+        position: pos(20, 160, 280, 60)
+      }
+      block f_state {
+        position: pos(325, 160, 285, 60)
+      }
+      block f_district {
+        position: pos(630, 160, 285, 60)
+      }
+      block f_program {
+        position: pos(935, 160, 265, 60)
+      }
+      block pr_k_users {
+        position: pos(20, 240, 285, 140)
+      }
+      block pr_k_new {
+        position: pos(325, 240, 285, 140)
+      }
+      block pr_k_events {
+        position: pos(630, 240, 285, 140)
+      }
+      block pr_k_epu {
+        position: pos(935, 240, 265, 140)
+      }
+      block pr_t_ramp {
+        position: pos(20, 400, 1180, 120)
+      }
+      block pr_c_ramp {
+        position: pos(20, 540, 1180, 400)
+      }
+      block pr_c_weekly {
+        position: pos(20, 960, 1180, 380)
+      }
+      block pr_tb_features {
+        position: pos(20, 1360, 1180, 400)
+      }
+      default_zoom: 1
+    }
+  }
+  settings {
+    autorun_on_open: true
+  }
+}

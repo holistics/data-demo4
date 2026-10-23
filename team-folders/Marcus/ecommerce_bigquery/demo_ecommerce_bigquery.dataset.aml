@@ -1,0 +1,226 @@
+Dataset demo_ecommerce_bigquery {
+  label: 'Ecommerce Dataset (BigQuery)'
+  description: '''
+# Dataset Capabilities
+Simplified BigQuery twin of `demo_ecommerce_version_2`, built on the dbt project
+`bigquery_ecommerce` (dataset `ecommerce_cleaned` in `data-demo-502609`).
+
+## What this dataset can answer
+- Revenue, cost of goods and gross profit, in total and split into five category groups:
+  Electronics (Mobiles & Tablets + Home Entertainment), Groceries, Home & Living, Fashion, Beauty.
+- GMV and order counts by status, category, product, customer, city, country and continent.
+
+## Definitions
+- Revenue = quantity × unit price × (1 − order discount), delivered orders only (NMV basis, no commission).
+- Cost = quantity × unit cost, delivered orders only.
+- Each category-group metric is the same base formula filtered to one group, so the five sum to the total.
+
+## What this dataset cannot answer
+- Merchants, operating expenses, net profit, marketing attribution, inventory.
+'''
+  data_source_name: 'demo_bigquery'
+
+  models: [
+    ecommerce_bq_order_items,
+    ecommerce_bq_orders,
+    ecommerce_bq_users,
+    ecommerce_bq_cities,
+    ecommerce_bq_products,
+    ecommerce_bq_categories,
+  ]
+  relationships: [
+    relationship(ecommerce_bq_order_items.order_id > ecommerce_bq_orders.order_id, true),
+    relationship(ecommerce_bq_orders.user_id > ecommerce_bq_users.user_id, true),
+    relationship(ecommerce_bq_users.city_id > ecommerce_bq_cities.city_id, true),
+    relationship(ecommerce_bq_order_items.product_id > ecommerce_bq_products.product_id, true),
+    relationship(ecommerce_bq_products.category_id > ecommerce_bq_categories.category_id, true),
+  ]
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BASE METRICS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric total_orders {
+    label: 'Total Orders'
+    type: 'number'
+    definition: @aql count(ecommerce_bq_orders.order_id) ;;
+    description: 'Count of orders, all statuses.'
+  }
+
+  metric gmv {
+    label: 'GMV (Gross Merchandise Value)'
+    type: 'number'
+    definition: @aql sum(ecommerce_bq_order_items.gross_value) ;;
+    format: "[\$\$]#,###0"
+    description: 'Quantity × unit price before discount; includes all statuses.'
+  }
+
+  metric revenue {
+    label: 'Total Revenue'
+    type: 'number'
+    definition: @aql sum(ecommerce_bq_order_items.revenue) ;;
+    format: "[\$\$]#,###0"
+    description: 'Quantity × unit price × (1 − discount), delivered orders only. Equivalent to NMV.'
+  }
+
+  metric cost {
+    label: 'Total Cost'
+    type: 'number'
+    definition: @aql sum(ecommerce_bq_order_items.cost) ;;
+    format: "[\$\$]#,###0"
+    description: 'Cost of goods: quantity × unit cost, delivered orders only.'
+  }
+
+  metric gross_profit {
+    label: 'Gross Profit'
+    type: 'number'
+    definition: @aql revenue - cost ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Revenue − Total Cost.'
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // REVENUE BY CATEGORY GROUP (base `revenue` filtered to one group)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric revenue_electronics {
+    label: 'Revenue - Electronics'
+    type: 'number'
+    definition: @aql revenue | where(ecommerce_bq_order_items.category_group is 'Electronics') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Revenue from Electronics (Mobiles & Tablets + Home Entertainment).'
+  }
+
+  metric revenue_groceries {
+    label: 'Revenue - Groceries'
+    type: 'number'
+    definition: @aql revenue | where(ecommerce_bq_order_items.category_group is 'Groceries') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Revenue from Groceries.'
+  }
+
+  metric revenue_home_living {
+    label: 'Revenue - Home & Living'
+    type: 'number'
+    definition: @aql revenue | where(ecommerce_bq_order_items.category_group is 'Home & Living') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Revenue from Home & Living (Home Furniture).'
+  }
+
+  metric revenue_fashion {
+    label: 'Revenue - Fashion'
+    type: 'number'
+    definition: @aql revenue | where(ecommerce_bq_order_items.category_group is 'Fashion') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Revenue from Fashion (Clothes).'
+  }
+
+  metric revenue_beauty {
+    label: 'Revenue - Beauty'
+    type: 'number'
+    definition: @aql revenue | where(ecommerce_bq_order_items.category_group is 'Beauty') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Revenue from Beauty (Skin Care).'
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // COST BY CATEGORY GROUP (base `cost` filtered to one group)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  metric cost_electronics {
+    label: 'Cost - Electronics'
+    type: 'number'
+    definition: @aql cost | where(ecommerce_bq_order_items.category_group is 'Electronics') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Cost for Electronics (Mobiles & Tablets + Home Entertainment).'
+  }
+
+  metric cost_groceries {
+    label: 'Cost - Groceries'
+    type: 'number'
+    definition: @aql cost | where(ecommerce_bq_order_items.category_group is 'Groceries') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Cost for Groceries.'
+  }
+
+  metric cost_home_living {
+    label: 'Cost - Home & Living'
+    type: 'number'
+    definition: @aql cost | where(ecommerce_bq_order_items.category_group is 'Home & Living') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Cost for Home & Living (Home Furniture).'
+  }
+
+  metric cost_fashion {
+    label: 'Cost - Fashion'
+    type: 'number'
+    definition: @aql cost | where(ecommerce_bq_order_items.category_group is 'Fashion') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Cost for Fashion (Clothes).'
+  }
+
+  metric cost_beauty {
+    label: 'Cost - Beauty'
+    type: 'number'
+    definition: @aql cost | where(ecommerce_bq_order_items.category_group is 'Beauty') ;;
+    format: "[\$\$]#,###0"
+    description: 'Total Cost for Beauty (Skin Care).'
+  }
+  metric margin {
+    label: "Margin"
+    type: "number"
+    description: "Margin of beauty and groceries categories"
+    definition: @aql (revenue_beauty + revenue_groceries - cost_beauty - cost_groceries) / (revenue_beauty + revenue_groceries);;
+    format: "none"
+  }
+  metric electronics_margin {
+    label: "Electronics Margin"
+    type: "number"
+    description: ""
+    definition: @aql (revenue_electronics - cost_electronics) / revenue_electronics;;
+    format: "none"
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CUSTOM VIEWS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  view {
+    group key_metrics {
+      metric revenue
+      metric cost
+      metric gross_profit
+      metric gmv
+      metric total_orders
+    }
+
+    group revenue_by_category_group {
+      metric revenue_electronics
+      metric revenue_groceries
+      metric revenue_home_living
+      metric revenue_fashion
+      metric revenue_beauty
+    }
+
+    group cost_by_category_group {
+      metric cost_electronics
+      metric cost_groceries
+      metric cost_home_living
+      metric cost_fashion
+      metric cost_beauty
+    }
+
+    model ecommerce_bq_orders {
+    }
+    model ecommerce_bq_order_items {
+    }
+    model ecommerce_bq_products {
+    }
+    model ecommerce_bq_categories {
+    }
+    model ecommerce_bq_users {
+    }
+    model ecommerce_bq_cities {
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+ "original_path": "extended_views/Reports/sales_aes_deals_meddic_recommendations_ext.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "include: \"/base_views/Reports/sales_aes_deals_meddic_recommendations_base.view\"\n\n# ------ BASE DIMENSIONS ----------------------------------------------------------------------------------------------\n\nview: sales_aes_deals_meddic_recommendations_ext {\n\n  extends: [sales_aes_deals_meddic_recommendations_base]\n\n  drill_fields: []\n\n  dimension: deal_id {\n    type: string\n  }\n\n  dimension: meddic_element {\n    type: string\n  }\n\n  dimension: meddic_metrics_recommendations {\n    type: string\n  }\n\n  measure: count {\n    type: count\n    hidden: yes\n  }\n\n}\n"
+}

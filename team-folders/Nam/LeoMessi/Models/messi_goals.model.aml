@@ -1,0 +1,114 @@
+// One row per senior Argentina goal scored by Messi (125 rows).
+//
+// Finer than `messi_matches` — a hat-trick match has three rows here — so joining this model fans
+// out match rows. Several match attributes (date, opponent, competition_type, stage, final_score,
+// tournament_id) are denormalised onto each goal for convenience. Only `match_id` is the ACTIVE
+// join; the `tournament_id` relationship to tournaments is declared INACTIVE in the dataset so
+// there is a single path goals > matches > tournaments.
+Model messi_goals {
+  type: 'table'
+  label: 'Goals'
+  description: "Every senior international goal Lionel Messi scored for Argentina, one row per goal (125 in total, 25 of them penalties). Records the match it came in, the score immediately after the goal, whether it was a penalty and its place in his career count. Use it for goal-level questions — penalties, game state, goal number landmarks — and use `messi_matches.messi_goals` for per-match scoring rates."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."goals"'
+
+  dimension goal_id {
+    label: 'Goal Id'
+    type: 'number'
+    description: "The **Goal Id** uniquely identifies each goal and is the primary key.  \nCount it for goal totals. It runs 1–125 in chronological order and equals `career_goal_no`."
+    hidden: false
+    definition: @sql {{ #SOURCE.goal_id }};;
+    primary_key: true
+  }
+
+  dimension match_id {
+    label: 'Match Id'
+    type: 'number'
+    description: "The **Match Id** of the match the goal was scored in.  \nThis is the ACTIVE join to `messi_matches`; use match attributes from there (venue, coach, result) rather than the denormalised copies on this model when grouping across both."
+    hidden: false
+    definition: @sql {{ #SOURCE.match_id }};;
+  }
+
+  dimension match_date {
+    label: 'Match Date'
+    type: 'date'
+    description: "The **Match Date** of the match the goal was scored in. Denormalised copy of `messi_matches.match_date`."
+    hidden: false
+    definition: @sql {{ #SOURCE.match_date }};;
+  }
+
+  dimension opponent {
+    label: 'Opponent'
+    type: 'text'
+    description: "The **Opponent** the goal was scored against. Denormalised copy of `messi_matches.opponent`."
+    hidden: false
+    definition: @sql {{ #SOURCE.opponent }};;
+  }
+
+  dimension competition_type {
+    label: 'Competition Type'
+    type: 'text'
+    description: "The **Competition Type** of the match: FIFA World Cup, FIFA World Cup qualification, Copa América or Friendly (no goals were scored in the Finalissima).  \nDenormalised copy of `messi_matches.competition_type`."
+    hidden: false
+    definition: @sql {{ #SOURCE.competition_type }};;
+  }
+
+  dimension tournament_id {
+    label: 'Tournament Id'
+    type: 'text'
+    description: "The **Tournament Id** of the match the goal was scored in, e.g. `WC2022`. Empty for friendlies.  \nThe relationship from this column to `messi_tournaments` is INACTIVE — goals reach tournaments through `messi_matches`."
+    hidden: false
+    definition: @sql {{ #SOURCE.tournament_id }};;
+  }
+
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+    description: "The **Stage** of the match the goal was scored in (Qualifier, Group, Round of 16, Quarter-final, Semi-final, Final…). Empty for friendlies."
+    hidden: false
+    definition: @sql {{ #SOURCE.stage }};;
+  }
+
+  dimension score_after_goal {
+    label: 'Score After Goal'
+    type: 'text'
+    description: "The **Score After Goal** is the match score immediately after this goal, Argentina first, e.g. `2–1`.  \nShows the game state the goal created — an equaliser, a go-ahead goal or a cushion. Uses an en dash (–) separator."
+    hidden: false
+    definition: @sql {{ #SOURCE.score_after_goal }};;
+  }
+
+  dimension is_penalty {
+    label: 'Is Penalty'
+    type: 'truefalse'
+    description: "The **Is Penalty** flag is true when the goal was an in-game penalty kick (25 of 125).  \nShootout kicks are not goals and never appear in this model."
+    hidden: false
+    definition: @sql {{ #SOURCE.is_penalty }};;
+  }
+
+  dimension goal_type {
+    label: 'Goal Type'
+    type: 'text'
+    description: "The **Goal Type** labels each goal as Penalty or Open play / free kick, derived from `is_penalty`. The source does not separate free kicks from open play."
+    hidden: false
+    definition: @aql case(
+      when: messi_goals.is_penalty is true, then: 'Penalty',
+      else: 'Open play / free kick'
+    );;
+  }
+
+  dimension final_score {
+    label: 'Final Score'
+    type: 'text'
+    description: "The **Final Score** of the match the goal was scored in, Argentina first, after extra time if played (shootout excluded), e.g. `3–3` for the 2022 World Cup final."
+    hidden: false
+    definition: @sql {{ #SOURCE.final_score }};;
+  }
+
+  dimension career_goal_no {
+    label: 'Career Goal No'
+    type: 'number'
+    description: "The **Career Goal No** is the goal's place in Messi's Argentina tally, 1 (vs Croatia, 2006) to 125.  \nUse it to find landmark goals, e.g. 55 (passing Batistuta as all-time top scorer) or 100 (vs Curaçao, 2023)."
+    hidden: false
+    definition: @sql {{ #SOURCE.career_goal_no }};;
+  }
+}

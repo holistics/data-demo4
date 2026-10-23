@@ -1,0 +1,258 @@
+// CommonLit — Partnerships & Customer Health.
+//
+// Account grain. Health rows join Dates on month_start; opportunities join Dates on close_date.
+// ROW-LEVEL PERMISSION: CSMs only see their own accounts (accounts.csm_name vs user attribute
+// `csm_name`). Admins and analysts with data-source access are exempt, per Holistics RLP rules.
+Dataset commonlit_partnerships_health {
+  label: 'CommonLit · Partnerships & Customer Health'
+  description: '''
+Paid CommonLit 360 accounts (district partnerships, school site licenses and pilots), their monthly
+Gainsight-style health and their Salesforce opportunities.
+
+## Definitions
+- **ARR**: annual recurring revenue of Active Partner accounts.
+- **Renewal rate**: closed-won ÷ closed (won + lost) Renewal opportunities, by close date.
+- **Pilot conversion rate**: closed-won ÷ closed Pilot Conversion opportunities, by close date.
+- **Latest health status**: Green / Yellow / Red on each account's most recent health month
+  (Green ≥ 70, Yellow 50-69, Red < 50).
+- **Program Status** (account level): Partner = Active Partner, Pilot = Active Pilot,
+  Free = Churned or Pilot - Not Converted.
+
+## Notes
+- Health facts (licensed / active teachers, students, assignments) are pre-aggregated per
+  account-month. Sum them across accounts within one month; do not sum across months.
+- ARR is a current snapshot on the account: it does not change with the school-year filter.
+'''
+  data_source_name: 'demo_nam_commonlit'
+
+  models: [
+    accounts,
+    commonlit_fct_account_health_monthly,
+    commonlit_fct_opportunities,
+    dates,
+    states,
+    districts
+  ]
+
+  relationships: [
+    relationship(commonlit_fct_account_health_monthly.account_id > accounts.account_id, true, 'one_way'),
+    relationship(commonlit_fct_account_health_monthly.month_start > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_opportunities.account_id > accounts.account_id, true, 'one_way'),
+    relationship(commonlit_fct_opportunities.close_date > dates.date_day, true, 'one_way'),
+    relationship(accounts.state_code > states.state_code, true, 'one_way'),
+    relationship(accounts.district_id > districts.district_id, true, 'one_way'),
+
+    // Inactive — second path from accounts to States
+    relationship(districts.state_code > states.state_code, false, 'one_way')
+  ]
+
+  // ---------------------------------------------------------------------------------
+  // ROW-LEVEL PERMISSION — CSMs see only their own accounts
+  // Requires a text user attribute `csm_name` holding the CSM's name exactly as in Salesforce,
+  // e.g. "Marcus Green". Users with the attribute set to All see every account.
+  // ---------------------------------------------------------------------------------
+  permission csm_own_accounts {
+    field: ref('accounts', 'csm_name')
+    operator: 'matches_user_attribute'
+    value: 'csm_name'
+  }
+
+  // ---------------------------------------------------------------------------------
+  // ACCOUNTS & ARR
+  // ---------------------------------------------------------------------------------
+  metric accounts_count {
+    label: 'Accounts'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct paid accounts (partners, pilots, churned).'
+    definition: @aql count_distinct(accounts.account_id);;
+  }
+
+  metric arr {
+    label: 'ARR'
+    type: 'number'
+    format: '[$$]#,###'
+    description: 'Annual recurring revenue of Active Partner accounts (current snapshot).'
+    definition: @aql sum(accounts.arr_usd) | where(accounts.account_status == 'Active Partner');;
+  }
+
+  metric churned_arr {
+    label: 'Churned ARR'
+    type: 'number'
+    format: '[$$]#,###'
+    description: 'Last ARR of accounts that churned.'
+    definition: @aql sum(accounts.arr_usd) | where(accounts.account_status == 'Churned');;
+  }
+
+  metric active_partners {
+    label: 'Active Partners'
+    type: 'number'
+    format: '#,###'
+    description: 'Accounts with status Active Partner.'
+    definition: @aql count_distinct(accounts.account_id) | where(accounts.account_status == 'Active Partner');;
+  }
+
+  metric active_pilots {
+    label: 'Active Pilots'
+    type: 'number'
+    format: '#,###'
+    description: 'Accounts currently piloting the paid program (status Active Pilot).'
+    definition: @aql count_distinct(accounts.account_id) | where(accounts.account_status == 'Active Pilot');;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // RENEWALS & PILOT CONVERSION (opportunities, by close date)
+  // ---------------------------------------------------------------------------------
+  metric renewals_won {
+    label: 'Renewals Won'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Renewal', commonlit_fct_opportunities.is_won == true);;
+  }
+
+  metric renewals_closed {
+    label: 'Renewals Closed'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Renewal', commonlit_fct_opportunities.is_closed == true);;
+  }
+
+  metric renewal_rate {
+    label: 'Renewal Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Gross logo renewal rate: closed-won ÷ closed Renewal opportunities, by close date.'
+    definition: @aql safe_divide(renewals_won * 1.0, renewals_closed);;
+  }
+
+  metric pilot_conversions_won {
+    label: 'Pilot Conversions Won'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Pilot Conversion', commonlit_fct_opportunities.is_won == true);;
+  }
+
+  metric pilot_conversions_closed {
+    label: 'Pilot Conversions Closed'
+    type: 'number'
+    format: '#,###'
+    definition: @aql count(commonlit_fct_opportunities.opportunity_id) | where(commonlit_fct_opportunities.opportunity_type == 'Pilot Conversion', commonlit_fct_opportunities.is_closed == true);;
+  }
+
+  metric pilot_conversion_rate {
+    label: 'Pilot Conversion Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Closed-won ÷ closed Pilot Conversion opportunities, by close date.'
+    definition: @aql safe_divide(pilot_conversions_won * 1.0, pilot_conversions_closed);;
+  }
+
+  metric open_pipeline {
+    label: 'Open Pipeline'
+    type: 'number'
+    format: '[$$]#,###'
+    description: 'Amount of open (not closed) opportunities.'
+    definition: @aql sum(commonlit_fct_opportunities.amount_usd) | where(commonlit_fct_opportunities.is_closed == false);;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // CUSTOMER HEALTH
+  // ---------------------------------------------------------------------------------
+  metric latest_health_status {
+    label: 'Latest Health Status'
+    type: 'text'
+    description: "Health status on the account's most recent health month. Group by account."
+    definition: @aql max(commonlit_fct_account_health_monthly.health_status) | where(commonlit_fct_account_health_monthly.is_latest_month == true);;
+  }
+
+  metric latest_health_score {
+    label: 'Latest Health Score'
+    type: 'number'
+    format: '#,###'
+    description: "Health score (0-100) on each account's most recent health month; averaged across accounts."
+    definition: @aql avg(commonlit_fct_account_health_monthly.health_score) | where(commonlit_fct_account_health_monthly.is_latest_month == true);;
+  }
+
+  metric at_risk_accounts {
+    label: 'At-Risk Accounts'
+    type: 'number'
+    format: '#,###'
+    description: 'Accounts whose latest health status is Red.'
+    definition: @aql count_distinct(commonlit_fct_account_health_monthly.account_id) | where(commonlit_fct_account_health_monthly.is_latest_month == true, commonlit_fct_account_health_monthly.health_status == 'Red');;
+  }
+
+  metric watch_accounts {
+    label: 'Watch-List Accounts'
+    type: 'number'
+    format: '#,###'
+    description: 'Accounts whose latest health status is Yellow.'
+    definition: @aql count_distinct(commonlit_fct_account_health_monthly.account_id) | where(commonlit_fct_account_health_monthly.is_latest_month == true, commonlit_fct_account_health_monthly.health_status == 'Yellow');;
+  }
+
+  metric arr_latest_health {
+    label: 'ARR (by Latest Health)'
+    type: 'number'
+    format: '[$$]#,###'
+    description: "ARR of Active Partner accounts, read through each account's latest health row so it can be split by health status or listed next to health metrics."
+    definition: @aql
+      sum(commonlit_fct_account_health_monthly, accounts.arr_usd)
+      | where(commonlit_fct_account_health_monthly.is_latest_month == true, accounts.account_status == 'Active Partner')
+    ;;
+  }
+
+  metric arr_at_risk {
+    label: 'ARR at Risk'
+    type: 'number'
+    format: '[$$]#,###'
+    description: 'ARR of Active Partner accounts whose latest health status is Red.'
+    definition: @aql arr_latest_health | where(commonlit_fct_account_health_monthly.health_status == 'Red');;
+  }
+
+  metric accounts_reporting_health {
+    label: 'Accounts (Health)'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct accounts with a health row in the period. Split by Health Status for the Green / Yellow / Red mix.'
+    definition: @aql count_distinct(commonlit_fct_account_health_monthly.account_id);;
+  }
+
+  metric avg_health_score {
+    label: 'Avg Health Score'
+    type: 'number'
+    format: '#,###'
+    description: 'Average monthly health score in the period.'
+    definition: @aql avg(commonlit_fct_account_health_monthly.health_score);;
+  }
+
+  metric licensed_teachers {
+    label: 'Licensed Teachers'
+    type: 'number'
+    format: '#,###'
+    description: 'Licensed teachers summed across accounts. Use with a month grouping (pre-aggregated per account-month).'
+    definition: @aql sum(commonlit_fct_account_health_monthly.licensed_teachers);;
+  }
+
+  metric account_active_teachers {
+    label: 'Active Teachers (Accounts)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active licensed teachers summed across accounts. Use with a month grouping (pre-aggregated per account-month).'
+    definition: @aql sum(commonlit_fct_account_health_monthly.active_teachers);;
+  }
+
+  metric account_active_students {
+    label: 'Active Students (Accounts)'
+    type: 'number'
+    format: '#,###'
+    description: 'Active students summed across accounts. Use with a month grouping (pre-aggregated per account-month).'
+    definition: @aql sum(commonlit_fct_account_health_monthly.active_students);;
+  }
+
+  metric teacher_adoption_rate {
+    label: 'Teacher Adoption Rate'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Active ÷ licensed teachers, weighted across accounts.'
+    definition: @aql safe_divide(account_active_teachers * 1.0, licensed_teachers);;
+  }
+}

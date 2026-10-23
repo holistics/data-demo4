@@ -1,0 +1,1124 @@
+view: hubspot_deals_all_historized_base {
+  sql_table_name: `fl-bi-p-poc.datamarts_poc.hubspot_deals_all_historized` ;;
+
+  dimension: ae_name {
+    type: string
+    sql: ${TABLE}.ae_name ;;
+  }
+
+  dimension: bdr_name {
+    type: string
+    sql: ${TABLE}.bdr_name ;;
+  }
+
+  dimension: bdr_team {
+    type: string
+    sql: ${TABLE}.bdr_team ;;
+  }
+  dimension: change_in_amount_vs_previous_day {
+    type: number
+    sql: ${TABLE}.change_in_amount_vs_previous_day ;;
+  }
+  dimension_group: churn {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.churn_date ;;
+  }
+  dimension_group: close {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.close_date ;;
+  }
+  dimension: company_id {
+    type: string
+    sql: ${TABLE}.company_id ;;
+  }
+  dimension: company_industry {
+    type: string
+    sql: ${TABLE}.company_industry ;;
+  }
+  dimension: company_is_workplace_partner {
+    type: yesno
+    sql: ${TABLE}.company_is_workplace_partner ;;
+  }
+
+  dimension_group: contact_dmt_lead {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.contact_dmt_lead ;;
+  }
+  dimension_group: contact_dmt_mql {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.contact_dmt_mql ;;
+  }
+  dimension_group: contact_dmt_sql {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.contact_dmt_sql ;;
+  }
+  dimension: contact_id_for_source_channel {
+    type: string
+    sql: ${TABLE}.contact_id_for_source_channel ;;
+  }
+  dimension: contact_is_workplace_customer {
+    type: yesno
+    sql: ${TABLE}.contact_is_workplace_customer ;;
+  }
+  dimension: contact_is_workplace_user {
+    type: yesno
+    sql: ${TABLE}.contact_is_workplace_user ;;
+  }
+
+  dimension: contact_workplace_community_membership {
+    type: string
+    sql: ${TABLE}.contact_workplace_community_membership ;;
+  }
+  dimension_group: contract_start {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.contract_start_date ;;
+  }
+  dimension: contract_term_in_months {
+    type: number
+    sql: ${TABLE}.contract_term_in_months ;;
+  }
+
+  dimension_group: copied_at {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.copied_at_date ;;
+  }
+  dimension_group: copied_at_timestamp {
+    type: time
+    timeframes: [raw, time, date, week, month, quarter, year]
+    sql: ${TABLE}.copied_at_timestamp ;;
+  }
+  dimension_group: created_at {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.created_at_date ;;
+  }
+  dimension: cs_name {
+    type: string
+    sql: ${TABLE}.cs_name ;;
+  }
+
+  dimension: current_amount_euros {
+    type: number
+    sql: ${TABLE}.current_amount_euros ;;
+  }
+  dimension: current_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.current_amount_in_record_currency ;;
+  }
+  dimension_group: date_entered_evaluation {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_entered_evaluation ;;
+  }
+  dimension_group: date_entered_negotiation {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_entered_negotiation ;;
+  }
+  dimension_group: date_entered_proposal {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_entered_proposal ;;
+  }
+  dimension_group: date_entered_sao {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_entered_sao ;;
+  }
+  dimension_group: date_entered_solution_design {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_entered_solution_design ;;
+  }
+  dimension_group: date_left_evaluation {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_left_evaluation ;;
+  }
+  dimension_group: date_left_negotiation {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_left_negotiation ;;
+  }
+  dimension_group: date_left_proposal {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_left_proposal ;;
+  }
+  dimension_group: date_left_sao {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_left_sao ;;
+  }
+  dimension_group: date_left_solution_design {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.date_left_solution_design ;;
+  }
+  dimension: days_from_deal_creation_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_deal_creation_to_closed_lost ;;
+  }
+  dimension: days_from_deal_creation_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_deal_creation_to_closed_won ;;
+  }
+  dimension: days_from_evaluation_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_evaluation_to_closed_lost ;;
+  }
+  dimension: days_from_evaluation_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_evaluation_to_closed_won ;;
+  }
+  dimension: days_from_evaluation_to_proposal {
+    type: number
+    sql: ${TABLE}.days_from_evaluation_to_proposal ;;
+  }
+  dimension: days_from_negotiation_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_negotiation_to_closed_lost ;;
+  }
+  dimension: days_from_negotiation_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_negotiation_to_closed_won ;;
+  }
+  dimension: days_from_proposal_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_proposal_to_closed_lost ;;
+  }
+  dimension: days_from_proposal_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_proposal_to_closed_won ;;
+  }
+  dimension: days_from_proposal_to_negotiation {
+    type: number
+    sql: ${TABLE}.days_from_proposal_to_negotiation ;;
+  }
+  dimension: days_from_sal_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_sal_to_closed_lost ;;
+  }
+  dimension: days_from_sal_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_sal_to_closed_won ;;
+  }
+  dimension: days_from_sal_to_sao {
+    type: number
+    sql: ${TABLE}.days_from_sal_to_sao ;;
+  }
+  dimension: days_from_sao_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_sao_to_closed_lost ;;
+  }
+  dimension: days_from_sao_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_sao_to_closed_won ;;
+  }
+  dimension: days_from_sao_to_solution_design {
+    type: number
+    sql: ${TABLE}.days_from_sao_to_solution_design ;;
+  }
+  dimension: days_from_solution_design_to_closed_lost {
+    type: number
+    sql: ${TABLE}.days_from_solution_design_to_closed_lost ;;
+  }
+  dimension: days_from_solution_design_to_closed_won {
+    type: number
+    sql: ${TABLE}.days_from_solution_design_to_closed_won ;;
+  }
+  dimension: days_from_solution_design_to_evaluation {
+    type: number
+    sql: ${TABLE}.days_from_solution_design_to_evaluation ;;
+  }
+  dimension: days_from_solution_design_to_negotiation {
+    type: number
+    sql: ${TABLE}.days_from_solution_design_to_negotiation ;;
+  }
+  dimension: days_in_current_stage {
+    type: number
+    sql: ${TABLE}.days_in_current_stage ;;
+  }
+  dimension: days_in_evaluation_stage {
+    type: number
+    sql: ${TABLE}.days_in_evaluation_stage ;;
+  }
+  dimension: days_in_negotiation_stage {
+    type: number
+    sql: ${TABLE}.days_in_negotiation_stage ;;
+  }
+  dimension: days_in_proposal_stage {
+    type: number
+    sql: ${TABLE}.days_in_proposal_stage ;;
+  }
+  dimension: days_in_sal {
+    type: number
+    sql: ${TABLE}.days_in_sal ;;
+  }
+  dimension: days_in_sal_stage {
+    type: number
+    sql: ${TABLE}.days_in_sal_stage ;;
+  }
+  dimension: days_in_sao_stage {
+    type: number
+    sql: ${TABLE}.days_in_sao_stage ;;
+  }
+  dimension: days_in_solution_design_stage {
+    type: number
+    sql: ${TABLE}.days_in_solution_design_stage ;;
+  }
+  dimension: days_since_last_activity {
+    type: number
+    sql: ${TABLE}.days_since_last_activity ;;
+  }
+  dimension: days_to_next_activity {
+    type: number
+    sql: ${TABLE}.days_to_next_activity ;;
+  }
+  dimension: deal_allocation {
+    type: string
+    sql: ${TABLE}.deal_allocation ;;
+  }
+
+  dimension: deal_allocation_mix {
+    type: string
+    sql: ${TABLE}.deal_allocation_mix ;;
+  }
+
+  dimension: deal_id {
+    type: string
+    sql: ${TABLE}.deal_id ;;
+  }
+  dimension: deal_name {
+    type: string
+    sql: ${TABLE}.deal_name ;;
+  }
+
+  dimension: deal_owner_name {
+    type: string
+    sql: ${TABLE}.deal_owner_name ;;
+  }
+  dimension: deal_paid_search_channel {
+    type: string
+    sql: ${TABLE}.deal_paid_search_channel ;;
+  }
+  dimension: deal_segment {
+    type: string
+    sql: ${TABLE}.deal_segment ;;
+  }
+
+  dimension: deal_source_channel {
+    type: string
+    sql: ${TABLE}.deal_source_channel ;;
+  }
+  dimension: deal_source_channel_campaign_name {
+    type: string
+    sql: ${TABLE}.deal_source_channel_campaign_name ;;
+  }
+  dimension: deal_source_channel_cluster_hubspot {
+    type: string
+    sql: ${TABLE}.deal_source_channel_cluster_hubspot ;;
+  }
+  dimension: deal_source_channel_department_hubspot {
+    type: string
+    sql: ${TABLE}.deal_source_channel_department_hubspot ;;
+  }
+  dimension: deal_source_channel_drilldown {
+    type: string
+    sql: ${TABLE}.deal_source_channel_drilldown ;;
+  }
+  dimension: deal_source_channel_drilldown_hubspot {
+    type: string
+    sql: ${TABLE}.deal_source_channel_drilldown_hubspot ;;
+  }
+  dimension: deal_source_channel_first_contact_associated_hubspot {
+    type: string
+    sql: ${TABLE}.deal_source_channel_first_contact_associated_hubspot ;;
+  }
+  dimension: deal_source_channel_hubspot {
+    type: string
+    sql: ${TABLE}.deal_source_channel_hubspot ;;
+  }
+  dimension: deal_source_channel_inbound_vs_outbound_hubspot {
+    type: string
+    sql: ${TABLE}.deal_source_channel_inbound_vs_outbound_hubspot ;;
+  }
+  dimension: deal_stage_probability {
+    type: number
+    sql: ${TABLE}.deal_stage_probability ;;
+  }
+  dimension: deal_type {
+    type: string
+    sql: ${TABLE}.deal_type ;;
+  }
+  dimension_group: dmt_closed_lost {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_closed_lost ;;
+  }
+  dimension_group: dmt_closed_won {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_closed_won ;;
+  }
+  dimension_group: dmt_closed_won_validation {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_closed_won_validation ;;
+  }
+  dimension_group: dmt_evaluation {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_evaluation ;;
+  }
+  dimension_group: dmt_negotiations {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_negotiations ;;
+  }
+  dimension_group: dmt_proposal {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_proposal ;;
+  }
+  dimension_group: dmt_sal {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_sal ;;
+  }
+  dimension_group: dmt_sao {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_sao ;;
+  }
+  dimension_group: dmt_solution_design {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.dmt_solution_design ;;
+  }
+
+  dimension: expansion_deal {
+    type: yesno
+    sql: ${TABLE}.expansion_deal ;;
+  }
+  dimension_group: expected_sd {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.expected_sd_date ;;
+  }
+  dimension: final_meddic_deal_health_score_computation {
+    type: number
+    sql: ${TABLE}.final_meddic_deal_health_score_computation ;;
+  }
+
+  dimension: forecast_category {
+    type: string
+    sql: ${TABLE}.forecast_category ;;
+  }
+  dimension: foreign_key_campaigns_closed_won {
+    type: string
+    sql: ${TABLE}.foreign_key_campaigns_closed_won ;;
+  }
+  dimension: foreign_key_campaigns_sao {
+    type: string
+    sql: ${TABLE}.foreign_key_campaigns_sao ;;
+  }
+  dimension: foreign_key_close_date_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_close_date_marketing_filters ;;
+  }
+  dimension: foreign_key_close_date_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_close_date_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_close_date_quarterly_basis {
+    type: string
+    sql: ${TABLE}.foreign_key_close_date_quarterly_basis ;;
+  }
+  dimension: foreign_key_closed_lost_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_closed_lost_marketing_filters ;;
+  }
+  dimension: foreign_key_closed_lost_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_closed_lost_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_closed_won_ae_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_closed_won_ae_filters ;;
+  }
+  dimension: foreign_key_closed_won_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_closed_won_marketing_filters ;;
+  }
+  dimension: foreign_key_closed_won_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_closed_won_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_closed_won_upsell_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_closed_won_upsell_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_closing_validation_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_closing_validation_marketing_filters ;;
+  }
+  dimension: foreign_key_closing_validation_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_closing_validation_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_dates {
+    type: string
+    sql: ${TABLE}.foreign_key_dates ;;
+  }
+  dimension: foreign_key_evaluation_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_evaluation_marketing_filters ;;
+  }
+  dimension: foreign_key_evaluation_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_evaluation_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_expected_sd_date_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_expected_sd_date_marketing_filters ;;
+  }
+  dimension: foreign_key_expected_sd_date_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_expected_sd_date_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_negotiations_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_negotiations_marketing_filters ;;
+  }
+  dimension: foreign_key_negotiations_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_negotiations_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_proposal_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_proposal_marketing_filters ;;
+  }
+  dimension: foreign_key_proposal_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_proposal_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_sal_bdr_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_sal_bdr_filters ;;
+  }
+  dimension: foreign_key_sal_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_sal_marketing_filters ;;
+  }
+  dimension: foreign_key_sal_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_sal_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_sao_bdr {
+    type: string
+    sql: ${TABLE}.foreign_key_sao_bdr ;;
+  }
+  dimension: foreign_key_sao_bdr_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_sao_bdr_filters ;;
+  }
+  dimension: foreign_key_sao_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_sao_marketing_filters ;;
+  }
+  dimension: foreign_key_sao_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_sao_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_sao_upsell_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_sao_upsell_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_snapshotdate_ae {
+    type: string
+    sql: ${TABLE}.foreign_key_snapshotdate_ae ;;
+  }
+  dimension: foreign_key_solution_design_marketing_filters {
+    type: string
+    sql: ${TABLE}.foreign_key_solution_design_marketing_filters ;;
+  }
+  dimension: foreign_key_solution_design_marketing_filters_allocation {
+    type: string
+    sql: ${TABLE}.foreign_key_solution_design_marketing_filters_allocation ;;
+  }
+  dimension: foreign_key_trunc_month_close_date_ae_name {
+    type: string
+    sql: ${TABLE}.foreign_key_trunc_month_close_date_ae_name ;;
+  }
+  dimension: foreign_key_trunc_month_dmt_closed_won_ae_name {
+    type: string
+    sql: ${TABLE}.foreign_key_trunc_month_dmt_closed_won_ae_name ;;
+  }
+  dimension: foreign_key_trunc_month_dmt_sal_ae_name {
+    type: string
+    sql: ${TABLE}.foreign_key_trunc_month_dmt_sal_ae_name ;;
+  }
+  dimension: foreign_key_trunc_month_dmt_sao_ae_name {
+    type: string
+    sql: ${TABLE}.foreign_key_trunc_month_dmt_sao_ae_name ;;
+  }
+  dimension_group: go_live {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.go_live_date ;;
+  }
+  dimension: has_integration {
+    type: yesno
+    sql: ${TABLE}.has_integration ;;
+  }
+  dimension: has_transformation_meddic_co_competition_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_co_competition_score ;;
+  }
+  dimension: has_transformation_meddic_dc_decision_criteria_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_dc_decision_criteria_score ;;
+  }
+  dimension: has_transformation_meddic_deal_champion_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_deal_champion_score ;;
+  }
+  dimension: has_transformation_meddic_dp_decision_path_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_dp_decision_path_score ;;
+  }
+  dimension: has_transformation_meddic_e_economic_buyers_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_e_economic_buyers_score ;;
+  }
+  dimension: has_transformation_meddic_i_implicated_pain_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_i_implicated_pain_score ;;
+  }
+  dimension: has_transformation_meddic_m_metrics_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_m_metrics_score ;;
+  }
+  dimension: has_transformation_meddic_p_paper_process_score {
+    type: yesno
+    sql: ${TABLE}.has_transformation_meddic_p_paper_process_score ;;
+  }
+  dimension: industry_flip {
+    type: string
+    sql: ${TABLE}.industry_flip ;;
+  }
+  dimension: initial_closing_validation_amount_euros {
+    type: number
+    sql: ${TABLE}.initial_closing_validation_amount_euros ;;
+  }
+  dimension: initial_closing_validation_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.initial_closing_validation_amount_in_record_currency ;;
+  }
+  dimension: initial_evaluation_amount_euros {
+    type: number
+    sql: ${TABLE}.initial_evaluation_amount_euros ;;
+  }
+  dimension: initial_evaluation_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.initial_evaluation_amount_in_record_currency ;;
+  }
+  dimension: initial_negotiations_amount_euros {
+    type: number
+    sql: ${TABLE}.initial_negotiations_amount_euros ;;
+  }
+  dimension: initial_negotiations_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.initial_negotiations_amount_in_record_currency ;;
+  }
+  dimension: initial_proposal_amount_euros {
+    type: number
+    sql: ${TABLE}.initial_proposal_amount_euros ;;
+  }
+  dimension: initial_proposal_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.initial_proposal_amount_in_record_currency ;;
+  }
+  dimension: initial_sao_amount_euros {
+    type: number
+    sql: ${TABLE}.initial_sao_amount_euros ;;
+  }
+  dimension: initial_sao_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.initial_sao_amount_in_record_currency ;;
+  }
+  dimension: initial_solution_design_amount_euros {
+    type: number
+    sql: ${TABLE}.initial_solution_design_amount_euros ;;
+  }
+  dimension: initial_solution_design_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.initial_solution_design_amount_in_record_currency ;;
+  }
+
+  dimension: is_a_meta_deal {
+    type: yesno
+    sql: ${TABLE}.is_a_meta_deal ;;
+  }
+  dimension: is_cs_referral {
+    type: string
+    sql: ${TABLE}.is_cs_referral ;;
+  }
+  dimension: is_deal_lost_to_beekeeper {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_beekeeper ;;
+  }
+  dimension: is_deal_lost_to_competitor_unknown {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_competitor_unknown ;;
+  }
+  dimension: is_deal_lost_to_coyo {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_coyo ;;
+  }
+  dimension: is_deal_lost_to_inhousesolution {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_inhousesolution ;;
+  }
+  dimension: is_deal_lost_to_limeade {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_limeade ;;
+  }
+  dimension: is_deal_lost_to_lolyo {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_lolyo ;;
+  }
+  dimension: is_deal_lost_to_microsoftviva {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_microsoftviva ;;
+  }
+  dimension: is_deal_lost_to_msteams {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_msteams ;;
+  }
+  dimension: is_deal_lost_to_speakap {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_speakap ;;
+  }
+  dimension: is_deal_lost_to_staffbase {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_staffbase ;;
+  }
+  dimension: is_deal_lost_to_statusquo {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_statusquo ;;
+  }
+  dimension: is_deal_lost_to_threema {
+    type: yesno
+    sql: ${TABLE}.is_deal_lost_to_threema ;;
+  }
+
+  dimension: is_key_deal {
+    type: yesno
+    sql: ${TABLE}.is_key_deal ;;
+  }
+  dimension: is_lost_deal {
+    type: number
+    sql: ${TABLE}.is_lost_deal ;;
+  }
+  dimension: is_lost_revenue {
+    type: yesno
+    sql: ${TABLE}.is_lost_revenue ;;
+  }
+  dimension: is_partner_influenced {
+    type: string
+    sql: ${TABLE}.is_partner_influenced ;;
+  }
+  dimension: is_partner_referral {
+    type: string
+    sql: ${TABLE}.is_partner_referral ;;
+  }
+  dimension: is_top_man_referral {
+    type: string
+    sql: ${TABLE}.is_top_man_referral ;;
+  }
+
+  dimension_group: last_activity {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.last_activity_date ;;
+  }
+  dimension_group: last_contacted {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.last_contacted_date ;;
+  }
+
+  dimension: licences_count {
+    type: number
+    sql: ${TABLE}.licences_count ;;
+  }
+  dimension: lost_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.lost_amount_in_record_currency ;;
+  }
+
+  dimension: meddic_cc_deal_champion_score {
+    type: number
+    sql: ${TABLE}.meddic_cc_deal_champion_score ;;
+  }
+
+  dimension: meddic_co_competition_score {
+    type: number
+    sql: ${TABLE}.meddic_co_competition_score ;;
+  }
+  dimension: meddic_competition_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_competition_recommendations ;;
+  }
+
+  dimension: meddic_dc_decision_criteria_score {
+    type: number
+    sql: ${TABLE}.meddic_dc_decision_criteria_score ;;
+  }
+  dimension: meddic_deal_champion_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_deal_champion_recommendations ;;
+  }
+  dimension: meddic_deal_health_score {
+    type: number
+    sql: ${TABLE}.meddic_deal_health_score ;;
+  }
+  dimension: meddic_decision_criteria_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_decision_criteria_recommendations ;;
+  }
+  dimension: meddic_decision_path_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_decision_path_recommendations ;;
+  }
+
+  dimension: meddic_dp_decision_path_score {
+    type: number
+    sql: ${TABLE}.meddic_dp_decision_path_score ;;
+  }
+
+  dimension: meddic_e_economic_buyer_score {
+    type: number
+    sql: ${TABLE}.meddic_e_economic_buyer_score ;;
+  }
+  dimension: meddic_economic_buyer_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_economic_buyer_recommendations ;;
+  }
+
+  dimension: meddic_i_implicated_pain_score {
+    type: number
+    sql: ${TABLE}.meddic_i_implicated_pain_score ;;
+  }
+  dimension: meddic_implicated_pain_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_implicated_pain_recommendations ;;
+  }
+
+  dimension: meddic_m_metrics_score {
+    type: number
+    sql: ${TABLE}.meddic_m_metrics_score ;;
+  }
+  dimension: meddic_metrics_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_metrics_recommendations ;;
+  }
+
+  dimension: meddic_p_paper_process_score {
+    type: number
+    sql: ${TABLE}.meddic_p_paper_process_score ;;
+  }
+  dimension: meddic_paper_process_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_paper_process_recommendations ;;
+  }
+  dimension: meddic_recommendations {
+    type: string
+    sql: ${TABLE}.meddic_recommendations ;;
+  }
+
+  dimension: new_business_vs_upsell {
+    type: string
+    sql: ${TABLE}.new_business_vs_upsell ;;
+  }
+  dimension_group: next_activity {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.next_activity_date ;;
+  }
+  dimension_group: next_step {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.next_step_date ;;
+  }
+
+  dimension: number_of_employees {
+    type: number
+    sql: ${TABLE}.number_of_employees ;;
+  }
+  dimension: number_of_transformation_meddic_scores {
+    type: number
+    sql: ${TABLE}.number_of_transformation_meddic_scores ;;
+  }
+  dimension: one_off_deal_amount {
+    type: number
+    sql: ${TABLE}.one_off_deal_amount ;;
+  }
+  dimension: one_off_total_amount {
+    type: number
+    sql: ${TABLE}.one_off_total_amount ;;
+  }
+  dimension: open_pipe_volume_euros {
+    type: number
+    sql: ${TABLE}.open_pipe_volume_euros ;;
+  }
+  dimension: open_pipe_volume_in_record_currency {
+    type: number
+    sql: ${TABLE}.open_pipe_volume_in_record_currency ;;
+  }
+
+  dimension: pipeline_label {
+    type: string
+    sql: ${TABLE}.pipeline_label ;;
+  }
+  dimension: presales_1__pre_project_pitched {
+    type: string
+    sql: ${TABLE}.presales_1__pre_project_pitched ;;
+  }
+  dimension_group: presales_1__pre_project_pitched {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.presales_1__pre_project_pitched_date ;;
+  }
+  dimension: presales_1__pre_project_won {
+    type: string
+    sql: ${TABLE}.presales_1__pre_project_won ;;
+  }
+  dimension_group: presales_1__pre_project_won {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.presales_1__pre_project_won_date ;;
+  }
+
+  dimension_group: presales_1_pre_project_delivery {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.presales_1_pre_project_delivery_date ;;
+  }
+
+  dimension_group: presales_2_discovery_delivery {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.presales_2_discovery_delivery_date ;;
+  }
+
+  dimension_group: presales_3_demo_delivery {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.presales_3_demo_delivery_date ;;
+  }
+
+  dimension: presales_3_with_integrations {
+    type: yesno
+    sql: ${TABLE}.presales_3_with_integrations ;;
+  }
+  dimension_group: presales_4_pov_delivery {
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.presales_4_pov_delivery_date ;;
+  }
+  dimension: presales_name {
+    type: string
+    sql: ${TABLE}.presales_name ;;
+  }
+  dimension: previous_amount_in_record_currency {
+    type: number
+    sql: ${TABLE}.previous_amount_in_record_currency ;;
+  }
+
+  dimension: primary_key {
+    type: string
+    sql: ${TABLE}.primary_key ;;
+  }
+
+  dimension_group: renewal {
+    type: time
+    timeframes: [raw, time, date, week, month, quarter, year]
+    datatype: datetime
+    sql: ${TABLE}.renewal_date ;;
+  }
+
+  dimension: sales_region {
+    type: string
+    sql: ${TABLE}.sales_region ;;
+  }
+
+  dimension: setup_amount {
+    type: number
+    sql: ${TABLE}.setup_amount ;;
+  }
+  dimension: source_channel_hubspot {
+    type: string
+    sql: ${TABLE}.source_channel_hubspot ;;
+  }
+
+  dimension: stage_label {
+    type: string
+    sql: ${TABLE}.stage_label ;;
+  }
+  dimension: standardised_deal_value_euros {
+    type: number
+    sql: ${TABLE}.standardised_deal_value_euros ;;
+  }
+  dimension: standardised_deal_value_in_record_currency {
+    type: number
+    sql: ${TABLE}.standardised_deal_value_in_record_currency ;;
+  }
+
+  dimension: territory_id {
+    type: string
+    sql: ${TABLE}.territory_id ;;
+  }
+  dimension: total_contract_value_euros {
+    type: number
+    sql: ${TABLE}.total_contract_value_euros ;;
+  }
+  dimension: trade_show {
+    type: string
+    sql: ${TABLE}.trade_show ;;
+  }
+  dimension: transformation_meddic_co_competition_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_co_competition_score ;;
+  }
+  dimension: transformation_meddic_dc_decision_criteria_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_dc_decision_criteria_score ;;
+  }
+  dimension: transformation_meddic_deal_champion_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_deal_champion_score ;;
+  }
+  dimension: transformation_meddic_dp_decision_path_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_dp_decision_path_score ;;
+  }
+  dimension: transformation_meddic_e_economic_buyers_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_e_economic_buyers_score ;;
+  }
+  dimension: transformation_meddic_i_implicated_pain_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_i_implicated_pain_score ;;
+  }
+  dimension: transformation_meddic_m_metrics_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_m_metrics_score ;;
+  }
+  dimension: transformation_meddic_p_paper_process_score {
+    type: number
+    sql: ${TABLE}.transformation_meddic_p_paper_process_score ;;
+  }
+
+  dimension: weeks_in_current_stage {
+    type: number
+    sql: ${TABLE}.weeks_in_current_stage ;;
+  }
+  measure: count {
+    type: count
+    drill_fields: [detail*]
+  }
+
+  # ----- Sets of fields for drilling ------
+  set: detail {
+    fields: [cs_name, deal_owner_name, ae_name, bdr_name, foreign_key_trunc_month_dmt_sal_ae_name, deal_source_channel_campaign_name, foreign_key_trunc_month_dmt_sao_ae_name, foreign_key_trunc_month_close_date_ae_name, presales_name, foreign_key_trunc_month_dmt_closed_won_ae_name, deal_name]
+  }
+
+}

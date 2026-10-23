@@ -1,0 +1,104 @@
+// CommonLit — Product Adoption.
+//
+// Grain: one row per teacher, week and feature used (PostHog-style). "Adopters since launch" uses
+// the first-use cohort pattern: each teacher counts once per feature, in the week of first use,
+// and the weekly new adopters are running-summed.
+Dataset commonlit_product_adoption {
+  label: 'CommonLit · Product Adoption'
+  description: '''
+Which product features teachers use and how fast new features ramp after launch.
+
+## Definitions
+- **Feature users**: distinct teachers who used the feature in the period.
+- **New adopters**: teachers using the feature for the first time that week.
+- **Adopters since launch**: cumulative distinct teachers who have used the feature, from launch
+  (or the start of the data, Aug 2024, for older features) up to each week. Group by Dates → week.
+- **Events**: PostHog event count.
+'''
+  data_source_name: 'demo_nam_commonlit'
+
+  models: [
+    product_features,
+    commonlit_fct_feature_usage_weekly,
+    dates,
+    schools,
+    districts,
+    states,
+    school_program_years
+  ]
+
+  relationships: [
+    relationship(commonlit_fct_feature_usage_weekly.feature_id > product_features.feature_id, true, 'one_way'),
+    relationship(commonlit_fct_feature_usage_weekly.week_start > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_feature_usage_weekly.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_feature_usage_weekly.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+    relationship(schools.district_id > districts.district_id, true, 'one_way'),
+    relationship(schools.state_code > states.state_code, true, 'one_way'),
+
+    // Inactive — second paths to Schools / States
+    relationship(districts.state_code > states.state_code, false, 'one_way'),
+    relationship(school_program_years.school_id > schools.school_id, false, 'one_way')
+  ]
+
+  dimension first_use_week {
+    model: commonlit_fct_feature_usage_weekly
+    label: 'First Use Week'
+    type: 'date'
+    description: "Week the teacher first used this feature (across all data)."
+    definition: @aql
+      min(commonlit_fct_feature_usage_weekly.week_start)
+      | dimensionalize(commonlit_fct_feature_usage_weekly.teacher_id, commonlit_fct_feature_usage_weekly.feature_id)
+    ;;
+  }
+
+  dimension weeks_since_launch {
+    model: commonlit_fct_feature_usage_weekly
+    label: 'Weeks Since Launch'
+    type: 'number'
+    description: 'Whole weeks between the feature launch date and the usage week. Aligns ramps of features launched at different times.'
+    definition: @aql date_diff('week', product_features.launch_date, commonlit_fct_feature_usage_weekly.week_start);;
+  }
+
+  metric feature_users {
+    label: 'Feature Users'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct teachers who used the feature in the period.'
+    definition: @aql count_distinct(commonlit_fct_feature_usage_weekly.teacher_id);;
+  }
+
+  metric feature_events {
+    label: 'Events'
+    type: 'number'
+    format: '#,###'
+    description: 'PostHog event count.'
+    definition: @aql sum(commonlit_fct_feature_usage_weekly.event_count);;
+  }
+
+  metric new_adopters {
+    label: 'New Adopters'
+    type: 'number'
+    format: '#,###'
+    description: 'Teacher-feature pairs whose first use falls in the period.'
+    definition: @aql
+      count(commonlit_fct_feature_usage_weekly.usage_key)
+      | where(commonlit_fct_feature_usage_weekly.week_start == commonlit_fct_feature_usage_weekly.first_use_week)
+    ;;
+  }
+
+  metric adopters_since_launch {
+    label: 'Adopters Since Launch'
+    type: 'number'
+    format: '#,###'
+    description: 'Cumulative teachers who have used the feature since launch, up to each week. Group by Dates → Date | week.'
+    definition: @aql new_adopters | running_total(dates.date_day);;
+  }
+
+  metric events_per_user {
+    label: 'Events per User'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Events ÷ feature users.'
+    definition: @aql safe_divide(feature_events * 1.0, feature_users);;
+  }
+}

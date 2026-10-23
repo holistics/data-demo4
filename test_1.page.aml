@@ -1,0 +1,151 @@
+Dashboard test_1 {
+  title: '[Draft] Hoa test'
+  owner: 'hoa.huynh@holistics.io'
+  block title: TextBlock {
+    content: @md # Your title goes here ;;
+  }
+  block v_only: VizBlock {
+    label: 'Career KPIs'
+    viz: MarkdownViz {
+      dataset: messi_argentina
+      values: [
+        VizFieldFull {
+          label: 'Caps'
+          ref: r(messi_argentina.messi_caps)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Goals'
+          ref: r(messi_argentina.messi_total_goals)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Win rate'
+          ref: r(messi_argentina.messi_win_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Per match'
+          ref: r(messi_argentina.messi_goals_per_match)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Won'
+          ref: r(messi_argentina.messi_wins)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Drawn'
+          ref: r(messi_argentina.messi_draws)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Lost'
+          ref: r(messi_argentina.messi_losses)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md <style>.mx { font-family: Rubik, system-ui, sans-serif; color: #0b2545; box-sizing: border-box; height: 100%; }
+.mx * { box-sizing: border-box; }
+.mx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; height: 100%; }
+.mx-kpi { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); display: flex; flex-direction: column; }
+.mx-kpi .l { font: 500 13px/1.2 Rubik, sans-serif; color: #5d7694; }
+.mx-kpi .v { font: 900 52px/1 'Big Shoulders Display', Impact, sans-serif; color: #0b2545; margin: 6px 0 4px; }
+.mx-kpi .n { font: 400 12px/1.35 Rubik, sans-serif; color: #5d7694; margin-top: auto; }
+.mx-kpi.gold { background: #fff2cc; border-color: #e9b42a; }
+.mx-kpi.gold .l, .mx-kpi.gold .v, .mx-kpi.gold .n { color: #3a2600; }
+.mx-split { display: flex; height: 28px; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+.mx-split span { display: flex; align-items: center; justify-content: center; font: 600 12px/1 'DM Mono', monospace; color: #fff; min-width: 28px; }
+.mx-split .w { background: #2a78d6; } .mx-split .d { background: #b7c3d1; color: #0b2545; } .mx-split .l { background: #eb6834; }
+.mx-legend { display: flex; flex-wrap: wrap; gap: 14px; font: 400 12px/1 Rubik, sans-serif; color: #5d7694; }
+.mx-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.mx-card { background: #fff; border: 1px solid #d3e3f3; border-radius: 14px; padding: 16px 18px; height: 100%; box-shadow: 0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18); overflow: auto; }
+.mx-card h3 { font: 800 22px/1 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; margin: 0 0 4px; color: #0b2545; }
+.mx-card .sub { font: 400 13px/1.4 Rubik, sans-serif; color: #5d7694; margin: 0 0 12px; }
+.mx-pill { display: inline-block; font: 600 11px/1 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; }
+.mx-pill.Win { background: #2a78d6; color: #fff; } .mx-pill.Draw { background: #b7c3d1; color: #0b2545; } .mx-pill.Loss { background: #eb6834; color: #fff; }
+.mx-mono { font: 500 11px/1.3 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5d7694; }</style>
+{% map(rows) %}<div class="mx" style="display:grid;grid-template-rows:auto 1fr;gap:14px">
+<div class="mx-kpis">
+<div class="mx-kpi"><span class="l">Caps</span><span class="v">{{ values.`Caps`.formatted }}</span><span class="n">Matches in the selection</span></div>
+<div class="mx-kpi"><span class="l">Goals</span><span class="v">{{ values.`Goals`.formatted }}</span><span class="n">{{ values.`Per match`.formatted }} per match</span></div>
+<div class="mx-kpi"><span class="l">Win rate</span><span class="v">{{ values.`Win rate`.formatted }}</span><span class="n">After 90/120 minutes</span></div>
+<div class="mx-kpi gold"><span class="l">Assists</span><span class="v">65</span><span class="n">Career total, the provider too. Not filterable.</span></div>
+</div>
+<div class="mx-card"><h3>Won, drawn, lost</h3>
+<div class="mx-split"><span class="w" style="flex:{{ values.`Won`.raw }}">{{ values.`Won`.formatted }}</span><span class="d" style="flex:{{ values.`Drawn`.raw }}">{{ values.`Drawn`.formatted }}</span><span class="l" style="flex:{{ values.`Lost`.raw }}">{{ values.`Lost`.formatted }}</span></div>
+<div class="mx-legend"><span><i style="background:#2a78d6"></i>Won</span><span><i style="background:#b7c3d1"></i>Drawn</span><span><i style="background:#eb6834"></i>Lost</span><span>Shootouts count as draws</span></div>
+</div></div>{% end %} ;;
+      settings {
+        pagination_size: 1
+        row_limit: 1
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    theme {
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      background {
+        bg_color: 'transparent'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+  }
+  explicit_interactions: []
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 60)
+    }
+    block v_only {
+      position: pos(20, 100, 620, 420)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  settings {
+    autorun_on_open: true
+  }
+}

@@ -1,0 +1,63 @@
+Model classes {
+  type: 'table'
+  label: "Classes"
+  description: "Class rosters, one row per class per school year."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_classes"'
+
+  dimension class_id {
+    label: "Class Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.class_id }};;
+    primary_key: true
+  }
+
+  dimension teacher_id {
+    label: "Teacher Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.teacher_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension school_year {
+    label: "School Year"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_year }};;
+  }
+
+  dimension grade_level {
+    label: "Grade Level"
+    type: 'number'
+    definition: @sql {{ #SOURCE.grade_level }};;
+    format: '0'
+  }
+
+  dimension class_name {
+    label: "Class Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.class_name }};;
+  }
+
+  dimension roster_source {
+    label: "Roster Source"
+    type: 'text'
+    description: "Where the roster came from (e.g. Clever, ClassLink, Google Classroom, manual)."
+    definition: @sql {{ #SOURCE.roster_source }};;
+  }
+
+  dimension students_rostered {
+    label: "Students Rostered"
+    type: 'number'
+    description: "Number of students on the class roster. Basis for the completion-rate denominator."
+    definition: @sql {{ #SOURCE.students_rostered }};;
+    format: '#,###'
+  }
+}
