@@ -20,74 +20,75 @@ Compare category-group GMV, fulfilled revenue, cost of goods, and gross profit. 
   block v_category_profitability: VizBlock {
     label: 'Category Profitability'
     viz: DataTable {
-  dataset: demo_ecommerce_bigquery
-  fields: [
-    VizFieldFull {
-      ref: r(ecommerce_bq_categories.category_group)
-      label: 'Category Group'
-      format {
-        type: 'text'
-      }
-    },
-    VizFieldFull {
-      ref: r(demo_ecommerce_bigquery.total_orders)
-      label: 'Total Orders'
-      format {
-        type: 'number'
-        pattern: '#,###0'
-      }
-    },
-    VizFieldFull {
-      ref: r(demo_ecommerce_bigquery.gmv)
-      label: 'GMV'
-      format {
-        type: 'number'
-        pattern: 'inherited'
-      }
-    },
-    VizFieldFull {
-      ref: r(demo_ecommerce_bigquery.revenue)
-      label: 'Total Revenue'
-      format {
-        type: 'number'
-        pattern: 'inherited'
-      }
-    },
-    VizFieldFull {
-      ref: r(demo_ecommerce_bigquery.cost)
-      label: 'Total Cost'
-      format {
-        type: 'number'
-        pattern: 'inherited'
-      }
-    },
-    VizFieldFull {
-      ref: r(demo_ecommerce_bigquery.gross_profit)
-      label: 'Gross Profit'
-      format {
-        type: 'number'
-        pattern: 'inherited'
+      dataset: demo_ecommerce_bigquery
+      fields: [
+        VizFieldFull {
+          ref: r(ecommerce_bq_categories.category_group)
+          label: 'Category Group'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_bigquery.total_orders)
+          label: 'Total Orders'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_bigquery.gmv)
+          label: 'GMV'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_bigquery.revenue)
+          label: 'Total Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_bigquery.cost)
+          label: 'Total Cost'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(demo_ecommerce_bigquery.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 5
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
       }
     }
-  ]
-  settings {
-    pagination_size: 100
-    show_row_number: true
-    sorts: [
-      IndexBasedSortSetting {
-        field_index: 5
-        direction: 'desc'
-      }
-    ]
-    wrap_header_text: true
   }
-}
-  }
-
   explicit_interactions: [
     FilterInteraction {
       from: 'f_order_date'
-      to: ['v_category_profitability']
+      to: [
+        'v_category_profitability'
+      ]
       field: r(ecommerce_bq_orders.order_date)
     }
   ]
@@ -96,7 +97,7 @@ Compare category-group GMV, fulfilled revenue, cost of goods, and gross profit. 
     tab overview: CanvasLayout {
       label: 'Overview'
       width: 1220
-      height: 680
+      height: 1080
       grid_size: 20
       auto_expand_vertically: true
 
