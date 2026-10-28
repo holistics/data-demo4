@@ -1,0 +1,102 @@
+Dashboard khai_order_details_lookup {
+  title: 'Order Details Lookup'
+  theme: H.themes.classic
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 3600
+  }
+
+  block title: TextBlock {
+    content: @md # Order Details Lookup
+Browse individual order records and their delivery attempts.
+;;
+  }
+
+  block order_details: VizBlock {
+    label: 'Order Details'
+    viz: DataTable {
+  dataset: dbt_khai_order_details_dataset
+  fields: [
+    VizFieldFull {
+      label: 'Order Id'
+      ref: r(dbt_khai_order_details.order_id)
+      uname: 'order_id'
+    },
+    VizFieldFull {
+      label: 'Full Name'
+      ref: r(dbt_khai_order_details.full_name)
+      format {
+        type: 'text'
+      }
+      uname: 'full_name'
+    },
+    VizFieldFull {
+      label: 'Product Id'
+      ref: r(dbt_khai_order_details.product_id)
+      uname: 'product_id'
+    },
+    VizFieldFull {
+      label: 'Order Status'
+      ref: r(dbt_khai_order_details.order_status)
+      format {
+        type: 'text'
+      }
+      uname: 'order_status'
+    },
+    VizFieldFull {
+      label: 'Order Created At'
+      ref: r(dbt_khai_order_details.order_created_at)
+      format {
+        type: 'datetime'
+      }
+      uname: 'order_created_at'
+    },
+    VizFieldFull {
+      label: 'Delivery Attempts'
+      ref: r(dbt_khai_order_details.delivery_attempts)
+      format {
+        type: 'number'
+        pattern: '#,###0'
+      }
+      uname: 'delivery_attempts'
+    }
+  ]
+  settings {
+    pagination_size: 100
+    show_row_number: true
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'order_created_at'
+        direction: 'desc'
+      },
+      KeyBasedSortSetting {
+        key: 'order_id'
+        direction: 'asc'
+      },
+      KeyBasedSortSetting {
+        key: 'product_id'
+        direction: 'asc'
+      }
+    ]
+    wrap_header_text: true
+  }
+}
+  }
+
+  explicit_interactions: []
+
+  view: TabLayout {
+    tab lookup: CanvasLayout {
+      label: 'Order Details'
+      width: 1220
+      height: 760
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block title { position: pos(20, 20, 1180, 100) layer: 1 }
+      block order_details { position: pos(20, 140, 1180, 580) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}
