@@ -1,0 +1,5 @@
+ProjectSettings project_settings {
+  viz {
+    inherit_semantic_description: true
+  }
+}
