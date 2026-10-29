@@ -1,0 +1,120 @@
+Dashboard category_reference {
+  title: 'Category Reference'
+  description: 'Browse the marketplace category hierarchy and typical price ranges.'
+  theme: H.themes.classic
+
+  block b_title: TextBlock {
+    content: @md # Category Reference ;;
+  }
+
+  block v_categories: VizBlock {
+    label: 'Category Detail'
+    description: 'One row per leaf category.'
+    viz: DataTable {
+      dataset: demo_ecommerce_bigquery
+      fields: [
+        VizFieldFull {
+          label: 'Category ID'
+          ref: r(ecommerce_bq_categories.category_id)
+          uname: 'category_id'
+        },
+        VizFieldFull {
+          label: 'Category Name'
+          ref: r(ecommerce_bq_categories.category_name)
+          format {
+            type: 'text'
+          }
+          uname: 'category_name'
+        },
+        VizFieldFull {
+          label: 'Parent Category Name'
+          ref: r(ecommerce_bq_categories.parent_category_name)
+          format {
+            type: 'text'
+          }
+          uname: 'parent_category_name'
+        },
+        VizFieldFull {
+          label: 'Category Group'
+          ref: r(ecommerce_bq_categories.category_group)
+          format {
+            type: 'text'
+          }
+          uname: 'category_group'
+        },
+        VizFieldFull {
+          label: 'Min Price'
+          ref: r(ecommerce_bq_categories.min_price)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Max Price'
+          ref: r(ecommerce_bq_categories.max_price)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Category Image URL'
+          ref: r(ecommerce_bq_categories.category_image_url)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'category_group'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'parent_category_name'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'category_name'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'category_id'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  explicit_interactions: []
+
+  view: CanvasLayout {
+    label: 'Category Reference'
+    width: 1220
+    height: 760
+    grid_size: 20
+
+    block b_title {
+      position: pos(20, 20, 1180, 80)
+    }
+    block v_categories {
+      position: pos(20, 120, 1180, 620)
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+}
