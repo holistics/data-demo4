@@ -1,5 +1,5 @@
 Model ecommerce_demo_pointmap_airbnb {
-  type: 'table'
+  type: 'table' // test
   label: 'Airbnb Listings'
   description: ''
   data_source_name: 'demodb'
