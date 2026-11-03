@@ -1,0 +1,121 @@
+Model amyra_2 {
+  type: 'table'
+  label: 'Amyra 2'
+  description: ''
+  data_source_name: 'demodb'
+  dimension deal_id {
+    label: 'Deal'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_id }};;
+  }
+  dimension deal_name {
+    label: 'Deal name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_name }};;
+  }
+  dimension deal_owner {
+    label: 'Deal owner'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_owner }};;
+  }
+  dimension deal_url {
+    label: 'Deal url'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_url }};;
+  }
+  dimension is_won {
+    label: 'Is won'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_won }};;
+  }
+  dimension revenue_won {
+    label: 'Revenue won'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.revenue_won }};;
+  }
+  dimension seats {
+    label: 'Seats'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.seats }};;
+  }
+  dimension close_rate {
+    label: 'Close rate'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_rate }};;
+  }
+  dimension created_date {
+    label: 'Created date'
+    description: ''
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_date }};;
+  }
+  dimension close_date {
+    label: 'Close date'
+    description: ''
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_date }};;
+  }
+  dimension close_timestamp {
+    label: 'Close timestamp'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_timestamp }};;
+  }
+  dimension close_unix {
+    label: 'Close unix'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_unix }};;
+  }
+  dimension signup_date {
+    label: 'Signup date'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.signup_date }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'test-data.csv'
+    uploaded_at: '2026-10-29 05:02:40'
+    hash: 'e2f953b043dcce4234b35a8592a8d23935b9b2cd109eb237f60f8b6119c043b1'
+    column_configs: [
+      H.imports.column_config("deal_id", "deal_id", "number"),
+      H.imports.column_config("deal_name", "deal_name", "text"),
+      H.imports.column_config("deal_owner", "deal_owner", "text"),
+      H.imports.column_config("deal_url", "deal_url", "text"),
+      H.imports.column_config("is_won", "is_won", "truefalse"),
+      H.imports.column_config("revenue_won", "revenue_won", "number"),
+      H.imports.column_config("seats", "seats", "number"),
+      H.imports.column_config("close_rate", "close_rate", "number"),
+      H.imports.column_config("created_date", "created_date", "date"),
+      H.imports.column_config("close_date", "close_date", "date"),
+      H.imports.column_config("close_timestamp", "close_timestamp", "datetime"),
+      H.imports.column_config("close_unix", "close_unix", "number"),
+      H.imports.column_config("signup_date", "signup_date", "text")
+    ]
+  }
+  owner: 'hien.nt+demo4@holistics.io'
+  table_name: '"dbt_khai"."holistics_amyra_2_afc17_202610290502"'
+}

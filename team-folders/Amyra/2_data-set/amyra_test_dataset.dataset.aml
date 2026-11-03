@@ -1,0 +1,20 @@
+Dataset amyra_test_dataset {
+  label: 'amyra_test_dataset'
+  description: ''
+  data_source_name: 'demodb'
+  models: [
+    amyra_1
+    ,
+    amyra_2,
+    amyra_3,
+    amyra_4
+  ]
+  relationships: []
+  metric total_revenue {
+    label: "Total Revenue"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql sum(amyra_1.revenue_won);;
+  }
+}

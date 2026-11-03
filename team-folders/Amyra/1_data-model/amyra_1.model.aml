@@ -1,0 +1,167 @@
+Model amyra_1 {
+  type: 'table'
+  label: 'Amyra 1'
+  description: ''
+  data_source_name: 'demodb'
+  dimension deal_id {
+    label: 'Deal'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_id }};;
+  }
+  dimension deal_name {
+    label: 'Deal name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_name }};;
+  }
+  dimension deal_owner {
+    label: 'Deal owner'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_owner }};;
+  }
+  dimension deal_search_label {
+    label: 'Deal'
+    description: 'Combined deal identifier, name, and owner for dashboard filtering.'
+    type: 'text'
+    hidden: false
+    definition: @sql CONCAT('Deal #', {{ #SOURCE.deal_id }}, ': ', {{ #SOURCE.deal_name }}, ' - ', {{ #SOURCE.deal_owner }}) ;;
+  }
+  dimension deal_dashboard_url {
+    label: 'Deal dashboard URL'
+    description: 'Dashboard link prefiltered to this deal.'
+    type: 'text'
+    hidden: true
+    definition: @sql CONCAT(
+      '/dashboard/v4/amyra_test_dashboard?f_test=',
+      REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+        CONCAT('Deal #', {{ #SOURCE.deal_id }}, ': ', {{ #SOURCE.deal_name }}, ' - ', {{ #SOURCE.deal_owner }}),
+        '%', '%25'), '#', '%23'), '&', '%26'), '=', '%3D'), '+', '%2B'), '?', '%3F')
+    ) ;;
+  }
+  dimension deal_owner_google_search_url {
+    label: 'Deal owner Google search URL'
+    description: 'Google search link for the deal owner.'
+    type: 'text'
+    hidden: true
+    definition: @sql CONCAT(
+      'https://www.google.com/search?q=',
+      REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+        {{ #SOURCE.deal_owner }},
+        '%', '%25'), '#', '%23'), '&', '%26'), '=', '%3D'), '+', '%2B'), '?', '%3F')
+    ) ;;
+  }
+  dimension deal_owner_email_url {
+    label: 'Deal owner email URL'
+    description: 'Email draft to example.com@gmail.com with the deal owner as the subject.'
+    type: 'text'
+    hidden: true
+    definition: @sql CONCAT(
+      'mailto:example.com@gmail.com?subject=',
+      REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+        {{ #SOURCE.deal_owner }},
+        '%', '%25'), '#', '%23'), '&', '%26'), '=', '%3D'), '+', '%2B'), '?', '%3F'), ' ', '%20'),
+      '&body=Hi%2C%20thanks%20for%20contacting%20us'
+    ) ;;
+  }
+  dimension deal_url {
+    label: 'Deal url'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.deal_url }};;
+  }
+  dimension is_won {
+    label: 'Is won'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_won }};;
+  }
+  dimension revenue_won {
+    label: 'Revenue won'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.revenue_won }};;
+  }
+  dimension seats {
+    label: 'Seats'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.seats }};;
+  }
+  dimension close_rate {
+    label: 'Close rate'
+    type: 'number'
+    description: ''
+    hidden: false
+    definition: @sql {{ #SOURCE.close_rate }};;
+    primary_key: false
+    format: "#,###0.00"
+  }
+  dimension created_date {
+    label: 'Created date'
+    description: ''
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_date }};;
+  }
+  dimension close_date {
+    label: 'Close date'
+    description: ''
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_date }};;
+  }
+  dimension close_timestamp {
+    label: 'Close timestamp'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_timestamp }};;
+  }
+  dimension close_unix {
+    label: 'Close unix'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.close_unix }};;
+  }
+  dimension signup_date {
+    label: 'Signup date'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.signup_date }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'test-data.csv'
+    uploaded_at: '2026-10-29 04:08:56'
+    hash: 'e2f953b043dcce4234b35a8592a8d23935b9b2cd109eb237f60f8b6119c043b1'
+    column_configs: [
+      H.imports.column_config("deal_id", "deal_id", "number"),
+      H.imports.column_config("deal_name", "deal_name", "text"),
+      H.imports.column_config("deal_owner", "deal_owner", "text"),
+      H.imports.column_config("deal_url", "deal_url", "text"),
+      H.imports.column_config("is_won", "is_won", "truefalse"),
+      H.imports.column_config("revenue_won", "revenue_won", "number"),
+      H.imports.column_config("seats", "seats", "number"),
+      H.imports.column_config("close_rate", "close_rate", "number"),
+      H.imports.column_config("created_date", "created_date", "date"),
+      H.imports.column_config("close_date", "close_date", "date"),
+      H.imports.column_config("close_timestamp", "close_timestamp", "datetime"),
+      H.imports.column_config("close_unix", "close_unix", "number"),
+      H.imports.column_config("signup_date", "signup_date", "text")
+    ]
+  }
+  owner: 'hien.nt+demo4@holistics.io'
+  table_name: '"dbt_khai"."holistics_amyratestdata_4b824_202610290408"'
+}
