@@ -10,9 +10,9 @@ Governed definitions (the whole point of the benchmark):
 - Revenue = 50% of discounted current-list-price item value from DELIVERED orders only, by order-placement date.
 - AOV     = GMV / total_orders.
 
-Inactive relationships (not listed by fetch_dataset): slb_merchants.city_id > slb_cities.id. The active path to slb_cities
-is the customer's city (slb_users.city_id). Merchant-side geography must activate the inactive path per measure with
-`metric | with_relationships(slb_merchants.city_id > slb_cities.id)`.
+Geography roles: slb_cities and slb_countries are the customer's city and country (via slb_users.city_id).
+slb_merchant_cities and slb_merchant_countries are the merchant's city and country (via slb_merchants.city_id).
+Both roles read the same cities and countries tables.
 '''
   data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
@@ -26,6 +26,8 @@ is the customer's city (slb_users.city_id). Merchant-side geography must activat
     slb_countries,
     slb_categories,
     slb_merchants,
+    slb_merchant_cities,
+    slb_merchant_countries,
   ]
 
   relationships: [
@@ -36,7 +38,8 @@ is the customer's city (slb_users.city_id). Merchant-side geography must activat
     relationship(slb_cities.country_code > slb_countries.code, true),
     relationship(slb_products.category_id > slb_categories.id, true),
     relationship(slb_products.merchant_id > slb_merchants.id, true),
-    relationship(slb_merchants.city_id > slb_cities.id, false),
+    relationship(slb_merchants.city_id > slb_merchant_cities.id, true),
+    relationship(slb_merchant_cities.country_code > slb_merchant_countries.code, true),
   ]
 
   // ── buyer/cohort dimensions (user grain) ──────────────────────────────────
