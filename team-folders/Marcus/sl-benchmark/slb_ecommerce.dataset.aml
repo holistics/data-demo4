@@ -4,11 +4,12 @@ Dataset slb_ecommerce {
 Benchmark dataset for the AMQL-vs-other-SL comparison. Reads the Neon benchmark projection (via slb_ecommerce_neon_h4)
 so all comparison tiers (Tier 0 raw SQL, Tier 1 dbt SL, Tier 2 Cube, Tier 3 AMQL) query identical data.
 
-Governed definitions (the whole point of the benchmark):
+Governed definitions: the six metrics of the benchmark contract, the same set every compared semantic layer exposes.
+- Orders placed and customers who placed an order: distinct orders and distinct customers, ALL statuses.
 - GMV     = sum(quantity * price), ALL statuses.
-- NMV     = sum(quantity * price * (1 - discount)) EXCLUDING cancelled/refunded. discount is a RATE 0..1.
+- AOV     = GMV / orders placed.
 - Revenue = 50% of discounted current-list-price item value from DELIVERED orders only, by order-placement date.
-- AOV     = GMV / total_orders.
+- Delivery attempts = sum of order-grain attempts, ALL statuses.
 
 Geography roles: slb_cities and slb_countries are the customer's city and country (via slb_users.city_id).
 slb_merchant_cities and slb_merchant_countries are the merchant's city and country (via slb_merchants.city_id).
@@ -42,124 +43,42 @@ Both roles read the same cities and countries tables.
     relationship(slb_merchant_cities.country_code > slb_merchant_countries.code, true),
   ]
 
-  // ── buyer/cohort dimensions (user grain) ──────────────────────────────────
-  dimension total_orders_all_time {
-    model: slb_users
-    label: 'Total Orders (Users)'
-    type: 'number'
-    // delivered-only, to match the governed "buyer" definition (Q4 reconcile: 68.3%)
-    definition: @aql total_orders | where(slb_orders.status is 'delivered') | dimensionalize(slb_users.id);;
-  }
-  dimension is_buyer {
-    model: slb_users
-    label: 'Is Buyer'
-    type: 'truefalse'
-    definition: @aql slb_users.total_orders_all_time > 0;;
-  }
-  dimension is_repeated_buyer {
-    model: slb_users
-    label: 'Is Repeated Buyer'
-    type: 'truefalse'
-    definition: @aql slb_users.total_orders_all_time > 1;;
-  }
-  dimension first_order_date {
-    model: slb_users
-    label: 'First Order Date'
-    type: 'date'
-    definition: @aql min(slb_orders.created_at) | dimensionalize(slb_users.id);;
-  }
-
-  // ── governed metrics ──────────────────────────────────────────────────────
+  // ── governed metrics: the six-metric benchmark contract ───────────────────
+  // Labels and descriptions match the contract and the other semantic layers in the benchmark.
   metric total_orders {
-    label: 'Total Orders'
+    label: 'Orders placed'
     type: 'number'
     definition: @aql count(slb_orders.id);;
-    description: 'Count of orders, all statuses.'
+    description: 'Distinct orders created in the selected period. Includes every recorded status.'
   }
-  metric total_delivery_attempts {
-    label: 'Total Delivery Attempts'
+  metric ordering_customers {
+    label: 'Customers who placed an order'
     type: 'number'
-    definition: @aql slb_orders | sum(slb_orders.delivery_attempts);;
-    description: 'Delivery attempts recorded per order, across all statuses. Each order contributes its full attempts once to every product category it contains, and once overall. Category totals are not additive to the overall total. Time periods refer to when the order was placed.'
-  }
-  metric total_users {
-    label: 'Total Users'
-    type: 'number'
-    definition: @aql count(slb_users.id);;
+    definition: @aql count_distinct(slb_orders.user_id);;
+    description: 'Distinct customers who placed at least one order in the selected period. Includes every recorded status.'
   }
   metric gmv {
-    label: 'GMV (Gross Merchandise Value)'
+    label: 'Gross merchandise value (GMV)'
     type: 'number'
     definition: @aql slb_order_items | sum(slb_order_items.quantity * slb_products.price);;
-    description: 'Gross value of items ordered before discounts; includes all statuses.'
-  }
-  metric revenue_commission {
-    label: 'Revenue Commission Rate'
-    type: 'number'
-    definition: @aql 0.5;;
-    description: 'Fixed demo commission rate.'
-  }
-  metric nmv {
-    label: 'NMV (Net Merchandise Value)'
-    type: 'number'
-    definition: @aql (slb_order_items | sum(slb_order_items.quantity * slb_products.price * (1 - slb_orders.discount))) | where(slb_orders.status not in ['cancelled', 'refunded']);;
-    description: 'Realized fulfilled value after order-level discounts; excludes cancelled and refunded.'
-  }
-  metric revenue {
-    label: 'Platform Commission Revenue'
-    type: 'number'
-    definition: @aql (nmv * revenue_commission) | where(slb_orders.status is 'delivered');;
-    description: 'Platform commission from delivered orders only: 50% of item quantity times current product price after the order-level discount. Time periods refer to when the order was placed.'
+    description: 'Current-list-price value of units on orders created in the selected period, before discounts. Includes every recorded status.'
   }
   metric aov {
-    label: 'AOV (Average Order Value)'
+    label: 'Average order value (AOV)'
     type: 'number'
     definition: @aql gmv / total_orders;;
-    description: 'Average gross value per order.'
+    description: 'Average pre-discount current-list-price value of orders created in the selected period. Includes every recorded status.'
   }
-  metric total_delivered_orders {
-    label: 'Total Delivered Orders'
+  metric revenue {
+    label: 'Platform commission revenue'
     type: 'number'
-    definition: @aql total_orders | where(slb_orders.status is 'delivered');;
+    definition: @aql (slb_order_items | sum(slb_order_items.quantity * slb_products.price * (1 - slb_orders.discount) * 0.50)) | where(slb_orders.status is 'delivered');;
+    description: 'Amount retained from delivered orders after discounts at 50% of discounted current-list-price order value.'
   }
-  metric total_cancelled_orders {
-    label: 'Total Cancelled Orders'
+  metric total_delivery_attempts {
+    label: 'Total delivery attempts'
     type: 'number'
-    definition: @aql total_orders | where(slb_orders.status is 'cancelled');;
-  }
-  metric total_refunded_orders {
-    label: 'Total Refunded Orders'
-    type: 'number'
-    definition: @aql total_orders | where(slb_orders.status is 'refunded');;
-  }
-  metric total_buyers {
-    label: 'Total Buyers'
-    type: 'number'
-    definition: @aql count(slb_users.id) | where(slb_users.is_buyer is true);;
-    description: 'Users with at least one order.'
-  }
-  metric total_repeated_buyers {
-    label: 'Total Repeat Buyers'
-    type: 'number'
-    definition: @aql count(slb_users.id) | where(slb_users.is_repeated_buyer is true);;
-    description: 'Users with 2+ orders.'
-  }
-  metric repeat_buyer_rate {
-    label: 'Repeat Buyer Rate'
-    type: 'number'
-    definition: @aql total_repeated_buyers * 1.0 / total_buyers;;
-    description: 'Repeat buyers / buyers.'
-  }
-  metric refunded_gmv {
-    label: 'Refunded GMV'
-    type: 'number'
-    definition: @aql gmv | where(slb_orders.status is 'refunded');;
-    description: 'Gross value of refunded items (GMV restricted to refunded orders).'
-  }
-  metric refund_rate {
-    label: 'Refund Rate'
-    type: 'number'
-    definition: @aql refunded_gmv / gmv;;
-    description: 'Share of GMV that was refunded = refunded_gmv / gmv. Composes at any grain (e.g. by category), which lets a query filter categories by this measure inline.'
+    definition: @aql slb_orders | sum(slb_orders.delivery_attempts);;
+    description: 'Recorded delivery attempts for orders created in the selected period. Includes every recorded status.'
   }
 }
