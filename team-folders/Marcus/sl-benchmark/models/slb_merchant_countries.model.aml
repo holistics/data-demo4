@@ -1,0 +1,25 @@
+Model slb_merchant_countries {
+  type: 'table'
+  label: 'SLB Merchant Countries'
+  description: 'Country where the merchant is based (Neon benchmark projection). Same source table as slb_countries, which holds customer countries.'
+  data_source_name: 'slb_ecommerce_neon_h4'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"benchmark"."countries"'
+
+  dimension code {
+    label: 'Merchant Country Code'
+    type: 'text'
+    primary_key: true
+    definition: @sql {{ #SOURCE.code }};;
+  }
+  dimension name {
+    label: 'Merchant Country Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension continent_name {
+    label: 'Merchant Continent Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.continent_name }};;
+  }
+}
