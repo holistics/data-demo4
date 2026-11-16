@@ -1,4 +1,4 @@
-# Maman demo guide for Nam
+# Maman demo guide
 
 How to walk Maman through the two data apps, the dataset and Holistics AI. Each step has a screenshot of what you should see.
 
@@ -111,7 +111,7 @@ Wait until the page has finished loading before you click. While Period to date 
 
 Open [Maman - Store Scorecard](https://demo4.holistics.io/datasets/80184) in a second tab.
 
-The field list on the left shows metric folders first, then the raw tables:
+The field list on the left shows metric folders first (red boxes), then the raw tables:
 
 - **Operating folders:** Operating Sales Traffic Toast, Operating Labor Harri, Operating Purchases Marginedge, Operating Kitchen Toast, Operating Sales Drivers Toast, Operating Items Toast, Operating Google Reviews
 - **Finance folders:** Finance Pnl Dollars Netsuite, Finance Pnl Pct Of Sales Netsuite, Finance Coverage Netsuite Vs Toast
