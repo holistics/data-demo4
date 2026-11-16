@@ -1,0 +1,24 @@
+// MarginEdge (purchasing) metrics. Needs maman_marginedge_fact_invoice_line_items,
+// maman_marginedge_fact_invoices, the relationship
+// maman_marginedge_fact_invoice_line_items.document_id > maman_marginedge_fact_invoices.document_id,
+// and maman_toast_metrics.
+PartialDataset maman_marginedge_metrics {
+  metric marginedge_purchases {
+    label: 'MarginEdge Purchases'
+    type: 'number'
+    description: 'Purchase-based COGS in USD: signed line amounts with P&L group COGS on reportable, non-transfer documents, credits kept, dated on COALESCE(invoice date, created date). What stores bought, not NetSuite booked COGS and not recipe cost.'
+    definition: @aql sum(maman_marginedge_fact_invoice_line_items.line_price_signed) | where(maman_marginedge_fact_invoice_line_items.pnl_group == 'COGS', maman_marginedge_fact_invoices.is_reportable == true, maman_marginedge_fact_invoices.document_type != 'TRANSFER');;
+  }
+  metric marginedge_purchases_pct {
+    label: 'MarginEdge Purchases % (of Toast Net Sales)'
+    type: 'number'
+    description: 'MarginEdge Purchases / Toast Net Sales, from summed dollars.'
+    definition: @aql safe_divide(marginedge_purchases, toast_net_sales);;
+  }
+  metric marginedge_pending_documents {
+    label: 'MarginEdge Documents Pending Approval'
+    type: 'number'
+    description: 'Documents with status PENDING_APPROVAL. A point-in-time backlog: do not filter it by the selected week; list the rows with vendor, invoice date, amount and invoice number.'
+    definition: @aql count(maman_marginedge_fact_invoices.document_id) | where(maman_marginedge_fact_invoices.status == 'PENDING_APPROVAL');;
+  }
+}

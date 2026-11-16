@@ -1,0 +1,48 @@
+// Harri (labor) metrics. Needs maman_harri_fact_labor_clock,
+// maman_harri_fact_salaried_cost, maman_harri_dim_employee, the relationship
+// maman_harri_fact_labor_clock.employee_id > maman_harri_dim_employee.employee_id,
+// and maman_toast_metrics (for the ratios to Toast Net Sales).
+PartialDataset maman_harri_metrics {
+  metric harri_hourly_labor_cost {
+    label: 'Harri Hourly Labor Cost'
+    type: 'number'
+    description: 'Gross pay in USD of approved clocks worked by HOURLY employees, overtime included. Clocks with no cost (about 1%) are left out, not counted as 0; see Harri Clocks Missing Cost.'
+    definition: @aql sum(maman_harri_fact_labor_clock.labor_cost) | where(maman_harri_fact_labor_clock.is_approved == true, maman_harri_dim_employee.pay_type == 'HOURLY');;
+  }
+  metric harri_salaried_labor_cost {
+    label: 'Harri Salaried Labor Cost'
+    type: 'number'
+    description: 'Salaried cost in USD: annual salary / 52 / 7 per employed calendar day. Employees without a usable salary have missing cost, not zero.'
+    definition: @aql sum(maman_harri_fact_salaried_cost.daily_cost);;
+  }
+  metric harri_labor_cost {
+    label: 'Harri Labor Cost'
+    type: 'number'
+    description: 'Operational labor cost in USD: Harri Hourly Labor Cost + Harri Salaried Labor Cost (salaried treated as 0 when a store has no salaried rows). Missing when the store has no hourly clock cost. Can include pre-opening labor. Not NetSuite booked labor: excludes bonus, vacation, sick pay, benefits and payroll taxes.'
+    definition: @aql harri_hourly_labor_cost + coalesce(harri_salaried_labor_cost, 0);;
+  }
+  metric harri_labor_hours {
+    label: 'Harri Labor Hours'
+    type: 'number'
+    description: 'Paid hours of approved clocks worked by HOURLY employees, net of unpaid breaks. Salaried hours are not included.'
+    definition: @aql sum(maman_harri_fact_labor_clock.paid_hours) | where(maman_harri_fact_labor_clock.is_approved == true, maman_harri_dim_employee.pay_type == 'HOURLY');;
+  }
+  metric harri_labor_pct {
+    label: 'Harri Labor % (of Toast Net Sales)'
+    type: 'number'
+    description: 'Harri Labor Cost / Toast Net Sales, from summed dollars. The Scorecard Operating labor %. Differs from NetSuite Total Labor %, which divides booked labor by NetSuite Sales.'
+    definition: @aql safe_divide(harri_labor_cost, toast_net_sales);;
+  }
+  metric harri_splh {
+    label: 'SPLH (Toast Sales per Harri Labor Hour)'
+    type: 'number'
+    description: 'Sales per labor hour in USD: Toast Net Sales / Harri Labor Hours (hourly paid hours only).'
+    definition: @aql safe_divide(toast_net_sales, harri_labor_hours);;
+  }
+  metric harri_clocks_missing_cost {
+    label: 'Harri Clocks Missing Cost'
+    type: 'number'
+    description: 'Approved clocks with no labor cost. Shows how much Harri cost is missing rather than zero.'
+    definition: @aql count(maman_harri_fact_labor_clock.clock_id) | where(maman_harri_fact_labor_clock.is_approved == true, maman_harri_fact_labor_clock.labor_cost is null);;
+  }
+}

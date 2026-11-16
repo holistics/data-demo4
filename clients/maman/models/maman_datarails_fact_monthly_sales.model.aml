@@ -1,0 +1,33 @@
+Model maman_datarails_fact_monthly_sales {
+  type: 'query'
+  label: 'Datarails Monthly Sales'
+  description: 'Datarails Board-reported sales. One row per store, fiscal period and scenario (Actuals only today). The table has no date, so this model adds the fiscal period end date from the catalog calendar and joins the Fiscal Calendar on it: filter by fiscal period or year, never by a single week.'
+  data_source_name: 'demo_bigquery'
+  models: [maman_catalog_fiscal_calendar]
+  query: @sql
+    SELECT s.*, p.period_end_date
+    FROM maman_demo.datarails_fact_monthly_sales AS s
+    LEFT JOIN (
+      SELECT DISTINCT {{ #c.fiscal_year }} AS fiscal_year, {{ #c.fiscal_period }} AS fiscal_period, {{ #c.period_end_date }} AS period_end_date
+      FROM {{ #maman_catalog_fiscal_calendar AS c }}
+    ) AS p
+      ON p.fiscal_year = s.fiscal_year AND p.fiscal_period = s.fiscal_period
+  ;;
+
+  dimension datarails_store_id { label: 'Datarails Store ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.datarails_store_id }};; description: 'Datarails store. Joins to Store through the crosswalk.' }
+  dimension fiscal_year { label: 'Datarails Fiscal Year' type: 'number' definition: @sql {{ #SOURCE.fiscal_year }};; description: 'Fiscal year of the row. Same 4-4-5 calendar as the catalog.' }
+  dimension fiscal_period { label: 'Datarails Fiscal Period' type: 'number' definition: @sql {{ #SOURCE.fiscal_period }};; description: 'Fiscal period of the row, 1 to 12.' }
+  dimension reporting_month { label: 'Datarails Reporting Month' type: 'text' definition: @sql {{ #SOURCE.reporting_month }};; description: 'Fiscal period label, for example FY2026 P10. Not a calendar month.' }
+  dimension period_end_date { label: 'Datarails Period End Date' type: 'date' definition: @sql {{ #SOURCE.period_end_date }};; description: 'Last day of the fiscal period of the row, looked up in the catalog calendar (not a Datarails column). Joins to the Fiscal Calendar, so a period or year filter picks the row up; a week filter picks it up only in the last week of the period.' }
+  dimension scenario { label: 'Datarails Scenario' type: 'text' definition: @sql {{ #SOURCE.scenario }};; description: 'Planning scenario. Only Actuals is loaded today.' }
+  dimension in_house { label: 'In House ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.in_house }};; description: 'In-house sales, USD.' }
+  dimension third_party_delivery { label: 'Third-Party Delivery ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.third_party_delivery }};; description: 'Third-party delivery sales, USD.' }
+  dimension catering { label: 'Catering ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.catering }};; description: 'Catering sales, USD.' }
+  dimension online_ordering { label: 'Online Ordering ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.online_ordering }};; description: 'Online-ordering sales, USD.' }
+  dimension events { label: 'Events ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.events }};; description: 'Event sales, USD.' }
+  dimension retail_ecommerce { label: 'Retail & E-Commerce ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.retail_ecommerce }};; description: 'Retail and e-commerce sales, USD.' }
+  dimension other_income { label: 'Other Income ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.other_income }};; description: 'Other income, USD.' }
+  dimension service_fees { label: 'Service Fees ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.service_fees }};; description: 'Service fees, USD.' }
+  dimension discounts { label: 'Discounts ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.discounts }};; description: 'Discounts, USD, deducted in net sales.' }
+  dimension net_sales { label: 'Datarails Net Sales ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.net_sales }};; description: 'Board-reported net sales in USD: all categories minus discounts. Use the Datarails Net Sales metric.' }
+}

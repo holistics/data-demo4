@@ -1,0 +1,76 @@
+// Ryan's weekly sales report: ERP actual vs forecast vs last year, and
+// matched Toast traffic. Shares the models and the Toast and NetSuite metric
+// partials with maman_store_scorecard; adds the weekly-sales partial.
+//
+// Join design matches the Scorecard: facts join Store through their own source
+// ID and the Fiscal Calendar on their own date. Three extra relationships join
+// GL lines, Toast checks and Toast orders to calendar.ly_date. They are
+// inactive, so default queries use the actual date; only the last-year metrics
+// activate them with with_relationships(). Datarails monthly sales has no date
+// column; its model adds the fiscal period end date, so its rows join the
+// calendar on the last day of each period. Store closures join Store only:
+// list them with their own closed_from and closed_to dates, not calendar
+// filters (calendar to closures has no direct join).
+//
+// A PartialDataset has no .extend(), so the chain starts from an anonymous
+// Dataset that holds the models and joins, then adds each metric partial.
+Dataset maman_weekly_sales = Dataset {
+  label: 'Maman - Weekly Sales'
+  description: "Ryan's weekly sales report dataset. ERP Actual Sales (NetSuite 4xxxx by transaction date), Forecast Sales, ERP Sales Last Year (same fiscal days, date - 364) and Toast orders, net sales, Events $ and average ticket, this year and last year. Group by Store Market, Format and Opening Cohort; select weeks with Fiscal Calendar fields. L4L (open 365 or more days before the week starts), closures and the other cohort rules are applied in the app. Management contracts are excluded by filtering Store Format."
+  data_source_name: 'demo_bigquery'
+  models: [
+    maman_catalog_fiscal_calendar,
+    maman_catalog_store_crosswalk,
+    maman_catalog_store_closures,
+    maman_planning_forecast_weekly,
+    maman_toast_dim_restaurants,
+    maman_toast_fact_orders,
+    maman_toast_fact_order_checks,
+    maman_netsuite_dim_accounts,
+    maman_netsuite_dim_locations,
+    maman_netsuite_dim_regions,
+    maman_netsuite_fact_gl_lines,
+    maman_datarails_dim_store,
+    maman_datarails_fact_monthly_sales,
+  ]
+  relationships: [
+    // Source dimensions hang off the crosswalk
+    relationship(maman_catalog_store_crosswalk.toast_restaurant_guid - maman_toast_dim_restaurants.restaurant_guid, true),
+    relationship(maman_catalog_store_crosswalk.netsuite_location_id - maman_netsuite_dim_locations.netsuite_location_id, true),
+    relationship(maman_netsuite_dim_locations.region_id > maman_netsuite_dim_regions.region_id, true),
+    relationship(maman_catalog_store_crosswalk.datarails_store_id - maman_datarails_dim_store.datarails_store_id, true),
+
+    // Catalog and planning
+    relationship(maman_catalog_store_closures.store_id > maman_catalog_store_crosswalk.store_id, true),
+    relationship(maman_planning_forecast_weekly.store_id > maman_catalog_store_crosswalk.store_id, true),
+    relationship(maman_planning_forecast_weekly.week_end_date > maman_catalog_fiscal_calendar.date, true),
+
+    // Toast
+    relationship(maman_toast_fact_orders.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_toast_fact_order_checks.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_toast_fact_order_checks.order_guid > maman_toast_fact_orders.order_guid, true),
+
+    // NetSuite
+    relationship(maman_netsuite_fact_gl_lines.netsuite_location_id > maman_catalog_store_crosswalk.netsuite_location_id, true),
+    relationship(maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_netsuite_fact_gl_lines.account_id > maman_netsuite_dim_accounts.account_id, true),
+
+    // Datarails: monthly rows sit on the fiscal period end date
+    relationship(maman_datarails_fact_monthly_sales.datarails_store_id > maman_catalog_store_crosswalk.datarails_store_id, true),
+    relationship(maman_datarails_fact_monthly_sales.period_end_date > maman_catalog_fiscal_calendar.date, true),
+
+    // Last year: inactive, activated only by the *_ly metrics
+    relationship(maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.ly_date, false),
+    relationship(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date, false),
+    relationship(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.ly_date, false),
+  ]
+
+  metric datarails_net_sales {
+    label: 'Datarails Net Sales (Board)'
+    type: 'number'
+    description: 'Board-reported FP&A net sales in USD from Datarails, Actuals scenario: in house, third-party delivery, catering, online ordering, events, retail and e-commerce, other income and service fees, minus discounts. Monthly by fiscal period: rows sit on the period end date, so use it with fiscal period or year filters, never a single week. Differs from ERP and Toast sales by design.'
+    definition: @aql sum(maman_datarails_fact_monthly_sales.net_sales) | where(maman_datarails_fact_monthly_sales.scenario == 'Actuals');;
+  }
+}.extend(maman_toast_metrics).extend(maman_netsuite_metrics).extend(maman_weekly_sales_metrics)

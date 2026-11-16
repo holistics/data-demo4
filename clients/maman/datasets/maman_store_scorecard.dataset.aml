@@ -1,0 +1,90 @@
+// Store Scorecard (Operating and Finance tabs). Metrics come from the shared
+// metric partials in ../metrics/; this file only adds models and joins.
+//
+// Join design: every fact joins the Store crosswalk through its own source ID
+// and the Fiscal Calendar on its own date column. Source dimensions (Toast
+// restaurants, Harri locations, MarginEdge units, NetSuite locations, Google
+// listings) hang off the crosswalk one-to-one, never off the facts, so each
+// fact has one path to them. The only fact-to-fact joins are many-to-one:
+// checks > orders, clocks > employees, line items > documents. Where those
+// create a second, longer route to Store or the Calendar, the direct one-hop
+// join wins on path length, so there is no tie.
+//
+// A PartialDataset has no .extend(), so the chain starts from an anonymous
+// Dataset that holds the models and joins, then adds each metric partial.
+Dataset maman_store_scorecard = Dataset {
+  label: 'Maman - Store Scorecard'
+  description: 'Store Scorecard dataset. Operating tab: Toast sales and traffic, Harri labor, MarginEdge purchases, kitchen times, item sales and Google reviews. Finance tab: NetSuite booked P&L to Prime Margin by GL transaction date. Toast vs NetSuite sales and Harri vs NetSuite labor are separate, labelled metrics. Filter by Fiscal Calendar fields and Store fields; Store Is Finance Scope = true gives the Finance tab population.'
+  data_source_name: 'demo_bigquery'
+  models: [
+    maman_catalog_fiscal_calendar,
+    maman_catalog_store_crosswalk,
+    maman_catalog_campaign_items,
+    maman_toast_dim_restaurants,
+    maman_toast_fact_orders,
+    maman_toast_fact_order_checks,
+    maman_toast_fact_order_selections,
+    maman_toast_kitchen_coverage_daily,
+    maman_harri_dim_location,
+    maman_harri_dim_employee,
+    maman_harri_fact_labor_clock,
+    maman_harri_fact_salaried_cost,
+    maman_marginedge_dim_restaurant_units,
+    maman_marginedge_fact_invoices,
+    maman_marginedge_fact_invoice_line_items,
+    maman_netsuite_dim_accounts,
+    maman_netsuite_dim_locations,
+    maman_netsuite_dim_regions,
+    maman_netsuite_fact_gl_lines,
+    maman_gbp_dim_listings,
+    maman_gbp_fact_reviews,
+    maman_gbp_fact_review_terms,
+    maman_gbp_agg_listing_daily,
+  ]
+  relationships: [
+    // Source dimensions hang off the crosswalk
+    relationship(maman_catalog_store_crosswalk.toast_restaurant_guid - maman_toast_dim_restaurants.restaurant_guid, true),
+    relationship(maman_catalog_store_crosswalk.harri_location_id - maman_harri_dim_location.harri_location_id, true),
+    relationship(maman_catalog_store_crosswalk.marginedge_unit_id - maman_marginedge_dim_restaurant_units.unit_id, true),
+    relationship(maman_catalog_store_crosswalk.netsuite_location_id - maman_netsuite_dim_locations.netsuite_location_id, true),
+    relationship(maman_netsuite_dim_locations.region_id > maman_netsuite_dim_regions.region_id, true),
+    relationship(maman_catalog_store_crosswalk.gbp_listing_id - maman_gbp_dim_listings.gbp_listing_id, true),
+
+    // Toast
+    relationship(maman_toast_fact_orders.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_toast_fact_order_checks.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_toast_fact_order_checks.order_guid > maman_toast_fact_orders.order_guid, true),
+    relationship(maman_toast_fact_order_selections.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_fact_order_selections.business_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_toast_kitchen_coverage_daily.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_kitchen_coverage_daily.business_date > maman_catalog_fiscal_calendar.date, true),
+
+    // Harri
+    relationship(maman_harri_fact_labor_clock.harri_location_id > maman_catalog_store_crosswalk.harri_location_id, true),
+    relationship(maman_harri_fact_labor_clock.business_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_harri_fact_labor_clock.employee_id > maman_harri_dim_employee.employee_id, true),
+    relationship(maman_harri_fact_salaried_cost.harri_location_id > maman_catalog_store_crosswalk.harri_location_id, true),
+    relationship(maman_harri_fact_salaried_cost.calendar_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_harri_dim_employee.harri_location_id > maman_catalog_store_crosswalk.harri_location_id, true),
+
+    // MarginEdge: line items reach Store and the Calendar through their document
+    relationship(maman_marginedge_fact_invoices.unit_id > maman_catalog_store_crosswalk.marginedge_unit_id, true),
+    relationship(maman_marginedge_fact_invoices.purchase_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_marginedge_fact_invoice_line_items.document_id > maman_marginedge_fact_invoices.document_id, true),
+
+    // NetSuite
+    relationship(maman_netsuite_fact_gl_lines.netsuite_location_id > maman_catalog_store_crosswalk.netsuite_location_id, true),
+    relationship(maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_netsuite_fact_gl_lines.account_id > maman_netsuite_dim_accounts.account_id, true),
+
+    // Google Business Profile
+    relationship(maman_gbp_fact_reviews.gbp_listing_id > maman_catalog_store_crosswalk.gbp_listing_id, true),
+    relationship(maman_gbp_fact_reviews.review_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_gbp_fact_review_terms.gbp_listing_id > maman_catalog_store_crosswalk.gbp_listing_id, true),
+    relationship(maman_gbp_fact_review_terms.review_date > maman_catalog_fiscal_calendar.date, true),
+    relationship(maman_gbp_agg_listing_daily.gbp_listing_id > maman_catalog_store_crosswalk.gbp_listing_id, true),
+    relationship(maman_gbp_agg_listing_daily.date > maman_catalog_fiscal_calendar.date, true),
+  ]
+}.extend(maman_toast_metrics).extend(maman_toast_operations_metrics).extend(maman_harri_metrics).extend(maman_marginedge_metrics).extend(maman_netsuite_metrics).extend(maman_gbp_metrics)

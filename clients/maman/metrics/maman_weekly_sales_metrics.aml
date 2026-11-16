@@ -1,0 +1,84 @@
+// Ryan's weekly sales report metrics: ERP actual, forecast, last year and the
+// matched last-year Toast traffic. Needs maman_toast_metrics,
+// maman_netsuite_metrics, maman_planning_forecast_weekly, and three inactive
+// last-year relationships in the dataset:
+//   maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.ly_date
+//   maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date
+//   maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.ly_date
+//
+// Last-year approach: the calendar row for a day D carries ly_date = D - 364,
+// the same fiscal weekday one 52-week year earlier. Activating a fact's
+// "date > ly_date" relationship makes every calendar filter or grouping
+// (fiscal week, week end date, period, year, week of year) select facts dated
+// 364 days earlier, while the rows still show this year's labels. This works
+// with any calendar field, unlike relative_period, which shifts only filters on
+// the one time dimension it names. All fiscal years in range have 52 weeks; a
+// 53-week year would need a different ly_date rule in the catalog.
+PartialDataset maman_weekly_sales_metrics {
+  metric erp_actual_sales {
+    label: 'ERP Actual Sales'
+    type: 'number'
+    description: "Ryan's actual sales in USD: NetSuite Sales (4xxxx GL accounts) by transaction date. Same value as NetSuite Sales, under Ryan's name. Subject to third-party delivery and period-end adjustments."
+    definition: @aql netsuite_sales;;
+  }
+  metric forecast_sales {
+    label: 'Forecast Sales'
+    type: 'number'
+    description: 'Weekly forecast in USD from the mock planning table: 8+4 cycle in FY2026, Budget in FY2025. Rows sit on the week end date, so filter or group by fiscal week, period or year. Not a curated Maman forecast yet.'
+    definition: @aql sum(maman_planning_forecast_weekly.forecast_sales);;
+  }
+  metric erp_sales_ly {
+    label: 'ERP Sales Last Year'
+    type: 'number'
+    description: 'NetSuite Sales in USD for the same fiscal days one year earlier (date - 364), aligned to the selected weeks. For WE 11/8/2026 it returns WE 11/9/2025. Missing for stores not trading last year.'
+    definition: @aql netsuite_sales | with_relationships(maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.ly_date);;
+  }
+  metric erp_var_forecast {
+    label: 'ERP Variance vs Forecast'
+    type: 'number'
+    description: 'ERP Actual Sales - Forecast Sales, USD.'
+    definition: @aql erp_actual_sales - forecast_sales;;
+  }
+  metric erp_var_forecast_pct {
+    label: 'ERP Variance vs Forecast %'
+    type: 'number'
+    description: 'ERP Variance vs Forecast / Forecast Sales, from summed dollars.'
+    definition: @aql safe_divide(erp_var_forecast, forecast_sales);;
+  }
+  metric erp_var_ly {
+    label: 'ERP Variance vs Last Year'
+    type: 'number'
+    description: 'ERP Actual Sales - ERP Sales Last Year, USD. Restrict to the L4L cohort for same-store growth.'
+    definition: @aql erp_actual_sales - erp_sales_ly;;
+  }
+  metric erp_var_ly_pct {
+    label: 'ERP Variance vs Last Year %'
+    type: 'number'
+    description: 'ERP Variance vs Last Year / ERP Sales Last Year, from summed dollars.'
+    definition: @aql safe_divide(erp_var_ly, erp_sales_ly);;
+  }
+  metric toast_net_sales_ly {
+    label: 'Toast Net Sales Last Year'
+    type: 'number'
+    description: 'Toast Net Sales in USD for the same fiscal days one year earlier (date - 364).'
+    definition: @aql toast_net_sales | with_relationships(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date);;
+  }
+  metric toast_events_sales_ly {
+    label: 'Toast Events $ Last Year'
+    type: 'number'
+    description: 'Toast Events $ for the same fiscal days one year earlier (date - 364).'
+    definition: @aql toast_events_sales | with_relationships(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date);;
+  }
+  metric toast_orders_ly {
+    label: 'Toast Orders Last Year'
+    type: 'number'
+    description: 'Eligible Toast orders for the same fiscal days one year earlier (date - 364).'
+    definition: @aql toast_orders | with_relationships(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.ly_date);;
+  }
+  metric toast_average_ticket_ex_events_ly {
+    label: 'Average Ticket ex-Events Last Year (Ryan)'
+    type: 'number'
+    description: "Ryan's average ticket one year earlier: (Toast Net Sales LY - Toast Events $ LY) / Toast Orders LY, from summed values."
+    definition: @aql safe_divide(toast_net_sales_ly - coalesce(toast_events_sales_ly, 0), toast_orders_ly);;
+  }
+}

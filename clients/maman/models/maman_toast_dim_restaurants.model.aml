@@ -1,0 +1,12 @@
+Model maman_toast_dim_restaurants {
+  type: 'table'
+  label: 'Toast Restaurants'
+  description: 'Toast restaurant dimension. One row per Toast restaurant. Reached from Store through the crosswalk; use it to compare Toast naming with the catalog store name.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.toast_dim_restaurants'
+
+  dimension restaurant_guid { label: 'Toast Restaurant GUID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.restaurant_guid }};; description: 'Toast restaurant ID. Primary key.' }
+  dimension restaurant_name { label: 'Toast Restaurant Name' type: 'text' definition: @sql {{ #SOURCE.restaurant_name }};; description: 'Restaurant name as configured in Toast. May differ from the catalog store name.' }
+  dimension timezone { label: 'Toast Timezone' type: 'text' definition: @sql {{ #SOURCE.timezone }};; description: 'Timezone configured on the Toast restaurant.' }
+  dimension is_active { label: 'Toast Is Active' type: 'truefalse' definition: @sql {{ #SOURCE.is_active }};; description: 'True when the restaurant is active in Toast.' }
+}

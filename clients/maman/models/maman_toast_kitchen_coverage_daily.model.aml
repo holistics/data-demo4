@@ -1,0 +1,13 @@
+Model maman_toast_kitchen_coverage_daily {
+  type: 'table'
+  label: 'Toast Kitchen Coverage'
+  description: "Daily kitchen fulfillment from Toast's Kitchen Details feed (kitchen-class stations). One row per restaurant per business date. Average Fulfillment Time uses only COVERED days. It is kitchen time, not the full time from order to guest."
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.toast_kitchen_coverage_daily'
+
+  dimension restaurant_guid { label: 'Toast Restaurant GUID' type: 'text' hidden: true definition: @sql {{ #SOURCE.restaurant_guid }};; description: 'Toast restaurant. Joins to Store through the crosswalk.' }
+  dimension business_date { label: 'Kitchen Business Date' type: 'date' definition: @sql {{ #SOURCE.business_date }};; description: 'Toast business date. Joins to the Fiscal Calendar.' }
+  dimension coverage_status { label: 'Kitchen Coverage Status' type: 'text' definition: @sql {{ #SOURCE.coverage_status }};; description: 'COVERED, PARTIAL or NOT_COVERED. Only COVERED days count toward Average Fulfillment Time.' }
+  dimension kitchen_ticket_count { label: 'Kitchen Tickets (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.kitchen_ticket_count }};; description: 'Kitchen tickets fulfilled that day.' }
+  dimension total_fulfillment_seconds { label: 'Fulfillment Seconds (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.total_fulfillment_seconds }};; description: 'Total kitchen fulfillment seconds that day. NULL when the day is not covered.' }
+}

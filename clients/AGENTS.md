@@ -19,6 +19,7 @@ modelling decisions, not just styling.
 |---|---|---|
 | `dabble/` | `dabble_neon`, own `dabble_*` models | Own data source + `context.aml` routing |
 | `brainstorm-apac/` | own seeded Postgres, own models | Own data source, RLS contract |
+| `maman/` | `demo_bigquery`, `maman_demo.*`, own `maman_*` models | Own mock BigQuery data, shared metric partials |
 | `fanserv/` | `demo_finance_extended` | Finance dataset, not ecommerce |
 | `iceye/` | `demo_finance` + `demo_finance_extended`, and one ecommerce re-skin | Client has non-ecommerce data, so it stays grouped here whole |
 | `branded-themes/*` | `demo_ecommerce_version_2` | Theme + layout only |

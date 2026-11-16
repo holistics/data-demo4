@@ -1,0 +1,17 @@
+Model maman_harri_dim_employee {
+  type: 'table'
+  label: 'Harri Employees'
+  description: 'Harri employees without names (PII stays in the restricted dataset). One row per employee. Gives clocks and salaried cost their pay type, and is the base of the Scorecard turnover block. Employees marked NEVER_STARTED are excluded from turnover.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.harri_dim_employee'
+
+  dimension employee_id { label: 'Employee ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.employee_id }};; description: 'Harri employee ID. Primary key.' }
+  dimension harri_location_id { label: 'Home Harri Location ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.harri_location_id }};; description: 'Home Harri location of the employee. Joins to Store for turnover by store. Clocks use their own location instead, so borrowed shifts count at the store where they were worked.' }
+  dimension job_title { label: 'Job Title' type: 'text' definition: @sql {{ #SOURCE.job_title }};; description: 'Job title in Harri.' }
+  dimension pay_type { label: 'Pay Type' type: 'text' definition: @sql {{ #SOURCE.pay_type }};; description: 'HOURLY or SALARIED. Labor Hours and hourly clock cost keep HOURLY only; salaried cost comes from Harri Salaried Cost.' }
+  dimension hourly_rate { label: 'Hourly Rate ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.hourly_rate }};; description: 'Hourly pay rate in USD for hourly staff.' }
+  dimension annual_salary { label: 'Annual Salary ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.annual_salary }};; description: 'Annual salary in USD. NULL for hourly staff and for about 3% of salaried staff, whose cost is then missing rather than zero.' }
+  dimension hire_date { label: 'Hire Date' type: 'date' definition: @sql {{ #SOURCE.hire_date }};; description: 'Hire date. Joins to the Fiscal Calendar by default, so Hires follow the selected weeks.' }
+  dimension termination_date { label: 'Termination Date' type: 'date' definition: @sql {{ #SOURCE.termination_date }};; description: 'Termination date, NULL while employed. An inactive relationship joins it to the Fiscal Calendar for the Terminations metric.' }
+  dimension employment_status { label: 'Employment Status' type: 'text' definition: @sql {{ #SOURCE.employment_status }};; description: 'ACTIVE, TERMINATED or NEVER_STARTED. NEVER_STARTED employees are excluded from turnover.' }
+}

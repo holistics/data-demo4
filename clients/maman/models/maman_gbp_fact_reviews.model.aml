@@ -1,0 +1,12 @@
+Model maman_gbp_fact_reviews {
+  type: 'table'
+  label: 'Google Reviews'
+  description: 'Google reviews without reviewer or text (PII). One row per review. Agrees with Google Listing Daily, which the review metrics use.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.gbp_fact_reviews'
+
+  dimension review_id { label: 'Review ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.review_id }};; description: 'Google review ID. Primary key.' }
+  dimension gbp_listing_id { label: 'Google Listing ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.gbp_listing_id }};; description: 'Listing reviewed. Joins to Store through the crosswalk.' }
+  dimension review_date { label: 'Review Date' type: 'date' definition: @sql {{ #SOURCE.review_date }};; description: 'Date the review was posted. Joins to the Fiscal Calendar.' }
+  dimension star_rating { label: 'Star Rating' type: 'number' definition: @sql {{ #SOURCE.star_rating }};; description: 'Stars given, 1 to 5.' }
+}

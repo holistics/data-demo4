@@ -1,0 +1,10 @@
+Model maman_harri_dim_location {
+  type: 'table'
+  label: 'Harri Locations'
+  description: 'Harri location dimension. One row per Harri location. Reached from Store through the crosswalk.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.harri_dim_location'
+
+  dimension harri_location_id { label: 'Harri Location ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.harri_location_id }};; description: 'Harri location ID. Primary key.' }
+  dimension location_name { label: 'Harri Location Name' type: 'text' definition: @sql {{ #SOURCE.location_name }};; description: 'Location name as configured in Harri. May differ from the catalog store name.' }
+}
