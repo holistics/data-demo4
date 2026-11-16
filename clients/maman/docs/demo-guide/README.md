@@ -4,14 +4,11 @@ Walkthrough of the two data apps, the dataset and Holistics AI, with a screensho
 
 ## About the data
 
-Every number in the demo is generated mock data, not Maman's figures.
+All numbers are generated mock data, not Maman's figures.
 
-- **Tables:** we rebuilt the curated tables Maman described (Toast, Harri, MarginEdge, NetSuite, Google Business Profile, Datarails) in our own BigQuery, with the same table names and grain.
-- **Columns:** Maman shared table names and grain only. We inferred the columns from their KPI definitions and their two reports (the Store Scorecard and Ryan's weekly sales report).
-- **Values:** store names, markets and opening dates follow Ryan's report. All amounts are generated to behave like their business (openings, closures, payroll booked after the week); no per-store figure comes from their reports.
-- **Forecast:** mock, because Ryan's forecast is not in their warehouse.
-
-With read access to their curated datasets, the same models, metrics and apps would point at real data.
+- **Tables:** same names and grain as the curated tables Maman described, rebuilt in our BigQuery.
+- **Columns:** inferred from their KPI definitions and their two reports, since Maman shared table names only.
+- **Values:** store names and opening dates follow Ryan's report; all amounts are generated.
 
 ## Links
 
