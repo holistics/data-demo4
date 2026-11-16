@@ -1,67 +1,69 @@
 // Toast (POS) sales and traffic metrics, defined once and composed into both
-// Maman datasets with .extend(). Needs these models in the dataset:
-// maman_toast_fact_order_checks, maman_toast_fact_orders,
-// maman_catalog_fiscal_calendar, and the relationship
-// maman_toast_fact_order_checks.order_guid > maman_toast_fact_orders.order_guid.
+// Maman datasets with .extend(). They read the daily aggregate
+// maman_toast_agg_store_daypart_daily (one row per restaurant, business date,
+// daypart and event flag, built with the eligible-order and eligible-check
+// rules), not the detail tables, so app queries stay small. Needs
+// maman_toast_agg_store_daypart_daily and maman_catalog_fiscal_calendar in the
+// dataset, each aggregate column joined to Store and the calendar.
 PartialDataset maman_toast_metrics {
   metric toast_net_sales {
     label: 'Toast Net Sales'
     type: 'number'
-    description: 'Operational POS sales in USD: check subtotal after discounts, plus non-gratuity service charges, minus fundraising charges, deferred-revenue and house-account lines and refunds (excluding refunded tips). Excludes tax and tips. Eligible checks only (check and order not voided, deleted or excess food). Additive across stores and days. Differs from NetSuite Sales (booked revenue) by design.'
-    definition: @aql sum(maman_toast_fact_order_checks.net_sales_amount) | where(maman_toast_fact_order_checks.is_eligible == true);;
+    description: 'Operational POS sales in USD: check subtotal after discounts, plus non-gratuity service charges, minus fundraising charges, deferred-revenue and house-account lines and refunds (excluding refunded tips). Excludes tax and tips. Eligible checks only (check and order not voided, deleted or excess food). Additive across stores and days. Differs from NetSuite Sales (booked revenue) by design. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql sum(maman_toast_agg_store_daypart_daily.net_sales);;
   }
   metric toast_transactions {
     label: 'Toast Transactions'
     type: 'number'
-    description: 'Count of eligible Toast checks. An order split into several checks counts several times, so this is not the same as Toast Orders.'
-    definition: @aql count(maman_toast_fact_order_checks.check_guid) | where(maman_toast_fact_order_checks.is_eligible == true);;
+    description: 'Count of eligible Toast checks. An order split into several checks counts several times, so this is not the same as Toast Orders. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql sum(maman_toast_agg_store_daypart_daily.eligible_checks);;
   }
   metric toast_trading_stores {
     label: 'Stores Trading on Toast'
     type: 'number'
-    description: 'Distinct Toast restaurants with at least one eligible check in the range. For the Finance coverage table and to spot partial or closed weeks.'
-    definition: @aql count_distinct(maman_toast_fact_order_checks.restaurant_guid) | where(maman_toast_fact_order_checks.is_eligible == true);;
+    description: 'Distinct Toast restaurants with at least one eligible check in the range. For the Finance coverage table and to spot partial or closed weeks. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql count_distinct(maman_toast_agg_store_daypart_daily.restaurant_guid) | where(maman_toast_agg_store_daypart_daily.eligible_checks > 0);;
   }
   metric toast_average_check {
     label: 'Toast Average Check'
     type: 'number'
-    description: "Scorecard average check in USD: Toast Net Sales / Toast Transactions, from summed values (never an average of store averages). Differs from Ryan's Average Ticket, which removes Events $ and divides by orders."
+    description: "Scorecard average check in USD: Toast Net Sales / Toast Transactions, from summed values (never an average of store averages). Differs from Ryan's Average Ticket, which removes Events $ and divides by orders. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules."
     definition: @aql safe_divide(toast_net_sales, toast_transactions);;
   }
   metric toast_orders {
     label: 'Toast Orders'
     type: 'number'
-    description: "Count of eligible Toast orders (not voided, deleted or excess food). Ryan's traffic measure and the denominator of his Average Ticket."
-    definition: @aql count(maman_toast_fact_orders.order_guid) | where(maman_toast_fact_orders.is_eligible_order == true);;
+    description: "Count of eligible Toast orders (not voided, deleted or excess food). Ryan's traffic measure and the denominator of his Average Ticket. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules."
+    definition: @aql sum(maman_toast_agg_store_daypart_daily.eligible_orders);;
   }
   metric toast_events_sales {
     label: 'Toast Events $'
     type: 'number'
-    description: "Toast Net Sales of event orders (Tripleseat, order Is Event Order = true), USD. Subtracted in Ryan's Average Ticket. NULL, not 0, when a store had no event orders."
-    definition: @aql toast_net_sales | where(maman_toast_fact_orders.is_event == true);;
+    description: "Toast Net Sales of event orders (Tripleseat, order Is Event Order = true), USD. Subtracted in Ryan's Average Ticket. NULL, not 0, when a store had no event orders. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules."
+    definition: @aql toast_net_sales | where(maman_toast_agg_store_daypart_daily.is_event == true);;
   }
   metric toast_average_ticket_ex_events {
     label: 'Average Ticket ex-Events (Ryan)'
     type: 'number'
-    description: "Ryan's average ticket in USD: (Toast Net Sales - Toast Events $) / Toast Orders, from summed values, never an average of store tickets. Not the same as the Scorecard Average Check."
+    description: "Ryan's average ticket in USD: (Toast Net Sales - Toast Events $) / Toast Orders, from summed values, never an average of store tickets. Not the same as the Scorecard Average Check. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules."
     definition: @aql safe_divide(toast_net_sales - coalesce(toast_events_sales, 0), toast_orders);;
   }
   metric toast_breakfast_sales_share {
     label: 'Toast Breakfast Sales %'
     type: 'number'
-    description: 'Share of Toast Net Sales from orders opened before 11:00 local (daypart Breakfast). Ratio of summed sales, not an average of store shares.'
-    definition: @aql safe_divide(toast_net_sales | where(maman_toast_fact_orders.daypart == 'Breakfast'), toast_net_sales);;
+    description: 'Share of Toast Net Sales from orders opened before 11:00 local (daypart Breakfast). Ratio of summed sales, not an average of store shares. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql safe_divide(toast_net_sales | where(maman_toast_agg_store_daypart_daily.daypart == 'Breakfast'), toast_net_sales);;
   }
   metric toast_lunch_sales_share {
     label: 'Toast Lunch Sales %'
     type: 'number'
-    description: 'Share of Toast Net Sales from orders opened 11:00 to 15:00 local (daypart Lunch). Ratio of summed sales.'
-    definition: @aql safe_divide(toast_net_sales | where(maman_toast_fact_orders.daypart == 'Lunch'), toast_net_sales);;
+    description: 'Share of Toast Net Sales from orders opened 11:00 to 15:00 local (daypart Lunch). Ratio of summed sales. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql safe_divide(toast_net_sales | where(maman_toast_agg_store_daypart_daily.daypart == 'Lunch'), toast_net_sales);;
   }
   metric toast_weekend_sales_share {
     label: 'Toast Weekend Sales %'
     type: 'number'
-    description: 'Share of Toast Net Sales on Saturday and Sunday business dates. Ratio of summed sales. 0% for stores that do not trade weekends.'
+    description: 'Share of Toast Net Sales on Saturday and Sunday business dates. Ratio of summed sales. 0% for stores that do not trade weekends. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
     definition: @aql safe_divide(toast_net_sales | where(maman_catalog_fiscal_calendar.is_weekend == true), toast_net_sales);;
   }
 }

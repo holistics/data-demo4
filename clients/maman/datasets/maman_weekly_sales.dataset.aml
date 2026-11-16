@@ -3,14 +3,17 @@
 // partials with maman_store_scorecard; adds the weekly-sales partial.
 //
 // Join design matches the Scorecard: facts join Store through their own source
-// ID and the Fiscal Calendar on their own date. Three extra relationships join
-// GL lines, Toast checks and Toast orders to calendar.ly_date. They are
+// ID and the Fiscal Calendar on their own date. The Toast metrics read the
+// daily aggregate maman_toast_agg_store_daypart_daily; the Toast detail models
+// stay for ad hoc questions. Extra relationships join GL lines, the Toast
+// aggregate, Toast checks and Toast orders to calendar.ly_date. They are
 // inactive, so default queries use the actual date; only the last-year metrics
-// activate them with with_relationships(). Datarails monthly sales has no date
-// column; its model adds the fiscal period end date, so its rows join the
-// calendar on the last day of each period. Store closures join Store only:
-// list them with their own closed_from and closed_to dates, not calendar
-// filters (calendar to closures has no direct join).
+// activate them (GL lines and the aggregate) with with_relationships().
+// Datarails monthly sales has no date column; its model adds the fiscal period
+// end date, so its rows join the calendar on the last day of each period.
+// Store closures join Store only: list them with their own closed_from and
+// closed_to dates, not calendar filters (calendar to closures has no direct
+// join).
 //
 // A PartialDataset has no .extend(), so the chain starts from an anonymous
 // Dataset that holds the models and joins, then adds each metric partial.
@@ -24,6 +27,7 @@ Dataset maman_weekly_sales = Dataset {
     maman_catalog_store_closures,
     maman_planning_forecast_weekly,
     maman_toast_dim_restaurants,
+    maman_toast_agg_store_daypart_daily,
     maman_toast_fact_orders,
     maman_toast_fact_order_checks,
     maman_netsuite_dim_accounts,
@@ -45,7 +49,11 @@ Dataset maman_weekly_sales = Dataset {
     relationship(maman_planning_forecast_weekly.store_id > maman_catalog_store_crosswalk.store_id, true),
     relationship(maman_planning_forecast_weekly.week_end_date > maman_catalog_fiscal_calendar.date, true),
 
-    // Toast
+    // Toast daily aggregate: the shared Toast metrics read it
+    relationship(maman_toast_agg_store_daypart_daily.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
+    relationship(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.date, true),
+
+    // Toast detail, kept for ad hoc questions
     relationship(maman_toast_fact_orders.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
     relationship(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.date, true),
     relationship(maman_toast_fact_order_checks.restaurant_guid > maman_catalog_store_crosswalk.toast_restaurant_guid, true),
@@ -61,8 +69,10 @@ Dataset maman_weekly_sales = Dataset {
     relationship(maman_datarails_fact_monthly_sales.datarails_store_id > maman_catalog_store_crosswalk.datarails_store_id, true),
     relationship(maman_datarails_fact_monthly_sales.period_end_date > maman_catalog_fiscal_calendar.date, true),
 
-    // Last year: inactive, activated only by the *_ly metrics
+    // Last year: inactive, activated only by the *_ly metrics (the two Toast
+    // detail ones are kept for ad hoc last-year queries on the detail tables)
     relationship(maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.ly_date, false),
+    relationship(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date, false),
     relationship(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date, false),
     relationship(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.ly_date, false),
   ]

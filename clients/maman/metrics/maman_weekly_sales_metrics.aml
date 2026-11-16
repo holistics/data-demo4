@@ -1,10 +1,9 @@
 // Ryan's weekly sales report metrics: ERP actual, forecast, last year and the
 // matched last-year Toast traffic. Needs maman_toast_metrics,
-// maman_netsuite_metrics, maman_planning_forecast_weekly, and three inactive
+// maman_netsuite_metrics, maman_planning_forecast_weekly, and two inactive
 // last-year relationships in the dataset:
 //   maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.ly_date
-//   maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date
-//   maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.ly_date
+//   maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date
 //
 // Last-year approach: the calendar row for a day D carries ly_date = D - 364,
 // the same fiscal weekday one 52-week year earlier. Activating a fact's
@@ -60,25 +59,25 @@ PartialDataset maman_weekly_sales_metrics {
   metric toast_net_sales_ly {
     label: 'Toast Net Sales Last Year'
     type: 'number'
-    description: 'Toast Net Sales in USD for the same fiscal days one year earlier (date - 364).'
-    definition: @aql toast_net_sales | with_relationships(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date);;
+    description: 'Toast Net Sales in USD for the same fiscal days one year earlier (date - 364). Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql toast_net_sales | with_relationships(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric toast_events_sales_ly {
     label: 'Toast Events $ Last Year'
     type: 'number'
-    description: 'Toast Events $ for the same fiscal days one year earlier (date - 364).'
-    definition: @aql toast_events_sales | with_relationships(maman_toast_fact_order_checks.business_date > maman_catalog_fiscal_calendar.ly_date);;
+    description: 'Toast Events $ for the same fiscal days one year earlier (date - 364). Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql toast_events_sales | with_relationships(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric toast_orders_ly {
     label: 'Toast Orders Last Year'
     type: 'number'
-    description: 'Eligible Toast orders for the same fiscal days one year earlier (date - 364).'
-    definition: @aql toast_orders | with_relationships(maman_toast_fact_orders.business_date > maman_catalog_fiscal_calendar.ly_date);;
+    description: 'Eligible Toast orders for the same fiscal days one year earlier (date - 364). Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    definition: @aql toast_orders | with_relationships(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric toast_average_ticket_ex_events_ly {
     label: 'Average Ticket ex-Events Last Year (Ryan)'
     type: 'number'
-    description: "Ryan's average ticket one year earlier: (Toast Net Sales LY - Toast Events $ LY) / Toast Orders LY, from summed values."
+    description: "Ryan's average ticket one year earlier: (Toast Net Sales LY - Toast Events $ LY) / Toast Orders LY, from summed values. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules."
     definition: @aql safe_divide(toast_net_sales_ly - coalesce(toast_events_sales_ly, 0), toast_orders_ly);;
   }
 }

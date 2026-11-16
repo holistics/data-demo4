@@ -1,0 +1,15 @@
+Model maman_toast_agg_item_daily {
+  type: 'table'
+  label: 'Toast Item Daily'
+  description: 'Daily Toast item sales, pre-aggregated from Toast Item Selections so app queries stay small. One row per restaurant, business date, item name, sales category and menu group. Keeps only primary (non-modifier), non-voided item lines, the same rules as the item metrics on the detail table. The shared item metrics read this table; use Toast Item Selections only for ad hoc questions such as modifiers.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.toast_agg_item_daily'
+
+  dimension restaurant_guid { label: 'Toast Restaurant GUID' type: 'text' hidden: true definition: @sql {{ #SOURCE.restaurant_guid }};; description: 'Toast restaurant of the item lines. Joins to Store through the crosswalk.' }
+  dimension business_date { label: 'Item Business Date' type: 'date' definition: @sql {{ #SOURCE.business_date }};; description: 'Toast business date of the item lines. Joins to the Fiscal Calendar.' }
+  dimension item_name { label: 'Item Name' type: 'text' definition: @sql {{ #SOURCE.item_name }};; description: 'Menu item name, lower case, for example classic chocolate chip cookie or latte. Campaign Items match on it.' }
+  dimension sales_category { label: 'Sales Category' type: 'text' definition: @sql {{ #SOURCE.sales_category }};; description: 'Food, NA Beverage, Retail or Catering. Top sellers rank Food and NA Beverage separately.' }
+  dimension menu_group { label: 'Menu Group' type: 'text' definition: @sql {{ #SOURCE.menu_group }};; description: 'Toast menu group of the item.' }
+  dimension units { label: 'Units (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.units }};; description: 'Units sold on primary, non-voided lines for the row (sum of quantity). Toast Item Units sums it.' }
+  dimension item_sales { label: 'Item Sales ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.item_sales }};; description: 'Line price in USD after discounts on primary, non-voided lines for the row (sum of price). Toast Item Sales sums it.' }
+}

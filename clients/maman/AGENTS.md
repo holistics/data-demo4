@@ -13,6 +13,7 @@ Maman is a US and Canada bakery-café group with about 70 stores, evaluating Hol
 
 - The schema contract is `~/Documents/Dev/holistics/demo-maman/mock-data/schema-contract.md` (repo `demo-maman`, outside demo4). It is the single source of truth for table and column names and types. To change a column, change the contract first, then the model.
 - Keep one model per contract table. Name each pass-through dimension exactly like its column and keep its type. Derived dimensions get new names.
+- The 2 Toast aggregates (`maman_toast_agg_store_daypart_daily`, `maman_toast_agg_item_daily`) follow `~/Documents/Dev/holistics/demo-maman/mock-data/toast-aggregates-spec.md`. The shared Toast metrics must read them, never the Toast detail models. Apps must group or filter Toast metrics by aggregate or Store/Calendar fields: a detail field such as `maman_toast_fact_order_selections.item_name` reaches the aggregates only through tied store or date paths.
 - Every dimension and metric needs a plain-language description: what it means, its grain or units, and caveats such as missing-not-zero, date basis and source.
 
 ## Join rules
@@ -60,7 +61,13 @@ git diff --check
 
 ## Tenant AI context
 
-`settings/ai/context.aml` has no Maman routing block yet, so Holistics AI does not know Maman's vocabulary. Per `clients/AGENTS.md`:
+Holistics AI learns Maman's definitions from two places that must stay in step with this folder:
 
-- Propose any routing block to the operator.
-- Never edit `context.aml` as a side effect of work in this folder.
+- **Route:** `settings/ai/context.aml` has a *Maman* routing-table row and the `maman_context_routing` section. Both bind to the `maman_*` models on `demo_bigquery` and the datasets `maman_store_scorecard` and `maman_weekly_sales`. The section repeats the non-negotiables inline: name the source, never average store percentages, missing is not zero, keep labor open, 4-4-5 calendar and last year = date − 364.
+- **Skill:** `ai/maman_kpi_definitions.skill.aml` (`Skill maman_kpi_definitions`, auto-invoked) holds the definitions table: which metric holds each source's definition, which dataset has it, and what the demo cannot show.
+
+Update them when this folder changes:
+
+- When you add, rename or redefine a metric named in the skill, or a model or dataset named in the route, update the skill or route in the same change. The route matches on model and dataset names, so a rename can silently break it.
+- Per `clients/AGENTS.md`, propose `context.aml` edits to the operator and wait for approval. Never edit it as a side effect of work in this folder.
+- After editing either file, run `holistics aml validate settings/ai/context.aml clients/maman` from the repository root.

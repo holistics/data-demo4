@@ -1,0 +1,15 @@
+Model maman_toast_agg_store_daypart_daily {
+  type: 'table'
+  label: 'Toast Store Daypart Daily'
+  description: 'Daily Toast sales and traffic, pre-aggregated from Toast Orders and Toast Checks so app queries stay small. One row per restaurant, business date, daypart and event flag, kept only when it has an eligible order or an eligible check. Applies the same eligibility rules as the detail tables: eligible orders are not voided, deleted or excess food; eligible checks have Is Eligible Check = true. Checks take daypart and event flag from their order. The shared Toast metrics read this table; use the detail models only for ad hoc questions.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.toast_agg_store_daypart_daily'
+
+  dimension restaurant_guid { label: 'Toast Restaurant GUID' type: 'text' hidden: true definition: @sql {{ #SOURCE.restaurant_guid }};; description: 'Toast restaurant of the orders, taken from the order. Joins to Store through the crosswalk.' }
+  dimension business_date { label: 'Toast Business Date' type: 'date' definition: @sql {{ #SOURCE.business_date }};; description: 'Toast business date (local trading day) of the orders, taken from the order. Joins to the Fiscal Calendar; in the weekly sales dataset an inactive join to the calendar Same Fiscal Day Last Year feeds the last-year metrics.' }
+  dimension daypart { label: 'Daypart' type: 'text' definition: @sql {{ #SOURCE.daypart }};; description: 'Daypart of the orders: Breakfast (opened before 11:00 local), Lunch (11:00 to 15:00) or Afternoon (after 15:00). Drives the breakfast and lunch sales shares.' }
+  dimension is_event { label: 'Is Event Order' type: 'truefalse' definition: @sql {{ #SOURCE.is_event }};; description: "True for rows of Tripleseat event orders. Toast Events $ (subtracted in Ryan's average ticket) is net sales of these rows." }
+  dimension eligible_orders { label: 'Eligible Orders (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.eligible_orders }};; description: 'Orders not voided, deleted or excess food in the row. Toast Orders sums it.' }
+  dimension eligible_checks { label: 'Eligible Checks (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.eligible_checks }};; description: 'Checks with Is Eligible Check = true in the row. Toast Transactions sums it.' }
+  dimension net_sales { label: 'Net Sales ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.net_sales }};; description: 'Sum of check net sales in USD over eligible checks in the row (excludes tax and tips). Toast Net Sales sums it.' }
+}

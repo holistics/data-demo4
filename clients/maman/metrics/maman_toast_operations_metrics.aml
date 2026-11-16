@@ -1,19 +1,20 @@
 // Toast item and kitchen metrics for the Scorecard Operating tab (top sellers,
 // campaigns, Average Fulfillment Time). Kept apart from maman_toast_metrics
 // because the weekly sales dataset does not carry these models. Needs
-// maman_toast_fact_order_selections and maman_toast_kitchen_coverage_daily.
+// maman_toast_agg_item_daily (daily item aggregate of primary, non-voided
+// lines) and maman_toast_kitchen_coverage_daily.
 PartialDataset maman_toast_operations_metrics {
   metric toast_item_units {
     label: 'Toast Item Units'
     type: 'number'
-    description: 'Units sold on primary (non-modifier), non-voided item lines. Use for top sellers and campaign units, by Item Name or Sales Category.'
-    definition: @aql sum(maman_toast_fact_order_selections.quantity) | where(maman_toast_fact_order_selections.is_primary_item == true, maman_toast_fact_order_selections.is_voided == false);;
+    description: 'Units sold on primary (non-modifier), non-voided item lines. Use for top sellers and campaign units, by Item Name or Sales Category. Reads the daily aggregate Toast Item Daily, built from Toast Item Selections with the same primary, non-voided rules.'
+    definition: @aql sum(maman_toast_agg_item_daily.units);;
   }
   metric toast_item_sales {
     label: 'Toast Item Sales'
     type: 'number'
-    description: 'Item-line sales in USD: line price after discounts on primary, non-voided item lines. Not the check-level Toast Net Sales KPI, so the totals do not tie exactly.'
-    definition: @aql sum(maman_toast_fact_order_selections.price) | where(maman_toast_fact_order_selections.is_primary_item == true, maman_toast_fact_order_selections.is_voided == false);;
+    description: 'Item-line sales in USD: line price after discounts on primary, non-voided item lines. Not the check-level Toast Net Sales KPI, so the totals do not tie exactly. Reads the daily aggregate Toast Item Daily, built from Toast Item Selections with the same primary, non-voided rules.'
+    definition: @aql sum(maman_toast_agg_item_daily.item_sales);;
   }
   metric toast_kitchen_tickets_covered {
     label: 'Kitchen Tickets (covered days)'

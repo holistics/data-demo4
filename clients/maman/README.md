@@ -21,7 +21,8 @@ All rows are generated. Maman shared table names and grain only, so the columns 
 
 ## Layout
 
-- `models/`: one model per contract table (27).
+- `models/`: one model per contract table (27), plus 2 Toast daily aggregates from `~/Documents/Dev/holistics/demo-maman/mock-data/toast-aggregates-spec.md`.
+  - The shared Toast metrics read `maman_toast_agg_store_daypart_daily` and `maman_toast_agg_item_daily`, not the detail tables, so app queries scan megabytes instead of gigabytes. The Toast detail models stay in the datasets for ad hoc questions.
   - All are table models except `maman_datarails_fact_monthly_sales`. That is a query model, because it adds the fiscal period end date from the calendar so monthly rows can join it.
 - `metrics/`: shared metric partials, one per source.
   - `maman_toast_metrics`: Toast sales and traffic.
@@ -32,6 +33,7 @@ All rows are generated. Maman shared table names and grain only, so the columns 
   - `maman_store_scorecard`: 23 models, 51 metrics.
   - `maman_weekly_sales`: 13 models, 42 metrics.
 - `docs/sample-queries.md`: AQL the data apps need.
+- `ai/maman_kpi_definitions.skill.aml`: the Holistics AI skill with the definitions that differ by source (sales, labor, COGS, comp vs same-store, average check vs ticket, transaction date vs posting period) and the answer rules. The *Maman* route in `settings/ai/context.aml` loads it for queries on the two datasets.
 
 ## Key modelling decisions
 
