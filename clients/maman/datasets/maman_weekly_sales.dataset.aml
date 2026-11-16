@@ -84,31 +84,16 @@ Dataset maman_weekly_sales = Dataset {
     definition: @aql sum(maman_datarails_fact_monthly_sales.net_sales) | where(maman_datarails_fact_monthly_sales.scenario == 'Actuals');;
   }
 
-  // Field list for Explore and dashboard builders. Models come first, listed
+  // Field list for Explore and dashboard builders, shown in the order listed.
+  // Metric groups come first and follow Ryan's report (ERP sales, forecast,
+  // Toast this year and last year, Datarails), then the other shared Toast and
+  // NetSuite metrics. AML allows no group inside a group and a metric must be
+  // in a group. The UI shows each group's name title-cased and ignores label,
+  // so each name carries the section and the source. Models come last, listed
   // directly under view with an empty body (all their fields): Store and
-  // Fiscal Calendar, then by source system. Metrics sit in flat groups that
-  // follow Ryan's report (ERP sales, forecast, Toast this year and last year,
-  // Datarails), then the other shared Toast and NetSuite metrics. AML allows
-  // no group inside a group and a metric must be in a group. The UI shows each
-  // group's name title-cased and ignores label, so each name carries the
-  // section and the source. Every model and metric is listed exactly once, so
-  // nothing is hidden from the curated view.
+  // Fiscal Calendar, then by source system. Every model and metric is listed
+  // exactly once, so nothing is hidden from the curated view.
   view {
-    model maman_catalog_store_crosswalk { }
-    model maman_catalog_fiscal_calendar { }
-    model maman_catalog_store_closures { }
-    model maman_toast_dim_restaurants { }
-    model maman_toast_agg_store_daypart_daily { }
-    model maman_toast_fact_orders { }
-    model maman_toast_fact_order_checks { }
-    model maman_netsuite_dim_locations { }
-    model maman_netsuite_dim_regions { }
-    model maman_netsuite_dim_accounts { }
-    model maman_netsuite_fact_gl_lines { }
-    model maman_planning_forecast_weekly { }
-    model maman_datarails_dim_store { }
-    model maman_datarails_fact_monthly_sales { }
-
     group erp_sales_netsuite {
       metric erp_actual_sales
       metric erp_sales_ly
@@ -169,5 +154,20 @@ Dataset maman_weekly_sales = Dataset {
       metric netsuite_locations_with_cogs
       metric netsuite_locations_with_labor
     }
+
+    model maman_catalog_store_crosswalk { }
+    model maman_catalog_fiscal_calendar { }
+    model maman_catalog_store_closures { }
+    model maman_toast_dim_restaurants { }
+    model maman_toast_agg_store_daypart_daily { }
+    model maman_toast_fact_orders { }
+    model maman_toast_fact_order_checks { }
+    model maman_netsuite_dim_locations { }
+    model maman_netsuite_dim_regions { }
+    model maman_netsuite_dim_accounts { }
+    model maman_netsuite_fact_gl_lines { }
+    model maman_planning_forecast_weekly { }
+    model maman_datarails_dim_store { }
+    model maman_datarails_fact_monthly_sales { }
   }
 }.extend(maman_toast_metrics).extend(maman_netsuite_metrics).extend(maman_weekly_sales_metrics)

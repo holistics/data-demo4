@@ -100,40 +100,15 @@ Dataset maman_store_scorecard = Dataset {
     relationship(maman_gbp_agg_listing_daily.date > maman_catalog_fiscal_calendar.date, true),
   ]
 
-  // Field list for Explore and dashboard builders. Models come first, listed
-  // directly under view with an empty body (all their fields): Store and
-  // Fiscal Calendar, then by source system. Metrics sit in flat groups, since
-  // AML allows no group inside a group and a metric must be in a group. The UI
-  // shows each group's name title-cased and ignores label, so each name
-  // carries the Scorecard section and the source. Every model and metric is
-  // listed exactly once, so nothing is hidden from the curated view.
+  // Field list for Explore and dashboard builders, shown in the order listed.
+  // Metric groups come first, flat since AML allows no group inside a group
+  // and a metric must be in a group. The UI shows each group's name
+  // title-cased and ignores label, so each name carries the Scorecard section
+  // and the source. Models come last, listed directly under view with an
+  // empty body (all their fields): Store and Fiscal Calendar, then by source
+  // system. Every model and metric is listed exactly once, so nothing is
+  // hidden from the curated view.
   view {
-    model maman_catalog_store_crosswalk { }
-    model maman_catalog_fiscal_calendar { }
-    model maman_catalog_campaign_items { }
-    model maman_toast_dim_restaurants { }
-    model maman_toast_agg_store_daypart_daily { }
-    model maman_toast_agg_item_daily { }
-    model maman_toast_fact_orders { }
-    model maman_toast_fact_order_checks { }
-    model maman_toast_fact_order_selections { }
-    model maman_toast_kitchen_coverage_daily { }
-    model maman_harri_dim_location { }
-    model maman_harri_dim_employee { }
-    model maman_harri_fact_labor_clock { }
-    model maman_harri_fact_salaried_cost { }
-    model maman_marginedge_dim_restaurant_units { }
-    model maman_marginedge_fact_invoices { }
-    model maman_marginedge_fact_invoice_line_items { }
-    model maman_netsuite_dim_locations { }
-    model maman_netsuite_dim_regions { }
-    model maman_netsuite_dim_accounts { }
-    model maman_netsuite_fact_gl_lines { }
-    model maman_gbp_dim_listings { }
-    model maman_gbp_fact_reviews { }
-    model maman_gbp_fact_review_terms { }
-    model maman_gbp_agg_listing_daily { }
-
     group operating_sales_traffic_toast {
       metric toast_net_sales
       metric toast_transactions
@@ -205,5 +180,31 @@ Dataset maman_store_scorecard = Dataset {
       metric netsuite_locations_with_labor
       metric toast_trading_stores
     }
+
+    model maman_catalog_store_crosswalk { }
+    model maman_catalog_fiscal_calendar { }
+    model maman_catalog_campaign_items { }
+    model maman_toast_dim_restaurants { }
+    model maman_toast_agg_store_daypart_daily { }
+    model maman_toast_agg_item_daily { }
+    model maman_toast_fact_orders { }
+    model maman_toast_fact_order_checks { }
+    model maman_toast_fact_order_selections { }
+    model maman_toast_kitchen_coverage_daily { }
+    model maman_harri_dim_location { }
+    model maman_harri_dim_employee { }
+    model maman_harri_fact_labor_clock { }
+    model maman_harri_fact_salaried_cost { }
+    model maman_marginedge_dim_restaurant_units { }
+    model maman_marginedge_fact_invoices { }
+    model maman_marginedge_fact_invoice_line_items { }
+    model maman_netsuite_dim_locations { }
+    model maman_netsuite_dim_regions { }
+    model maman_netsuite_dim_accounts { }
+    model maman_netsuite_fact_gl_lines { }
+    model maman_gbp_dim_listings { }
+    model maman_gbp_fact_reviews { }
+    model maman_gbp_fact_review_terms { }
+    model maman_gbp_agg_listing_daily { }
   }
 }.extend(maman_toast_metrics).extend(maman_toast_operations_metrics).extend(maman_harri_metrics).extend(maman_marginedge_metrics).extend(maman_netsuite_metrics).extend(maman_gbp_metrics)
