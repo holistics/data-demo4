@@ -54,7 +54,7 @@ PartialDataset maman_netsuite_metrics {
     label: 'NetSuite Prime Margin'
     type: 'number'
     description: 'NetSuite Sales - NetSuite COGS - NetSuite Total Labor, USD. Missing (shown as a dash) when COGS or labor is not booked yet, rather than overstated.'
-    definition: @aql netsuite_sales - netsuite_cogs - netsuite_total_labor;;
+    definition: @aql case(when: netsuite_cogs is null or netsuite_total_labor is null, then: null, else: netsuite_sales - netsuite_cogs - netsuite_total_labor);;
   }
   metric netsuite_cogs_pct {
     label: 'NetSuite COGS % of Sales'
