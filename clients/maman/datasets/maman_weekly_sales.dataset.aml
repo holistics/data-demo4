@@ -83,4 +83,91 @@ Dataset maman_weekly_sales = Dataset {
     description: 'Board-reported FP&A net sales in USD from Datarails, Actuals scenario: in house, third-party delivery, catering, online ordering, events, retail and e-commerce, other income and service fees, minus discounts. Monthly by fiscal period: rows sit on the period end date, so use it with fiscal period or year filters, never a single week. Differs from ERP and Toast sales by design.'
     definition: @aql sum(maman_datarails_fact_monthly_sales.net_sales) | where(maman_datarails_fact_monthly_sales.scenario == 'Actuals');;
   }
+
+  // Field list for Explore and dashboard builders. Models come first, listed
+  // directly under view with an empty body (all their fields): Store and
+  // Fiscal Calendar, then by source system. Metrics sit in flat groups that
+  // follow Ryan's report (ERP sales, forecast, Toast this year and last year,
+  // Datarails), then the other shared Toast and NetSuite metrics. AML allows
+  // no group inside a group and a metric must be in a group. The UI shows each
+  // group's name title-cased and ignores label, so each name carries the
+  // section and the source. Every model and metric is listed exactly once, so
+  // nothing is hidden from the curated view.
+  view {
+    model maman_catalog_store_crosswalk { }
+    model maman_catalog_fiscal_calendar { }
+    model maman_catalog_store_closures { }
+    model maman_toast_dim_restaurants { }
+    model maman_toast_agg_store_daypart_daily { }
+    model maman_toast_fact_orders { }
+    model maman_toast_fact_order_checks { }
+    model maman_netsuite_dim_locations { }
+    model maman_netsuite_dim_regions { }
+    model maman_netsuite_dim_accounts { }
+    model maman_netsuite_fact_gl_lines { }
+    model maman_planning_forecast_weekly { }
+    model maman_datarails_dim_store { }
+    model maman_datarails_fact_monthly_sales { }
+
+    group erp_sales_netsuite {
+      metric erp_actual_sales
+      metric erp_sales_ly
+      metric erp_var_ly
+      metric erp_var_ly_pct
+      metric erp_var_forecast
+      metric erp_var_forecast_pct
+    }
+    group forecast_planning {
+      metric forecast_sales
+    }
+    group toast_traffic_this_year {
+      metric toast_net_sales
+      metric toast_orders
+      metric toast_events_sales
+      metric toast_average_ticket_ex_events
+    }
+    group toast_traffic_last_year {
+      metric toast_net_sales_ly
+      metric toast_orders_ly
+      metric toast_events_sales_ly
+      metric toast_average_ticket_ex_events_ly
+    }
+    group datarails_board_sales {
+      metric datarails_net_sales
+    }
+    group toast_other_metrics {
+      metric toast_transactions
+      metric toast_average_check
+      metric toast_trading_stores
+      metric toast_breakfast_sales_share
+      metric toast_lunch_sales_share
+      metric toast_weekend_sales_share
+    }
+    group netsuite_pnl_dollars {
+      metric netsuite_sales
+      metric netsuite_cogs
+      metric netsuite_salary
+      metric netsuite_hourly
+      metric netsuite_other_wages
+      metric netsuite_benefits_payroll_taxes
+      metric netsuite_other_labor
+      metric netsuite_total_labor
+      metric netsuite_prime_margin
+    }
+    group netsuite_pnl_pct_of_sales {
+      metric netsuite_cogs_pct
+      metric netsuite_salary_pct
+      metric netsuite_hourly_pct
+      metric netsuite_other_wages_pct
+      metric netsuite_benefits_payroll_taxes_pct
+      metric netsuite_other_labor_pct
+      metric netsuite_total_labor_pct
+      metric netsuite_prime_margin_pct
+    }
+    group netsuite_coverage {
+      metric netsuite_locations_with_sales
+      metric netsuite_locations_with_cogs
+      metric netsuite_locations_with_labor
+    }
+  }
 }.extend(maman_toast_metrics).extend(maman_netsuite_metrics).extend(maman_weekly_sales_metrics)

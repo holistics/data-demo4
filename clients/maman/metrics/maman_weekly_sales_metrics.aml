@@ -17,67 +17,67 @@ PartialDataset maman_weekly_sales_metrics {
   metric erp_actual_sales {
     label: 'ERP Actual Sales'
     type: 'number'
-    description: "Ryan's actual sales in USD: NetSuite Sales (4xxxx GL accounts) by transaction date. Same value as NetSuite Sales, under Ryan's name. Subject to third-party delivery and period-end adjustments."
+    description: "Ryan's name for NetSuite Sales: booked revenue in USD by transaction date. Not the same as Toast Net Sales."
     definition: @aql netsuite_sales;;
   }
   metric forecast_sales {
     label: 'Forecast Sales'
     type: 'number'
-    description: 'Weekly forecast in USD from the mock planning table: 8+4 cycle in FY2026, Budget in FY2025. Rows sit on the week end date, so filter or group by fiscal week, period or year. Not a curated Maman forecast yet.'
+    description: 'Weekly sales forecast in USD from the mock Planning forecast: 8+4 in FY2026, Budget in FY2025. Rows sit on the week end date.'
     definition: @aql sum(maman_planning_forecast_weekly.forecast_sales);;
   }
   metric erp_sales_ly {
     label: 'ERP Sales Last Year'
     type: 'number'
-    description: 'NetSuite Sales in USD for the same fiscal days one year earlier (date - 364), aligned to the selected weeks. For WE 11/8/2026 it returns WE 11/9/2025. Missing for stores not trading last year.'
+    description: 'NetSuite Sales in USD for the same fiscal days last year (date - 364). Missing for stores not trading last year.'
     definition: @aql netsuite_sales | with_relationships(maman_netsuite_fact_gl_lines.transaction_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric erp_var_forecast {
     label: 'ERP Variance vs Forecast'
     type: 'number'
-    description: 'ERP Actual Sales - Forecast Sales, USD.'
+    description: 'ERP Actual Sales minus Forecast Sales, in USD. Positive means sales beat the forecast.'
     definition: @aql erp_actual_sales - forecast_sales;;
   }
   metric erp_var_forecast_pct {
     label: 'ERP Variance vs Forecast %'
     type: 'number'
-    description: 'ERP Variance vs Forecast / Forecast Sales, from summed dollars.'
+    description: 'ERP variance vs forecast as a % of Forecast Sales. Positive means sales beat the forecast.'
     definition: @aql safe_divide(erp_var_forecast, forecast_sales);;
   }
   metric erp_var_ly {
     label: 'ERP Variance vs Last Year'
     type: 'number'
-    description: 'ERP Actual Sales - ERP Sales Last Year, USD. Restrict to the L4L cohort for same-store growth.'
+    description: 'ERP Actual Sales minus ERP Sales Last Year, in USD. Restrict to the L4L cohort for same-store growth.'
     definition: @aql erp_actual_sales - erp_sales_ly;;
   }
   metric erp_var_ly_pct {
     label: 'ERP Variance vs Last Year %'
     type: 'number'
-    description: 'ERP Variance vs Last Year / ERP Sales Last Year, from summed dollars.'
+    description: 'Year-over-year growth of ERP Actual Sales, as a % of ERP Sales Last Year. Restrict to the L4L cohort for same-store growth.'
     definition: @aql safe_divide(erp_var_ly, erp_sales_ly);;
   }
   metric toast_net_sales_ly {
     label: 'Toast Net Sales Last Year'
     type: 'number'
-    description: 'Toast Net Sales in USD for the same fiscal days one year earlier (date - 364). Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    description: 'Toast Net Sales in USD for the same fiscal days last year (date - 364).'
     definition: @aql toast_net_sales | with_relationships(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric toast_events_sales_ly {
     label: 'Toast Events $ Last Year'
     type: 'number'
-    description: 'Toast Events $ for the same fiscal days one year earlier (date - 364). Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    description: 'Toast Events $ in USD for the same fiscal days last year (date - 364). NULL, not 0, when there were no event orders.'
     definition: @aql toast_events_sales | with_relationships(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric toast_orders_ly {
     label: 'Toast Orders Last Year'
     type: 'number'
-    description: 'Eligible Toast orders for the same fiscal days one year earlier (date - 364). Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules.'
+    description: 'Count of Toast orders for the same fiscal days last year (date - 364).'
     definition: @aql toast_orders | with_relationships(maman_toast_agg_store_daypart_daily.business_date > maman_catalog_fiscal_calendar.ly_date);;
   }
   metric toast_average_ticket_ex_events_ly {
     label: 'Average Ticket ex-Events Last Year (Ryan)'
     type: 'number'
-    description: "Ryan's average ticket one year earlier: (Toast Net Sales LY - Toast Events $ LY) / Toast Orders LY, from summed values. Reads the daily aggregate Toast Store Daypart Daily, built from Toast Orders and Checks with the same eligible-order and eligible-check rules."
+    description: "Ryan's Average Ticket ex-Events in USD for the same fiscal days last year (date - 364)."
     definition: @aql safe_divide(toast_net_sales_ly - coalesce(toast_events_sales_ly, 0), toast_orders_ly);;
   }
 }

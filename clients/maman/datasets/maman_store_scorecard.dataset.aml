@@ -100,15 +100,41 @@ Dataset maman_store_scorecard = Dataset {
     relationship(maman_gbp_agg_listing_daily.date > maman_catalog_fiscal_calendar.date, true),
   ]
 
-  // Field list for Explore and dashboard builders. AML does not allow a group
-  // inside a group, so Operating, Finance and Dimensions are flat groups in
-  // that order, with the section in each label. Every model is listed with an
-  // empty body (all its fields), and every metric sits in exactly one group,
-  // so nothing is hidden from the curated view. A model sits in an Operating
-  // or Finance group only when its fields serve that one Scorecard block.
+  // Field list for Explore and dashboard builders. Models come first, listed
+  // directly under view with an empty body (all their fields): Store and
+  // Fiscal Calendar, then by source system. Metrics sit in flat groups, since
+  // AML allows no group inside a group and a metric must be in a group. The UI
+  // shows each group's name title-cased and ignores label, so each name
+  // carries the Scorecard section and the source. Every model and metric is
+  // listed exactly once, so nothing is hidden from the curated view.
   view {
-    group operating_sales_traffic {
-      label: 'Operating · Sales & traffic (Toast)'
+    model maman_catalog_store_crosswalk { }
+    model maman_catalog_fiscal_calendar { }
+    model maman_catalog_campaign_items { }
+    model maman_toast_dim_restaurants { }
+    model maman_toast_agg_store_daypart_daily { }
+    model maman_toast_agg_item_daily { }
+    model maman_toast_fact_orders { }
+    model maman_toast_fact_order_checks { }
+    model maman_toast_fact_order_selections { }
+    model maman_toast_kitchen_coverage_daily { }
+    model maman_harri_dim_location { }
+    model maman_harri_dim_employee { }
+    model maman_harri_fact_labor_clock { }
+    model maman_harri_fact_salaried_cost { }
+    model maman_marginedge_dim_restaurant_units { }
+    model maman_marginedge_fact_invoices { }
+    model maman_marginedge_fact_invoice_line_items { }
+    model maman_netsuite_dim_locations { }
+    model maman_netsuite_dim_regions { }
+    model maman_netsuite_dim_accounts { }
+    model maman_netsuite_fact_gl_lines { }
+    model maman_gbp_dim_listings { }
+    model maman_gbp_fact_reviews { }
+    model maman_gbp_fact_review_terms { }
+    model maman_gbp_agg_listing_daily { }
+
+    group operating_sales_traffic_toast {
       metric toast_net_sales
       metric toast_transactions
       metric toast_average_check
@@ -117,7 +143,6 @@ Dataset maman_store_scorecard = Dataset {
       metric toast_average_ticket_ex_events
     }
     group operating_labor_harri {
-      label: 'Operating · Labor (Harri, not NetSuite payroll)'
       metric harri_labor_cost
       metric harri_hourly_labor_cost
       metric harri_salaried_labor_cost
@@ -127,49 +152,33 @@ Dataset maman_store_scorecard = Dataset {
       metric harri_clocks_missing_cost
     }
     group operating_purchases_marginedge {
-      label: 'Operating · Purchases (MarginEdge, not NetSuite COGS)'
       metric marginedge_purchases
       metric marginedge_purchases_pct
       metric marginedge_pending_documents
-      model maman_marginedge_fact_invoices { }
-      model maman_marginedge_fact_invoice_line_items { }
     }
     group operating_kitchen_toast {
-      label: 'Operating · Kitchen (Toast)'
       metric toast_avg_fulfillment_seconds
       metric toast_kitchen_tickets_covered
       metric toast_covered_store_days
-      model maman_toast_kitchen_coverage_daily { }
     }
     group operating_sales_drivers_toast {
-      label: 'Operating · Sales drivers (Toast)'
       metric toast_breakfast_sales_share
       metric toast_lunch_sales_share
       metric toast_weekend_sales_share
     }
-    group operating_items_campaigns_toast {
-      label: 'Operating · Items & campaigns (Toast)'
+    group operating_items_toast {
       metric toast_item_units
       metric toast_item_sales
-      model maman_toast_agg_item_daily { }
-      model maman_catalog_campaign_items { }
-    }
-    group operating_workforce_harri {
-      label: 'Operating · Workforce (Harri)'
-      model maman_harri_dim_employee { }
     }
     group operating_google_reviews {
-      label: 'Operating · Google reviews (Google Business Profile)'
       metric gbp_overall_rating
       metric gbp_avg_rating_received
       metric gbp_reviews_received
       metric gbp_4_5_star_share
       metric gbp_total_reviews
       metric gbp_low_star_reviews_mentioning
-      model maman_gbp_fact_review_terms { }
     }
-    group finance_pnl_dollars {
-      label: 'Finance · P&L to prime margin $ (NetSuite booked)'
+    group finance_pnl_dollars_netsuite {
       metric netsuite_sales
       metric netsuite_cogs
       metric netsuite_salary
@@ -179,11 +188,8 @@ Dataset maman_store_scorecard = Dataset {
       metric netsuite_other_labor
       metric netsuite_total_labor
       metric netsuite_prime_margin
-      model maman_netsuite_fact_gl_lines { }
-      model maman_netsuite_dim_accounts { }
     }
-    group finance_pnl_pct_of_sales {
-      label: 'Finance · P&L % of sales (NetSuite booked)'
+    group finance_pnl_pct_of_sales_netsuite {
       metric netsuite_cogs_pct
       metric netsuite_salary_pct
       metric netsuite_hourly_pct
@@ -193,49 +199,11 @@ Dataset maman_store_scorecard = Dataset {
       metric netsuite_total_labor_pct
       metric netsuite_prime_margin_pct
     }
-    group finance_coverage {
-      label: 'Finance · Coverage (NetSuite locations vs Toast trading stores)'
+    group finance_coverage_netsuite_vs_toast {
       metric netsuite_locations_with_sales
       metric netsuite_locations_with_cogs
       metric netsuite_locations_with_labor
       metric toast_trading_stores
-    }
-    group dimensions_store {
-      label: 'Dimensions · Store'
-      model maman_catalog_store_crosswalk { }
-    }
-    group dimensions_fiscal_calendar {
-      label: 'Dimensions · Fiscal calendar'
-      model maman_catalog_fiscal_calendar { }
-    }
-    group dimensions_toast {
-      label: 'Dimensions · Toast attributes'
-      model maman_toast_dim_restaurants { }
-      model maman_toast_agg_store_daypart_daily { }
-      model maman_toast_fact_orders { }
-      model maman_toast_fact_order_checks { }
-      model maman_toast_fact_order_selections { }
-    }
-    group dimensions_harri {
-      label: 'Dimensions · Harri attributes'
-      model maman_harri_dim_location { }
-      model maman_harri_fact_labor_clock { }
-      model maman_harri_fact_salaried_cost { }
-    }
-    group dimensions_marginedge {
-      label: 'Dimensions · MarginEdge attributes'
-      model maman_marginedge_dim_restaurant_units { }
-    }
-    group dimensions_netsuite {
-      label: 'Dimensions · NetSuite attributes'
-      model maman_netsuite_dim_locations { }
-      model maman_netsuite_dim_regions { }
-    }
-    group dimensions_google {
-      label: 'Dimensions · Google Business Profile attributes'
-      model maman_gbp_dim_listings { }
-      model maman_gbp_fact_reviews { }
-      model maman_gbp_agg_listing_daily { }
     }
   }
 }.extend(maman_toast_metrics).extend(maman_toast_operations_metrics).extend(maman_harri_metrics).extend(maman_marginedge_metrics).extend(maman_netsuite_metrics).extend(maman_gbp_metrics)
