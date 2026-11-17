@@ -100,6 +100,24 @@ Dataset maman_store_scorecard = Dataset {
     relationship(maman_gbp_agg_listing_daily.date > maman_catalog_fiscal_calendar.date, true),
   ]
 
+  // Row-level permission (Maman requirement: executives and HQ see all
+  // locations, regional leaders their markets, GMs their stores). Rules
+  // combine with AND. They need the Text user attributes maman_market and
+  // maman_store; a user with no value sees no rows, so set both to All for
+  // executives, maman_store to All for regional leaders, and maman_market to
+  // All for GMs. Not enforced for Admins or Analysts with data source access.
+  permission maman_market_access {
+    field: r(maman_catalog_store_crosswalk.market)
+    operator: 'matches_user_attribute'
+    value: 'maman_market'
+  }
+
+  permission maman_store_access {
+    field: r(maman_catalog_store_crosswalk.store_name)
+    operator: 'matches_user_attribute'
+    value: 'maman_store'
+  }
+
   // Field list for Explore and dashboard builders, shown in the order listed.
   // Metric groups come first, flat since AML allows no group inside a group
   // and a metric must be in a group. The UI shows each group's name
