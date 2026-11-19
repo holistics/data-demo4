@@ -14,6 +14,7 @@ All numbers are generated mock data, not Maman's figures.
 
 - [Store Scorecard app](https://demo4.holistics.io/apps/1106-maman-store-scorecard)
 - [Weekly Sales Report app](https://demo4.holistics.io/apps/1107-maman-weekly-sales-report)
+- Sample apps ported from Anfra: [Metric Sheet](https://demo4.holistics.io/apps/1141-maman-metric-sheet), [Spreadsheet](https://demo4.holistics.io/apps/1139-maman-spreadsheet), [What-if](https://demo4.holistics.io/apps/1138-maman-what-if)
 - [Maman - Store Scorecard dataset](https://demo4.holistics.io/datasets/80184)
 - [Maman - Weekly Sales dataset](https://demo4.holistics.io/datasets/80185)
 - In the sidebar: Reporting → Data Apps → Maman, and Datasets → PoCs → Maman
@@ -129,6 +130,22 @@ The pairs Maman wants kept apart sit in different folders: Toast Net Sales vs Ne
 
 The Weekly Sales dataset has folders for ERP sales, forecast, and Toast traffic this year and last year.
 
+### 3.1 Row-level access by market and store
+
+Both datasets filter rows by 2 user attributes: `maman_market` and `maman_store`. A user sees only rows that match both. A user with no value sees nothing. Admins are not filtered.
+
+Sample Viewer users (group "Maman - Demo viewers"):
+
+| User | `maman_market` | `maman_store` | Sees |
+|---|---|---|---|
+| Maman Regional Lead - NY (`dong.ln+maman-ny@holistics.io`) | Manhattan, Tri-State | All | NY-area stores only |
+| Maman Regional Lead - DMV (`dong.ln+maman-dmv@holistics.io`) | DMV | All | 16 DMV stores |
+| Maman GM - 545 Madison (`dong.ln+maman-gm-madison@holistics.io`) | All | Maman 545 Madison | One store |
+
+To show it: Organization Settings → View and Edit as → pick a user → open the Store Scorecard app. The Locations list and every total change with the user.
+
+Talk track: "Same app, same metrics. Each person sees only their stores, and the rule lives in the dataset, so every app, dashboard and AI answer follows it."
+
 ## 4. Ask AI
 
 ### 4.1 Open Ask AI
@@ -160,6 +177,10 @@ Other prompts:
 - What does this dataset contain?
 - Give me the one official labor % for P10 for the CFO. (It shows both and says the choice is still open.)
 - What is the difference between average check and average ticket?
+
+## 5. Build a data app with an AI agent
+
+Prompt and setup: [build-data-app-prompt.md](build-data-app-prompt.md)
 
 ## If something goes wrong
 
