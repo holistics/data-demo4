@@ -5,6 +5,7 @@ const dropdown = $('userDropdown');
 const userButton = $('userButton');
 let users = [];
 let current;
+let view = 'dashboards';
 let inflight;
 
 const initials = (name) => name.split(/[\s()]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
@@ -98,7 +99,7 @@ async function load(user) {
     const res = await fetch('/api/embed-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identity_id: user.id }),
+      body: JSON.stringify({ identity_id: user.id, view }),
       signal: inflight.signal,
     });
     const data = await res.json();
@@ -121,6 +122,17 @@ function setDrawer(open) {
   $('payloadPanel').setAttribute('aria-hidden', String(!open));
   $('scrim').hidden = !open;
   $('payloadToggle').setAttribute('aria-expanded', String(open));
+}
+
+for (const btn of document.querySelectorAll('.seg')) {
+  btn.addEventListener('click', () => {
+    view = btn.dataset.view;
+    for (const b of document.querySelectorAll('.seg')) {
+      b.classList.toggle('active', b === btn);
+      b.setAttribute('aria-selected', String(b === btn));
+    }
+    if (current) load(current);
+  });
 }
 
 $('payloadToggle').addEventListener('click', () => setDrawer(!$('payloadPanel').classList.contains('open')));

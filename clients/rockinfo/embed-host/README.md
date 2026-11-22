@@ -8,9 +8,10 @@ from the tenant row (client name and colour), so no per-customer copies exist.
 - `server.mjs`: Node server with no dependencies. It serves `public/` and signs
   embed tokens at `POST /api/embed-token`. The browser sends only an identity ID.
   Tenant, portal, row-level filter, workspace role and AI are resolved on the
-  server from `lib/tenants.mjs`.
-- `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), two personas per customer (editor with
-  AI, viewer) and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
+  server from `lib/tenants.mjs`. Ask AI is on for every persona and answers only
+  from that customer's rows; the Ask AI tab loads the portal at `/ai`.
+- `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), two personas per customer (editor and
+  viewer, both with Ask AI) and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
 
 ## Env
 
