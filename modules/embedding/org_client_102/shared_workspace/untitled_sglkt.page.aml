@@ -358,50 +358,50 @@ Dashboard untitled_sglkt {
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 1890
+    height: 1910
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(20, 20, 1260, 120)
+      position: pos(20, 20, 1260, 140)
     }
     block t_cohort_intro {
-      position: pos(20, 140, 1260, 110)
+      position: pos(20, 160, 1260, 110)
     }
     block f_grain {
-      position: pos(20, 270, 240, 80)
+      position: pos(20, 290, 240, 80)
     }
     block f_milestone {
-      position: pos(280, 270, 240, 80)
+      position: pos(280, 290, 240, 80)
     }
     block f_cohort_window {
-      position: pos(540, 270, 240, 80)
+      position: pos(540, 290, 240, 80)
     }
     block f_partner_type {
-      position: pos(780, 270, 240, 80)
+      position: pos(780, 290, 240, 80)
     }
     block f_segment {
-      position: pos(1040, 270, 240, 80)
+      position: pos(1040, 290, 240, 80)
     }
     block f_date {
-      position: pos(20, 370, 300, 80)
+      position: pos(20, 390, 300, 80)
     }
     block f_region {
-      position: pos(340, 370, 300, 80)
+      position: pos(340, 390, 300, 80)
     }
     block p_candidate_cohort {
-      position: pos(20, 470, 1260, 560)
+      position: pos(20, 490, 1260, 560)
     }
     block t_voucher_cohort_intro {
-      position: pos(20, 1060, 1260, 110)
+      position: pos(20, 1080, 1260, 110)
     }
     block f_v_partner {
-      position: pos(20, 1190, 300, 80)
+      position: pos(20, 1210, 300, 80)
     }
     block f_v_channel {
-      position: pos(340, 1190, 300, 80)
+      position: pos(340, 1210, 300, 80)
     }
     block p_voucher_cohort {
-      position: pos(20, 1290, 1260, 560)
+      position: pos(20, 1310, 1260, 560)
     }
     mobile {
       mode: 'auto'
