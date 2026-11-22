@@ -1,0 +1,48 @@
+Model rockinfo_programs {
+  type: 'table'
+  label: 'Program'
+  description: 'One row per credential program run by a client: certifications, micro-credentials, CPD and learning paths.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."programs"'
+
+  dimension program_id {
+    label: 'Program ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.program_id }};;
+    description: 'Program key.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension program_name {
+    label: 'Program'
+    type: 'text'
+    definition: @sql {{ #SOURCE.program_name }};;
+    description: 'Program name, for example Cloud Solutions Architect.'
+  }
+  dimension program_type {
+    label: 'Program Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.program_type }};;
+    description: 'Certification, Micro-credential, CPD or Learning Path.'
+  }
+  dimension recert_cycle_months {
+    label: 'Recertification Cycle (months)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.recert_cycle_months }};;
+    description: 'Months a credential stays valid before recertification is due. Empty means the credential does not expire.'
+  }
+  dimension exam_fee_usd {
+    label: 'Exam Fee (USD)'
+    type: 'number'
+    format: '[$$]#,###0'
+    definition: @sql {{ #SOURCE.exam_fee_usd }};;
+    description: 'List price of the program exam voucher in USD. Zero when the program has no paid exam.'
+  }
+}

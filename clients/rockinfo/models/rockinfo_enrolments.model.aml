@@ -1,0 +1,79 @@
+Model rockinfo_enrolments {
+  type: 'table'
+  label: 'Course Enrolment'
+  description: 'One row per candidate enrolment in a course.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."enrolments"'
+
+  dimension enrolment_id {
+    label: 'Enrolment ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.enrolment_id }};;
+    description: 'Enrolment key.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension candidate_id {
+    label: 'Candidate ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.candidate_id }};;
+    description: 'Join key only.'
+  }
+  dimension course_id {
+    label: 'Course ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.course_id }};;
+    description: 'Join key only.'
+  }
+  dimension enrolled_at {
+    label: 'Enrolled At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.enrolled_at }};;
+    description: 'When the candidate enrolled.'
+  }
+  dimension enrolled_date {
+    label: 'Enrolled Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.enrolled_at }}::date;;
+    description: 'Date the candidate enrolled. Activity date for learning metrics.'
+  }
+  dimension completed_at {
+    label: 'Completed At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.completed_at }};;
+    description: 'When the course was completed. Empty while in progress or withdrawn.'
+  }
+  dimension status {
+    label: 'Enrolment Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+    description: 'Completed, In progress (active in the last 120 days) or Withdrawn.'
+  }
+  dimension progress_pct {
+    label: 'Progress %'
+    type: 'number'
+    definition: @sql {{ #SOURCE.progress_pct }};;
+    description: 'Course progress from 0 to 100.'
+  }
+  dimension final_score {
+    label: 'Course Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.final_score }};;
+    description: 'Final course assessment score out of 100. Empty unless completed.'
+  }
+  dimension days_to_complete {
+    label: 'Days to Complete'
+    type: 'number'
+    definition: @sql ({{ #SOURCE.completed_at }}::date - {{ #SOURCE.enrolled_at }}::date);;
+    description: 'Days from enrolment to completion. Empty unless completed.'
+  }
+}

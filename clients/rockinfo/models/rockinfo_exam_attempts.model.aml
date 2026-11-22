@@ -1,0 +1,79 @@
+Model rockinfo_exam_attempts {
+  type: 'table'
+  label: 'Exam Attempt'
+  description: 'One row per exam sitting. Paid attempts are booked with a voucher.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."exam_attempts"'
+
+  dimension attempt_id {
+    label: 'Attempt ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.attempt_id }};;
+    description: 'Attempt key.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension candidate_id {
+    label: 'Candidate ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.candidate_id }};;
+    description: 'Join key only.'
+  }
+  dimension exam_id {
+    label: 'Exam ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.exam_id }};;
+    description: 'Join key only.'
+  }
+  dimension voucher_id {
+    label: 'Voucher ID'
+    type: 'number'
+    definition: @sql {{ #SOURCE.voucher_id }};;
+    description: 'Voucher redeemed to book this attempt.'
+  }
+  dimension attempt_number {
+    label: 'Attempt Number'
+    type: 'number'
+    definition: @sql {{ #SOURCE.attempt_number }};;
+    description: '1 for a first attempt, 2 and 3 for retakes.'
+  }
+  dimension attempted_at {
+    label: 'Attempted At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.attempted_at }};;
+    description: 'When the exam was sat.'
+  }
+  dimension attempted_date {
+    label: 'Attempted Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.attempted_at }}::date;;
+    description: 'Date the exam was sat. Activity date for exam metrics.'
+  }
+  dimension score {
+    label: 'Exam Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.score }};;
+    description: 'Exam score out of 100.'
+  }
+  dimension result {
+    label: 'Result'
+    type: 'text'
+    definition: @sql {{ #SOURCE.result }};;
+    description: 'Pass or Fail.'
+  }
+  dimension delivery_mode {
+    label: 'Attempt Delivery Mode'
+    type: 'text'
+    definition: @sql {{ #SOURCE.delivery_mode }};;
+    description: 'Online proctored or Test centre.'
+  }
+}

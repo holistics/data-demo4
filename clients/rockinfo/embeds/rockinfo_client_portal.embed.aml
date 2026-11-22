@@ -1,0 +1,41 @@
+// Rockinfo client portal: white-label analytics inside the Rockinfo app.
+// The Rockinfo backend signs the token per signed-in user and passes
+// rockinfo_client_id, so every dashboard, Explore, AI answer and export is
+// limited to that client's rows. Payload examples: ../docs/embed-payloads.md
+EmbedPortal rockinfo_client_portal {
+  description: 'Rockinfo client analytics: program performance, learning, credentials, vouchers and cohorts, scoped to one client tenant, with governed self-service and AI.'
+  objects: [
+    rockinfo_program_performance,
+    rockinfo_partner_detail,      // drill-through destination
+    rockinfo_candidate_record,    // drill-through destination
+    rockinfo_credentialing,       // governed dataset for Explore, client-built dashboards and AI
+  ]
+  initial_object: rockinfo_program_performance
+  required_permissions: [
+    rockinfo_credentialing.permission.client_access,
+  ]
+  // Lets demo4 admins preview the portal in Holistics without a token.
+  // A real token always overrides this with the client's own ID.
+  default_user_attributes: {
+    rockinfo_client_id: '__ALL__'
+  }
+  ai {
+    customization {
+      global {
+        assistant_name: 'Rockinfo Insights'
+      }
+      chat_page {
+        intro {
+          header: 'Ask about your candidates, exams, credentials and vouchers.'
+          body: @md
+            ## 🎓 Completion, pass rates and time-to-certify by program
+            ## 🔁 Who is due for recertification, and who lapsed
+            ## 🎟️ Voucher redemption, deferred revenue and breakage by partner
+            ## 📌 Save any answer to your dashboards
+          ;;
+        }
+        prompt_placeholder: 'e.g. Which partners have the most unredeemed vouchers older than 6 months?'
+      }
+    }
+  }
+}

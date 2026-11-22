@@ -1,0 +1,334 @@
+Dashboard rockinfo_partner_detail {
+  title: 'Partner Detail'
+  description: 'Drill-through destination for one channel partner: vouchers, orders and candidates.'
+  owner: 'vincent@holistics.io'
+
+  block t_p_header: TextBlock {
+    content: @md
+<div style="padding: 4px 8px">
+
+## Partner Detail
+
+Drill-through destination. Opened from any partner name on the Program Performance dashboard, already filtered to that partner.
+</div>;;
+  }
+  block f_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'single'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block f_date: FilterBlock {
+    label: 'Activity Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_dates.date_day)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+  block t_partner_profile: VizBlock {
+    label: 'Partner profile'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_type)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_tier)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_region)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_country)
+        }
+      ]
+    }
+  }
+  block k_p_candidates: VizBlock {
+    label: 'New Candidates'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.total_candidates)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_p_pass: VizBlock {
+    label: 'Exam Pass Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.pass_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block k_p_sales: VizBlock {
+    label: 'Voucher Sales'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.voucher_sales)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+    }
+  }
+  block k_p_outstanding: VizBlock {
+    label: 'Vouchers Outstanding'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.vouchers_outstanding)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block c_p_vouchers: VizBlock {
+    label: 'Vouchers by issue month and status'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        label: 'Issue Month'
+        ref: r(rockinfo_dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(rockinfo_vouchers.voucher_status)
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.vouchers_issued)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block t_p_orders: VizBlock {
+    label: 'Voucher orders - for invoice reconciliation'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_vouchers.order_id)
+          uname: 'o_id'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exams.exam_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_issued)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_redeemed)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_outstanding)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_expired)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.voucher_sales)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.recognised_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.deferred_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'o_id'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block t_p_candidates: VizBlock {
+    label: 'Candidates from this partner - click a candidate ID to open the Candidate Record'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_candidates.candidate_id)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.candidate_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.segment)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.country)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.registered_date)
+          uname: 'pc_reg'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.course_completions)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.exams_passed)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.credentials_issued)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'pc_reg'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 1420
+    grid_size: 20
+    auto_expand_vertically: true
+    mobile {
+      mode: 'auto'
+    }
+    block t_p_header {
+      position: pos(20, 20, 1180, 100)
+    }
+    block f_partner {
+      position: pos(20, 140, 380, 80)
+    }
+    block f_date {
+      position: pos(420, 140, 280, 80)
+    }
+    block t_partner_profile {
+      position: pos(20, 240, 1180, 140)
+    }
+    block k_p_candidates {
+      position: pos(20, 400, 280, 140)
+    }
+    block k_p_pass {
+      position: pos(320, 400, 280, 140)
+    }
+    block k_p_sales {
+      position: pos(620, 400, 280, 140)
+    }
+    block k_p_outstanding {
+      position: pos(920, 400, 280, 140)
+    }
+    block c_p_vouchers {
+      position: pos(20, 560, 580, 380)
+    }
+    block t_p_orders {
+      position: pos(620, 560, 580, 380)
+    }
+    block t_p_candidates {
+      position: pos(20, 960, 1180, 420)
+    }
+    default_zoom: 'fit_to_width'
+  }
+  settings {
+    timezone: 'America/New_York'
+  }
+}

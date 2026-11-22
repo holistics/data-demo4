@@ -1,0 +1,54 @@
+Model rockinfo_exams {
+  type: 'table'
+  label: 'Exam'
+  description: 'One row per certification exam. Vouchers are sold per exam.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."exams"'
+
+  dimension exam_id {
+    label: 'Exam ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.exam_id }};;
+    description: 'Exam key.'
+  }
+  dimension program_id {
+    label: 'Program ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.program_id }};;
+    description: 'Program the exam certifies. Join key only.'
+  }
+  dimension exam_name {
+    label: 'Exam'
+    type: 'text'
+    definition: @sql {{ #SOURCE.exam_name }};;
+    description: 'Exam name.'
+  }
+  dimension exam_code {
+    label: 'Exam Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.exam_code }};;
+    description: 'Public exam code.'
+  }
+  dimension passing_score {
+    label: 'Passing Score'
+    type: 'number'
+    definition: @sql {{ #SOURCE.passing_score }};;
+    description: 'Minimum score out of 100 needed to pass.'
+  }
+  dimension delivery_mode {
+    label: 'Delivery Mode'
+    type: 'text'
+    definition: @sql {{ #SOURCE.delivery_mode }};;
+    description: 'Online proctored or Test centre.'
+  }
+  dimension list_price_usd {
+    label: 'Exam List Price (USD)'
+    type: 'number'
+    format: '[$$]#,###0'
+    definition: @sql {{ #SOURCE.list_price_usd }};;
+    description: 'Undiscounted voucher price in USD.'
+  }
+}
