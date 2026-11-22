@@ -1,26 +1,233 @@
 Dashboard untitled_dbofh {
-  title: 'Untitled'
+  title: 'Draft: Program Health Check'
+  description: 'Maya Chen (Adobe program manager), private draft before publishing to the team: completion, pass and recertification by program. Point in time.'
   owner: 'embed_b74cd12e3cf8ea51d0@holistics.io'
   block title: TextBlock {
-    content: @md # Your title goes here ;;
+    content: @md
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6">My report &middot; Personal workspace &middot; only Maya Chen can see this</div>
+
+      # Draft: Program Health Check
+
+      Working draft. Once the numbers look right I will publish it to Team reports.
+    ;;
   }
-  explicit_interactions: []
+  block f_program: FilterBlock {
+    label: 'Program'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_programs.program_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_type: FilterBlock {
+    label: 'Program Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_programs.program_type)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block k1: VizBlock {
+    label: 'Course Completion Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.completion_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k2: VizBlock {
+    label: 'Exam Pass Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.pass_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k3: VizBlock {
+    label: 'Recertification Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.recertification_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block c1: VizBlock {
+    label: 'Credentials issued by program'
+    viz: BarChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        ref: r(rockinfo_programs.program_name)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.credentials_issued)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        x_axis_label: ' '
+        sort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block t1: VizBlock {
+    label: 'Program health'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_programs.program_name)
+          uname: 't1_d0'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_programs.program_type)
+          uname: 't1_d1'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.enrolments)
+          uname: 't1_m0'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.completion_rate)
+          uname: 't1_m1'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.pass_rate)
+          uname: 't1_m2'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.credentials_issued)
+          uname: 't1_m3'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.recertification_rate)
+          uname: 't1_m4'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.expiring_90d)
+          uname: 't1_m5'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 't1_m0'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 5000
+        show_row_number: true
+      }
+    }
+  }
+
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 800
+    height: 1240
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(20, 20, 1260, 60)
+      position: pos(20, 20, 1260, 100)
+    }
+    block f_program {
+      position: pos(20, 140, 300, 80)
+    }
+    block f_type {
+      position: pos(340, 140, 300, 80)
+    }
+    block k1 {
+      position: pos(20, 240, 406, 120)
+    }
+    block k2 {
+      position: pos(446, 240, 406, 120)
+    }
+    block k3 {
+      position: pos(872, 240, 406, 120)
+    }
+    block c1 {
+      position: pos(20, 380, 1260, 380)
+    }
+    block t1 {
+      position: pos(20, 780, 1260, 440)
     }
     mobile {
       mode: 'auto'
     }
   }
   theme: DynamicPageTheme {
-    light: H.themes.vanilla
-    dark: H.themes.charcoal
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
   }
   settings {
     autorun_on_open: true
