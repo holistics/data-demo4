@@ -26,5 +26,5 @@ holistics aml validate clients/rockinfo/models/*.model.aml clients/rockinfo/data
   clients/rockinfo/dashboards/*.page.aml clients/rockinfo/embeds/*.embed.aml -u rockinfo_client_id:number
 ```
 
-Then run a real query for changed logic. Rockinfo has no routing block in
-`settings/ai/context.aml`; ask the operator before adding one (see `clients/AGENTS.md`).
+Then run a real query for changed logic. Runtime AI behaviour is the *Route Context — Rockinfo*
+block in `settings/ai/context.aml`; ask the operator before changing it (see `clients/AGENTS.md`).
