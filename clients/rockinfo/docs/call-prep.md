@@ -47,8 +47,8 @@ Data store: "Database" (unspecified: confirm the engine).
 
 ## Cohort: why it fits Rockinfo
 
-- **Time-to-certify by registration cohort** is a program health KPI that certification bodies
-  report to boards. It shows whether a new course or exam change made candidates faster.
+- **Time-to-certify by registration cohort** is a program health KPI that certification program owners
+  report to leadership. It shows whether a new course or exam change made candidates faster.
 - **Voucher redemption by issue cohort** is a finance and partner question: how quickly bulk
   partner purchases turn into exam bookings, and how much will become breakage.
 - **Recertification** is shown as a rate and an outreach list rather than a cohort. Keep it
