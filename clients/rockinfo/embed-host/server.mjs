@@ -10,8 +10,8 @@ import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { identities } from './lib/tenants.mjs';
-import { DEFAULT_VIEW, SECTIONS, VIEWS, WORKSPACE_SECTIONS, canOpen, viewsFor, workspaceView } from './lib/portal.mjs';
+import { PLANS, identities } from './lib/tenants.mjs';
+import { DEFAULT_VIEW, SECTIONS, VIEWS, WORKSPACE_SECTIONS, canOpen, homeFor, viewsFor, workspaceView } from './lib/portal.mjs';
 
 // Optional secrets.env next to this file (KEY=VALUE lines), for builds that bake
 // the credential into the image. Never commit it; real env vars win.
@@ -80,9 +80,10 @@ function config() {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
       title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds, views: viewsFor(i),
-      editor: i.access === 'editor',
+      plan: i.plan, caps: i.caps, home: homeFor(i),
     })),
-    sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub }) => ({ id, title, sub })) })),
+    plans: PLANS,
+    sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub, native }) => ({ id, title, sub, native: !!native })) })),
     workspaceSections: WORKSPACE_SECTIONS,
     defaultView: DEFAULT_VIEW,
   };
@@ -91,13 +92,15 @@ function config() {
 function embedToken(identityId, view) {
   const identity = identities().find((i) => i.id === identityId);
   if (!identity) return [400, { error: 'Unknown identity.' }];
-  const target = VIEWS.get(view || DEFAULT_VIEW) || workspaceView(view);
-  if (!target) return [400, { error: 'Unknown view.' }];
-  if (!canOpen(identity, view || DEFAULT_VIEW)) return [403, { error: 'This role cannot open that view.' }];
+  const target = VIEWS.get(view || homeFor(identity)) || workspaceView(view);
+  if (!target || target.native) return [400, { error: 'Unknown view.' }];
+  view ||= homeFor(identity);
+  if (!canOpen(identity, view)) return [403, { error: 'This role cannot open that view.' }];
   if (!env.HOLISTICS_EMBED_KEY_ID || !env.HOLISTICS_EMBED_SECRET) {
     return [500, { error: 'Embed credential is not configured on this deployment.' }];
   }
-  const isEditor = identity.access === 'editor';
+  // Every permission below comes from the identity's plan (lib/tenants.mjs PLANS).
+  const c = identity.caps;
   const payload = {
     embed_portal: identity.portal,
     embed_org_id: identity.orgId,
@@ -105,15 +108,15 @@ function embedToken(identityId, view) {
     embed_user_email: `${mailboxFor(identity.id)}@${MAIL_DOMAIN}`,
     user_attributes: { rockinfo_client_id: identity.clientIds },
     permissions: {
-      enable_personal_workspace: isEditor,
-      org_workspace_role: isEditor ? 'editor' : 'viewer',
+      enable_personal_workspace: c.personal,
+      org_workspace_role: c.org,
     },
-    // Ask AI for every customer persona; it answers only from the user's own rows.
     settings: {
-      ai: { enabled: true },
-      // Email subscriptions: users schedule dashboards to their own inbox.
-      allow_dashboard_export: true,
-      allow_data_subscribe: true,
+      ai: { enabled: c.ai },
+      allow_dashboard_export: c.pdf,
+      allow_raw_data_export: c.csv,
+      // Email subscriptions need dashboard export too.
+      allow_data_subscribe: c.schedules && c.pdf,
     },
     exp: Math.floor(Date.now() / 1000) + 60 * 60,
   };

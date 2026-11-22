@@ -6,6 +6,7 @@ export const SECTIONS = [
   {
     key: 'ai',
     label: 'AI',
+    requires: 'ai',
     items: [
       {
         id: 'ai',
@@ -39,8 +40,8 @@ export const SECTIONS = [
   {
     key: 'datasets',
     label: 'Datasets',
-    // Explore is for people who can build; viewers get dashboards and Rocky AI only.
-    editorsOnly: true,
+    // Explore is for plans that can build; the others never see the dataset entry.
+    requires: 'explore',
     items: [
       {
         id: 'rockinfo_credentialing',
@@ -49,26 +50,38 @@ export const SECTIONS = [
       },
     ],
   },
+  {
+    key: 'about',
+    label: 'Your plan',
+    items: [
+      {
+        id: 'plans',
+        title: 'Plans & permissions',
+        sub: 'What each analytics plan can and cannot do, and how self-built reports are packaged.',
+        native: true,
+      },
+    ],
+  },
 ];
 
 for (const s of SECTIONS) for (const i of s.items) i.path ??= `/objects/${i.id}`;
 
 export const VIEWS = new Map(
-  SECTIONS.flatMap((s) => s.items.map((i) => [i.id, { ...i, section: s.key, editorsOnly: !!s.editorsOnly }])),
+  SECTIONS.flatMap((s) => s.items.map((i) => [i.id, { ...i, section: s.key, requires: s.requires }])),
 );
 
-// Sidebar entries this identity may open: viewers never see editor-only sections.
+// Sidebar entries this identity's plan may open (`requires` names a plan capability).
 export const canOpen = (identity, viewId) => {
   if (workspaceView(viewId)) return true;
   const v = VIEWS.get(viewId);
-  return !!v && (!v.editorsOnly || identity.access === 'editor');
+  return !!v && (!v.requires || !!identity.caps[v.requires]);
 };
 // Dashboards the tenant's own editors saved to their shared (org) or personal workspace.
 // Holistics lists them in the iframe's embed:loaded event; the sidebar shows them under
 // these sections and opens one as view `ws:<uname>`. Holistics enforces who may open it.
 export const WORKSPACE_SECTIONS = [
-  { key: 'org', label: 'Team reports', empty: 'No team reports yet. Editors build one in Explore and save it to the Shared workspace.' },
-  { key: 'personal', label: 'My reports', editorsOnly: true },
+  { key: 'org', label: 'Team reports', empty: 'No team reports yet. Enterprise users build one in Explore and publish it to the Shared workspace.' },
+  { key: 'personal', label: 'My reports', requires: 'personal' },
 ];
 const UNAME = /^[a-z0-9_]+(\.[a-z0-9_]+)?$/;
 export const workspaceView = (viewId) => {
@@ -78,3 +91,5 @@ export const workspaceView = (viewId) => {
 
 export const viewsFor = (identity) => [...VIEWS.keys()].filter((id) => canOpen(identity, id));
 export const DEFAULT_VIEW = 'ai';
+// First view for a plan without Rocky AI.
+export const homeFor = (identity) => (identity.caps.ai ? 'ai' : 'rockinfo_program_performance');
