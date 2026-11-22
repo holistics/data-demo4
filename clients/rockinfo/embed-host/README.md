@@ -8,9 +8,9 @@ its own data, in its own themed portal, from one governed dataset.
   embed tokens at `POST /api/embed-token`. The browser sends only an identity ID.
   Tenant, portal, row-level filter, workspace role and AI are resolved on the
   server from `lib/tenants.mjs`.
-- `lib/tenants.mjs`: customers (`rockinfo_client_id` 101–105), the per-customer
+- `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), the per-customer
   portal names (`rockinfo_portal_<slug>`), two personas per customer (editor with
-  AI, viewer) and a Rockinfo internal admin on the neutral `rockinfo_client_portal`.
+  AI, viewer) and a Rockinfo internal admin (all nine seeded tenants, 101–109) on the neutral `rockinfo_client_portal`.
 
 ## Env
 

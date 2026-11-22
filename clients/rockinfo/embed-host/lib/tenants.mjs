@@ -5,10 +5,13 @@
 export const TENANTS = [
   { id: 101, slug: 'adobe', name: 'Adobe', accent: '#EB1000', portal: 'rockinfo_portal_adobe' },
   { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', portal: 'rockinfo_portal_lenovo' },
-  { id: 103, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', portal: 'rockinfo_portal_nutanix' },
-  { id: 104, slug: 'f5', name: 'F5', accent: '#E4002B', portal: 'rockinfo_portal_f5' },
-  { id: 105, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', portal: 'rockinfo_portal_cloudinary' },
+  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', portal: 'rockinfo_portal_nutanix' },
+  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', portal: 'rockinfo_portal_f5' },
+  { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', portal: 'rockinfo_portal_cloudinary' },
 ];
+
+// Every seeded tenant: Adobe, Lenovo, SonicWall, Axway, Nutanix, F5, Gigamon, RStudio, Cloudinary.
+export const ALL_CLIENT_IDS = [101, 102, 103, 104, 105, 106, 107, 108, 109];
 
 export const NEUTRAL_PORTAL = 'rockinfo_client_portal';
 
@@ -43,7 +46,7 @@ export function identities() {
     title: 'Rockinfo internal admin',
     role: 'Sees every customer through the neutral portal',
     access: 'editor',
-    clientIds: TENANTS.map((t) => t.id),
+    clientIds: ALL_CLIENT_IDS,
     orgId: 'rockinfo_internal',
     portal: NEUTRAL_PORTAL,
   });
