@@ -1052,7 +1052,7 @@ Dashboard rockinfo_program_performance {
   }
 
   block t_expiring: VizBlock {
-    label: 'Recertification outreach - expiring in the next 90 days (click a candidate ID for the full record)'
+    label: 'Recertification outreach - expiring in the next 90 days (click a candidate for the full record)'
     viz: DataTable {
       dataset: rockinfo_credentialing
       filter {
@@ -1062,11 +1062,8 @@ Dashboard rockinfo_program_performance {
       }
       fields: [
         VizFieldFull {
-          ref: r(rockinfo_candidates.candidate_id)
-          uname: 'e_id'
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.candidate_name)
+          label: 'Candidate'
+          ref: r(rockinfo_candidates.candidate_label)
           uname: 'e_name'
         },
         VizFieldFull {
@@ -1119,12 +1116,8 @@ Dashboard rockinfo_program_performance {
         ]
         column_styles: [
           ColumnStyle {
-            key: 'e_id'
-            width: 100
-          },
-          ColumnStyle {
             key: 'e_name'
-            width: 150
+            width: 210
           },
           ColumnStyle {
             key: 'e_email'

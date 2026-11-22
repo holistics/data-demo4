@@ -20,7 +20,7 @@ Dashboard rockinfo_candidate_record {
         label: 'Candidate Profile'
         formula: @aql case(
             when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: concat(max(rockinfo_candidates.segment), ' · ', max(rockinfo_candidates.country), ' · via ', max(rockinfo_partners.partner_name), ' · ', max(rockinfo_candidates.email))
-          , else: 'Pick a candidate ID above, or click one in any list, to see their learning, exams and credentials.'
+          , else: 'Search a candidate by name or ID above, or click one in any list, to see their learning, exams and credentials.'
         );;
         calc_type: 'measure'
         data_type: 'text'
@@ -66,11 +66,11 @@ Dashboard rockinfo_candidate_record {
     }
   }
   block f_candidate: FilterBlock {
-    label: 'Candidate ID'
+    label: 'Candidate (search name or ID)'
     type: 'field'
     source: FieldFilterSource {
       dataset: rockinfo_credentialing
-      field: r(rockinfo_candidates.candidate_id)
+      field: r(rockinfo_candidates.candidate_label)
     }
     default {
       operator: 'is'

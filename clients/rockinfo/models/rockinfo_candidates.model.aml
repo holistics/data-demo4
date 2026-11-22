@@ -10,7 +10,7 @@ Model rockinfo_candidates {
     type: 'number'
     primary_key: true
     definition: @sql {{ #SOURCE.candidate_id }};;
-    description: 'Candidate key. Use for distinct candidate counts and as the drill-through key to the Candidate Record.'
+    description: 'Candidate key. Use for distinct candidate counts.'
   }
   dimension client_id {
     label: 'Client ID'
@@ -31,6 +31,12 @@ Model rockinfo_candidates {
     type: 'text'
     definition: @sql {{ #SOURCE.candidate_name }};;
     description: 'Synthetic candidate name.'
+  }
+  dimension candidate_label {
+    label: 'Candidate (Name + ID)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.candidate_name }} || ' (#' || {{ #SOURCE.candidate_id }}::text || ')';;
+    description: 'Candidate name with ID, e.g. "Jane Doe (#10234)". Unique per candidate, searchable by name or ID. The Candidate Record filter and drill-through key.'
   }
   dimension email {
     label: 'Email'
