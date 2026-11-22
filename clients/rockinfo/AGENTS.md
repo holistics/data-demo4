@@ -32,5 +32,23 @@ holistics aml validate clients/rockinfo/models/*.model.aml clients/rockinfo/data
   clients/rockinfo/themes/*.theme.aml -u rockinfo_client_id:number
 ```
 
-Then run a real query for changed logic. Runtime AI behaviour is the *Route Context — Rockinfo*
-block in `settings/ai/context.aml`; ask the operator before changing it (see `clients/AGENTS.md`).
+Then run a real query for changed logic.
+
+**AI context.** Holistics AI gets Rockinfo behaviour from the *Route Context — Rockinfo* block
+in `settings/ai/context.aml` (vocabulary, bound models, tenant rules). The portal's own
+`ai { }` block covers assistant name, intro and placeholder only.
+
+- Change `context.aml` only when the operator asks. Portal, landing-page, dashboard and
+  embed-host changes do not need it.
+- When you change vocabulary, models, tenants or what clients are, list the route lines that
+  now drift and ask the operator before finishing.
+
+**Deploy.** AML and the embed host deploy separately; ship both when a change spans them. Follow
+`docs/deploy.md` for commands, credentials and verification.
+
+- demo4: land, `git push origin master`, then run the `submit_publish` job. A push alone does not
+  reach production. Publish only after validation passes, and confirm the job shows no `aml_errors`.
+- Embed host (https://rockinfo-embed.pages.holistics.dev): build a fresh image tag with the baked
+  key, `proto deploy --image`, then check that `/api/embed-token` returns an `embedUrl`. Keep
+  `holistics/prototypes-deploy#203` open and unmerged.
+- Never commit `embed-host/secrets.env` or print its values.
