@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rockinfo Analytics</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230B6E4F'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>R</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">R</span>
+          <div>
+            <p class="brand-name">Rockinfo</p>
+            <p class="brand-sub">Credentialing platform</p>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Rockinfo modules">
+          <a class="nav-item" href="#">Candidates</a>
+          <a class="nav-item" href="#">Learning</a>
+          <a class="nav-item" href="#">Certification</a>
+          <a class="nav-item" href="#">Vouchers</a>
+          <a class="nav-item" href="#">Credentials</a>
+          <a class="nav-item active" href="#" aria-current="page">Analytics</a>
+        </nav>
+        <p class="sidebar-foot">Analytics powered by Holistics, embedded per customer.</p>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="tenant-badge" id="tenantBadge">
+            <span class="tenant-dot"></span>
+            <div>
+              <p class="tenant-name" id="tenantName">Loading…</p>
+              <p class="tenant-role" id="tenantRole"></p>
+            </div>
+          </div>
+          <div class="controls">
+            <label class="field">
+              <span>Signed in as</span>
+              <select id="identitySelect" aria-label="Signed-in identity"></select>
+            </label>
+            <button class="ghost" id="payloadToggle" type="button" aria-expanded="false">What the token says</button>
+          </div>
+        </header>
+
+        <section class="customers" aria-label="Rockinfo customers">
+          <p class="customers-label">Switch customer</p>
+          <ul class="customer-list" id="customerList"></ul>
+        </section>
+
+        <section class="stage">
+          <div class="frame-wrap">
+            <div class="state" id="state">Choose an identity to load the portal.</div>
+            <iframe id="embedFrame" title="Rockinfo analytics portal" allow="clipboard-write; fullscreen"></iframe>
+          </div>
+          <aside class="payload" id="payloadPanel" hidden>
+            <h2>Signed on Rockinfo's server</h2>
+            <p>The browser only sends who is signed in. The server picks the customer's portal and theme, its row-level filter, and what the user may do.</p>
+            <dl class="payload-facts" id="payloadFacts"></dl>
+            <pre id="payloadJson"></pre>
+          </aside>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
