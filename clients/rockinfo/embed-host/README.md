@@ -13,7 +13,7 @@ from the tenant row (client name and colour), so no per-customer copies exist.
   Dashboards (one entry per dashboard) and Datasets (one entry per dataset). Each entry opens
   that one object on its own at `/objects/<name>`.
 - `lib/portal.mjs`: the sidebar entries. Keep it in step with the `objects` in
-  `../embeds/rockinfo_client_portal.embed.aml`; the server signs only views listed here.
+  `../embeds/rockinfo_client_portal.embed.aml`; the server signs only views listed here. Sections marked `editorsOnly` (Datasets) are hidden from viewers and refused for them.
 - `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), two personas per customer (editor and
   viewer, both with Ask AI) and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
 
