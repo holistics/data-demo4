@@ -2,6 +2,7 @@
 // One theme for every tenant; per-tenant accent stays data-driven (rockinfo_clients.brand_color).
 //
 // Sources:
+// Palette order: blue first, Rockinfo red last, so a single-series chart never reads as an alert.
 // - Logo red #DC1F34: https://www.rockinfo.com/wp-content/uploads/2024/11/cropped-logo-192x192.png
 //   (dominant pixel), also .rkcta-btn in https://www.rockinfo.com/wp-content/et-cache/987498753/et-core-unified-987498753.min.css
 // - CTA red #E11D2A / hover #B8141F: --rk-btn in https://www.rockinfo.com/wp-content/themes/rockwell/style.css
@@ -49,14 +50,14 @@ ColorPalette rockinfo_light_palette {
   title: "Rockinfo Light"
   categorical {
     colors: [
-      "oklch(0.575 0.218 23.2)",
       "oklch(0.623 0.188 259.8)",
       "oklch(0.620 0.160 150.0)",
       "oklch(0.660 0.150 65.0)",
       "oklch(0.560 0.180 300.0)",
       "oklch(0.640 0.120 200.0)",
       "oklch(0.620 0.140 115.0)",
-      "oklch(0.660 0.190 342.0)"
+      "oklch(0.660 0.190 342.0)",
+      "oklch(0.575 0.218 23.2)"
     ]
   }
 }
@@ -240,14 +241,14 @@ ColorPalette rockinfo_dark_palette {
   title: "Rockinfo Dark"
   categorical {
     colors: [
-      "oklch(0.640 0.200 23.2)",
       "oklch(0.660 0.170 259.8)",
       "oklch(0.690 0.150 150.0)",
       "oklch(0.730 0.140 65.0)",
       "oklch(0.620 0.160 300.0)",
       "oklch(0.710 0.110 200.0)",
       "oklch(0.690 0.130 115.0)",
-      "oklch(0.710 0.170 342.0)"
+      "oklch(0.710 0.170 342.0)",
+      "oklch(0.640 0.200 23.2)"
     ]
   }
 }

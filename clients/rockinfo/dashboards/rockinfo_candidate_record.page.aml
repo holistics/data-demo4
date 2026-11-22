@@ -7,7 +7,33 @@ Dashboard rockinfo_candidate_record {
     label: 'Client header'
     viz: MarkdownViz {
       dataset: rockinfo_credentialing
+      calculation sel_candidate {
+        label: 'Selected Candidate'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: concat(max(rockinfo_candidates.candidate_name), ' (', cast(max(rockinfo_candidates.candidate_id), 'text'), ')')
+          , else: 'Candidate Record'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation sel_profile {
+        label: 'Candidate Profile'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: concat(max(rockinfo_candidates.segment), ' · ', max(rockinfo_candidates.country), ' · via ', max(rockinfo_partners.partner_name), ' · ', max(rockinfo_candidates.email))
+          , else: 'Pick a candidate ID above, or click one in any list, to see their learning, exams and credentials.'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
       values: [
+        VizFieldFull {
+          label: 'Candidate'
+          ref: 'sel_candidate'
+        },
+        VizFieldFull {
+          label: 'Profile'
+          ref: 'sel_profile'
+        },
         VizFieldFull {
           label: 'Client'
           ref: r(rockinfo_credentialing.portal_client_name)
@@ -28,9 +54,9 @@ Dashboard rockinfo_candidate_record {
       content: @md <div style="display:flex;align-items:center;gap:16px;height:100%;padding:4px 8px;font-family:Inter,ui-sans-serif,system-ui,sans-serif;border-left:6px solid {{ rows[0].values.`Color`.raw }}">
       <div style="width:52px;height:52px;border-radius:12px;background:{{ rows[0].values.`Color`.raw }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:none">&#127891;</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:inherit;opacity:.65">{{ rows[0].values.`Industry` }}</div>
-        <div style="font-size:24px;font-weight:700;color:inherit;font-family:'Inter Tight',Inter,sans-serif;line-height:1.25">{{ rows[0].values.`Client` }} <span style="color:{{ rows[0].values.`Color`.raw }}">&middot;</span> Candidate Record</div>
-        <div style="font-size:13px;color:inherit;opacity:.8">Learning, exams and credentials for one candidate on a single record.</div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:inherit;opacity:.6;line-height:1.6">{{ rows[0].values.`Industry` }} · Candidate Record</div>
+        <div style="font-size:24px;font-weight:700;color:inherit;font-family:'Inter Tight',Inter,sans-serif;line-height:1.25">{{ rows[0].values.`Client` }} <span style="color:{{ rows[0].values.`Color`.raw }}">&middot;</span> {{ rows[0].values.`Candidate` }}</div>
+        <div style="font-size:13px;color:inherit;opacity:.75;line-height:1.5">{{ rows[0].values.`Profile` }}</div>
       </div>
       <div style="font-size:11px;color:inherit;opacity:.55;text-align:right;flex:none">Powered by Rockinfo<br/>Analytics</div>
     </div>;;
@@ -59,35 +85,6 @@ Dashboard rockinfo_candidate_record {
           }
         ]
       }
-    }
-  }
-  block t_c_profile: VizBlock {
-    label: 'Profile'
-    viz: DataTable {
-      dataset: rockinfo_credentialing
-      fields: [
-        VizFieldFull {
-          ref: r(rockinfo_candidates.candidate_id)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.candidate_name)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.email)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.segment)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.country)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_partners.partner_name)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.registered_date)
-        }
-      ]
     }
   }
   block t_c_learning: VizBlock {
@@ -122,6 +119,7 @@ Dashboard rockinfo_candidate_record {
             direction: 'asc'
           }
         ]
+        wrap_header_text: true
       }
     }
   }
@@ -157,6 +155,7 @@ Dashboard rockinfo_candidate_record {
             direction: 'asc'
           }
         ]
+        wrap_header_text: true
       }
     }
   }
@@ -179,7 +178,12 @@ Dashboard rockinfo_candidate_record {
           ref: r(rockinfo_credentials.expires_at)
         },
         VizFieldFull {
+          ref: r(rockinfo_credentials.days_to_expiry)
+          label: 'Days Left'
+        },
+        VizFieldFull {
           ref: r(rockinfo_credentials.is_recertification)
+          label: 'Renewal?'
         },
         VizFieldFull {
           ref: r(rockinfo_credentials.credential_status)
@@ -192,6 +196,7 @@ Dashboard rockinfo_candidate_record {
             direction: 'asc'
           }
         ]
+        wrap_header_text: true
       }
     }
   }
@@ -199,29 +204,26 @@ Dashboard rockinfo_candidate_record {
   view: CanvasLayout {
     label: 'View 1'
     width: 1220
-    height: 1020
+    height: 1300
     grid_size: 20
     auto_expand_vertically: true
     mobile {
       mode: 'auto'
     }
     block t_c_header {
-      position: pos(20, 20, 1180, 100)
+      position: pos(20, 20, 1180, 120)
     }
     block f_candidate {
-      position: pos(20, 140, 380, 80)
-    }
-    block t_c_profile {
-      position: pos(20, 240, 1180, 140)
+      position: pos(20, 160, 380, 80)
     }
     block t_c_learning {
-      position: pos(20, 400, 1180, 300)
+      position: pos(20, 260, 1180, 320)
     }
     block t_c_exams {
-      position: pos(20, 720, 580, 260)
+      position: pos(20, 600, 1180, 300)
     }
     block t_c_credentials {
-      position: pos(620, 720, 580, 260)
+      position: pos(20, 920, 1180, 300)
     }
     default_zoom: 'fit_to_width'
   }
