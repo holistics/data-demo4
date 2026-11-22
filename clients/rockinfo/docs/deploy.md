@@ -57,6 +57,8 @@ each time: proto deploys by digest, and reusing a tag can serve a stale image.
 ```sh
 B=<scratch dir>; rm -rf $B; mkdir -p $B
 cd clients/rockinfo/embed-host && cp -r Dockerfile server.mjs lib public $B/
+git -C ../../.. pull --ff-only   # Holistics commits embed saves to master; pick them up first
+node scripts/report-meta.mjs "$(git rev-parse --show-toplevel)" > $B/public/report-meta.json   # Team report built-by / created / updated
 op item get rockinfo-embed --format json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const f=Object.fromEntries(JSON.parse(s).fields.map(x=>[x.label,x.value]));process.stdout.write(["HOLISTICS_EMBED_KEY_ID","HOLISTICS_EMBED_SECRET"].map(k=>k+"="+f[k]).join("\n")+"\n")})' > $B/secrets.env
 grep -c '=.\+' $B/secrets.env   # must print 2; a 1Password timeout yields an image without the key
 (cd $B && docker buildx build --platform linux/amd64 -t ghcr.io/vinwoon/rockinfo-embed:<tag> --push .)
