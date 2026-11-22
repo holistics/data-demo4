@@ -91,8 +91,8 @@ function embedToken(identityId, view) {
   };
   const token = signHS256(payload, env.HOLISTICS_EMBED_SECRET);
   // payload is returned for the demo's "What the token says" panel; it holds no secret
-  // The portal lands on Ask AI (initial_object: 'ai'); the Dashboards tab opens the main dashboard.
-  const path = view === 'dashboards' ? '/objects/rockinfo_program_performance' : '';
+  // Rockinfo Insights opens the full-page Ask AI view; Dashboards opens the main dashboard.
+  const path = view === 'dashboards' ? '/objects/rockinfo_program_performance' : '/ai';
   return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}`, payload }];
 }
 
