@@ -14,7 +14,7 @@ let defaultView = 'ai';
 let workspaceSections = [];
 let workspaceItems = { org: [], personal: [] };
 let embedOrigin = '';
-const isWs = (id) => /^ws:[a-z0-9_]+$/.test(id || '');
+const isWs = (id) => /^ws:[a-z0-9_]+(\.[a-z0-9_]+)?$/.test(id || '');
 let view;
 let inflight;
 
