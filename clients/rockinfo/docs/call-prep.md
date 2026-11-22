@@ -32,7 +32,7 @@ Data store: "Database" (unspecified: confirm the engine).
 7. **Tenant switch**: token for Lenovo (102). Same portal and dashboard, re-branded from data,
    different programs and partners, no Adobe data anywhere, AI included. These are Rockinfo's
    own customers, with synthetic numbers: say so up front.
-8. **Self-service and packaging**: as the client admin (Enterprise), build a chart in Explore and publish it to Team reports; switch to the Essentials viewer to see it arrive. Close on **Plans & permissions**: what Rockinfo includes free and what it charges for.
+8. **Self-service and packaging**: as the Adobe client admin (Enterprise), build a chart in Explore and publish it to Team reports; switch to the Adobe partner success viewer to see it arrive, then to F5 (Essentials) to show a cheaper plan. Close on **Plans & permissions**: what Rockinfo includes free and what it charges for.
 9. **Code**: dataset AML, permission block, Git.
 
 ## Discovery questions

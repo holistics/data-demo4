@@ -146,8 +146,9 @@ function renderMenu() {
   dropdown.innerHTML = '';
   const groups = new Map();
   for (const u of users) {
-    if (!groups.has(u.tenantName)) groups.set(u.tenantName, []);
-    groups.get(u.tenantName).push(u);
+    const g = u.plan === 'internal' ? u.tenantName : `${u.tenantName} · ${u.planName} plan`;
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(u);
   }
   for (const [tenant, list] of groups) {
     const label = document.createElement('p');
@@ -305,16 +306,16 @@ const el = (tag, cls, text) => {
   return n;
 };
 
-function personaFor(planKey) {
-  const slug = current.tenantSlug === 'rockinfo' ? users[0].tenantSlug : current.tenantSlug;
-  return users.find((u) => u.tenantSlug === slug && u.plan === planKey);
-}
+// The admin of the first tenant on that plan (users are listed admin first).
+const personaFor = (planKey) => users.find((u) => u.plan === planKey);
+const tenantsOn = (planKey) => [...new Set(users.filter((u) => u.plan === planKey).map((u) => u.tenantName))].join(', ');
 
 function tryButton(planKey) {
   const u = personaFor(planKey);
-  const b = el('button', 'plan-try', u.id === current.id ? 'You are signed in as this plan' : `Try as ${u.tenantName} ${u.title.toLowerCase()}`);
+  const here = current.plan === planKey;
+  const b = el('button', 'plan-try', here ? 'Your tenant is on this plan' : `Try as ${u.tenantName} ${u.title.toLowerCase()}`);
   b.type = 'button';
-  b.disabled = u.id === current.id;
+  b.disabled = here;
   // Land on the plan's home view so the embed loads and its Team reports appear.
   b.addEventListener('click', () => {
     setView(u.home);
@@ -339,7 +340,7 @@ function renderPlans() {
     const card = el('article', 'plan-card' + (current.plan === p.key ? ' current' : ''));
     const head = el('div', 'plan-head');
     head.append(el('h3', null, p.name), el('span', 'plan-price', p.price));
-    card.append(head, el('p', 'plan-persona', p.title), el('p', 'plan-pitch', p.pitch), tryButton(p.key));
+    card.append(head, el('p', 'plan-persona', tenantsOn(p.key)), el('p', 'plan-pitch', p.pitch), tryButton(p.key));
     cards.appendChild(card);
   }
   root.appendChild(cards);
@@ -477,6 +478,7 @@ try {
   plans = cfg.plans || [];
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
   setView(viewFromHash());
+  // The homepage opens as the first persona: the Enterprise tenant's Client admin.
   load(users[0]);
 } catch (e) {
   setState(`Could not load config: ${e.message}`, true);
