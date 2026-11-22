@@ -42,7 +42,10 @@ function renderNav() {
       a.href = `#${item.id}`;
       a.dataset.view = item.id;
       a.title = item.sub;
-      a.innerHTML = `<svg viewBox="0 0 20 20" aria-hidden="true">${ICONS[s.key] || ICONS.dashboards}</svg>`;
+      a.innerHTML =
+        s.key === 'ai'
+          ? '<img class="nav-icon" src="/assets/rocky-ai.png" alt="" width="22" height="22" />'
+          : `<svg viewBox="0 0 20 20" aria-hidden="true">${ICONS[s.key] || ICONS.dashboards}</svg>`;
       const text = document.createElement('span');
       text.className = 'nav-label';
       text.textContent = item.title;
