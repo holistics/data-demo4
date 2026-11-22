@@ -1,0 +1,144 @@
+Model accounts {
+  type: 'table'
+  label: "Accounts"
+  description: "Salesforce/Gainsight accounts: district partnerships, school site licenses and pilots of the paid CommonLit 360 program. arr_usd only for partner/churned accounts."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_accounts"'
+
+  dimension account_id {
+    label: "Account Id"
+    type: 'text'
+    description: "Gainsight/Salesforce account key (e.g. ACC-0001). Primary key."
+    hidden: true
+    definition: @sql {{ #SOURCE.account_id }};;
+    primary_key: true
+  }
+
+  dimension salesforce_account_id {
+    label: "Salesforce Account Id"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.salesforce_account_id }};;
+  }
+
+  dimension account_name {
+    label: "Account Name"
+    type: 'text'
+    description: "District or school name on the paid account."
+    definition: @sql {{ #SOURCE.account_name }};;
+  }
+
+  dimension account_level {
+    label: "Account Level"
+    type: 'text'
+    description: "District (district-wide partnership) or School (single-site license)."
+    definition: @sql {{ #SOURCE.account_level }};;
+  }
+
+  dimension district_id {
+    label: "District Id"
+    type: 'number'
+    description: "District of the account. School-level accounts carry their parent district."
+    hidden: true
+    definition: @sql {{ #SOURCE.district_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    description: "School of a school-level account; empty for district accounts."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension state_code {
+    label: "State"
+    type: 'text'
+    definition: @sql {{ #SOURCE.state_code }};;
+  }
+
+  dimension csm_name {
+    label: "CSM"
+    type: 'text'
+    description: "Customer Success Manager who owns the account. Drives row-level permission: CSMs only see their own accounts."
+    definition: @sql {{ #SOURCE.csm_name }};;
+  }
+
+  dimension segment {
+    label: "Segment"
+    type: 'text'
+    description: "Commercial segment: Enterprise / Mid-size / Small District or School Site."
+    definition: @sql {{ #SOURCE.segment }};;
+  }
+
+  dimension product_tier {
+    label: "Product Tier"
+    type: 'text'
+    description: "Paid package: CommonLit 360 Core or CommonLit 360 + Assessments."
+    definition: @sql {{ #SOURCE.product_tier }};;
+  }
+
+  dimension account_status {
+    label: "Account Status"
+    type: 'text'
+    description: "Active Partner, Active Pilot, Churned or Pilot - Not Converted."
+    definition: @sql {{ #SOURCE.account_status }};;
+  }
+
+  dimension partnership_start_date {
+    label: "Partnership Start Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.partnership_start_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension partnership_end_date {
+    label: "Partnership End Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.partnership_end_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension next_renewal_date {
+    label: "Next Renewal Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.next_renewal_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension pilot_start_date {
+    label: "Pilot Start Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.pilot_start_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension pilot_end_date {
+    label: "Pilot End Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.pilot_end_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension pilot_outcome {
+    label: "Pilot Outcome"
+    type: 'text'
+    description: "Outcome of the pilot: Converted, Not Converted or In Progress. Empty for accounts that never piloted."
+    definition: @sql {{ #SOURCE.pilot_outcome }};;
+  }
+
+  dimension arr_usd {
+    label: "ARR"
+    type: 'number'
+    description: "Annual recurring revenue in USD. Only populated for partner and churned accounts."
+    definition: @sql {{ #SOURCE.arr_usd }};;
+    format: '[$$]#,###'
+  }
+
+  dimension program_status {
+    label: "Program Status"
+    type: 'text'
+    description: "Account-level program status, aligned with School Program Years: Partner (Active Partner), Pilot (Active Pilot) or Free (Churned / Pilot - Not Converted: back on the free product)."
+    definition: @sql case {{ #SOURCE.account_status }} when 'Active Partner' then 'Partner' when 'Active Pilot' then 'Pilot' else 'Free' end;;
+  }
+}

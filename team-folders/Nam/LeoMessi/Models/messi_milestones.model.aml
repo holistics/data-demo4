@@ -1,0 +1,48 @@
+Model messi_milestones {
+  type: 'table'
+  label: 'Milestones'
+  description: "Landmark moments in Messi's Argentina career, one row per milestone (16): debut, first goal, 100th and 200th caps, becoming all-time top scorer and most-capped player, each senior trophy, both retirement announcements and his final appearance. Use it as a timeline or as annotations on a caps/goals-over-time chart."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."milestones"'
+
+  dimension milestone_id {
+    label: 'Milestone Id'
+    type: 'number'
+    description: "The **Milestone Id** uniquely identifies each milestone and is the primary key. Runs in chronological order."
+    hidden: false
+    definition: @sql {{ #SOURCE.milestone_id }};;
+    primary_key: true
+  }
+
+  dimension event_date {
+    label: 'Event Date'
+    type: 'date'
+    description: "The **Event Date** the milestone happened. For match milestones it equals the match date; off-field events (retirement announcements) have their own date."
+    hidden: false
+    definition: @sql {{ #SOURCE.event_date }};;
+  }
+
+  dimension match_id {
+    label: 'Match Id'
+    type: 'number'
+    description: "The **Match Id** of the match the milestone happened in, joining to `messi_matches`.  \nEmpty for off-field milestones (reversing his 2016 retirement, announcing his 2026 retirement), which therefore have no match attributes."
+    hidden: false
+    definition: @sql {{ #SOURCE.match_id }};;
+  }
+
+  dimension milestone {
+    label: 'Milestone'
+    type: 'text'
+    description: "The **Milestone** headline, e.g. `Senior debut`, `Became Argentina's all-time top scorer`, `Won FIFA World Cup`."
+    hidden: false
+    definition: @sql {{ #SOURCE.milestone }};;
+  }
+
+  dimension detail {
+    label: 'Detail'
+    type: 'text'
+    description: "The **Detail** is free-text context for the milestone — opponent, score, venue or the record passed."
+    hidden: false
+    definition: @sql {{ #SOURCE.detail }};;
+  }
+}

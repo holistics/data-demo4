@@ -1,7 +1,7 @@
 Model slb_cities {
   type: 'table'
-  label: 'SLB Cities'
-  description: 'Cities (Neon benchmark projection).'
+  label: 'SLB Customer Cities'
+  description: 'City where the customer lives (Neon benchmark projection). Merchant cities are in slb_merchant_cities.'
   data_source_name: 'slb_ecommerce_neon_h4'
   owner: 'dong.ln@holistics.io'
   table_name: '"benchmark"."cities"'

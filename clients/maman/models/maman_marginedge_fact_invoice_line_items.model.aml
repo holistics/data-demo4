@@ -1,0 +1,17 @@
+Model maman_marginedge_fact_invoice_line_items {
+  type: 'table'
+  label: 'MarginEdge Line Items'
+  description: 'MarginEdge document lines. One row per line, with signed price and P&L group. MarginEdge Purchases sums COGS lines of reportable, non-transfer documents. The line reaches Store and the Fiscal Calendar through its document, which holds the purchase date.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.marginedge_fact_invoice_line_items'
+
+  dimension line_id { label: 'Line ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.line_id }};; description: 'MarginEdge line ID. Primary key.' }
+  dimension document_id { label: 'Document ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.document_id }};; description: 'Parent document. Joins to MarginEdge Documents for date, unit, type and reportable flag.' }
+  dimension unit_id { label: 'MarginEdge Unit ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.unit_id }};; description: 'MarginEdge unit of the line; same as its document unit. Not joined, to keep one path to Store.' }
+  dimension product_name { label: 'Product' type: 'text' definition: @sql {{ #SOURCE.product_name }};; description: 'Purchased product name.' }
+  dimension category { label: 'Product Category' type: 'text' definition: @sql {{ #SOURCE.category }};; description: 'MarginEdge product category.' }
+  dimension quantity { label: 'Quantity (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.quantity }};; description: 'Purchased quantity.' }
+  dimension unit_price { label: 'Unit Price ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.unit_price }};; description: 'Price per unit in USD.' }
+  dimension line_price_signed { label: 'Line Price Signed ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.line_price_signed }};; description: 'Signed line amount in USD; credits are negative. MarginEdge Purchases sums it.' }
+  dimension pnl_group { label: 'P&L Group' type: 'text' definition: @sql {{ #SOURCE.pnl_group }};; description: 'COGS, Operating Expense or Other. MarginEdge Purchases keeps COGS only.' }
+}

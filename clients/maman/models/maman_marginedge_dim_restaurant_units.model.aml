@@ -1,0 +1,11 @@
+Model maman_marginedge_dim_restaurant_units {
+  type: 'table'
+  label: 'MarginEdge Units'
+  description: 'MarginEdge restaurant units. One row per unit. Reached from Store through the crosswalk.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.marginedge_dim_restaurant_units'
+
+  dimension unit_id { label: 'MarginEdge Unit ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.unit_id }};; description: 'MarginEdge unit ID. Primary key.' }
+  dimension unit_name { label: 'MarginEdge Unit Name' type: 'text' definition: @sql {{ #SOURCE.unit_name }};; description: 'Unit name as configured in MarginEdge.' }
+  dimension unit_group { label: 'MarginEdge Unit Group' type: 'text' definition: @sql {{ #SOURCE.unit_group }};; description: 'MarginEdge unit group, used for vendor-invoice reporting by group.' }
+}

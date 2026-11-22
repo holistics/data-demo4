@@ -1,0 +1,23 @@
+Model maman_toast_fact_order_checks {
+  type: 'table'
+  label: 'Toast Checks'
+  description: 'Toast checks. One row per check; check-level money lives here. About 3% of orders have 2 checks, so checks and orders are not interchangeable. Source of Toast Net Sales, Transactions and Average Check.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.toast_fact_order_checks'
+
+  dimension check_guid { label: 'Check GUID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.check_guid }};; description: 'Toast check ID. Primary key. Transactions count these.' }
+  dimension order_guid { label: 'Order GUID' type: 'text' hidden: true definition: @sql {{ #SOURCE.order_guid }};; description: 'Parent Toast order. Joins to Toast Orders for daypart, dining option and the Events flag.' }
+  dimension restaurant_guid { label: 'Toast Restaurant GUID' type: 'text' hidden: true definition: @sql {{ #SOURCE.restaurant_guid }};; description: 'Toast restaurant of the check. Joins to Store through the crosswalk.' }
+  dimension business_date { label: 'Check Business Date' type: 'date' definition: @sql {{ #SOURCE.business_date }};; description: 'Toast business date (local trading day) of the check. Joins to the Fiscal Calendar.' }
+  dimension closed_at { label: 'Check Closed At (UTC)' type: 'datetime' definition: @sql {{ #SOURCE.closed_at }};; description: 'UTC timestamp when the check was closed.' }
+  dimension subtotal_amount { label: 'Subtotal ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.subtotal_amount }};; description: 'Check subtotal in USD before discounts, tax and tips.' }
+  dimension discount_amount { label: 'Discount ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.discount_amount }};; description: 'Discounts applied to the check, USD, positive number.' }
+  dimension service_charge_amount { label: 'Service Charge ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.service_charge_amount }};; description: 'Non-gratuity service charges, USD. Included in net sales.' }
+  dimension fundraising_service_charge_amount { label: 'Fundraising Service Charge ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.fundraising_service_charge_amount }};; description: 'Fundraising service charges, USD. Deducted from net sales.' }
+  dimension deferred_revenue_amount { label: 'Deferred Revenue ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.deferred_revenue_amount }};; description: 'Deferred-revenue and house-account-payment lines, USD. Deducted from net sales.' }
+  dimension refund_amount { label: 'Refund ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.refund_amount }};; description: 'Refunds excluding refunded tips, USD. Deducted from net sales.' }
+  dimension tax_amount { label: 'Tax ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.tax_amount }};; description: 'Sales tax, USD. Not part of net sales.' }
+  dimension tip_amount { label: 'Tip ($)' type: 'number' hidden: true definition: @sql {{ #SOURCE.tip_amount }};; description: 'Tips, USD. Not part of net sales.' }
+  dimension net_sales_amount { label: 'Net Sales ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.net_sales_amount }};; description: 'Check net sales in USD: subtotal - discount + service charge - fundraising - deferred revenue - refund. Excludes tax and tips. Use the Toast Net Sales metric, which also applies the eligibility filter.' }
+  dimension is_eligible { label: 'Is Eligible Check' type: 'truefalse' definition: @sql {{ #SOURCE.is_eligible }};; description: 'True when neither the check nor its order is voided, deleted or excess food. Every Toast check KPI keeps only eligible checks.' }
+}

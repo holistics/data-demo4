@@ -1,0 +1,14 @@
+Model maman_netsuite_dim_accounts {
+  type: 'table'
+  label: 'NetSuite Accounts'
+  description: 'NetSuite chart of accounts. One row per GL account. GL lines join here for account names and statement sections. The Finance P&L lines are derived from the account number on the GL line (see P&L Line).'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.netsuite_dim_accounts'
+
+  dimension account_id { label: 'Account ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.account_id }};; description: 'NetSuite account ID. Primary key.' }
+  dimension account_number { label: 'Account Number' type: 'text' definition: @sql {{ #SOURCE.account_number }};; description: 'Five-digit account number, for example 40100. 4xxxx sales, 5xxxx COGS, 60xxx to 62xxx labor, 7xxxx operating expense.' }
+  dimension account_name { label: 'Account Name' type: 'text' definition: @sql {{ #SOURCE.account_name }};; description: 'Account name, for example Food Sales or Hourly.' }
+  dimension account_type { label: 'Account Type' type: 'text' definition: @sql {{ #SOURCE.account_type }};; description: 'NetSuite account type.' }
+  dimension statement_section { label: 'Statement Section' type: 'text' definition: @sql {{ #SOURCE.statement_section }};; description: 'Sales, COGS, Labor or Operating Expense.' }
+  dimension sign { label: 'Account Sign' type: 'number' hidden: true definition: @sql {{ #SOURCE.sign }};; description: 'Natural sign of the account. GL amounts are already in reporting sign, so metrics do not apply it.' }
+}

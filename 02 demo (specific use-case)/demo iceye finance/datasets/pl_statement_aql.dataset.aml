@@ -1,0 +1,168 @@
+Dataset pl_statement_aql {
+  label: 'P&L Statement (AQL metrics)'
+  description: 'Same ledger as profit_loss_statement_dataset, but every P&L line is a plain AQL metric (no mapping/query model). Used by the Metric Sheet version of the P&L statement.'
+  data_source_name: 'demo_dbt_test'
+  owner: 'chukwudi@holistics.io'
+  models: [
+    iceye_fact_pl_statements,
+    iceye_dim_accounts,
+    iceye_account_hierarchy_map,
+    iceye_dim_departments,
+    iceye_department_hierarchy_map,
+  ]
+
+  relationships: [
+    relationship(iceye_fact_pl_statements.account_number > iceye_dim_accounts.acct_number, true),
+    relationship(iceye_fact_pl_statements.department_number > iceye_dim_departments.department_number, true),
+    relationship(iceye_account_hierarchy_map.account_number > iceye_dim_accounts.acct_number, true),
+    relationship(iceye_department_hierarchy_map.department_number > iceye_dim_departments.department_number, true),
+  ]
+
+  // Signed ledger amount: credit − debit (income positive, costs negative)
+  metric total_net_amount_eur {
+    label: 'Total Net Amount EUR'
+    type: 'number'
+    description: 'Sum of line-level Net Amount EUR (credit − debit).'
+    definition: @aql iceye_fact_pl_statements.net_amount_eur_agg;;
+    format: '[€]#,###0'
+  }
+
+  // ---- Sections (A, B, C, D, F): filter by account group ----
+  metric pnl_revenue {
+    label: 'A  Revenue'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_group_level_1 == 'Revenue'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_cogs {
+    label: 'B  COGS'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_group_level_1 == 'Cost of Sales'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_opex {
+    label: 'C  OPEX'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_group_level_1 == 'Operating Expenses' and iceye_account_hierarchy_map.account_group_level_2 != 'Depreciation & Amortization'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_da {
+    label: 'D  Depreciation & Amortization'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_group_level_2 == 'Depreciation & Amortization'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_financial {
+    label: 'F  Financial Expenses'
+    type: 'number'
+    description: 'Placeholder: the demo ledger has no financial income/expense accounts, so this is 0.'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_group_level_1 in ['Financial Income', 'Financial Expenses']), 0);;
+    format: '[€]#,###0'
+  }
+
+  // ---- Calculated subtotals: plain arithmetic on the sections ----
+  metric pnl_gross_margin {
+    label: 'A-B  GROSS MARGIN'
+    type: 'number'
+    definition: @aql pnl_revenue + pnl_cogs;;
+    format: '[€]#,###0'
+  }
+  metric pnl_ebitda {
+    label: 'A-B-C  EBITDA'
+    type: 'number'
+    definition: @aql pnl_gross_margin + pnl_opex;;
+    format: '[€]#,###0'
+  }
+  metric pnl_net_profit {
+    label: 'A-B-C-D-F  NET PROFIT'
+    type: 'number'
+    definition: @aql pnl_ebitda + pnl_da + pnl_financial;;
+    format: '[€]#,###0'
+  }
+  metric pnl_gross_margin_pct {
+    label: 'Gross Margin %'
+    type: 'number'
+    definition: @aql safe_divide(pnl_gross_margin, pnl_revenue);;
+    format: '#,###0.0%'
+  }
+  metric pnl_ebitda_margin_pct {
+    label: 'EBITDA Margin %'
+    type: 'number'
+    definition: @aql safe_divide(pnl_ebitda, pnl_revenue);;
+    format: '#,###0.0%'
+  }
+  metric pnl_net_margin_pct {
+    label: 'Net Margin %'
+    type: 'number'
+    definition: @aql safe_divide(pnl_net_profit, pnl_revenue);;
+    format: '#,###0.0%'
+  }
+
+  // ---- Account detail lines: one metric per account (add one when a new account is created) ----
+  metric pnl_a1_product_revenue {
+    label: 'A1  Product Revenue'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '4000'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_a2_service_revenue {
+    label: 'A2  Service Revenue'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '4010'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_a3_data_imagery_revenue {
+    label: 'A3  Data & Imagery Revenue'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '4020'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_b1_cost_of_goods_sold {
+    label: 'B1  Cost of Goods Sold'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '5000'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_b2_satellite_operations {
+    label: 'B2  Satellite Operations Cost'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '5010'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_c1_salaries_wages {
+    label: 'C1  Salaries & Wages'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '6000'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_c2_research_development {
+    label: 'C2  Research & Development'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '6010'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_c3_sales_marketing {
+    label: 'C3  Sales & Marketing'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '6020'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_c4_general_admin {
+    label: 'C4  General & Administrative'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '6030'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_c5_facilities {
+    label: 'C5  Facilities'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '6040'), 0);;
+    format: '[€]#,###0'
+  }
+  metric pnl_c6_travel_entertainment {
+    label: 'C6  Travel & Entertainment'
+    type: 'number'
+    definition: @aql coalesce(total_net_amount_eur | where(iceye_account_hierarchy_map.account_number == '6050'), 0);;
+    format: '[€]#,###0'
+  }
+}

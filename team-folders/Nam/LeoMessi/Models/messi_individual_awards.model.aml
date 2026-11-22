@@ -1,0 +1,57 @@
+Model messi_individual_awards {
+  type: 'table'
+  label: 'Individual Awards'
+  description: "Individual awards Messi won while playing for Argentina, one row per award (15): World Cup Golden/Silver Balls and Boots, Copa América best-player and top-scorer awards, U-20 World Youth Championship awards and the IFFHS World's Best International Goal Scorer title."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."individual_awards"'
+
+  dimension award_id {
+    label: 'Award Id'
+    type: 'number'
+    description: "The **Award Id** uniquely identifies each award and is the primary key. Count it for award totals."
+    hidden: false
+    definition: @sql {{ #SOURCE.award_id }};;
+    primary_key: true
+  }
+
+  dimension awarding_body_or_event {
+    label: 'Awarding Body / Event'
+    type: 'text'
+    description: "The **Awarding Body / Event** that gave the award: FIFA World Cup, Copa América, FIFA World Youth Championship or IFFHS."
+    hidden: false
+    definition: @sql {{ #SOURCE.awarding_body_or_event }};;
+  }
+
+  dimension award {
+    label: 'Award'
+    type: 'text'
+    description: "The **Award** name, e.g. Golden Ball, Silver Ball, Silver Boot, Best Player, Top Scorer (Golden Boot), World's Best International Goal Scorer.  \nThe 2015 Copa América Best Player award is included although Messi declined it — see `notes`."
+    hidden: false
+    definition: @sql {{ #SOURCE.award }};;
+  }
+
+  dimension year {
+    label: 'Year'
+    type: 'number'
+    format: "0"
+    description: "The **Year** the award was won."
+    hidden: false
+    definition: @sql {{ #SOURCE.year }};;
+  }
+
+  dimension tournament_id {
+    label: 'Tournament Id'
+    type: 'text'
+    description: "The **Tournament Id** the award was won at, joining to `messi_tournaments`. Empty for U-20 and IFFHS awards, which are not tied to a senior tournament."
+    hidden: false
+    definition: @sql {{ #SOURCE.tournament_id }};;
+  }
+
+  dimension notes {
+    label: 'Notes'
+    type: 'text'
+    description: "The **Notes** give context such as goal tallies, shared awards or that the award was declined. Descriptive only."
+    hidden: false
+    definition: @sql {{ #SOURCE.notes }};;
+  }
+}

@@ -1,0 +1,9 @@
+Dataset localization {
+  label: 'Localization',
+  description: ''
+  data_source_name: 'demodb'
+  models: [
+    holistics_localization
+  ]
+  relationships: []
+}

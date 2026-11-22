@@ -1,0 +1,141 @@
+// CommonLit — Assessments & Growth.
+//
+// SENSITIVE: student names and ELL / IEP / FRL flags (students model) are masked through the
+// `pii_access` user attribute (see Models/commonlit_pii.aml). Viewers without pii_access = 1 see
+// 'Restricted' for those breakdowns.
+//
+// DATA NOTE: the source currently holds MOY and EOY windows only (no BOY). Growth is measured from
+// the earliest window present — BOY when it exists, otherwise MOY — to EOY.
+Dataset commonlit_assessments_growth {
+  label: 'CommonLit · Assessments & Growth'
+  description: '''
+Benchmark assessment results for schools on CommonLit 360 + Assessments or piloting: scores,
+proficiency and BOY→EOY growth, with breakdowns by English learner (ELL), special education (IEP)
+and free/reduced-price lunch (FRL) status.
+
+## Definitions
+- **Growth**: avg EOY scaled score − avg baseline scaled score in the same school year. The
+  baseline is BOY; this dataset currently has no BOY window, so MOY is used until BOY is loaded.
+- **% Proficient**: share of results at Meets or Exceeds (proficiency cut = 458 + 14 × (grade − 3)).
+
+## Sensitive fields
+ELL, IEP, FRL and student names are restricted. They show 'Restricted' unless the viewer's
+`pii_access` user attribute is 1.
+'''
+  data_source_name: 'demo_nam_commonlit'
+
+  models: [
+    commonlit_fct_benchmark_results,
+    students,
+    dates,
+    schools,
+    districts,
+    states,
+    school_program_years
+  ]
+
+  relationships: [
+    relationship(commonlit_fct_benchmark_results.student_id > students.student_id, true, 'one_way'),
+    relationship(commonlit_fct_benchmark_results.test_date > dates.date_day, true, 'one_way'),
+    relationship(commonlit_fct_benchmark_results.school_id > schools.school_id, true, 'one_way'),
+    relationship(commonlit_fct_benchmark_results.program_year_key > school_program_years.program_year_key, true, 'one_way'),
+    relationship(schools.district_id > districts.district_id, true, 'one_way'),
+    relationship(schools.state_code > states.state_code, true, 'one_way'),
+
+    // Inactive — second paths to Schools / States
+    relationship(students.school_id > schools.school_id, false, 'one_way'),
+    relationship(districts.state_code > states.state_code, false, 'one_way'),
+    relationship(school_program_years.school_id > schools.school_id, false, 'one_way')
+  ]
+
+  metric students_tested {
+    label: 'Students Tested'
+    type: 'number'
+    format: '#,###'
+    description: 'Distinct students with a benchmark result.'
+    definition: @aql count_distinct(commonlit_fct_benchmark_results.student_id);;
+  }
+
+  metric avg_scaled_score {
+    label: 'Avg Scaled Score'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Average benchmark scaled score.'
+    definition: @aql avg(commonlit_fct_benchmark_results.scaled_score);;
+  }
+
+  metric avg_boy_score {
+    label: 'Avg BOY Score'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Average beginning-of-year scaled score. Empty until BOY results are loaded.'
+    definition: @aql avg(commonlit_fct_benchmark_results.scaled_score) | where(commonlit_fct_benchmark_results.assessment_window == 'BOY');;
+  }
+
+  metric avg_moy_score {
+    label: 'Avg MOY Score'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Average middle-of-year scaled score.'
+    definition: @aql avg(commonlit_fct_benchmark_results.scaled_score) | where(commonlit_fct_benchmark_results.assessment_window == 'MOY');;
+  }
+
+  metric avg_eoy_score {
+    label: 'Avg EOY Score'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Average end-of-year scaled score.'
+    definition: @aql avg(commonlit_fct_benchmark_results.scaled_score) | where(commonlit_fct_benchmark_results.assessment_window == 'EOY');;
+  }
+
+  metric avg_baseline_score {
+    label: 'Avg Baseline Score'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'BOY score when available, otherwise MOY.'
+    definition: @aql coalesce(avg_boy_score, avg_moy_score);;
+  }
+
+  metric growth_points {
+    label: 'Growth (BOY→EOY)'
+    type: 'number'
+    format: '#,###0.0'
+    description: 'Avg EOY scaled score − avg baseline (BOY, or MOY while BOY is not loaded).'
+    definition: @aql avg_eoy_score - avg_baseline_score;;
+  }
+
+  metric pct_proficient {
+    label: '% Proficient'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Share of results at Meets or Exceeds grade level.'
+    definition: @aql
+      safe_divide(
+        (count(commonlit_fct_benchmark_results.benchmark_result_id)
+          | where(commonlit_fct_benchmark_results.performance_level in ['Meets', 'Exceeds'])) * 1.0,
+        count(commonlit_fct_benchmark_results.benchmark_result_id)
+      )
+    ;;
+  }
+
+  metric pct_proficient_eoy {
+    label: '% Proficient (EOY)'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Share of EOY results at Meets or Exceeds grade level.'
+    definition: @aql pct_proficient | where(commonlit_fct_benchmark_results.assessment_window == 'EOY');;
+  }
+
+  metric pct_proficient_baseline {
+    label: '% Proficient (Baseline)'
+    type: 'number'
+    format: '#,###0.0%'
+    description: 'Share of baseline-window results (BOY, or MOY while BOY is not loaded) at Meets or Exceeds.'
+    definition: @aql
+      coalesce(
+        pct_proficient | where(commonlit_fct_benchmark_results.assessment_window == 'BOY'),
+        pct_proficient | where(commonlit_fct_benchmark_results.assessment_window == 'MOY')
+      )
+    ;;
+  }
+}

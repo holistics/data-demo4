@@ -1,0 +1,13 @@
+Model maman_catalog_campaign_items {
+  type: 'table'
+  label: 'Campaign Items'
+  description: 'Campaign configuration the Scorecard reads: one row per campaign and menu item. It has no relationship in the datasets because one item can belong to several campaigns. The data app reads the item list here, then filters Toast Item Selections by Item Name and the campaign dates.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.catalog_campaign_items'
+
+  dimension campaign_name { label: 'Campaign' type: 'text' definition: @sql {{ #SOURCE.campaign_name }};; description: 'Campaign name, for example Latte 5.61 or Seasonal Beverages launch.' }
+  dimension campaign_type { label: 'Campaign Type' type: 'text' definition: @sql {{ #SOURCE.campaign_type }};; description: 'Item promo or Seasonal launch. Seasonal launches also get a first-four-weeks view.' }
+  dimension start_date { label: 'Campaign Start Date' type: 'date' definition: @sql {{ #SOURCE.start_date }};; description: 'First day the campaign runs.' }
+  dimension end_date { label: 'Campaign End Date' type: 'date' definition: @sql {{ #SOURCE.end_date }};; description: 'Last day the campaign runs. NULL means ongoing.' }
+  dimension item_name { label: 'Item Name' type: 'text' definition: @sql {{ #SOURCE.item_name }};; description: 'Toast item name in the campaign, lower case, matching Toast Item Selections Item Name.' }
+}

@@ -1,175 +1,25 @@
-
 // ═══════════════════════════════════════════════════════════════════════════
-// THE TRADITIONAL APPROACH
-//
-// This is how a cohort report gets built without a semantic layer: one SQL
-// model with the cohort logic baked in — first order per user, months since
-// acquisition, cohort size — pre-joined out to the line grain so that every
-// attribute anyone might slice by is a COLUMN in the result set.
-//
-// It is correct, and unfiltered it returns exactly what the semantic layer
-// returns. The difference only appears when someone filters: `parent_category`
-// here is an output column, so a filter on it slices the aggregate. There is
-// no way for it to mean "customers acquired by this category" — that
-// distinction cannot be expressed once the logic is frozen into SQL.
+// Cohort granularity control.
 // ═══════════════════════════════════════════════════════════════════════════
-Model ecom_cohort_sql {
+Model ecom_cohort_params {
   type: 'query'
-  label: 'Cohort Fact (SQL model)'
-  description: 'Hand-built cohort fact table, the conventional analyst approach. Grain: one row per (user, order, category) with cohort month, months since acquisition and cohort size carried along. Filtering any column slices the aggregate.'
+  label: 'Cohort Params'
+  description: 'Parameter model powering the dynamic cohort-granularity selector.'
   data_source_name: 'demodb'
   owner: 'chukwudi@holistics.io'
+  query: @sql select 1;;
+  models: []
 
-  models: [
-    ecommerce_orders,
-    ecommerce_order_items,
-    ecommerce_products,
-    map_categories,
-    ecommerce_users,
-    ecommerce_cities,
-    ecommerce_countries
-  ]
-
-  // Every attribute anyone might filter by has to be SELECTED here. That is the
-  // maintenance cost of the SQL approach: a new filter means editing this query
-  // and re-running it, rather than adding one field to a model.
-  query: @sql
-    with first_order as (
-      select
-        {{ #o.user_id }} as user_id,
-        min(date_trunc('month', (cast({{ #o.created_at }} as timestamptz) at time zone 'Etc/UTC'))) as cohort_month,
-        cast(min(cast({{ #o.created_at }} as timestamptz) at time zone 'Etc/UTC') as date) as first_date
-      from {{ #ecommerce_orders as o }}
-      group by 1
-    ),
-    first_units as (
-      select
-        {{ #o3.user_id }} as user_id,
-        sum({{ #oi2.quantity }}) as units
-      from {{ #ecommerce_orders as o3 }}
-      inner join first_order fo2
-        on fo2.user_id = {{ #o3.user_id }}
-       and cast(cast({{ #o3.created_at }} as timestamptz) at time zone 'Etc/UTC' as date) = fo2.first_date
-      inner join {{ #ecommerce_order_items as oi2 }} on {{ #oi2.order_id }} = {{ #o3.id }}
-      group by 1
-    ),
-    cohort_sizes as (
-      -- counted from USERS, not orders, so customers who never purchased form
-      -- their own (null) cohort instead of vanishing from the report
-      select fo3.cohort_month as cohort_month, count(*) as cohort_size
-      from {{ #ecommerce_users as u2 }}
-      left join first_order fo3 on fo3.user_id = {{ #u2.id }}
-      group by 1
-    )
-    select
-      fo.cohort_month as cohort_month,
-      case when {{ #o2.created_at }} is null then null else
-        (date_part('year', date_trunc('month', (cast({{ #o2.created_at }} as timestamptz) at time zone 'Etc/UTC'))) - date_part('year', fo.cohort_month)) * 12
-          + (date_part('month', date_trunc('month', (cast({{ #o2.created_at }} as timestamptz) at time zone 'Etc/UTC'))) - date_part('month', fo.cohort_month))
-      end as month_number,
-      {{ #u.id }} as user_id,
-      {{ #o2.id }} as order_id,
-      {{ #mc.parent_category }} as parent_category,
-      {{ #p.name }} as product_name,
-      {{ #ctry.name }} as country,
-      case
-        when fu.units is null then 'Never ordered'
-        when fu.units = 1 then '01'
-        when fu.units = 2 then '02'
-        when fu.units = 3 then '03'
-        when fu.units <= 5 then '04-05'
-        when fu.units <= 10 then '06-10'
-        when fu.units <= 20 then '11-20'
-        else '21+'
-      end as units_band,
-      cs.cohort_size as cohort_size,
-      sum(
-        case when {{ #o2.status }} is not null and {{ #o2.status }} not in ('cancelled', 'refunded')
-             then {{ #oi.quantity }} * {{ #p.price }} * (1 - {{ #o2.discount }})
-             else 0 end
-      ) as revenue
-    from {{ #ecommerce_users as u }}
-    left join first_order fo on fo.user_id = {{ #u.id }}
-    left join cohort_sizes cs
-      on cs.cohort_month = fo.cohort_month
-      or (cs.cohort_month is null and fo.cohort_month is null)
-    left join first_units fu on fu.user_id = {{ #u.id }}
-    left join {{ #ecommerce_orders as o2 }} on {{ #o2.user_id }} = {{ #u.id }}
-    left join {{ #ecommerce_order_items as oi }} on {{ #oi.order_id }} = {{ #o2.id }}
-    left join {{ #ecommerce_products as p }} on {{ #p.id }} = {{ #oi.product_id }}
-    left join {{ #map_categories as mc }} on {{ #mc.category_id }} = {{ #p.category_id }}
-    left join {{ #ecommerce_cities as ci }} on {{ #ci.id }} = {{ #u.city_id }}
-    left join {{ #ecommerce_countries as ctry }} on {{ #ctry.code }} = {{ #ci.country_code }}
-    group by 1, 2, 3, 4, 5, 6, 7, 8, 9
-  ;;
-
-  dimension row_key {
-    label: 'Row Key'
+  param cohort_grain {
+    label: 'Cohort Granularity'
     type: 'text'
-    hidden: true
-    primary_key: true
-    definition: @aql concat(cast(ecom_cohort_sql.user_id, 'text'), '||', coalesce(cast(ecom_cohort_sql.order_id, 'text'), '-'), '||', coalesce(ecom_cohort_sql.product_name, '-')) ;;
-  }
-  dimension cohort_month {
-    label: 'Cohort Month (SQL)'
-    type: 'date'
-    definition: @sql {{ #SOURCE.cohort_month }};;
-  }
-  dimension month_number {
-    label: 'Month Number (SQL)'
-    type: 'number'
-    definition: @sql {{ #SOURCE.month_number }};;
-  }
-  dimension user_id {
-    label: 'User Id'
-    type: 'number'
-    hidden: true
-    definition: @sql {{ #SOURCE.user_id }};;
-  }
-  dimension order_id {
-    label: 'Order Id'
-    type: 'number'
-    hidden: true
-    definition: @sql {{ #SOURCE.order_id }};;
-  }
-  dimension parent_category {
-    label: 'Category (SQL model column)'
-    type: 'text'
-    definition: @sql {{ #SOURCE.parent_category }};;
-    description: 'An output column of the SQL model. Filtering it slices the aggregate — it cannot mean "customers acquired by this category".'
-  }
-  dimension product_name {
-    label: 'Product (SQL model column)'
-    type: 'text'
-    definition: @sql {{ #SOURCE.product_name }};;
-  }
-  dimension country {
-    label: 'Country (SQL model column)'
-    type: 'text'
-    definition: @sql {{ #SOURCE.country }};;
-  }
-  dimension units_band {
-    label: 'Units Band (SQL model column)'
-    type: 'text'
-    definition: @sql {{ #SOURCE.units_band }};;
-  }
-  dimension cohort_size_col {
-    label: 'Cohort Size Column'
-    type: 'number'
-    hidden: true
-    definition: @sql {{ #SOURCE.cohort_size }};;
-  }
-  measure revenue {
-    label: 'Revenue (SQL)'
-    type: 'number'
-    hidden: true
-    definition: @aql sum(ecom_cohort_sql.revenue_col) ;;
-  }
-  dimension revenue_col {
-    label: 'Revenue Col'
-    type: 'number'
-    hidden: true
-    definition: @sql {{ #SOURCE.revenue }};;
+    allowed_values: [
+      'Day',
+      'Week',
+      'Month',
+      'Quarter',
+      'Year'
+    ]
   }
 }
 
@@ -316,7 +166,7 @@ Consequences worth knowing:
     ecommerce_cities,
     ecommerce_countries,
     ecom_cohort_first_order_categories,
-    ecom_cohort_sql
+    ecom_cohort_params
   ]
 
   relationships: [
@@ -351,6 +201,86 @@ Consequences worth knowing:
     type: 'date'
     description: 'The day the user first ordered. Date, not timestamp — see Is First Order.'
     definition: @aql min(ecommerce_orders.created_at) | dimensionalize(ecommerce_users.id) ;;
+  }
+
+
+
+  // ── Dynamic cohort granularity ──────────────────────────────────────────
+  // Each grain is dimensionalized SEPARATELY, then case() picks between the
+  // finished dates. Putting the aggregate inside the case (min(...) |
+  // dimensionalize(...) per branch) compiles locally and is rejected at query
+  // time — the case must choose between plain date columns, not aggregates.
+  //
+  // Both sides of every date_diff must be DATE-typed, or one side gets
+  // timezone-converted and the diagonal shifts by a period.
+
+  dimension first_order_day {
+    model: ecommerce_users
+    label: 'First Order Day'
+    type: 'date'
+    hidden: true
+    definition: @aql min(ecommerce_orders.created_at | day()) | dimensionalize(ecommerce_users.id) ;;
+  }
+  dimension first_order_week {
+    model: ecommerce_users
+    label: 'First Order Week'
+    type: 'date'
+    hidden: true
+    definition: @aql min(ecommerce_orders.created_at | week()) | dimensionalize(ecommerce_users.id) ;;
+  }
+  dimension first_order_month {
+    model: ecommerce_users
+    label: 'First Order Month'
+    type: 'date'
+    hidden: true
+    definition: @aql min(ecommerce_orders.created_at | month()) | dimensionalize(ecommerce_users.id) ;;
+  }
+  dimension first_order_quarter {
+    model: ecommerce_users
+    label: 'First Order Quarter'
+    type: 'date'
+    hidden: true
+    definition: @aql min(ecommerce_orders.created_at | quarter()) | dimensionalize(ecommerce_users.id) ;;
+  }
+  dimension first_order_year {
+    model: ecommerce_users
+    label: 'First Order Year'
+    type: 'date'
+    hidden: true
+    definition: @aql min(ecommerce_orders.created_at | year()) | dimensionalize(ecommerce_users.id) ;;
+  }
+
+
+  dimension cohort_period {
+    model: ecommerce_users
+    label: 'Cohort Period'
+    type: 'date'
+    description: 'The period the customer was acquired in. Granularity switches with the Cohort Granularity control.'
+    definition: @aql case(
+        when: 'Day' in ecom_cohort_params.cohort_grain, then: ecommerce_users.first_order_day
+      , when: 'Week' in ecom_cohort_params.cohort_grain, then: ecommerce_users.first_order_week
+      , when: 'Quarter' in ecom_cohort_params.cohort_grain, then: ecommerce_users.first_order_quarter
+      , when: 'Year' in ecom_cohort_params.cohort_grain, then: ecommerce_users.first_order_year
+      , else: ecommerce_users.first_order_month
+    ) ;;
+  }
+
+  // date_diff('week', ...) compiles to div(double precision, integer) on this
+  // Postgres, which does not exist — it fails the whole case, not just the Week
+  // branch, because every branch is present in the compiled SQL. Both sides are
+  // already week-truncated, so day-difference over 7 is exact.
+  dimension period_number {
+    model: ecommerce_orders
+    label: 'Period Number'
+    type: 'number'
+    description: 'Calendar periods between acquisition and the order, in the unit the Cohort Granularity control is set to, in lockstep with Cohort Period. Period 0 is always the acquisition period itself.'
+    definition: @aql case(
+        when: 'Day' in ecom_cohort_params.cohort_grain, then: date_diff('day', ecommerce_users.first_order_day, (ecommerce_orders.created_at | day()))
+      , when: 'Week' in ecom_cohort_params.cohort_grain, then: date_diff('day', ecommerce_users.first_order_week, (ecommerce_orders.created_at | week())) / 7
+      , when: 'Quarter' in ecom_cohort_params.cohort_grain, then: date_diff('quarter', ecommerce_users.first_order_quarter, (ecommerce_orders.created_at | quarter()))
+      , when: 'Year' in ecom_cohort_params.cohort_grain, then: date_diff('year', ecommerce_users.first_order_year, (ecommerce_orders.created_at | year()))
+      , else: date_diff('month', ecommerce_users.first_order_month, (ecommerce_orders.created_at | month()))
+    ) ;;
   }
 
   dimension month_number {
@@ -437,7 +367,7 @@ Consequences worth knowing:
     label: 'Cohort Size'
     type: 'number'
     description: 'Distinct users acquired in the cohort month, held CONSTANT across the lifecycle axis by of_all() so it is a valid denominator. If this drifts across Month Number, every ratio below is wrong.'
-    definition: @aql count_distinct(ecommerce_users.id) | of_all(ecommerce_orders.month_number) ;;
+    definition: @aql count_distinct(ecommerce_users.id) | of_all(ecommerce_orders.period_number, keep_filters: true) ;;
     format: '#,###0'
   }
 
@@ -479,7 +409,7 @@ Consequences worth knowing:
     label: 'Cumulative Cohort Revenue'
     type: 'number'
     description: 'Running total of Cohort Revenue over the lifecycle axis. fill_missing fills lifecycle months in which the cohort happened to place no orders — without it the pivot axis skips those columns and a curve that jumps month 5 to month 11 looks contiguous.'
-    definition: @aql running_total(cohort_revenue, ecommerce_orders.month_number, fill_missing: true) ;;
+    definition: @aql running_total(cohort_revenue, ecommerce_orders.period_number, fill_missing: true) ;;
     format: '[$$]#,###0'
   }
 
@@ -511,7 +441,7 @@ Consequences worth knowing:
     label: 'Cumulative Cohort Orders'
     type: 'number'
     description: 'Running total of Cohort Orders over the lifecycle axis.'
-    definition: @aql running_total(cohort_order_count, ecommerce_orders.month_number, fill_missing: true) ;;
+    definition: @aql running_total(cohort_order_count, ecommerce_orders.period_number, fill_missing: true) ;;
     format: '#,###0'
   }
 
@@ -533,83 +463,29 @@ Consequences worth knowing:
 
 
 
-  // ── Metrics over the SQL cohort model (the traditional build) ──────────
-  metric sql_cohort_size {
-    label: 'Cohort Size (SQL model)'
+
+
+  // ── Calendar-axis cohort (granularity prototype) ────────────────────────
+  // Both axes are raw DATES, so the viz field's own datetrunc drives them.
+  // Switching granularity re-cuts rows and columns together, natively, with no
+  // param and no date_diff — the lifecycle offset is read off the diagonal
+  // rather than numbered. The denominator is held constant with of_all() on
+  // the activity date, exactly as the month version holds it across month_number.
+
+  metric cohort_size_calendar {
+    label: 'Cohort Size (calendar axis)'
     type: 'number'
-    description: 'Cohort size as the SQL model computed it, carried on every row. Filtering a column does not change it — but it no longer matches the customers being counted above it.'
-    definition: @aql max(ecom_cohort_sql.cohort_size_col) ;;
+    description: 'Distinct customers acquired in the row period, held constant across the activity axis so it stays a valid denominator at any granularity.'
+    definition: @aql count_distinct(ecommerce_users.id) | of_all(ecommerce_orders.created_date) ;;
     format: '#,###0'
   }
 
-  metric sql_active_users {
-    label: 'Active Users (SQL model)'
+  metric cohort_retention_calendar {
+    label: 'Retention (calendar axis)'
     type: 'number'
-    definition: @aql count_distinct(ecom_cohort_sql.user_id) ;;
-    format: '#,###0'
-  }
-
-  metric sql_retention {
-    label: 'Retention (SQL model)'
-    type: 'number'
-    definition: @aql safe_divide(sql_active_users, sql_cohort_size) ;;
+    description: 'Active customers in the activity period over cohort size. Read the lifecycle off the diagonal: the leading cell of each row is the acquisition period itself and must be 100%.'
+    definition: @aql safe_divide(cohort_active_users, cohort_size_calendar) ;;
     format: '#,##0.0%'
-  }
-
-  metric sql_revenue {
-    label: 'Cohort Revenue (SQL model)'
-    type: 'number'
-    definition: @aql sum(ecom_cohort_sql.revenue_col) ;;
-    format: '[$$]#,###0'
-  }
-
-  metric sql_cumulative_revenue {
-    label: 'Cumulative Revenue (SQL model)'
-    type: 'number'
-    definition: @aql running_total(sql_revenue, ecom_cohort_sql.month_number, fill_missing: true) ;;
-    format: '[$$]#,###0'
-  }
-
-  metric sql_ltv {
-    label: 'LTV (SQL model)'
-    type: 'number'
-    definition: @aql safe_divide(sql_cumulative_revenue, sql_cohort_size) ;;
-    format: '[$$]#,###0.00'
-  }
-
-  metric sql_order_count {
-    label: 'Cohort Orders (SQL model)'
-    type: 'number'
-    definition: @aql count_distinct(ecom_cohort_sql.order_id) ;;
-    format: '#,###0'
-  }
-
-  metric sql_cumulative_orders {
-    label: 'Cumulative Orders (SQL model)'
-    type: 'number'
-    definition: @aql running_total(sql_order_count, ecom_cohort_sql.month_number, fill_missing: true) ;;
-    format: '#,###0'
-  }
-
-  metric sql_orders_per_user {
-    label: 'Orders Per User (SQL model)'
-    type: 'number'
-    definition: @aql safe_divide(sql_cumulative_orders, sql_cohort_size) ;;
-    format: '#,###0.00'
-  }
-
-  metric sql_aov {
-    label: 'Cohort AOV (SQL model)'
-    type: 'number'
-    definition: @aql safe_divide(sql_revenue, sql_order_count) ;;
-    format: '[$$]#,###0.00'
-  }
-
-  metric sql_ltv_total {
-    label: 'LTV to date (SQL model)'
-    type: 'number'
-    definition: @aql safe_divide(sql_revenue, sql_cohort_size) ;;
-    format: '[$$]#,###0.00'
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

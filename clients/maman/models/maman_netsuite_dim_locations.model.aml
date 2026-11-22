@@ -1,0 +1,12 @@
+Model maman_netsuite_dim_locations {
+  type: 'table'
+  label: 'NetSuite Locations'
+  description: 'NetSuite locations. One row per location, including some with no store in the crosswalk (for example headquarters). Reached from Store through the crosswalk.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.netsuite_dim_locations'
+
+  dimension netsuite_location_id { label: 'NetSuite Location ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.netsuite_location_id }};; description: 'NetSuite location ID. Primary key.' }
+  dimension location_name { label: 'NetSuite Location Name' type: 'text' definition: @sql {{ #SOURCE.location_name }};; description: 'Location name as booked in NetSuite, for example Maman - 545 Madison.' }
+  dimension region_id { label: 'NetSuite Region ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.region_id }};; description: 'NetSuite region of the location. Joins to NetSuite Regions.' }
+  dimension location_type { label: 'NetSuite Location Type' type: 'text' definition: @sql {{ #SOURCE.location_type }};; description: 'NetSuite location type.' }
+}

@@ -1,0 +1,95 @@
+Model content {
+  type: 'table'
+  label: "Content"
+  description: "CommonLit lessons and assessments (Library and Assessments team). collection: Free Library, 360 Curriculum, Target Lessons."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_content"'
+
+  dimension content_id {
+    label: "Content Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.content_id }};;
+    primary_key: true
+  }
+
+  dimension title {
+    label: "Title"
+    type: 'text'
+    definition: @sql {{ #SOURCE.title }};;
+  }
+
+  dimension content_type {
+    label: "Content Type"
+    type: 'text'
+    definition: @sql {{ #SOURCE.content_type }};;
+  }
+
+  dimension collection {
+    label: "Collection"
+    type: 'text'
+    description: "Free Library, 360 Curriculum or Target Lessons."
+    definition: @sql {{ #SOURCE.collection }};;
+  }
+
+  dimension grade_level {
+    label: "Grade Level"
+    type: 'number'
+    definition: @sql {{ #SOURCE.grade_level }};;
+    format: '0'
+  }
+
+  dimension genre {
+    label: "Genre"
+    type: 'text'
+    definition: @sql {{ #SOURCE.genre }};;
+  }
+
+  dimension theme {
+    label: "Theme"
+    type: 'text'
+    definition: @sql {{ #SOURCE.theme }};;
+  }
+
+  dimension unit_name {
+    label: "Unit Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.unit_name }};;
+  }
+
+  dimension lexile {
+    label: "Lexile"
+    type: 'number'
+    description: "Lexile text complexity measure."
+    definition: @sql {{ #SOURCE.lexile }};;
+    format: '0'
+  }
+
+  dimension question_count {
+    label: "Question Count"
+    type: 'number'
+    definition: @sql {{ #SOURCE.question_count }};;
+    format: '#,###'
+  }
+
+  dimension est_minutes {
+    label: "Est. Minutes"
+    type: 'number'
+    definition: @sql {{ #SOURCE.est_minutes }};;
+    format: '#,###'
+  }
+
+  dimension publish_date {
+    label: "Publish Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.publish_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension is_new_release {
+    label: "Is New Release"
+    type: 'truefalse'
+    description: "True for lessons released in the current content cycle."
+    definition: @sql {{ #SOURCE.is_new_release }};;
+  }
+}

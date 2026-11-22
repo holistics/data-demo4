@@ -1,0 +1,12 @@
+Model maman_harri_fact_salaried_cost {
+  type: 'table'
+  label: 'Harri Salaried Cost'
+  description: 'Daily salaried labor cost. One row per salaried employee per employed calendar day. Daily cost = annual salary / 52 / 7, NULL when the salary is missing.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.harri_fact_salaried_cost'
+
+  dimension employee_id { label: 'Employee ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.employee_id }};; description: 'Salaried employee. Joins to Harri Employees.' }
+  dimension harri_location_id { label: 'Harri Location ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.harri_location_id }};; description: 'Location charged with the cost. Joins to Store through the crosswalk.' }
+  dimension calendar_date { label: 'Salaried Cost Date' type: 'date' definition: @sql {{ #SOURCE.calendar_date }};; description: 'Calendar day the cost applies to. Joins to the Fiscal Calendar.' }
+  dimension daily_cost { label: 'Daily Cost ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.daily_cost }};; description: 'Salaried cost for the day in USD (annual salary / 52 / 7). NULL when the salary is missing.' }
+}

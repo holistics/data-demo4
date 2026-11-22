@@ -1,0 +1,70 @@
+Model commonlit_fct_opportunities {
+  type: 'table'
+  label: "Opportunities"
+  description: "Salesforce opportunities: New Business, Pilot, Pilot Conversion, Renewal."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_opportunities"'
+
+  dimension opportunity_id {
+    label: "Opportunity Id"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.opportunity_id }};;
+    primary_key: true
+  }
+
+  dimension account_id {
+    label: "Account Id"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.account_id }};;
+  }
+
+  dimension opportunity_type {
+    label: "Opportunity Type"
+    type: 'text'
+    description: "New Business, Pilot, Pilot Conversion or Renewal."
+    definition: @sql {{ #SOURCE.opportunity_type }};;
+  }
+
+  dimension stage {
+    label: "Stage"
+    type: 'text'
+    description: "Salesforce stage, e.g. Discovery, Proposal, Closed Won, Closed Lost."
+    definition: @sql {{ #SOURCE.stage }};;
+  }
+
+  dimension amount_usd {
+    label: "Amount"
+    type: 'number'
+    description: "Opportunity amount in USD."
+    definition: @sql {{ #SOURCE.amount_usd }};;
+    format: '[$$]#,###'
+  }
+
+  dimension close_date {
+    label: "Close Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.close_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension is_closed {
+    label: "Is Closed"
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_closed }};;
+  }
+
+  dimension is_won {
+    label: "Is Won"
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_won }};;
+  }
+
+  dimension fiscal_year {
+    label: "Fiscal Year"
+    type: 'text'
+    description: "CommonLit fiscal year (FY27 = Jul 2026 - Jun 2027)."
+    definition: @sql {{ #SOURCE.fiscal_year }};;
+  }
+}

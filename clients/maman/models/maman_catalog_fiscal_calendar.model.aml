@@ -1,0 +1,28 @@
+Model maman_catalog_fiscal_calendar {
+  type: 'table'
+  label: 'Fiscal Calendar'
+  description: 'Maman 4-4-5 fiscal calendar from the semantic catalog. One row per day from 2024-01-01 to 2027-12-26. Weeks run Monday to Sunday. Every fact joins here on its own date column, so all sources share the same fiscal weeks, periods and years.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.catalog_fiscal_calendar'
+
+  dimension date { label: 'Date' type: 'date' primary_key: true definition: @sql {{ #SOURCE.date }};; description: 'Calendar day. Primary key and the join target for every fact date (Toast business date, Harri business date, NetSuite transaction date and so on).' }
+  dimension fiscal_year { label: 'Fiscal Year' type: 'number' definition: @sql {{ #SOURCE.fiscal_year }};; description: 'Maman fiscal year, for example 2026. FY2026 runs 2025-12-29 to 2026-12-27. All years in range have 52 weeks.' }
+  dimension fiscal_quarter { label: 'Fiscal Quarter' type: 'number' definition: @sql {{ #SOURCE.fiscal_quarter }};; description: 'Fiscal quarter number, 1 to 4. Each quarter is 3 fiscal periods (4-4-5 weeks).' }
+  dimension fiscal_period { label: 'Fiscal Period' type: 'number' definition: @sql {{ #SOURCE.fiscal_period }};; description: 'Fiscal period number, 1 to 12. P3, P6, P9 and P12 have 5 weeks; the others have 4.' }
+  dimension fiscal_week_of_year { label: 'Fiscal Week of Year' type: 'number' definition: @sql {{ #SOURCE.fiscal_week_of_year }};; description: 'Fiscal week number within the fiscal year, 1 to 52. Use with Fiscal Year for year-to-date ranges (for example weeks 1 to 45).' }
+  dimension fiscal_week_of_period { label: 'Fiscal Week of Period' type: 'number' definition: @sql {{ #SOURCE.fiscal_week_of_period }};; description: 'Week number within the fiscal period, 1 to 5. Use for period-to-date ranges.' }
+  dimension fiscal_period_label { label: 'Fiscal Period Label' type: 'text' definition: @sql {{ #SOURCE.fiscal_period_label }};; description: 'Display label of the fiscal period, for example FY2026 P11. Matches NetSuite posting_period and Datarails reporting_month labels.' }
+  dimension fiscal_week_label { label: 'Fiscal Week Label' type: 'text' definition: @sql {{ #SOURCE.fiscal_week_label }};; description: 'Display label of the fiscal week as the Scorecard shows it, for example P11 · W2 · FY2026. Sort with Fiscal Week Key, not alphabetically.' }
+  dimension fiscal_week_key { label: 'Fiscal Week Key' type: 'number' definition: @sql {{ #SOURCE.fiscal_year }} * 100 + {{ #SOURCE.fiscal_week_of_year }};; description: 'Sortable fiscal week number, fiscal year x 100 + week of year (for example 202645). Use to order weeks or to pick the prior week.' }
+  dimension fiscal_period_key { label: 'Fiscal Period Key' type: 'number' definition: @sql {{ #SOURCE.fiscal_year }} * 100 + {{ #SOURCE.fiscal_period }};; description: 'Sortable fiscal period number, fiscal year x 100 + period (for example 202611). Use to order periods.' }
+  dimension week_start_date { label: 'Week Start Date' type: 'date' definition: @sql {{ #SOURCE.week_start_date }};; description: "Monday that starts the fiscal week containing this day. Ryan's L4L rule compares store opening dates with this date." }
+  dimension week_end_date { label: 'Week End Date' type: 'date' definition: @sql {{ #SOURCE.week_end_date }};; description: 'Sunday that ends the fiscal week containing this day. Ryan labels weeks by it (WE 11/8/2026). Filter on it to select whole fiscal weeks.' }
+  dimension period_start_date { label: 'Period Start Date' type: 'date' definition: @sql {{ #SOURCE.period_start_date }};; description: 'First day (Monday) of the fiscal period containing this day.' }
+  dimension period_end_date { label: 'Period End Date' type: 'date' definition: @sql {{ #SOURCE.period_end_date }};; description: 'Last day (Sunday) of the fiscal period containing this day.' }
+  dimension fiscal_year_start_date { label: 'Fiscal Year Start Date' type: 'date' definition: @sql {{ #SOURCE.fiscal_year_start_date }};; description: 'First day (Monday) of the fiscal year containing this day.' }
+  dimension day_of_week { label: 'Day of Week' type: 'number' definition: @sql {{ #SOURCE.day_of_week }};; description: 'Day number within the fiscal week, 1 = Monday to 7 = Sunday.' }
+  dimension day_name { label: 'Day Name' type: 'text' definition: @sql {{ #SOURCE.day_name }};; description: 'Weekday name of the day, for example Tuesday. Use for the Scorecard best-day label.' }
+  dimension is_weekend { label: 'Is Weekend' type: 'truefalse' definition: @sql {{ #SOURCE.is_weekend }};; description: 'True on Saturday and Sunday. Drives the Scorecard weekend sales share.' }
+  dimension ly_date { label: 'Same Fiscal Day Last Year' type: 'date' definition: @sql {{ #SOURCE.ly_date }};; description: 'Same fiscal day last year, date minus 364 days (52 weeks), so the weekday and fiscal week line up. Inactive last-year relationships join facts to this column; the last-year metrics use them.' }
+  dimension is_week_end_date { label: 'Is Week End Date' type: 'truefalse' definition: @sql {{ #SOURCE.date }} = {{ #SOURCE.week_end_date }};; description: 'True on the Sunday that ends each fiscal week. Use to read point-in-time values (for example Google total reviews) as of the end of each week.' }
+}

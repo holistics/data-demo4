@@ -1,0 +1,87 @@
+// Maman KPI definitions and answer rules for Holistics AI. Loaded by the Maman
+// route in settings/ai/context.aml. Metric names must match
+// clients/maman/metrics/*.aml and the two maman_* datasets.
+Skill maman_kpi_definitions {
+  label: 'Maman — KPI definitions that differ by source'
+  description: "Maman bakery-café KPI definitions and answer rules for datasets maman_store_scorecard and maman_weekly_sales (models maman_*). Use for any question on these datasets, and whenever a user asks why two Maman numbers differ or which one is right: Toast vs NetSuite vs Datarails sales, Harri vs NetSuite labor, MarginEdge purchases vs NetSuite COGS, comp sales vs same-store sales, L4L cohorts, average check vs average ticket, weekly Finance vs the management P&L, the 4-4-5 fiscal calendar, or last-year comparisons. Typical phrasings: 'why doesn't Toast sales match NetSuite', 'what is our labor %', 'is comp the same as same-store sales', 'how is last year aligned'."
+  invocation: 'auto'
+  content: @md
+    Maman is a US and Canada bakery-café group (about 70 stores). Its systems measure the same idea in different ways on purpose. Maman asked that these differences stay visible and labelled, not merged into one universal formula. Every figure in these datasets is generated mock data: never present it as Maman's real results.
+
+    ## Answer rules
+
+    Apply all five in every answer on `maman_store_scorecard` or `maman_weekly_sales`:
+
+    1. **Name the source.** Label every figure with its system and metric, for example "Toast Net Sales (POS)" or "NetSuite Total Labor (booked GL)". When the user says "sales", "labor" or "COGS" without a source, show each source's figure side by side with one line on why they differ. Never swap one source for another silently.
+    2. **Recompute ratios from summed dollars.** Every % is summed numerator / summed denominator at the level shown. Never average or sum store percentages, store average checks or store tickets. For a total, query the metric without the store dimension.
+    3. **Show missing as missing.** NULL means the source has no data or no store match (crosswalk source ID is NULL, payroll not booked yet, no salary rate). Write "missing" or show a dash. Never treat it as zero and never fill it from another source.
+    4. **Keep labor open.** Maman has not decided between Harri-only, NetSuite-only, or both with a reconciliation. Show Harri and NetSuite labor together, each labelled, and describe what each includes. This holds even when the user asks for one official number, for the CFO, the Board or the Finance view: give both figures, say the labor presentation is still open at Maman, and leave the choice to them. Recommend neither.
+    5. **Use Maman's calendar.** Select and group by Fiscal Calendar fields, and build last year with the `*_ly` metrics (date − 364). See *Fiscal calendar and last year* below.
+
+    When asked why two numbers differ, answer in this order: each figure with its source and metric, the reason they differ, then where Maman uses each.
+
+    ## Definitions that differ
+
+    ### Sales: Toast vs NetSuite vs Datarails
+
+    | Measure | Source and definition | Metric | Dataset |
+    |---|---|---|---|
+    | Toast Net Sales | Toast POS. Check subtotal after discounts plus non-gratuity service charges, minus fundraising charges, deferred-revenue and house-account lines and refunds. Excludes tax and tips. By business date. | `toast_net_sales` | both |
+    | NetSuite Sales | NetSuite GL, booked revenue: accounts 4xxxx, discounts negative. By transaction date. `erp_actual_sales` is the same value under Ryan's name. | `netsuite_sales`, `erp_actual_sales` | both; `erp_actual_sales` in `maman_weekly_sales` |
+    | Datarails Net Sales (Board) | Datarails FP&A, Actuals. Board-reported: in house, third-party delivery, catering, online ordering, events, Retail & E-Commerce, other income and service fees, minus discounts. Monthly by fiscal period. | `datarails_net_sales` | `maman_weekly_sales` only |
+
+    - Toast vs NetSuite differ through delivery-platform adjustments, other income and posting treatment.
+    - Datarails is monthly: filter it by fiscal period or year, never by one week.
+
+    ### Labor: Harri vs NetSuite
+
+    | Measure | Source and definition | Metric | Dataset |
+    |---|---|---|---|
+    | Harri labor | Harri time and attendance. Approved hourly clock pay with overtime, plus salaried cost at annual salary / 52 / 7 per employed day. Can include pre-opening labor. Excludes bonus, vacation, sick pay, benefits and payroll taxes. Labor % divides by Toast Net Sales. | `harri_labor_cost`, `harri_hourly_labor_cost`, `harri_salaried_labor_cost`, `harri_labor_pct`, `harri_labor_hours`, `harri_splh` | `maman_store_scorecard` only |
+    | NetSuite labor | NetSuite GL, booked payroll: Salary 61001, Hourly 61002, Other Wages 61003 to 61009, Employee Benefits & Payroll Taxes 62xxx, other 60xxx/61xxx postings. Labor % divides by NetSuite Sales. Payroll is dated Sunday and booked the following Wednesday, so the latest week shows missing labor until then. | `netsuite_total_labor`, `netsuite_total_labor_pct`, `netsuite_salary`, `netsuite_hourly`, `netsuite_other_wages`, `netsuite_benefits_payroll_taxes`, `netsuite_other_labor` | both |
+
+    ### Cost of goods: MarginEdge purchases vs NetSuite COGS
+
+    | Measure | Source and definition | Metric | Dataset |
+    |---|---|---|---|
+    | MarginEdge Purchases | MarginEdge, what stores bought: signed COGS line items on reportable, non-transfer documents, credits kept, dated on invoice date (created date if missing). % divides by Toast Net Sales. | `marginedge_purchases`, `marginedge_purchases_pct` | `maman_store_scorecard` only |
+    | NetSuite COGS | NetSuite GL, booked accounting cost: accounts 5xxxx. % divides by NetSuite Sales. | `netsuite_cogs`, `netsuite_cogs_pct` | both |
+    | Theoretical recipe cost | A third concept (recipe cost of items sold). Not modelled here: say so. | none | none |
+
+    ### Growth: comp vs same-store sales
+
+    | Measure | Definition | How to get it |
+    |---|---|---|
+    | Comp sales vs prior week (Scorecard) | Toast Net Sales of the selected range vs the preceding range of equal length, across the selected stores. Week over week, not same-store and not year over year. | No metric. Compute `safe_divide(toast_net_sales - p, p)` with `p = toast_net_sales \| relative_period(maman_catalog_fiscal_calendar.date, interval(-7 days))` for a week. |
+    | Ryan's same-store sales (weekly L4L) | ERP Actual Sales vs ERP Sales Last Year for cafes open at least 12 months (365 days) before the week starts. Cafes with a closure in either week, and invalid trading weeks, are handled explicitly. | `erp_actual_sales`, `erp_sales_ly`, `erp_var_ly`, `erp_var_ly_pct` on `maman_weekly_sales`, filtered to `store_format == 'Cafe'` and `opening_date` on or before week start − 365 days. The weekly sales app applies the closure and valid-week rules; an ad hoc answer with only the opening-date filter is an approximation and must say so. |
+    | Warehouse Same-Store Sales dashboard | Maman's separate warehouse dashboard: configurable maturity threshold, 18 months by default, plus a $25,000 sales floor in both compared periods. | Not built in Holistics. Say so. If asked to approximate it, label the result as an approximation of that dashboard, not Maman's figure. |
+
+    ### Average: Average Check vs Ryan's average ticket
+
+    | Measure | Definition | Metric | Dataset |
+    |---|---|---|---|
+    | Toast Average Check (Scorecard) | Toast Net Sales / eligible Toast checks. | `toast_average_check` | both |
+    | Average Ticket ex-Events (Ryan) | (Toast Net Sales − Toast Events $) / eligible Toast orders. | `toast_average_ticket_ex_events` (last year: `toast_average_ticket_ex_events_ly`, weekly sales only) | both |
+
+    - Orders and checks are not interchangeable: a split order has one order and several checks (`toast_orders` vs `toast_transactions`).
+
+    ### Date lens: weekly Finance vs the management P&L
+
+    - **Weekly Finance (Scorecard Finance tab):** NetSuite GL lines grouped by transaction date through the Fiscal Calendar. Every `netsuite_*` metric uses this by default. Late postings and corrections can change a past week.
+    - **Management P&L:** NetSuite posting periods. Group or filter by `maman_netsuite_fact_gl_lines.posting_period`. The management P&L report itself is not built in Holistics.
+    - In this mock data every GL line posts to the period of its transaction date, so the two lenses give the same period totals. Say that; do not invent a gap.
+
+    ## Scope and datasets
+
+    - `maman_store_scorecard`: Toast, Harri, MarginEdge, NetSuite, Google reviews. No Datarails, no forecast, no `*_ly` metrics.
+    - `maman_weekly_sales`: Toast, NetSuite (ERP), Datarails, forecast, `*_ly` metrics. No Harri, no MarginEdge.
+    - Finance population: `maman_catalog_store_crosswalk.is_finance_scope == true` (US cafes, catering and Retail & E-Commerce; management contracts excluded). "All locations" on the Finance tab is not the full US P&L.
+    - All-location operating ratios include stores with no Toast sales (commissaries, management contracts). Filter `store_format == 'Cafe'` for café benchmarks and say which population you used.
+
+    ## Fiscal calendar and last year
+
+    - Maman uses a 4-4-5 fiscal calendar. Weeks run Monday to Sunday. 12 periods: P3, P6, P9 and P12 have 5 weeks, the others 4. FY2026 runs 2025-12-29 to 2026-12-27. All years in the data have 52 weeks; a 53-week year would give P12 six weeks.
+    - Use `maman_catalog_fiscal_calendar` fields (`fiscal_year`, `fiscal_period`, `fiscal_week_of_year`, `week_end_date`, `fiscal_week_key`, `fiscal_period_label`). A "month" means a fiscal period unless the user says calendar month. Datarails `reporting_month` is a fiscal period label, not a calendar month.
+    - Last year = date − 364 days (`ly_date`): the same weekday and fiscal week one 52-week year earlier. Use `erp_sales_ly`, `toast_net_sales_ly`, `toast_orders_ly`, `toast_events_sales_ly` and `toast_average_ticket_ex_events_ly` on `maman_weekly_sales`. They return last year's days under this year's labels. Avoid a one-year calendar shift (`relative_period(..., interval(-1 year))`): it misaligns weekdays and fiscal weeks.
+  ;;
+}

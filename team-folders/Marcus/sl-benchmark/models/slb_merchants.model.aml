@@ -20,6 +20,7 @@ Model slb_merchants {
   dimension city_id {
     label: 'City Id'
     type: 'number'
+    description: 'References slb_merchant_cities.id. Use slb_merchant_cities and slb_merchant_countries for merchant geography.'
     definition: @sql {{ #SOURCE.city_id }};;
   }
 }

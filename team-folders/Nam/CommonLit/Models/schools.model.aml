@@ -1,0 +1,81 @@
+Model schools {
+  type: 'table'
+  label: "Schools"
+  description: "Schools with at least one CommonLit user. is_title_i = pct_frl >= 40 (schoolwide Title I eligibility)."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_schools"'
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+    primary_key: true
+  }
+
+  dimension district_id {
+    label: "District Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.district_id }};;
+  }
+
+  dimension nces_school_id {
+    label: "NCES School Id"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.nces_school_id }};;
+  }
+
+  dimension school_name {
+    label: "School Name"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_name }};;
+  }
+
+  dimension state_code {
+    label: "State"
+    type: 'text'
+    definition: @sql {{ #SOURCE.state_code }};;
+  }
+
+  dimension school_level {
+    label: "School Level"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_level }};;
+  }
+
+  dimension grades_served {
+    label: "Grades Served"
+    type: 'text'
+    definition: @sql {{ #SOURCE.grades_served }};;
+  }
+
+  dimension locale {
+    label: "Locale"
+    type: 'text'
+    definition: @sql {{ #SOURCE.locale }};;
+  }
+
+  dimension enrollment {
+    label: "Enrollment"
+    type: 'number'
+    definition: @sql {{ #SOURCE.enrollment }};;
+    format: '#,###'
+  }
+
+  dimension pct_frl {
+    label: "% FRL"
+    type: 'number'
+    description: "Share of students eligible for free/reduced-price lunch (0-100)."
+    definition: @sql {{ #SOURCE.pct_frl }};;
+    format: '#,###0.0\\%'
+  }
+
+  dimension is_title_i {
+    label: "Is Title I"
+    type: 'truefalse'
+    description: "Schoolwide Title I eligibility (% FRL >= 40)."
+    definition: @sql {{ #SOURCE.is_title_i }};;
+  }
+}

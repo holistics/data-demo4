@@ -1,0 +1,15 @@
+Model maman_gbp_agg_listing_daily {
+  type: 'table'
+  label: 'Google Listing Daily'
+  description: 'Daily Google review aggregates. One row per listing per day. Flow columns (reviews received, rating sum, 4 to 5 star count) add up over days; cumulative columns (total reviews, overall rating) must be read on the last day of the range, never summed over days.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.gbp_agg_listing_daily'
+
+  dimension gbp_listing_id { label: 'Google Listing ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.gbp_listing_id }};; description: 'Listing. Joins to Store through the crosswalk.' }
+  dimension date { label: 'Google Listing Date' type: 'date' definition: @sql {{ #SOURCE.date }};; description: 'Day of the aggregate. Joins to the Fiscal Calendar.' }
+  dimension reviews_received { label: 'Reviews Received (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.reviews_received }};; description: 'Reviews posted that day.' }
+  dimension rating_sum_received { label: 'Rating Sum Received (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.rating_sum_received }};; description: 'Sum of stars of reviews posted that day.' }
+  dimension reviews_4_5_star { label: '4-5 Star Reviews (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.reviews_4_5_star }};; description: 'Reviews with 4 or 5 stars posted that day.' }
+  dimension total_review_count { label: 'Total Reviews (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.total_review_count }};; description: 'Cumulative review count as of the day.' }
+  dimension overall_rating { label: 'Overall Rating (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.overall_rating }};; description: 'Cumulative average rating as of the day, 1 decimal.' }
+}

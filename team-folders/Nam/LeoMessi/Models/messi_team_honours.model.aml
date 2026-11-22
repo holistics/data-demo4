@@ -1,0 +1,65 @@
+Model messi_team_honours {
+  type: 'table'
+  label: 'Team Honours'
+  description: "Team podium finishes Messi achieved with Argentina at senior, U-20 and U-23 (Olympic) level — one row per honour (14), including runner-up and third-place finishes, not just trophies. Use `counts_as_trophy` to count trophies won."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."team_honours"'
+
+  dimension honour_id {
+    label: 'Honour Id'
+    type: 'number'
+    description: "The **Honour Id** uniquely identifies each honour and is the primary key."
+    hidden: false
+    definition: @sql {{ #SOURCE.honour_id }};;
+    primary_key: true
+  }
+
+  dimension level {
+    label: 'Level'
+    type: 'text'
+    description: "The **Level** of the team: Senior, U-20 or U-23 (Olympic).  \nOnly Senior honours link to a tournament in `messi_tournaments`; youth honours have no `tournament_id`."
+    hidden: false
+    definition: @sql {{ #SOURCE.level }};;
+  }
+
+  dimension competition {
+    label: 'Competition'
+    type: 'text'
+    description: "The **Competition** the honour was won in, e.g. FIFA World Cup, Copa América, Finalissima, Superclásico de las Américas, FIFA World Youth Championship, Olympic football tournament (Beijing)."
+    hidden: false
+    definition: @sql {{ #SOURCE.competition }};;
+  }
+
+  dimension year {
+    label: 'Year'
+    type: 'number'
+    format: "0"
+    description: "The **Year** of the competition."
+    hidden: false
+    definition: @sql {{ #SOURCE.year }};;
+  }
+
+  dimension result {
+    label: 'Result'
+    type: 'text'
+    description: "The **Result** achieved: Winner, Gold medal, Runner-up or Third place."
+    hidden: false
+    definition: @sql {{ #SOURCE.result }};;
+  }
+
+  dimension tournament_id {
+    label: 'Tournament Id'
+    type: 'text'
+    description: "The **Tournament Id** joining the honour to `messi_tournaments`, e.g. `WC2022`.  \nEmpty for youth honours and the 2019 Superclásico de las Américas, which was a friendly."
+    hidden: false
+    definition: @sql {{ #SOURCE.tournament_id }};;
+  }
+
+  dimension counts_as_trophy {
+    label: 'Counts as Trophy'
+    type: 'truefalse'
+    description: "The **Counts as Trophy** flag is true for honours won outright (Winner or Gold medal) — 7 rows: 5 Senior, 1 U-20, 1 U-23.  \nCaution: the Senior count of 5 includes the 2019 Superclásico de las Américas friendly. The headline \"4 senior trophies\" in `messi_career_summary` excludes it — use `messi_major_senior_trophies` to match that figure."
+    hidden: false
+    definition: @sql {{ #SOURCE.counts_as_trophy }};;
+  }
+}

@@ -1,0 +1,48 @@
+// Harri (labor) metrics. Needs maman_harri_fact_labor_clock,
+// maman_harri_fact_salaried_cost, maman_harri_dim_employee, the relationship
+// maman_harri_fact_labor_clock.employee_id > maman_harri_dim_employee.employee_id,
+// and maman_toast_metrics (for the ratios to Toast Net Sales).
+PartialDataset maman_harri_metrics {
+  metric harri_hourly_labor_cost {
+    label: 'Harri Hourly Labor Cost'
+    type: 'number'
+    description: 'Hourly employee pay in USD, including overtime, from approved Harri clocks. Clocks with no cost are left out, not counted as 0.'
+    definition: @aql sum(maman_harri_fact_labor_clock.labor_cost) | where(maman_harri_fact_labor_clock.is_approved == true, maman_harri_dim_employee.pay_type == 'HOURLY');;
+  }
+  metric harri_salaried_labor_cost {
+    label: 'Harri Salaried Labor Cost'
+    type: 'number'
+    description: 'Salaried employee cost in USD from Harri, spread evenly over each employed day. Missing, not 0, when salary is unknown.'
+    definition: @aql sum(maman_harri_fact_salaried_cost.daily_cost);;
+  }
+  metric harri_labor_cost {
+    label: 'Harri Labor Cost'
+    type: 'number'
+    description: 'Operating labor cost in USD from Harri, hourly and salaried. Not the same as NetSuite Total Labor, which adds bonus, benefits and payroll taxes.'
+    definition: @aql harri_hourly_labor_cost + coalesce(harri_salaried_labor_cost, 0);;
+  }
+  metric harri_labor_hours {
+    label: 'Harri Labor Hours'
+    type: 'number'
+    description: 'Paid hours of hourly employees on approved Harri clocks, net of unpaid breaks. Excludes salaried hours.'
+    definition: @aql sum(maman_harri_fact_labor_clock.paid_hours) | where(maman_harri_fact_labor_clock.is_approved == true, maman_harri_dim_employee.pay_type == 'HOURLY');;
+  }
+  metric harri_labor_pct {
+    label: 'Harri Labor % (of Toast Net Sales)'
+    type: 'number'
+    description: 'Harri labor cost as a % of Toast Net Sales. The operating labor %; not the same as NetSuite Total Labor %.'
+    definition: @aql safe_divide(harri_labor_cost, toast_net_sales);;
+  }
+  metric harri_splh {
+    label: 'SPLH (Toast Sales per Harri Labor Hour)'
+    type: 'number'
+    description: 'Sales per labor hour in USD: Toast Net Sales for each paid hour of hourly staff in Harri.'
+    definition: @aql safe_divide(toast_net_sales, harri_labor_hours);;
+  }
+  metric harri_clocks_missing_cost {
+    label: 'Harri Clocks Missing Cost'
+    type: 'number'
+    description: 'Count of approved Harri clocks with no labor cost. Shows how much Harri Labor Cost may be understated.'
+    definition: @aql count(maman_harri_fact_labor_clock.clock_id) | where(maman_harri_fact_labor_clock.is_approved == true, maman_harri_fact_labor_clock.labor_cost is null);;
+  }
+}

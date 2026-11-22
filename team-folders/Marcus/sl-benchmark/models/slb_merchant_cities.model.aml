@@ -1,0 +1,25 @@
+Model slb_merchant_cities {
+  type: 'table'
+  label: 'SLB Merchant Cities'
+  description: 'City where the merchant is based (Neon benchmark projection). Same source table as slb_cities, which holds customer cities.'
+  data_source_name: 'slb_ecommerce_neon_h4'
+  owner: 'dong.ln@holistics.io'
+  table_name: '"benchmark"."cities"'
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension name {
+    label: 'Merchant City Name'
+    type: 'text'
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension country_code {
+    label: 'Merchant Country Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+}

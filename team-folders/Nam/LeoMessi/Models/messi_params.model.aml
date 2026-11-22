@@ -1,0 +1,23 @@
+// Parameter holder for the dashboard's metric switcher ("Six summers side by side").
+// One-row dummy query; it carries no data and has no relationships.
+Model messi_params {
+  type: 'query'
+  label: 'Messi Parameters'
+  description: 'Holds dashboard parameters for the Messi dataset. Carries no data.'
+  data_source_name: 'demo_nam_leo_messi'
+  query: @sql select 1 as dummy;;
+
+  dimension dummy {
+    label: 'Dummy'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.dummy }};;
+  }
+
+  param metric_selector {
+    label: 'Metric'
+    description: 'Chooses the metric shown by `messi_selected_metric`.'
+    type: 'text'
+    allowed_values: ['Goals', 'Caps', 'Penalty Goals', 'Goals per Match', 'Win Rate']
+  }
+}

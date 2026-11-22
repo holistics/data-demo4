@@ -1,0 +1,98 @@
+Model commonlit_fct_account_health_monthly {
+  type: 'table'
+  label: "Account Health (Monthly)"
+  description: "Gainsight-style monthly customer health per account (Aug-May). Green >= 70, Yellow 50-69, Red < 50."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_account_health_monthly"'
+
+  dimension account_id {
+    label: "Account Id"
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.account_id }};;
+  }
+
+  dimension month_start {
+    label: "Month"
+    type: 'date'
+    definition: @sql {{ #SOURCE.month_start }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension licensed_teachers {
+    label: "Licensed Teachers"
+    type: 'number'
+    description: "Teachers covered by the license that month."
+    definition: @sql {{ #SOURCE.licensed_teachers }};;
+    format: '#,###'
+  }
+
+  dimension active_teachers {
+    label: "Active Teachers"
+    type: 'number'
+    description: "Licensed teachers active that month. Pre-aggregated per account-month: average, do not sum across months."
+    definition: @sql {{ #SOURCE.active_teachers }};;
+    format: '#,###'
+  }
+
+  dimension active_students {
+    label: "Active Students"
+    type: 'number'
+    description: "Students with a submission that month (pre-aggregated per account-month)."
+    definition: @sql {{ #SOURCE.active_students }};;
+    format: '#,###'
+  }
+
+  dimension completed_assignments {
+    label: "Completed Assignments"
+    type: 'number'
+    description: "Student submissions that month (pre-aggregated per account-month)."
+    definition: @sql {{ #SOURCE.completed_assignments }};;
+    format: '#,###'
+  }
+
+  dimension teacher_adoption_rate {
+    label: "Teacher Adoption Rate"
+    type: 'number'
+    description: "Active teachers / licensed teachers for the month (0-1)."
+    definition: @sql {{ #SOURCE.teacher_adoption_rate }};;
+    format: '#,###0.0%'
+  }
+
+  dimension health_score {
+    label: "Health Score"
+    type: 'number'
+    description: "Gainsight health score 0-100. Green >= 70, Yellow 50-69, Red < 50."
+    definition: @sql {{ #SOURCE.health_score }};;
+    format: '#,###'
+  }
+
+  dimension health_status {
+    label: "Health Status"
+    type: 'text'
+    description: "Green, Yellow or Red, from the health score."
+    definition: @sql {{ #SOURCE.health_status }};;
+  }
+
+  dimension csm_sentiment {
+    label: "CSM Sentiment"
+    type: 'text'
+    definition: @sql {{ #SOURCE.csm_sentiment }};;
+  }
+
+  dimension account_month_key {
+    label: "Account Month Key"
+    type: 'text'
+    description: "Surrogate primary key account_id|month_start."
+    hidden: true
+    definition: @sql {{ #SOURCE.account_id }} || '|' || {{ #SOURCE.month_start }}::text;;
+    primary_key: true
+  }
+
+  dimension is_latest_month {
+    label: "Is Latest Month"
+    type: 'truefalse'
+    description: "True on each account's most recent health row. Use for 'latest health status'."
+    definition: @sql {{ #SOURCE.month_start }} = (select max(h.month_start) from "commonlit"."fct_account_health_monthly" h where h.account_id = {{ #SOURCE.account_id }});;
+  }
+}

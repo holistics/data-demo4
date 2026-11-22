@@ -1,0 +1,20 @@
+Model maman_marginedge_fact_invoices {
+  type: 'table'
+  label: 'MarginEdge Documents'
+  description: 'MarginEdge purchasing documents. One row per document per unit: invoices, credits, transfers and purchase orders. Holds the purchase date and the filters for MarginEdge Purchases, and the PENDING_APPROVAL backlog.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.marginedge_fact_invoices'
+
+  dimension document_id { label: 'Document ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.document_id }};; description: 'MarginEdge document ID. Primary key; line items reference it.' }
+  dimension unit_id { label: 'MarginEdge Unit ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.unit_id }};; description: 'MarginEdge unit of the document. Joins to Store through the crosswalk.' }
+  dimension vendor_name { label: 'Vendor' type: 'text' definition: @sql {{ #SOURCE.vendor_name }};; description: 'Supplier on the document.' }
+  dimension invoice_number { label: 'Invoice Number' type: 'text' definition: @sql {{ #SOURCE.invoice_number }};; description: 'Supplier invoice reference, shown as Reference in invoices awaiting approval.' }
+  dimension document_type { label: 'Document Type' type: 'text' definition: @sql {{ #SOURCE.document_type }};; description: 'INVOICE, CREDIT, TRANSFER or PURCHASE_ORDER. MarginEdge Purchases excludes TRANSFER and keeps credits.' }
+  dimension status { label: 'Document Status' type: 'text' definition: @sql {{ #SOURCE.status }};; description: 'CLOSED, APPROVED or PENDING_APPROVAL. PENDING_APPROVAL documents form the invoices-awaiting-approval backlog.' }
+  dimension invoice_date { label: 'Invoice Date' type: 'date' definition: @sql {{ #SOURCE.invoice_date }};; description: 'Supplier invoice date. NULL on some documents; Purchase Date falls back to the created date.' }
+  dimension created_date { label: 'Created Date' type: 'date' definition: @sql {{ #SOURCE.created_date }};; description: 'Date the document was created in MarginEdge.' }
+  dimension purchase_date { label: 'Purchase Date' type: 'date' definition: @sql COALESCE({{ #SOURCE.invoice_date }}, {{ #SOURCE.created_date }});; description: 'COALESCE(invoice date, created date), the date MarginEdge Purchases is reported on. Joins to the Fiscal Calendar.' }
+  dimension total_amount { label: 'Document Total ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.total_amount }};; description: 'Signed document total in USD; credits are negative.' }
+  dimension is_reportable { label: 'Is Reportable' type: 'truefalse' definition: @sql {{ #SOURCE.is_reportable }};; description: 'True when MarginEdge marks the document reportable. MarginEdge Purchases keeps reportable documents only.' }
+  dimension is_intercompany { label: 'Is Intercompany' type: 'truefalse' definition: @sql {{ #SOURCE.is_intercompany }};; description: 'True for intercompany documents (for example commissary to store). Not filtered by the Scorecard purchase KPI; available for vendor-invoice analysis.' }
+}

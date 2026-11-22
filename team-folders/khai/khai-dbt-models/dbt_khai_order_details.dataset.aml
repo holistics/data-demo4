@@ -1,0 +1,15 @@
+Dataset dbt_khai_order_details_dataset {
+  label: 'Order Details'
+  description: 'Order, product, and customer detail for order-level exploration.'
+  data_source_name: 'khaidb'
+  owner: 'khai.to+demo4@holistics.io'
+
+  models: [
+    dbt_khai_order_details
+  ]
+  relationships: []
+
+  view {
+    model dbt_khai_order_details { }
+  }
+}

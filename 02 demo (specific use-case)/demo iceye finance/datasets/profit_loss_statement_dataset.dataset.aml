@@ -9,6 +9,7 @@ Dataset profit_loss_statement_dataset {
     iceye_dim_departments,
     iceye_department_hierarchy_map,
     iceye_account_hierarchy_map,
+    iceye_pl_report_lines,
   ]
 
   relationships: [
@@ -16,6 +17,7 @@ Dataset profit_loss_statement_dataset {
     relationship(iceye_fact_pl_statements.department_number > iceye_dim_departments.department_number, true),
     relationship(iceye_account_hierarchy_map.account_number > iceye_dim_accounts.acct_number, true),
     relationship(iceye_department_hierarchy_map.department_number > iceye_dim_departments.department_number, true),
+    relationship(iceye_pl_report_lines.account_number > iceye_dim_accounts.acct_number, true),
   ]
 
   metric total_net_amount_eur {
@@ -36,5 +38,56 @@ Dataset profit_loss_statement_dataset {
     type: 'number'
     definition: @aql sum(iceye_fact_pl_statements.accounting_line_debit_amount_eur);;
     format: '[€]#,###0.00'
+  }
+
+  // P&L statement lines — one metric per report line of iceye_pl_report_lines
+  metric pl_revenue {
+    label: 'Revenue'
+    type: 'number'
+    definition: @aql total_net_amount_eur | where(iceye_pl_report_lines.line_code == 'A');;
+    format: '[€]#,###0'
+  }
+  metric pl_gross_margin {
+    label: 'Gross Margin'
+    type: 'number'
+    definition: @aql total_net_amount_eur | where(iceye_pl_report_lines.line_code == 'A-B');;
+    format: '[€]#,###0'
+  }
+  metric pl_ebitda {
+    label: 'EBITDA'
+    type: 'number'
+    definition: @aql total_net_amount_eur | where(iceye_pl_report_lines.line_code == 'A-B-C');;
+    format: '[€]#,###0'
+  }
+  metric pl_net_profit {
+    label: 'Net Profit'
+    type: 'number'
+    definition: @aql total_net_amount_eur | where(iceye_pl_report_lines.line_code == 'A-B-C-D-F');;
+    format: '[€]#,###0'
+  }
+  metric pl_gross_margin_pct {
+    label: 'Gross Margin %'
+    type: 'number'
+    definition: @aql safe_divide(pl_gross_margin, pl_revenue);;
+    format: '#,###0.0%'
+  }
+  metric pl_ebitda_margin_pct {
+    label: 'EBITDA Margin %'
+    type: 'number'
+    definition: @aql safe_divide(pl_ebitda, pl_revenue);;
+    format: '#,###0.0%'
+  }
+  metric pl_net_margin_pct {
+    label: 'Net Margin %'
+    type: 'number'
+    definition: @aql safe_divide(pl_net_profit, pl_revenue);;
+    format: '#,###0.0%'
+  }
+  metric pl_pct_of_revenue {
+    label: '% of Revenue'
+    type: 'number'
+    description: 'Line amount as a share of Revenue for the same period (common-size P&L).'
+    definition: @aql safe_divide(total_net_amount_eur, pl_revenue | of_all(iceye_pl_report_lines));;
+    format: '#,###0.0%'
   }
 }

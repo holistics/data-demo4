@@ -1,0 +1,265 @@
+// The central fact of the Messi demo — one row per senior Argentina appearance (cap).
+//
+// Every other match-level fact hangs off this model: goals and milestones join on `match_id`,
+// and competitive matches reach their tournament through `tournament_id`. `match_id` equals
+// `cap_no` for all 207 rows, so the two are interchangeable as identifiers.
+Model messi_matches {
+  type: 'table'
+  label: 'Matches'
+  description: "Every senior international match Lionel Messi played for Argentina, from his debut on 17 Aug 2005 to the 2026 World Cup final on 19 Jul 2026. One row per appearance (207 caps): who Argentina played, where, in which competition and stage, the score, the result and how many goals Messi scored. This is the appearance fact of the dataset and the model every caps, results and scoring-rate question starts from."
+  data_source_name: 'demo_nam_leo_messi'
+  table_name: '"public"."matches"'
+
+  dimension match_id {
+    label: 'Match Id'
+    type: 'number'
+    description: "The **Match Id** uniquely identifies each appearance and is the primary key.  \nIt is identical to `cap_no` on every row. Goals and milestones join here; count it distinctly for caps whenever `messi_goals` is in the query, because a match with several Messi goals fans out to several goal rows."
+    hidden: false
+    definition: @sql {{ #SOURCE.match_id }};;
+    primary_key: true
+  }
+
+  dimension cap_no {
+    label: 'Cap No'
+    type: 'number'
+    description: "The **Cap No** is the running count of Messi's senior Argentina appearances, 1 (debut vs Hungary, 2005) to 207 (2026 World Cup final).  \nUse it to locate landmark appearances such as the 100th, 148th (most-capped record) or 200th cap."
+    hidden: false
+    definition: @sql {{ #SOURCE.cap_no }};;
+  }
+
+  dimension match_date {
+    label: 'Match Date'
+    type: 'date'
+    description: "The **Match Date** is the day the match was played.  \nThis is the main time lens of the dataset — caps, goals and results over time are all reported against it."
+    hidden: false
+    definition: @sql {{ #SOURCE.match_date }};;
+  }
+
+  dimension year {
+    label: 'Year'
+    type: 'number'
+    format: "0"
+    description: "The **Year** the match was played, stored as a plain number (2005–2026).  \nConvenience column equal to the year of `match_date`; use it for simple calendar-year grouping."
+    hidden: false
+    definition: @sql {{ #SOURCE.year }};;
+  }
+
+  dimension opponent {
+    label: 'Opponent'
+    type: 'text'
+    description: "The **Opponent** is the national team Argentina played, e.g. Brazil, Uruguay, France.  \nGroup by it for head-to-head records and Messi's goals against each nation."
+    hidden: false
+    definition: @sql {{ #SOURCE.opponent }};;
+  }
+
+  dimension opponent_confederation {
+    label: 'Opponent Confederation'
+    type: 'text'
+    description: "The **Opponent Confederation** is the FIFA confederation the opponent belongs to: CONMEBOL, UEFA, CONCACAF, AFC or CAF.  \nCONMEBOL dominates (113 of 207 caps) because World Cup qualifiers and Copa América are played within South America."
+    hidden: false
+    definition: @sql {{ #SOURCE.opponent_confederation }};;
+  }
+
+  dimension competition_type {
+    label: 'Competition Type'
+    type: 'text'
+    description: "The **Competition Type** groups the match into one of five buckets: FIFA World Cup, FIFA World Cup qualification, Copa América, CONMEBOL–UEFA Cup of Champions (Finalissima) or Friendly.  \nThis is the main split for comparing Messi's output across competitions. Copa América Centenario (2016) is classed as Copa América."
+    hidden: false
+    definition: @sql {{ #SOURCE.competition_type }};;
+  }
+
+  dimension is_competitive {
+    label: 'Is Competitive'
+    type: 'truefalse'
+    description: "The **Is Competitive** flag is true for every non-friendly match (146 caps) and false for friendlies (61 caps).  \nCompetitive matches always carry a `tournament_id` and `stage`; friendlies carry neither."
+    hidden: false
+    definition: @sql {{ #SOURCE.is_competitive }};;
+  }
+
+  dimension tournament_id {
+    label: 'Tournament Id'
+    type: 'text'
+    description: "The **Tournament Id** links the match to its tournament or qualifying cycle, e.g. `WC2022`, `CA2021`, `WCQ2026`, `FIN2022`.  \nThis is the ACTIVE join path to `messi_tournaments`. Empty for friendlies."
+    hidden: false
+    definition: @sql {{ #SOURCE.tournament_id }};;
+  }
+
+  dimension stage {
+    label: 'Stage'
+    type: 'text'
+    description: "The **Stage** of the competition the match belongs to: Qualifier, Group, Round of 32, Round of 16, Quarter-final, Semi-final, Third place or Final.  \nEmpty for friendlies. Filter to `Final` for Messi's record in finals (9 matches)."
+    hidden: false
+    definition: @sql {{ #SOURCE.stage }};;
+  }
+
+  dimension city {
+    label: 'City'
+    type: 'text'
+    description: "The **City** the match was played in."
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+
+  dimension country {
+    label: 'Country'
+    type: 'text'
+    description: "The **Country** the match was played in (the venue's country, not the opponent)."
+    hidden: false
+    definition: @sql {{ #SOURCE.country }};;
+  }
+
+  dimension stadium {
+    label: 'Stadium'
+    type: 'text'
+    description: "The **Stadium** the match was played at, e.g. Lusail Stadium.  \nSparse: empty for 121 of 207 matches, including most finals. Use `city` for venue display — it is always populated."
+    hidden: false
+    definition: @sql {{ #SOURCE.stadium }};;
+  }
+
+  dimension home_away_neutral {
+    label: 'Home / Away / Neutral'
+    type: 'text'
+    description: "The **Home / Away / Neutral** venue status from Argentina's perspective: Home, Away or Neutral.  \nTournament matches outside the host nation are Neutral, which is why Neutral is the largest bucket."
+    hidden: false
+    definition: @sql {{ #SOURCE.home_away_neutral }};;
+  }
+
+  dimension argentina_score {
+    label: 'Argentina Score'
+    type: 'number'
+    description: "The **Argentina Score** is the goals Argentina scored, after 90 minutes or after extra time if played.  \nPenalty shootout kicks are NOT included — see `shootout_score`."
+    hidden: false
+    definition: @sql {{ #SOURCE.argentina_score }};;
+  }
+
+  dimension opponent_score {
+    label: 'Opponent Score'
+    type: 'number'
+    description: "The **Opponent Score** is the goals the opponent scored, after 90 minutes or after extra time if played.  \nPenalty shootout kicks are NOT included."
+    hidden: false
+    definition: @sql {{ #SOURCE.opponent_score }};;
+  }
+
+  dimension extra_time {
+    label: 'Extra Time'
+    type: 'truefalse'
+    description: "The **Extra Time** flag is true when the match went beyond 90 minutes (a.e.t.)."
+    hidden: false
+    definition: @sql {{ #SOURCE.extra_time }};;
+  }
+
+  dimension result {
+    label: 'Result Code'
+    type: 'text'
+    description: "The **Result Code** is Argentina's result as a single letter: W, D or L.  \nIt is the result after 90/120 minutes — a match decided on penalties is a **D** here, with the shootout outcome in `shootout_result`. This is the FIFA statistical convention, and the one the 134 wins / 43 draws / 30 losses in the career summary use. Prefer `result_label` for display."
+    hidden: false
+    definition: @sql {{ #SOURCE.result }};;
+  }
+
+  dimension result_label {
+    label: 'Result'
+    type: 'text'
+    description: "The **Result** spelled out: Win, Draw or Loss (90/120 minutes; shootouts count as draws).  \nDerived from `result`. For the outcome after penalties use `result_incl_shootout`."
+    hidden: false
+    definition: @aql case(
+      when: messi_matches.result == 'W', then: 'Win',
+      when: messi_matches.result == 'D', then: 'Draw',
+      when: messi_matches.result == 'L', then: 'Loss'
+    );;
+  }
+
+  dimension result_incl_shootout {
+    label: 'Result (incl. Shootout)'
+    type: 'text'
+    description: "The **Result (incl. Shootout)** resolves penalty shootouts: a drawn match won on penalties becomes Win, one lost on penalties becomes Loss.  \nUse it to answer \"did Argentina advance / lift the trophy\" — e.g. the 2022 World Cup final is a Draw in `result_label` but a Win here."
+    hidden: false
+    definition: @aql case(
+      when: messi_matches.shootout_result == 'W', then: 'Win',
+      when: messi_matches.shootout_result == 'L', then: 'Loss',
+      when: messi_matches.result == 'W', then: 'Win',
+      when: messi_matches.result == 'D', then: 'Draw',
+      when: messi_matches.result == 'L', then: 'Loss'
+    );;
+  }
+
+  dimension shootout_result {
+    label: 'Shootout Result'
+    type: 'text'
+    description: "The **Shootout Result** is W or L when the match was settled on penalties, otherwise empty.  \nAlways paired with a D in `result`. 9 of Messi's caps went to a shootout."
+    hidden: false
+    definition: @sql {{ #SOURCE.shootout_result }};;
+  }
+
+  dimension went_to_shootout {
+    label: 'Went to Shootout'
+    type: 'truefalse'
+    description: "The **Went to Shootout** flag is true when the match was decided on penalties."
+    hidden: false
+    definition: @aql messi_matches.shootout_result is not null;;
+  }
+
+  dimension shootout_score {
+    label: 'Shootout Score'
+    type: 'text'
+    description: "The **Shootout Score** is the penalty shootout score with Argentina first, e.g. `4–2`. Empty when there was no shootout."
+    hidden: false
+    definition: @sql {{ #SOURCE.shootout_score }};;
+  }
+
+  dimension scoreline {
+    label: 'Score'
+    type: 'text'
+    description: "The **Score** as display text, Argentina first, e.g. `3–1`; when the match went to penalties the shootout is appended, e.g. `3–3 (4–2 p)`. Display only — use `argentina_score` / `opponent_score` for arithmetic."
+    hidden: false
+    definition: @sql {{ #SOURCE.argentina_score }}::text || '–' || {{ #SOURCE.opponent_score }}::text
+      || COALESCE(' (' || {{ #SOURCE.shootout_score }} || ' p)', '');;
+  }
+
+  dimension goal_difference {
+    label: 'Goal Difference'
+    type: 'number'
+    description: "The **Goal Difference** is `argentina_score - opponent_score` for the match (shootout kicks excluded). Positive means an Argentina win."
+    hidden: false
+    definition: @aql messi_matches.argentina_score - messi_matches.opponent_score;;
+  }
+
+  dimension messi_goals {
+    label: 'Messi Goals (Match)'
+    type: 'number'
+    description: "The **Messi Goals (Match)** is the number of goals Messi scored in this match, including penalties but not shootout kicks.  \nSums to 125 across the career and agrees with the row count of `messi_goals`. Use it (not a goal row count) for scoring rate per cap, because it needs no join."
+    hidden: false
+    definition: @sql {{ #SOURCE.messi_goals }};;
+  }
+
+  dimension messi_scored {
+    label: 'Messi Scored'
+    type: 'truefalse'
+    description: "The **Messi Scored** flag is true when Messi scored at least once in the match."
+    hidden: false
+    definition: @aql messi_matches.messi_goals > 0;;
+  }
+
+  dimension is_hat_trick {
+    label: 'Is Hat-trick'
+    type: 'truefalse'
+    description: "The **Is Hat-trick** flag is true when Messi scored three or more goals in the match (11 matches)."
+    hidden: false
+    definition: @aql messi_matches.messi_goals >= 3;;
+  }
+
+  dimension coach {
+    label: 'Coach'
+    type: 'text'
+    description: "The **Coach** is the Argentina head coach for the match — nine coaches from José Pékerman (2005) to Lionel Scaloni (2019–2026, 79 caps).  \nGroup by it to compare eras."
+    hidden: false
+    definition: @sql {{ #SOURCE.coach }};;
+  }
+
+  dimension notes {
+    label: 'Notes'
+    type: 'text'
+    description: "The **Notes** are free-text context for notable matches (13 of 207 rows populated). Descriptive only — do not group or filter on it."
+    hidden: false
+    definition: @sql {{ #SOURCE.notes }};;
+  }
+}

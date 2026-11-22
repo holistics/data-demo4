@@ -1,0 +1,5 @@
+{
+ "original_path": "base_views/Meta_Data/project_costs_daily_base.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "view: project_costs_daily_base {\n  sql_table_name: `fl-bi-p-poc.meta_poc.project_costs_daily` ;;\n\n  dimension_group: day {\n    type: time\n    timeframes: [raw, date, week, month, quarter, year]\n    convert_tz: no\n    datatype: date\n    sql: ${TABLE}.day ;;\n  }\n\n  dimension: primary_key {\n    type: string\n    sql: ${TABLE}.primary_key ;;\n  }\n\n  dimension: project_id {\n    type: string\n    sql: ${TABLE}.project_id ;;\n  }\n  dimension: total_dollar_billed {\n    type: number\n    sql: ${TABLE}.total_dollar_billed ;;\n  }\n  dimension: total_tb_billed {\n    type: number\n    sql: ${TABLE}.total_tb_billed ;;\n  }\n  dimension: user_email {\n    type: string\n    sql: ${TABLE}.user_email ;;\n  }\n  measure: count {\n    type: count\n  }\n}\n"
+}

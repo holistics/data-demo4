@@ -40,3 +40,8 @@ Tag {
   color: '#ffff00'
   description: 'Still in progress. Not yet approved for business use.'
 }
+
+Tag {
+  name: 'onboarding'
+  color: '#ffc0cb'
+}

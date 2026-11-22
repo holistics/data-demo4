@@ -1,0 +1,11 @@
+Model maman_gbp_dim_listings {
+  type: 'table'
+  label: 'Google Listings'
+  description: 'Google Business Profile listings. One row per listing. Reached from Store through the crosswalk.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.gbp_dim_listings'
+
+  dimension gbp_listing_id { label: 'Google Listing ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.gbp_listing_id }};; description: 'Google listing ID. Primary key.' }
+  dimension listing_name { label: 'Google Listing Name' type: 'text' definition: @sql {{ #SOURCE.listing_name }};; description: 'Listing name on Google.' }
+  dimension city { label: 'Google Listing City' type: 'text' definition: @sql {{ #SOURCE.city }};; description: 'City of the listing.' }
+}

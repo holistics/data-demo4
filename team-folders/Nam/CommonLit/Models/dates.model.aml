@@ -1,0 +1,121 @@
+Model dates {
+  type: 'table'
+  label: "Dates"
+  description: "Calendar 2024-07-01..2027-06-30. School year runs Jul 1 - Jun 30 (school_year e.g. 2025-26). is_school_day excludes weekends, summer and major breaks."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_dates"'
+
+  dimension date_day {
+    label: "Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.date_day }};;
+    format: 'LLL dd, yyyy'
+    primary_key: true
+  }
+
+  dimension day_of_week_num {
+    label: "Day Of Week Num"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.day_of_week_num }};;
+    format: '0'
+  }
+
+  dimension day_of_week {
+    label: "Day Of Week"
+    type: 'text'
+    definition: @sql {{ #SOURCE.day_of_week }};;
+  }
+
+  dimension is_weekend {
+    label: "Is Weekend"
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.is_weekend }};;
+  }
+
+  dimension week_start {
+    label: "Week"
+    type: 'date'
+    definition: @sql {{ #SOURCE.week_start }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension month_start {
+    label: "Month"
+    type: 'date'
+    definition: @sql {{ #SOURCE.month_start }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension month_label {
+    label: "Month Label"
+    type: 'text'
+    definition: @sql {{ #SOURCE.month_label }};;
+  }
+
+  dimension calendar_year {
+    label: "Calendar Year"
+    type: 'number'
+    definition: @sql {{ #SOURCE.calendar_year }};;
+    format: '0'
+  }
+
+  dimension calendar_quarter {
+    label: "Calendar Quarter"
+    type: 'number'
+    definition: @sql {{ #SOURCE.calendar_quarter }};;
+    format: '0'
+  }
+
+  dimension school_year_start {
+    label: "School Year Start"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_year_start }};;
+    format: '0'
+  }
+
+  dimension school_year {
+    label: "School Year"
+    type: 'text'
+    description: "School year label; a school year runs Jul 1 - Jun 30 (e.g. 2025-26)."
+    definition: @sql {{ #SOURCE.school_year }};;
+  }
+
+  dimension school_year_month_num {
+    label: "School Year Month Num"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_year_month_num }};;
+    format: '0'
+  }
+
+  dimension academic_term {
+    label: "Academic Term"
+    type: 'text'
+    description: "Academic term the date falls in."
+    definition: @sql {{ #SOURCE.academic_term }};;
+  }
+
+  dimension is_school_day {
+    label: "Is School Day"
+    type: 'truefalse'
+    description: "False on weekends, summer and major breaks."
+    definition: @sql {{ #SOURCE.is_school_day }};;
+  }
+
+  dimension is_past {
+    label: "Is Past"
+    type: 'truefalse'
+    description: "True for dates before today in the source data."
+    definition: @sql {{ #SOURCE.is_past }};;
+  }
+
+  dimension school_year_start_date {
+    label: "School Year Start"
+    type: 'date'
+    description: "Jul 1 that opens the school year (2025-07-01 for 2025-26). A real date, so school-year comparisons can shift it by one year."
+    definition: @sql make_date({{ #SOURCE.school_year_start }}, 7, 1);;
+    format: 'LLL dd, yyyy'
+  }
+}

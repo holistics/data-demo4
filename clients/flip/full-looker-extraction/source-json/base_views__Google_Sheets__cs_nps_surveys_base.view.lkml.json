@@ -1,0 +1,5 @@
+{
+ "original_path": "base_views/Google_Sheets/cs_nps_surveys_base.view.lkml",
+ "target_project": "fl-bi-p-poc",
+ "content": "view: cs_nps_surveys_base {\n  sql_table_name: `fl-bi-p-poc.source_google_sheets_poc.cs_nps_surveys` ;;\n\n  dimension: hubspot_company_id {\n    type: string\n    sql: ${TABLE}.hubspot_company_id ;;\n  }\n\n  dimension: hubspot_contact_id {\n    type: string\n    sql: ${TABLE}.hubspot_contact_id ;;\n  }\n\n  dimension: nps_value {\n    type: number\n    sql: ${TABLE}.nps_value ;;\n  }\n\n  dimension_group: survey_start_date {\n    type: time\n    timeframes: [\n      raw,\n      time,\n      date,\n      week,\n      month,\n      quarter,\n      year\n    ]\n    convert_tz: no\n    datatype: date\n    sql: ${TABLE}.survey_start_date ;;\n  }\n\n  dimension: survey_quarter {\n    type: string\n    sql: ${TABLE}.survey_quarter ;;\n  }\n\n  dimension: response_id {\n    type: string\n    sql: ${TABLE}.response_id ;;\n  }\n\n  measure: count {\n    type: count\n    drill_fields: []\n  }\n}\n"
+}

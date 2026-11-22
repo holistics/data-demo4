@@ -1,0 +1,225 @@
+Dashboard tp_holistics_4 {
+  title: 'tp_holistics_4'
+  description: ''
+  owner: 'toan.ppn@holistics.io'
+  block title: TextBlock {
+    content: @md # Holistics 4.0 - Toan Pham ;;
+  }
+  block v_brrn: VizBlock {
+    label: 'Order created in Nov 2023'
+    viz: DataTable {
+      dataset: tp_ecommerce_order_user
+      filter {
+        field: r(tp_ecommerce_orders.created_at)
+        operator: 'matches'
+        value: 'nov 2023'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(tp_ecommerce_orders.created_at)
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(tp_ecommerce_users.full_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(tp_ecommerce_users.email)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block f_order_date: FilterBlock {
+    label: 'Order date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: tp_ecommerce_order_user
+      field: r(tp_ecommerce_orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'nov 2023'
+    }
+  }
+  block t_eygb: TextBlock {
+    content: @md ### What is each user’s Full name and Email?
+------
+;;
+  }
+  block v_2k3s: VizBlock {
+    label: "All user's full name and emails"
+    viz: DataTable {
+      dataset: tp_ecommerce_order_user
+      fields: [
+        VizFieldFull {
+          ref: r(tp_ecommerce_users.full_name)
+          format {
+            type: 'text'
+          }
+          uname: 'tp_ecommerce_users_full_name_1'
+        },
+        VizFieldFull {
+          ref: r(tp_ecommerce_users.email)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'tp_ecommerce_users_full_name_1'
+            direction: 'asc'
+          }
+        ]
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block t_kk4s: TextBlock {
+    content: @md ### Which users made an order in Nov 2023?
+------;;
+  }
+  block t_76lt: TextBlock {
+    content: @md ### How many orders each age range has placed?
+------;;
+  }
+  block v_c67q: VizBlock {
+    label: 'Total orders by age group'
+    viz: ColumnChart {
+      dataset: tp_ecommerce_order_user
+      x_axis: VizFieldFull {
+        ref: r(tp_ecommerce_users.age_group)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: '# orders'
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: '# orders'
+            ref: r(tp_ecommerce_orders.all_orders_count)
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        legend_label: 'hidden'
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 1240
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 60)
+    }
+    block v_brrn {
+      position: pos(660, 260, 620, 420)
+      layer: 1
+    }
+    block f_order_date {
+      position: pos(980, 80, 300, 60)
+      layer: 1
+    }
+    block t_eygb {
+      position: pos(20, 180, 540, 60)
+      layer: 1
+    }
+    block v_2k3s {
+      position: pos(20, 260, 620, 420)
+      layer: 1
+    }
+    block t_kk4s {
+      position: pos(660, 180, 540, 60)
+      layer: 1
+    }
+    block t_76lt {
+      position: pos(20, 720, 540, 60)
+      layer: 1
+    }
+    block v_c67q {
+      position: pos(20, 800, 1240, 220)
+      layer: 1
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        'v_brrn',
+        'v_2k3s',
+        'v_c67q'
+      ]
+      field: r(tp_ecommerce_orders.created_at)
+    },
+    FilterInteraction {
+      from: 'v_brrn'
+      to: [
+        'v_2k3s',
+        'v_c67q'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_2k3s'
+      to: [
+        'v_brrn',
+        'v_c67q'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_c67q'
+      to: [
+        'v_brrn',
+        'v_2k3s'
+      ]
+    }
+  ]
+}

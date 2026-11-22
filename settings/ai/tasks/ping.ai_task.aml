@@ -1,0 +1,12 @@
+AiTask ping {
+  label: 'Ping'
+  brief:
+  @md
+    Say hi
+  ;;
+  acceptance_criteria:
+  @md
+    
+  ;;
+  timeout_minutes: 15
+}

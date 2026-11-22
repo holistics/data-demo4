@@ -1,0 +1,52 @@
+Model school_program_years {
+  type: 'table'
+  label: "School Program Years"
+  description: "Program status of every school for each school year: Partner (paid), Pilot (trialing paid program) or Free. Use to split usage by program."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."dim_school_program_years"'
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension school_year {
+    label: "School Year"
+    type: 'text'
+    definition: @sql {{ #SOURCE.school_year }};;
+  }
+
+  dimension school_year_start {
+    label: "School Year Start"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_year_start }};;
+    format: '0'
+  }
+
+  dimension program_status {
+    label: "Program Status"
+    type: 'text'
+    description: "Program status of the school in that school year: Partner (paid), Pilot (trialing the paid program) or Free."
+    definition: @sql {{ #SOURCE.program_status }};;
+  }
+
+  dimension account_id {
+    label: "Account Id"
+    type: 'text'
+    description: "Paid account the school belongs to in that year (Partner / Pilot only)."
+    hidden: true
+    definition: @sql {{ #SOURCE.account_id }};;
+  }
+
+  dimension program_year_key {
+    label: "Program Year Key"
+    type: 'text'
+    description: "Surrogate primary key school_id|school_year (the table has a composite primary key)."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }}::text || '|' || {{ #SOURCE.school_year }};;
+    primary_key: true
+  }
+}

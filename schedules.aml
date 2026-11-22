@@ -7,5 +7,11 @@ const schedules = [
   PreAggregateSchedule {
     cron: '46 14 * * *' // 14:46 GMT+7 daily
     object: movie_ratings_analysis
+  },
+
+  AiSchedule {
+    cron: '0 8 * * *'
+    targets: [ping]
+    run_as: 'tien.tt@holistics.io'
   }
 ]

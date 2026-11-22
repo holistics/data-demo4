@@ -1,0 +1,91 @@
+Model commonlit_fct_assignments {
+  type: 'table'
+  label: "Assignments"
+  description: "Assignments created by teachers for a class (one content item each)."
+  data_source_name: 'demo_nam_commonlit'
+  table_name: '"commonlit"."fct_assignments"'
+
+  dimension assignment_id {
+    label: "Assignment Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.assignment_id }};;
+    primary_key: true
+  }
+
+  dimension class_id {
+    label: "Class Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.class_id }};;
+  }
+
+  dimension teacher_id {
+    label: "Teacher Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.teacher_id }};;
+  }
+
+  dimension school_id {
+    label: "School Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }};;
+  }
+
+  dimension content_id {
+    label: "Content Id"
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.content_id }};;
+  }
+
+  dimension assigned_date {
+    label: "Assigned Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.assigned_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension due_date {
+    label: "Due Date"
+    type: 'date'
+    definition: @sql {{ #SOURCE.due_date }};;
+    format: 'LLL dd, yyyy'
+  }
+
+  dimension assignment_type {
+    label: "Assignment Type"
+    type: 'text'
+    definition: @sql {{ #SOURCE.assignment_type }};;
+  }
+
+  dimension guided_reading_enabled {
+    label: "Guided Reading Enabled"
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.guided_reading_enabled }};;
+  }
+
+  dimension ai_feedback_enabled {
+    label: "AI Feedback Enabled"
+    type: 'truefalse'
+    definition: @sql {{ #SOURCE.ai_feedback_enabled }};;
+  }
+
+  dimension school_year {
+    label: "School Year (derived)"
+    type: 'text'
+    description: "School year of assigned_date, derived with the same Jul 1 - Jun 30 rule as Dates.school_year. Used only to build the program-year key; filter on Dates.school_year instead."
+    hidden: true
+    definition: @sql case when extract(month from {{ #SOURCE.assigned_date }}) >= 7 then extract(year from {{ #SOURCE.assigned_date }})::int::text || '-' || lpad(((extract(year from {{ #SOURCE.assigned_date }})::int + 1) % 100)::text, 2, '0') else (extract(year from {{ #SOURCE.assigned_date }})::int - 1)::text || '-' || lpad((extract(year from {{ #SOURCE.assigned_date }})::int % 100)::text, 2, '0') end;;
+  }
+
+  dimension program_year_key {
+    label: "Program Year Key"
+    type: 'text'
+    description: "school_id|school_year. Joins this fact to School Program Years (composite key school_id + school_year)."
+    hidden: true
+    definition: @sql {{ #SOURCE.school_id }}::text || '|' || (case when extract(month from {{ #SOURCE.assigned_date }}) >= 7 then extract(year from {{ #SOURCE.assigned_date }})::int::text || '-' || lpad(((extract(year from {{ #SOURCE.assigned_date }})::int + 1) % 100)::text, 2, '0') else (extract(year from {{ #SOURCE.assigned_date }})::int - 1)::text || '-' || lpad((extract(year from {{ #SOURCE.assigned_date }})::int % 100)::text, 2, '0') end);;
+  }
+}

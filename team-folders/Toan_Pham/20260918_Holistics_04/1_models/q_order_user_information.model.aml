@@ -1,0 +1,54 @@
+Model order_user_information {
+  type: 'query'
+  label: 'Order User Information'
+  description: ''
+  data_source_name: 'demodb'
+  dimension user_id {
+    label: 'User Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+  dimension user_name {
+    label: 'User Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.user_name }};;
+  }
+  dimension user_email {
+    label: 'User Email'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.user_email }};;
+  }
+  dimension age_group {
+    label: 'Age Group'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.age_group }};;
+  }
+  dimension count_orders {
+    label: 'Count Orders'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.count_orders }};;
+  }
+
+  owner: 'toan.ppn@holistics.io'
+  query: @sql
+    --How many orders each age range has placed?
+    SELECT
+     {{ #u.id}} user_id,
+     {{ #u.full_name}} user_name,
+     {{ #u.email}} user_email,
+     {{ #u.age_group}},
+     count({{ #o.id}}) count_orders
+
+    FROM {{ #tp_ecommerce_orders o}}
+    LEFT JOIN {{ #tp_ecommerce_users u}} on {{ #o.user_id}} = {{ #u.id}}
+    GROUP BY 1,2,3,4;;
+  models: [
+    tp_ecommerce_users,
+    tp_ecommerce_orders
+  ]
+}

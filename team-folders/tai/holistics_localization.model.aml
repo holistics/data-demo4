@@ -1,0 +1,217 @@
+Model holistics_localization {
+  type: 'table'
+  label: 'Holistics localization'
+  description: ''
+  data_source_name: 'demodb'
+  dimension text {
+    label: 'Text'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.text }};;
+  }
+  dimension snippet {
+    label: 'Snippet'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.snippet }};;
+  }
+  dimension group {
+    label: 'Group'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.group }};;
+  }
+  dimension env {
+    label: 'Env'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.env }};;
+  }
+  dimension file {
+    label: 'File'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.file }};;
+  }
+  dimension line {
+    label: 'Line'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.line }};;
+  }
+  dimension env_confidence {
+    label: 'Env confidence'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.env_confidence }};;
+  }
+  dimension env_reason {
+    label: 'Env reason'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.env_reason }};;
+  }
+  dimension also_in_exports {
+    label: 'Also in exports'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.also_in_exports }};;
+  }
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension module {
+    label: 'Module'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.module }};;
+  }
+  dimension pattern {
+    label: 'Pattern'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.pattern }};;
+  }
+  dimension pattern_name {
+    label: 'Pattern name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.pattern_name }};;
+  }
+  dimension confidence {
+    label: 'Confidence'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.confidence }};;
+  }
+  dimension params {
+    label: 'Params'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.params }};;
+  }
+  dimension slots {
+    label: 'Slots'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.slots }};;
+  }
+  dimension suggested_key {
+    label: 'Suggested key'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.suggested_key }};;
+  }
+  dimension common_candidate {
+    label: 'Common candidate'
+    description: ''
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.common_candidate }};;
+  }
+  dimension ui_context {
+    label: 'Ui context'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.ui_context }};;
+  }
+  dimension call_context {
+    label: 'Call context'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.call_context }};;
+  }
+  dimension call_recipe {
+    label: 'Call recipe'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.call_recipe }};;
+  }
+  dimension flags {
+    label: 'Flags'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.flags }};;
+  }
+  dimension guard_exp {
+    label: 'Guard exp'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.guard_exp }};;
+  }
+  dimension how_to_fix {
+    label: 'How to fix'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.how_to_fix }};;
+  }
+  dimension embed_path {
+    label: 'Embed path'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.embed_path }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'sites.csv'
+    uploaded_at: '2026-10-19 10:12:23'
+    hash: 'bc8a1ba2955bb6c60bda320a9694e1191c53dc8b9f45b7d82ca086b02c0b3891'
+    column_configs: [
+      H.imports.column_config("text", "text", "text"),
+      H.imports.column_config("snippet", "snippet", "text"),
+      H.imports.column_config("group", "group", "text"),
+      H.imports.column_config("env", "env", "text"),
+      H.imports.column_config("file", "file", "text"),
+      H.imports.column_config("line", "line", "number"),
+      H.imports.column_config("env_confidence", "env_confidence", "text"),
+      H.imports.column_config("env_reason", "env_reason", "text"),
+      H.imports.column_config("also_in_exports", "also_in_exports", "truefalse"),
+      H.imports.column_config("id", "id", "text"),
+      H.imports.column_config("module", "module", "text"),
+      H.imports.column_config("pattern", "pattern", "text"),
+      H.imports.column_config("pattern_name", "pattern_name", "text"),
+      H.imports.column_config("confidence", "confidence", "text"),
+      H.imports.column_config("params", "params", "text"),
+      H.imports.column_config("slots", "slots", "text"),
+      H.imports.column_config("suggested_key", "suggested_key", "text"),
+      H.imports.column_config("common_candidate", "common_candidate", "truefalse"),
+      H.imports.column_config("ui_context", "ui_context", "text"),
+      H.imports.column_config("call_context", "call_context", "text"),
+      H.imports.column_config("call_recipe", "call_recipe", "text"),
+      H.imports.column_config("flags", "flags", "text"),
+      H.imports.column_config("guard_exp", "guard_exp", "text"),
+      H.imports.column_config("how_to_fix", "how_to_fix", "text"),
+      H.imports.column_config("embed_path", "embed_path", "text")
+    ]
+  }
+  owner: 'tai.nguyen@holistics.io'
+  table_name: '"dbt_khai"."holistics_sites_csv_efdcb_202610191012"'
+}

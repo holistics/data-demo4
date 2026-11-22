@@ -1,0 +1,12 @@
+Model maman_catalog_store_closures {
+  type: 'table'
+  label: 'Store Closures'
+  description: "Temporary store closures from the semantic catalog, for example Tribeca and Soho renovations. One row per closure window. Ryan's report treats a cafe with a closed week in either compared year as a Transition and holds it out of L4L; the data app applies that rule from these rows."
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.catalog_store_closures'
+
+  dimension store_id { label: 'Store ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.store_id }};; description: 'Catalog store key of the closed store. Joins to Store.' }
+  dimension closed_from { label: 'Closed From' type: 'date' definition: @sql {{ #SOURCE.closed_from }};; description: 'First closed day, inclusive.' }
+  dimension closed_to { label: 'Closed To' type: 'date' definition: @sql {{ #SOURCE.closed_to }};; description: 'Last closed day, inclusive.' }
+  dimension reason { label: 'Closure Reason' type: 'text' definition: @sql {{ #SOURCE.reason }};; description: 'Why the store was closed, for example renovation.' }
+}
