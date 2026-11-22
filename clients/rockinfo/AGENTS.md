@@ -19,13 +19,17 @@ on `rockinfo_clients.client_id` against the Number user attribute `rockinfo_clie
 - Keep cohort params on `rockinfo_clients` (the permission anchor).
 - Keep one dashboard set and one portal for all tenants. Never copy a dashboard or portal per client;
   per-client branding comes from data (`rockinfo_clients.brand_color` via the header metrics).
+- Style every dashboard with the single Rockinfo theme, `themes/rockinfo.theme.aml` (light + dark,
+  derived from rockinfo.com; sources cited in the file). Never add per-client themes; keep header
+  text colours `inherit` so both modes read.
 - Test isolation with an embedded identity, never as an admin or analyst.
 
 **Validate after every AML edit** from the repo root:
 
 ```sh
 holistics aml validate clients/rockinfo/models/*.model.aml clients/rockinfo/datasets/*.aml \
-  clients/rockinfo/dashboards/*.page.aml clients/rockinfo/embeds/*.embed.aml -u rockinfo_client_id:number
+  clients/rockinfo/dashboards/*.page.aml clients/rockinfo/embeds/*.embed.aml \
+  clients/rockinfo/themes/*.theme.aml -u rockinfo_client_id:number
 ```
 
 Then run a real query for changed logic. Runtime AI behaviour is the *Route Context — Rockinfo*
