@@ -1,0 +1,15 @@
+Model maman_datarails_dim_store {
+  type: 'table'
+  label: 'Datarails Stores'
+  description: 'Datarails FP&A store attributes. One row per Datarails location. Reached from Store through the crosswalk. Its maturity label is the FP&A view and can differ from Ryan’s week-level L4L rule.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.datarails_dim_store'
+
+  dimension datarails_store_id { label: 'Datarails Store ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.datarails_store_id }};; description: 'Datarails store ID. Primary key.' }
+  dimension store_name { label: 'Datarails Store Name' type: 'text' definition: @sql {{ #SOURCE.store_name }};; description: 'Store name as held in Datarails.' }
+  dimension opening_date { label: 'Datarails Opening Date' type: 'date' definition: @sql {{ #SOURCE.opening_date }};; description: 'Opening date held in Datarails.' }
+  dimension eow_opening_date { label: 'Datarails EOW Opening Date' type: 'date' definition: @sql {{ #SOURCE.eow_opening_date }};; description: 'Sunday ending the opening week.' }
+  dimension store_format { label: 'Datarails Store Format' type: 'text' definition: @sql {{ #SOURCE.store_format }};; description: 'Store format held in Datarails.' }
+  dimension region { label: 'Datarails Region' type: 'text' definition: @sql {{ #SOURCE.region }};; description: 'Region held in Datarails.' }
+  dimension maturity_label { label: 'Datarails Maturity' type: 'text' definition: @sql {{ #SOURCE.maturity_label }};; description: 'Current FP&A maturity label: L4L, NSO25 or NSO26. A current label, not tied to the selected week.' }
+}

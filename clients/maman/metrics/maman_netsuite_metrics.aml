@@ -1,0 +1,125 @@
+// NetSuite (ERP) booked P&L metrics, by GL transaction date. Needs
+// maman_netsuite_fact_gl_lines. Every % divides summed dollars by summed
+// NetSuite Sales; never average store percentages.
+PartialDataset maman_netsuite_metrics {
+  metric netsuite_sales {
+    label: 'NetSuite Sales'
+    type: 'number'
+    description: 'Booked revenue in USD from NetSuite, net of discounts, by transaction date. Not the same as Toast Net Sales or Datarails Net Sales.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Sales');;
+  }
+  metric netsuite_cogs {
+    label: 'NetSuite COGS'
+    type: 'number'
+    description: 'Booked cost of goods sold in USD from NetSuite, by invoice date. Not the same as MarginEdge Purchases.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'COGS');;
+  }
+  metric netsuite_salary {
+    label: 'NetSuite Salary'
+    type: 'number'
+    description: 'Booked salary in USD from NetSuite. Weekly payroll is dated the Sunday ending the week and booked the following Wednesday.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Salary');;
+  }
+  metric netsuite_hourly {
+    label: 'NetSuite Hourly'
+    type: 'number'
+    description: 'Booked hourly wages in USD from NetSuite. Part of NetSuite Total Labor.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Hourly');;
+  }
+  metric netsuite_other_wages {
+    label: 'NetSuite Other Wages'
+    type: 'number'
+    description: 'Booked other wages in USD from NetSuite, such as overtime, bonus, vacation and sick pay.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Other Wages');;
+  }
+  metric netsuite_benefits_payroll_taxes {
+    label: 'NetSuite Employee Benefits & Payroll Taxes'
+    type: 'number'
+    description: 'Booked employee benefits and payroll taxes in USD from NetSuite. Part of NetSuite Total Labor.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Employee Benefits & Payroll Taxes');;
+  }
+  metric netsuite_other_labor {
+    label: 'NetSuite Other Labor'
+    type: 'number'
+    description: 'Booked labor in USD from NetSuite not classed as salary, hourly, other wages, or benefits and payroll taxes.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Other labor');;
+  }
+  metric netsuite_total_labor {
+    label: 'NetSuite Total Labor'
+    type: 'number'
+    description: 'Booked labor in USD from NetSuite, with benefits and payroll taxes; missing until payroll is booked. Not the same as Harri Labor Cost.'
+    definition: @aql sum(maman_netsuite_fact_gl_lines.amount) | where(maman_netsuite_fact_gl_lines.is_labor_account == true);;
+  }
+  metric netsuite_prime_margin {
+    label: 'NetSuite Prime Margin'
+    type: 'number'
+    description: 'Booked sales minus prime cost (COGS plus labor) in USD, from NetSuite. Missing until both COGS and labor are booked.'
+    definition: @aql case(when: netsuite_cogs is null or netsuite_total_labor is null, then: null, else: netsuite_sales - netsuite_cogs - netsuite_total_labor);;
+  }
+  metric netsuite_cogs_pct {
+    label: 'NetSuite COGS % of Sales'
+    type: 'number'
+    description: 'NetSuite COGS as a % of NetSuite Sales. Not the same as MarginEdge Purchases %.'
+    definition: @aql safe_divide(netsuite_cogs, netsuite_sales);;
+  }
+  metric netsuite_salary_pct {
+    label: 'NetSuite Salary % of Sales'
+    type: 'number'
+    description: 'NetSuite Salary as a % of NetSuite Sales (booked revenue).'
+    definition: @aql safe_divide(netsuite_salary, netsuite_sales);;
+  }
+  metric netsuite_hourly_pct {
+    label: 'NetSuite Hourly % of Sales'
+    type: 'number'
+    description: 'NetSuite Hourly as a % of NetSuite Sales (booked revenue).'
+    definition: @aql safe_divide(netsuite_hourly, netsuite_sales);;
+  }
+  metric netsuite_other_wages_pct {
+    label: 'NetSuite Other Wages % of Sales'
+    type: 'number'
+    description: 'NetSuite Other Wages as a % of NetSuite Sales (booked revenue).'
+    definition: @aql safe_divide(netsuite_other_wages, netsuite_sales);;
+  }
+  metric netsuite_benefits_payroll_taxes_pct {
+    label: 'NetSuite Benefits & Payroll Taxes % of Sales'
+    type: 'number'
+    description: 'NetSuite Employee Benefits & Payroll Taxes as a % of NetSuite Sales (booked revenue).'
+    definition: @aql safe_divide(netsuite_benefits_payroll_taxes, netsuite_sales);;
+  }
+  metric netsuite_other_labor_pct {
+    label: 'NetSuite Other Labor % of Sales'
+    type: 'number'
+    description: 'NetSuite Other Labor as a % of NetSuite Sales (booked revenue).'
+    definition: @aql safe_divide(netsuite_other_labor, netsuite_sales);;
+  }
+  metric netsuite_total_labor_pct {
+    label: 'NetSuite Total Labor % of Sales'
+    type: 'number'
+    description: 'NetSuite Total Labor as a % of NetSuite Sales. The Finance labor %; not the same as Harri Labor %.'
+    definition: @aql safe_divide(netsuite_total_labor, netsuite_sales);;
+  }
+  metric netsuite_prime_margin_pct {
+    label: 'NetSuite Prime Margin % of Sales'
+    type: 'number'
+    description: 'NetSuite Prime Margin as a % of NetSuite Sales (booked revenue). Missing until COGS and labor are booked.'
+    definition: @aql safe_divide(netsuite_prime_margin, netsuite_sales);;
+  }
+  metric netsuite_locations_with_sales {
+    label: 'NetSuite Locations with Sales'
+    type: 'number'
+    description: 'Count of NetSuite locations with any sales booked in the date range. Used to check Finance data coverage.'
+    definition: @aql count_distinct(maman_netsuite_fact_gl_lines.netsuite_location_id) | where(maman_netsuite_fact_gl_lines.pnl_line == 'Sales');;
+  }
+  metric netsuite_locations_with_cogs {
+    label: 'NetSuite Locations with COGS'
+    type: 'number'
+    description: 'Count of NetSuite locations with any COGS booked in the date range. Used to check Finance data coverage.'
+    definition: @aql count_distinct(maman_netsuite_fact_gl_lines.netsuite_location_id) | where(maman_netsuite_fact_gl_lines.pnl_line == 'COGS');;
+  }
+  metric netsuite_locations_with_labor {
+    label: 'NetSuite Locations with Labor'
+    type: 'number'
+    description: 'Count of NetSuite locations with any labor booked in the date range. Lower than locations with sales until payroll is booked.'
+    definition: @aql count_distinct(maman_netsuite_fact_gl_lines.netsuite_location_id) | where(maman_netsuite_fact_gl_lines.is_labor_account == true);;
+  }
+}

@@ -1,0 +1,53 @@
+Model maman_netsuite_fact_gl_lines {
+  type: 'table'
+  label: 'NetSuite GL Lines'
+  description: 'NetSuite general-ledger lines. One row per accounting line. Source of booked NetSuite Sales, COGS, labor and Prime Margin (the Finance tab) and of ERP sales in the weekly sales report. Grouped by transaction date, so late postings and corrections can change a past week. Payroll is dated on the Sunday ending the week and booked the following Wednesday, so the latest week has no labor until then.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.netsuite_fact_gl_lines'
+
+  dimension gl_line_id { label: 'GL Line ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.gl_line_id }};; description: 'NetSuite GL line ID. Primary key.' }
+  dimension transaction_id { label: 'Transaction ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.transaction_id }};; description: 'Parent NetSuite transaction.' }
+  dimension transaction_type { label: 'Transaction Type' type: 'text' definition: @sql {{ #SOURCE.transaction_type }};; description: 'Journal, Bill or Payroll.' }
+  dimension transaction_date { label: 'Transaction Date' type: 'date' definition: @sql {{ #SOURCE.transaction_date }};; description: 'GL transaction date. Joins to the Fiscal Calendar; the weekly Finance tab groups on it.' }
+  dimension posting_period { label: 'Posting Period' type: 'text' definition: @sql {{ #SOURCE.posting_period }};; description: 'NetSuite posting period label, for example FY2026 P11. The management P&L groups on it, not on transaction date, so the two can differ.' }
+  dimension account_id { label: 'Account ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.account_id }};; description: 'GL account. Joins to NetSuite Accounts.' }
+  dimension account_number { label: 'GL Account Number' type: 'text' definition: @sql {{ #SOURCE.account_number }};; description: 'Five-digit account number on the line. P&L Line is derived from it.' }
+  dimension netsuite_location_id { label: 'NetSuite Location ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.netsuite_location_id }};; description: 'NetSuite location of the line. Joins to Store through the crosswalk; lines of locations without a store (headquarters) drop out when you filter or group by a Store field.' }
+  dimension subsidiary { label: 'Subsidiary' type: 'text' definition: @sql {{ #SOURCE.subsidiary }};; description: 'Maman US or Maman Canada.' }
+  dimension amount { label: 'Amount ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.amount }};; description: 'Line amount in USD, reporting sign: sales and costs positive, discounts negative.' }
+  dimension pnl_line {
+    label: 'P&L Line'
+    type: 'text'
+    definition: @sql
+      CASE
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '4') THEN 'Sales'
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '5') THEN 'COGS'
+        WHEN {{ #SOURCE.account_number }} = '61001' THEN 'Salary'
+        WHEN {{ #SOURCE.account_number }} = '61002' THEN 'Hourly'
+        WHEN {{ #SOURCE.account_number }} BETWEEN '61003' AND '61009' THEN 'Other Wages'
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '62') THEN 'Employee Benefits & Payroll Taxes'
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '60') OR STARTS_WITH({{ #SOURCE.account_number }}, '61') THEN 'Other labor'
+        ELSE 'Other'
+      END
+    ;;
+    description: 'Finance tab line of the GL line: Sales (4xxxx), COGS (5xxxx), Salary (61001), Hourly (61002), Other Wages (61003 to 61009), Employee Benefits & Payroll Taxes (62xxx), Other labor (any other 60xxx or 61xxx posting) or Other (operating expense and the rest).'
+  }
+  dimension pnl_line_order {
+    label: 'P&L Line Order'
+    type: 'number'
+    definition: @sql
+      CASE
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '4') THEN 1
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '5') THEN 2
+        WHEN {{ #SOURCE.account_number }} = '61001' THEN 3
+        WHEN {{ #SOURCE.account_number }} = '61002' THEN 4
+        WHEN {{ #SOURCE.account_number }} BETWEEN '61003' AND '61009' THEN 5
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '62') THEN 6
+        WHEN STARTS_WITH({{ #SOURCE.account_number }}, '60') OR STARTS_WITH({{ #SOURCE.account_number }}, '61') THEN 7
+        ELSE 9
+      END
+    ;;
+    description: 'Display order of P&L Line in the Finance statement, 1 = Sales to 7 = Other labor, 9 = Other.'
+  }
+  dimension is_labor_account { label: 'Is Labor Account' type: 'truefalse' definition: @sql SUBSTR({{ #SOURCE.account_number }}, 1, 2) IN ('60', '61', '62');; description: 'True for accounts 60xxx, 61xxx and 62xxx, the accounts in NetSuite Total Labor.' }
+}

@@ -1,0 +1,37 @@
+// Toast item and kitchen metrics for the Scorecard Operating tab (top sellers,
+// campaigns, Average Fulfillment Time). Kept apart from maman_toast_metrics
+// because the weekly sales dataset does not carry these models. Needs
+// maman_toast_agg_item_daily (daily item aggregate of primary, non-voided
+// lines) and maman_toast_kitchen_coverage_daily.
+PartialDataset maman_toast_operations_metrics {
+  metric toast_item_units {
+    label: 'Toast Item Units'
+    type: 'number'
+    description: 'Units sold of menu items in Toast, excluding modifiers and voids. Use it to rank top sellers and campaign items.'
+    definition: @aql sum(maman_toast_agg_item_daily.units);;
+  }
+  metric toast_item_sales {
+    label: 'Toast Item Sales'
+    type: 'number'
+    description: 'Item sales in USD after discounts, from Toast item lines. Not the same as Toast Net Sales, so totals do not tie exactly.'
+    definition: @aql sum(maman_toast_agg_item_daily.item_sales);;
+  }
+  metric toast_kitchen_tickets_covered {
+    label: 'Kitchen Tickets (covered days)'
+    type: 'number'
+    description: 'Count of Toast kitchen tickets on store-days with full kitchen data (covered days). The base for Average Fulfillment Time.'
+    definition: @aql sum(maman_toast_kitchen_coverage_daily.kitchen_ticket_count) | where(maman_toast_kitchen_coverage_daily.coverage_status == 'COVERED');;
+  }
+  metric toast_avg_fulfillment_seconds {
+    label: 'Average Fulfillment Time (seconds)'
+    type: 'number'
+    description: 'Average kitchen time per ticket in seconds, from Toast, on covered store-days only. Kitchen-station time, not full order-to-guest time.'
+    definition: @aql safe_divide(sum(maman_toast_kitchen_coverage_daily.total_fulfillment_seconds) | where(maman_toast_kitchen_coverage_daily.coverage_status == 'COVERED'), toast_kitchen_tickets_covered);;
+  }
+  metric toast_covered_store_days {
+    label: 'Kitchen Covered Store-Days'
+    type: 'number'
+    description: 'Count of store-days with full Toast kitchen data. Check it before comparing fulfillment times across periods.'
+    definition: @aql count(maman_toast_kitchen_coverage_daily.business_date) | where(maman_toast_kitchen_coverage_daily.coverage_status == 'COVERED');;
+  }
+}

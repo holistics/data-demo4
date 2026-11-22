@@ -1,0 +1,10 @@
+Model maman_netsuite_dim_regions {
+  type: 'table'
+  label: 'NetSuite Regions'
+  description: 'NetSuite regions. One row per region. Reached from Store through NetSuite Locations.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.netsuite_dim_regions'
+
+  dimension region_id { label: 'NetSuite Region ID' type: 'number' primary_key: true hidden: true definition: @sql {{ #SOURCE.region_id }};; description: 'NetSuite region ID. Primary key.' }
+  dimension region_name { label: 'NetSuite Region' type: 'text' definition: @sql {{ #SOURCE.region_name }};; description: 'Region name as booked in NetSuite. May differ from the catalog Market.' }
+}

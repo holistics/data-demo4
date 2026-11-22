@@ -1,0 +1,12 @@
+Model maman_planning_forecast_weekly {
+  type: 'table'
+  label: 'Weekly Sales Forecast'
+  description: "Mock stand-in for the forecast Ryan pulls from extracts; Maman's warehouse has no curated forecast yet. One row per store and fiscal week (week end date). Covers Cafe, Catering and Retail & E-Commerce. FY2026 uses the 8+4 cycle (actuals through P8, forecast from P9); FY2025 uses Budget."
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.planning_forecast_weekly'
+
+  dimension store_id { label: 'Store ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.store_id }};; description: 'Catalog store key. Joins to Store.' }
+  dimension week_end_date { label: 'Forecast Week End Date' type: 'date' definition: @sql {{ #SOURCE.week_end_date }};; description: 'Sunday ending the forecast week. Joins to the Fiscal Calendar date, so the row sits on the last day of the week and any fiscal week, period or year filter picks it up.' }
+  dimension forecast_cycle { label: 'Forecast Cycle' type: 'text' definition: @sql {{ #SOURCE.forecast_cycle }};; description: 'Planning scenario of the row: 8+4 for FY2026, Budget for FY2025. One cycle per year, so sums do not double count.' }
+  dimension forecast_sales { label: 'Forecast Sales (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.forecast_sales }};; description: 'Forecast sales in USD for the store and week. Use the Forecast Sales metric rather than this row value.' }
+}

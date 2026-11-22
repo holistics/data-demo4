@@ -1,0 +1,19 @@
+Model maman_harri_fact_labor_clock {
+  type: 'table'
+  label: 'Harri Clocks'
+  description: 'Harri approved clocks. One row per clock or shift. Source of hourly labor cost and Labor Hours. Includes pre-opening shifts for new stores, so Harri labor can exist before Toast sales start.'
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.harri_fact_labor_clock'
+
+  dimension clock_id { label: 'Clock ID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.clock_id }};; description: 'Harri clock ID. Primary key.' }
+  dimension employee_id { label: 'Employee ID' type: 'text' hidden: true definition: @sql {{ #SOURCE.employee_id }};; description: 'Employee who worked the shift. Joins to Harri Employees for pay type.' }
+  dimension harri_location_id { label: 'Harri Location ID' type: 'number' hidden: true definition: @sql {{ #SOURCE.harri_location_id }};; description: 'Location where the shift was worked. Joins to Store through the crosswalk.' }
+  dimension business_date { label: 'Clock Business Date' type: 'date' definition: @sql {{ #SOURCE.business_date }};; description: 'Business date of the shift. Joins to the Fiscal Calendar.' }
+  dimension clock_in_at { label: 'Clock In (UTC)' type: 'datetime' definition: @sql {{ #SOURCE.clock_in_at }};; description: 'UTC clock-in time.' }
+  dimension clock_out_at { label: 'Clock Out (UTC)' type: 'datetime' definition: @sql {{ #SOURCE.clock_out_at }};; description: 'UTC clock-out time.' }
+  dimension regular_hours { label: 'Regular Hours (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.regular_hours }};; description: 'Regular hours on the shift.' }
+  dimension overtime_hours { label: 'Overtime Hours (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.overtime_hours }};; description: 'Overtime hours on the shift.' }
+  dimension paid_hours { label: 'Paid Hours (row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.paid_hours }};; description: 'Paid hours, net of unpaid breaks as deducted by Harri. Labor Hours sums this for hourly staff.' }
+  dimension labor_cost { label: 'Labor Cost ($, row)' type: 'number' hidden: true definition: @sql {{ #SOURCE.labor_cost }};; description: 'Gross pay for the shift in USD, overtime included. NULL for about 1% of clocks (missing cost, not zero); Clocks Missing Cost counts them.' }
+  dimension is_approved { label: 'Clock Is Approved' type: 'truefalse' definition: @sql {{ #SOURCE.is_approved }};; description: 'True when the clock is approved. Labor KPIs keep approved clocks only.' }
+}

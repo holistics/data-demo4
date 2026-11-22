@@ -8,5 +8,10 @@ EmbedPortal test_embed {
     demo_ecommerce_version_2.permission.vendor_access,
     demo_ecommerce_version_2.permission.country_access,
     demo_ecommerce_version_2.permission.city_access
-  ]
+  ],
+  default_user_attributes: {
+    vendor_id: '__ALL__'
+    country: '__ALL__'
+    city: '__ALL__'
+  }
 }

@@ -1,0 +1,40 @@
+// Google Business Profile review metrics. Needs maman_gbp_agg_listing_daily
+// and maman_gbp_fact_review_terms.
+PartialDataset maman_gbp_metrics {
+  metric gbp_reviews_received {
+    label: 'Google Reviews Received'
+    type: 'number'
+    description: 'Count of Google reviews posted in the date range, from Google Business Profile.'
+    definition: @aql sum(maman_gbp_agg_listing_daily.reviews_received);;
+  }
+  metric gbp_avg_rating_received {
+    label: 'Google Average Rating (reviews received)'
+    type: 'number'
+    description: 'Average star rating (1 to 5) of Google reviews posted in the date range, from Google Business Profile. The Scorecard weekly rating.'
+    definition: @aql safe_divide(sum(maman_gbp_agg_listing_daily.rating_sum_received), gbp_reviews_received);;
+  }
+  metric gbp_4_5_star_share {
+    label: 'Google 4-5 Star Share'
+    type: 'number'
+    description: '% of Google reviews posted in the date range that gave 4 or 5 stars, from Google Business Profile.'
+    definition: @aql safe_divide(sum(maman_gbp_agg_listing_daily.reviews_4_5_star), gbp_reviews_received);;
+  }
+  metric gbp_total_reviews {
+    label: 'Google Total Reviews (end of range)'
+    type: 'number'
+    description: 'Total Google reviews to date on the last day of the range, from Google Business Profile. A snapshot, not a sum over days.'
+    definition: @aql sum(maman_gbp_agg_listing_daily.total_review_count) | where(maman_gbp_agg_listing_daily.date == max(maman_gbp_agg_listing_daily.date));;
+  }
+  metric gbp_overall_rating {
+    label: 'Google Overall Rating (end of range)'
+    type: 'number'
+    description: 'Overall Google star rating on the last day of the range, from Google Business Profile. Across stores, weighted by review count.'
+    definition: @aql safe_divide(sum(maman_gbp_agg_listing_daily.overall_rating * maman_gbp_agg_listing_daily.total_review_count) | where(maman_gbp_agg_listing_daily.date == max(maman_gbp_agg_listing_daily.date)), gbp_total_reviews);;
+  }
+  metric gbp_low_star_reviews_mentioning {
+    label: 'Low-Star Reviews Mentioning Term'
+    type: 'number'
+    description: 'Count of 1 to 3 star Google Business Profile reviews that mention a term. Group by Review Term to rank recurring complaints.'
+    definition: @aql count_distinct(maman_gbp_fact_review_terms.review_id);;
+  }
+}

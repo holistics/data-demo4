@@ -1,0 +1,22 @@
+Model maman_toast_fact_orders {
+  type: 'table'
+  label: 'Toast Orders'
+  description: "Toast POS orders. One row per order, no money (money is on Toast Checks). Source of Ryan's order count and of order attributes the checks inherit: daypart, dining option and the Events flag."
+  data_source_name: 'demo_bigquery'
+  table_name: 'maman_demo.toast_fact_orders'
+
+  dimension order_guid { label: 'Order GUID' type: 'text' primary_key: true hidden: true definition: @sql {{ #SOURCE.order_guid }};; description: 'Toast order ID. Primary key; Toast Checks and Item Selections reference it.' }
+  dimension restaurant_guid { label: 'Toast Restaurant GUID' type: 'text' hidden: true definition: @sql {{ #SOURCE.restaurant_guid }};; description: 'Toast restaurant of the order. Joins to Store through the crosswalk.' }
+  dimension business_date { label: 'Order Business Date' type: 'date' definition: @sql {{ #SOURCE.business_date }};; description: 'Toast business date (local trading day) of the order. Joins to the Fiscal Calendar.' }
+  dimension opened_at { label: 'Order Opened At (UTC)' type: 'datetime' definition: @sql {{ #SOURCE.opened_at }};; description: 'UTC timestamp when the order was opened.' }
+  dimension opened_hour_local { label: 'Order Opened Hour (local)' type: 'number' definition: @sql {{ #SOURCE.opened_hour_local }};; description: 'Local hour of day (0 to 23) when the order was opened. Use for sales by hour of day.' }
+  dimension daypart { label: 'Daypart' type: 'text' definition: @sql {{ #SOURCE.daypart }};; description: 'Breakfast (opened before 11:00 local), Lunch (11:00 to 15:00) or Afternoon (after 15:00). Drives the Scorecard breakfast and lunch shares.' }
+  dimension dining_option { label: 'Dining Option' type: 'text' definition: @sql {{ #SOURCE.dining_option }};; description: 'Dine In, To Go, Delivery - DoorDash, Delivery - Uber Eats, Online Ordering, Catering or Event.' }
+  dimension order_source { label: 'Order Source' type: 'text' definition: @sql {{ #SOURCE.order_source }};; description: 'In Store, Online, Third Party or Tripleseat.' }
+  dimension is_event { label: 'Is Event Order' type: 'truefalse' definition: @sql {{ #SOURCE.is_event }};; description: "True for Tripleseat event orders. Events $ (subtracted in Ryan's average ticket) is Toast net sales of these orders." }
+  dimension guest_count { label: 'Guest Count' type: 'number' definition: @sql {{ #SOURCE.guest_count }};; description: 'Guests on the order as entered in Toast.' }
+  dimension is_voided { label: 'Order Is Voided' type: 'truefalse' definition: @sql {{ #SOURCE.is_voided }};; description: 'True when the order was voided. Voided orders are excluded from all KPIs.' }
+  dimension is_deleted { label: 'Order Is Deleted' type: 'truefalse' definition: @sql {{ #SOURCE.is_deleted }};; description: 'True when the order was deleted. Deleted orders are excluded from all KPIs.' }
+  dimension is_excess_food { label: 'Order Is Excess Food' type: 'truefalse' definition: @sql {{ #SOURCE.is_excess_food }};; description: 'True for excess-food (donation or waste) orders. Excluded from all KPIs.' }
+  dimension is_eligible_order { label: 'Is Eligible Order' type: 'truefalse' definition: @sql NOT (COALESCE({{ #SOURCE.is_voided }}, FALSE) OR COALESCE({{ #SOURCE.is_deleted }}, FALSE) OR COALESCE({{ #SOURCE.is_excess_food }}, FALSE));; description: 'True when the order is not voided, deleted or excess food. The Orders metric counts only these.' }
+}
