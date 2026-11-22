@@ -5,7 +5,11 @@ const dropdown = $('userDropdown');
 const userButton = $('userButton');
 let users = [];
 let current;
-let view = 'ai';
+const VIEWS = {
+  ai: ['Rockinfo Insights', 'Ask questions about your own candidates, exams, credentials and vouchers.'],
+  dashboards: ['Dashboards', 'Program performance, learning, credentials and vouchers for your organisation.'],
+};
+let view = VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : 'ai';
 let inflight;
 
 const initials = (name) => name.split(/[\s()]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
@@ -127,16 +131,26 @@ function setDrawer(open) {
   $('payloadToggle').setAttribute('aria-expanded', String(open));
 }
 
-for (const btn of document.querySelectorAll('.seg')) {
-  btn.addEventListener('click', () => {
-    view = btn.dataset.view;
-    for (const b of document.querySelectorAll('.seg')) {
-      b.classList.toggle('active', b === btn);
-      b.setAttribute('aria-selected', String(b === btn));
-    }
-    if (current) load(current);
-  });
+function setView(next) {
+  view = next;
+  $('pageTitle').textContent = VIEWS[view][0];
+  $('pageSub').textContent = VIEWS[view][1];
+  for (const a of document.querySelectorAll('.view-link')) {
+    const on = a.dataset.view === view;
+    a.classList.toggle('active', on);
+    if (on) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  }
 }
+
+window.addEventListener('hashchange', () => {
+  const next = location.hash.slice(1);
+  if (VIEWS[next] && next !== view) {
+    setView(next);
+    if (current) load(current);
+  }
+});
+setView(view);
 
 $('payloadToggle').addEventListener('click', () => setDrawer(!$('payloadPanel').classList.contains('open')));
 $('payloadClose').addEventListener('click', () => setDrawer(false));

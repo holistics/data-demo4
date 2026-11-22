@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <div class="page">
+    <p class="poc-banner" role="note"><strong>Proof of concept · mock data.</strong> Every figure here is synthetic, generated for this PoC. It is not real data from Rockinfo or from any customer named.</p>
     <div class="shell">
       <aside class="sidebar">
         <div class="brand">
@@ -25,7 +27,11 @@
           <a class="nav-item" href="#">Certification</a>
           <a class="nav-item" href="#">Vouchers</a>
           <a class="nav-item" href="#">Credentials</a>
-          <a class="nav-item active" href="#" aria-current="page">Analytics</a>
+        </nav>
+        <nav class="nav" aria-label="Analytics">
+          <p class="nav-section">Analytics</p>
+          <a class="nav-item view-link" href="#dashboards" data-view="dashboards"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Dashboards</a>
+          <a class="nav-item view-link" href="#ai" data-view="ai"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/></svg>Rockinfo Insights<span class="nav-badge">AI</span></a>
         </nav>
         <p class="sidebar-foot">Analytics powered by Holistics, embedded per customer.</p>
       </aside>
@@ -33,8 +39,8 @@
       <main class="main">
         <header class="topbar">
           <div class="page-title">
-            <h1>Analytics</h1>
-            <p>Program performance, learning, credentials and vouchers for your organisation.</p>
+            <h1 id="pageTitle">Rockinfo Insights</h1>
+            <p id="pageSub">Ask questions about your own candidates, exams, credentials and vouchers.</p>
           </div>
           <div class="user-menu">
             <button class="user-button" id="userButton" type="button" aria-haspopup="menu" aria-expanded="false">
@@ -50,13 +56,6 @@
         </header>
 
         <section class="toolbar" aria-label="Embed actions">
-          <div class="segmented" role="tablist" aria-label="Portal view">
-            <button class="seg active" id="viewAi" type="button" role="tab" aria-selected="true" data-view="ai">
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/></svg>
-              Ask AI
-            </button>
-            <button class="seg" id="viewDashboards" type="button" role="tab" aria-selected="false" data-view="dashboards">Dashboards</button>
-          </div>
           <button class="tool" id="payloadToggle" type="button" aria-expanded="false">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 6l-4 4 4 4M13 6l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             View embed payload
@@ -75,6 +74,7 @@
           </div>
         </section>
       </main>
+    </div>
     </div>
 
     <div class="scrim" id="scrim" hidden></div>
