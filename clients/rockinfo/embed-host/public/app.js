@@ -477,7 +477,8 @@ try {
   plans = cfg.plans || [];
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
   setView(viewFromHash());
-  load(users[0]);
+  // The homepage opens as the first tenant's Client admin (Enterprise), which sees every section.
+  load(users.find((u) => u.tenantSlug === users[0].tenantSlug && u.plan === 'enterprise') || users[0]);
 } catch (e) {
   setState(`Could not load config: ${e.message}`, true);
 }
