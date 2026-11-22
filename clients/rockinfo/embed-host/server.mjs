@@ -93,7 +93,9 @@ function embedToken(identityId, view) {
   // payload is returned for the demo's "What the token says" panel; it holds no secret
   // Rockinfo Insights opens the full-page Ask AI view; Dashboards opens the main dashboard.
   const path = view === 'dashboards' ? '/objects/rockinfo_program_performance' : '/ai';
-  return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}`, payload }];
+  // Collapse the Holistics portal's own left nav: the Rockinfo sidebar is the navigation.
+  // Holistics offers only expanded or collapsed, so a small toggle icon stays top-left.
+  return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}&left_panel_state=collapsed`, payload }];
 }
 
 createServer(async (req, res) => {
