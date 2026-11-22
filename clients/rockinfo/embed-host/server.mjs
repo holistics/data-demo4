@@ -80,7 +80,7 @@ function config() {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
       title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds, views: viewsFor(i),
-      plan: i.plan, caps: i.caps, home: homeFor(i),
+      plan: i.plan, planName: i.planName, caps: i.caps, home: homeFor(i),
     })),
     plans: PLANS,
     sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub, native }) => ({ id, title, sub, native: !!native })) })),
@@ -99,7 +99,7 @@ function embedToken(identityId, view) {
   if (!env.HOLISTICS_EMBED_KEY_ID || !env.HOLISTICS_EMBED_SECRET) {
     return [500, { error: 'Embed credential is not configured on this deployment.' }];
   }
-  // Every permission below comes from the identity's plan (lib/tenants.mjs PLANS).
+  // Every permission below is what both the tenant's plan and the user's role allow (lib/tenants.mjs).
   const c = identity.caps;
   const payload = {
     embed_portal: identity.portal,
