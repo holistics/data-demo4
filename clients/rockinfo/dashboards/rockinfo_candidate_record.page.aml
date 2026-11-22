@@ -28,11 +28,11 @@ Dashboard rockinfo_candidate_record {
       content: @md <div style="display:flex;align-items:center;gap:16px;height:100%;padding:4px 8px;font-family:Inter,ui-sans-serif,system-ui,sans-serif;border-left:6px solid {{ rows[0].values.`Color`.raw }}">
       <div style="width:52px;height:52px;border-radius:12px;background:{{ rows[0].values.`Color`.raw }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:none">&#127891;</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">{{ rows[0].values.`Industry` }}</div>
-        <div style="font-size:24px;font-weight:700;color:#111827;line-height:1.25">{{ rows[0].values.`Client` }} <span style="color:{{ rows[0].values.`Color`.raw }}">&middot;</span> Candidate Record</div>
-        <div style="font-size:13px;color:#4B5563">Learning, exams and credentials for one candidate on a single record.</div>
+        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:inherit;opacity:.65">{{ rows[0].values.`Industry` }}</div>
+        <div style="font-size:24px;font-weight:700;color:inherit;font-family:'Inter Tight',Inter,sans-serif;line-height:1.25">{{ rows[0].values.`Client` }} <span style="color:{{ rows[0].values.`Color`.raw }}">&middot;</span> Candidate Record</div>
+        <div style="font-size:13px;color:inherit;opacity:.8">Learning, exams and credentials for one candidate on a single record.</div>
       </div>
-      <div style="font-size:11px;color:#9CA3AF;text-align:right;flex:none">Powered by Rockinfo<br/>Analytics</div>
+      <div style="font-size:11px;color:inherit;opacity:.55;text-align:right;flex:none">Powered by Rockinfo<br/>Analytics</div>
     </div>;;
     }
     settings {
@@ -224,6 +224,10 @@ Dashboard rockinfo_candidate_record {
       position: pos(620, 720, 580, 260)
     }
     default_zoom: 'fit_to_width'
+  }
+  theme: DynamicPageTheme {
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
   }
   settings {
     timezone: 'America/New_York'
