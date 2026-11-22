@@ -25,6 +25,8 @@ EmbedPortal rockinfo_client_portal {
     customization {
       global {
         assistant_name: 'Rocky AI'
+        // Rocky's avatar, served by the embed host (embed-host/public/assets/rocky-ai.png).
+        icon: 'https://rockinfo-embed.pages.holistics.dev/assets/rocky-ai.png'
       }
       chat_page {
         intro {
