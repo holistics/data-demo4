@@ -85,3 +85,4 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   embed-token fields; the embed host's Plans & permissions page shows what each can and cannot do.
 
 See `docs/embed-payloads.md` for the token payloads and `docs/call-prep.md` for the call brief.
+Work-in-progress notes between sessions live in `docs/handoff/`.
