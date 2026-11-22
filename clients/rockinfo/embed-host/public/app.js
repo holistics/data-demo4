@@ -34,6 +34,7 @@ const ICONS = {
   ai: '<path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/>',
   dashboards: '<path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   team: '<path d="M4 3.5h8l4 4V16.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 13v-2M10 13V9M13 13v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  personal: '<path d="M4 3.5h8l4 4V16.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="10" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.8 14.5c.6-1.5 1.8-2.2 3.2-2.2s2.6.7 3.2 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   datasets: '<ellipse cx="10" cy="5" rx="6" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V5M4 10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
 };
 
@@ -106,21 +107,21 @@ function navGroup(labelText) {
   return group;
 }
 
+// A plan capability is on unless it is false or 'no_access' (org_workspace_role).
+const hasCap = (key) => {
+  const v = current?.caps?.[key];
+  return !!v && v !== 'no_access';
+};
+
+// Team reports appear only for plans with an org workspace; My reports only for Creators, and
+// Holistics lists only the viewer's own personal dashboards, so each person sees just theirs.
 function renderWorkspaceSections(nav) {
   for (const ws of workspaceSections) {
-    if (ws.requires && !current?.caps?.[ws.requires]) continue;
-    // Program Dashboards has no Team reports: show the upsell instead of an empty list.
-    if (ws.locked && current?.caps?.org === 'no_access') {
-      const group = navGroup(ws.label);
-      const p = el('p', 'nav-empty nav-locked', ws.locked);
-      group.appendChild(p);
-      nav.appendChild(group);
-      continue;
-    }
+    if (ws.requires && !hasCap(ws.requires)) continue;
     const items = workspaceItems[ws.key] || [];
     if (!items.length && !ws.empty) continue;
     const group = navGroup(ws.label);
-    for (const d of items) group.appendChild(navLink(`ws:${d.uname}`, d.title, wsItem(`ws:${d.uname}`).sub, 'team'));
+    for (const d of items) group.appendChild(navLink(`ws:${d.uname}`, d.title, wsItem(`ws:${d.uname}`).sub, ws.icon || 'team'));
     if (!items.length) {
       const p = document.createElement('p');
       p.className = 'nav-empty';

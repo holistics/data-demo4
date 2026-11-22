@@ -1,26 +1,229 @@
 Dashboard untitled_fbkkj {
-  title: 'Untitled'
+  title: 'My Region: Partner Pipeline'
+  description: 'Laura Martín (Lenovo partner manager), private: candidates moving from course to exam to credential, by partner and region. Point in time.'
   owner: 'embed_c76800c0eabd40c561@holistics.io'
   block title: TextBlock {
-    content: @md # Your title goes here ;;
+    content: @md
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6">My report &middot; Personal workspace &middot; only Laura Martín can see this</div>
+
+      # My Region: Partner Pipeline
+
+      How far each partner gets its candidates: started, sat the exam, certified.
+    ;;
   }
-  explicit_interactions: []
+  block f_region: FilterBlock {
+    label: 'Partner Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_region)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block k1: VizBlock {
+    label: 'Started a Course'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.candidates_started_course)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k2: VizBlock {
+    label: 'Sat an Exam'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.candidates_sat_exam)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k3: VizBlock {
+    label: 'Certified'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.candidates_certified)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block c1: VizBlock {
+    label: 'Certified candidates by partner region'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        ref: r(rockinfo_partners.partner_region)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.candidates_certified)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        x_axis_label: ' '
+        sort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block t1: VizBlock {
+    label: 'Partner pipeline'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_name)
+          uname: 't1_d0'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_region)
+          uname: 't1_d1'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_type)
+          uname: 't1_d2'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.candidates_started_course)
+          uname: 't1_m0'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.candidates_completed_course)
+          uname: 't1_m1'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.candidates_sat_exam)
+          uname: 't1_m2'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.candidates_certified)
+          uname: 't1_m3'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.pass_rate)
+          uname: 't1_m4'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 't1_m3'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 5000
+        show_row_number: true
+      }
+    }
+  }
+
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 800
+    height: 1240
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(20, 20, 1260, 60)
+      position: pos(20, 20, 1260, 100)
+    }
+    block f_region {
+      position: pos(20, 140, 300, 80)
+    }
+    block f_partner {
+      position: pos(340, 140, 300, 80)
+    }
+    block k1 {
+      position: pos(20, 240, 406, 120)
+    }
+    block k2 {
+      position: pos(446, 240, 406, 120)
+    }
+    block k3 {
+      position: pos(872, 240, 406, 120)
+    }
+    block c1 {
+      position: pos(20, 380, 1260, 380)
+    }
+    block t1 {
+      position: pos(20, 780, 1260, 440)
     }
     mobile {
       mode: 'auto'
     }
   }
   theme: DynamicPageTheme {
-    light: H.themes.vanilla
-    dark: H.themes.charcoal
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
   }
   settings {
     autorun_on_open: true

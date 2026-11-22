@@ -79,13 +79,17 @@ export const canOpen = (identity, viewId) => {
 // Dashboards the tenant's own editors saved to their shared (org) or personal workspace.
 // Holistics lists them in the iframe's embed:loaded event; the sidebar shows them under
 // these sections and opens one as view `ws:<uname>`. Holistics enforces who may open it.
+// `requires` names the plan capability that shows the section: an org workspace for Team
+// reports (Program Dashboards has none), a Creator seat for My reports.
 export const WORKSPACE_SECTIONS = [
   {
-    key: 'org', label: 'Team reports',
+    key: 'org', label: 'Team reports', requires: 'org', icon: 'team',
     empty: 'No team reports yet. Creators build one in Explore and publish it to the team.',
-    locked: 'Team reports come with Analytics Studio: your Creators build reports and share them with everyone here.',
   },
-  { key: 'personal', label: 'My reports', requires: 'personal' },
+  {
+    key: 'personal', label: 'My reports', requires: 'personal', icon: 'personal',
+    empty: 'Only you can see these. Save a Rocky AI answer or build a report in Explore, and choose Personal workspace.',
+  },
 ];
 const UNAME = /^[a-z0-9_]+(\.[a-z0-9_]+)?$/;
 export const workspaceView = (viewId) => {
