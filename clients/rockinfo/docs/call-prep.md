@@ -32,7 +32,7 @@ Data store: "Database" (unspecified: confirm the engine).
 7. **Tenant switch**: token for Lenovo (102). Same portal and dashboard, re-branded from data,
    different programs and partners, no Adobe data anywhere, AI included. These are Rockinfo's
    own customers, with synthetic numbers: say so up front.
-8. **Self-service and packaging**: as the Adobe client admin (Enterprise), build a chart in Explore and publish it to Team reports; switch to the Adobe partner success viewer to see it arrive, then to Cloudinary (Essentials) to show a cheaper plan. Close on **Plans & permissions**: what Rockinfo includes free and what it charges for.
+8. **Self-service and packaging**: as Maya Chen (Adobe program manager, Creator + Publisher on Studio Enterprise), ask Rocky, save the answer and publish it to Team reports. Switch to Tom Becker (Adobe VP, Viewer) to see it arrive and ask Rocky a follow-up; to Priya Raman (Viewer + Data Export) to download the rows; to Daniel Okafor (Creator) to show building privately without publishing rights; then to Ben Walker at Cloudinary (Program Dashboards) for the included tier with Team reports locked. Close on **Plans & permissions**: give away what spreads usage, charge for authorship, control and data leaving.
 9. **Code**: dataset AML, permission block, Git.
 
 ## Discovery questions

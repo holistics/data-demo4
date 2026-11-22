@@ -80,7 +80,11 @@ export const canOpen = (identity, viewId) => {
 // Holistics lists them in the iframe's embed:loaded event; the sidebar shows them under
 // these sections and opens one as view `ws:<uname>`. Holistics enforces who may open it.
 export const WORKSPACE_SECTIONS = [
-  { key: 'org', label: 'Team reports', empty: 'No team reports yet. Enterprise users build one in Explore and publish it to the Shared workspace.' },
+  {
+    key: 'org', label: 'Team reports',
+    empty: 'No team reports yet. Creators build one in Explore and publish it to the team.',
+    locked: 'Team reports come with Analytics Studio: your Creators build reports and share them with everyone here.',
+  },
   { key: 'personal', label: 'My reports', requires: 'personal' },
 ];
 const UNAME = /^[a-z0-9_]+(\.[a-z0-9_]+)?$/;

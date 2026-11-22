@@ -3,13 +3,14 @@
 // id; tenant, portal and permissions are resolved here, so nobody can switch tenant or
 // plan by editing the request.
 
-// Each tenant is on one plan, most expensive first; the persona menu keeps this order.
+// Each tenant buys one plan, most expensive first (the persona menu keeps this order), and
+// optionally the Data Export add-on.
 export const TENANTS = [
-  { id: 101, slug: 'adobe', name: 'Adobe', accent: '#EB1000', plan: 'enterprise' },
-  { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', plan: 'enterprise' },
-  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', plan: 'selfservice' },
-  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', plan: 'insights' },
-  { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', plan: 'essentials' },
+  { id: 101, slug: 'adobe', name: 'Adobe', accent: '#EB1000', plan: 'enterprise', dataExport: true },
+  { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', plan: 'enterprise', dataExport: true },
+  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', plan: 'studio', dataExport: true },
+  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', plan: 'studio', dataExport: false },
+  { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', plan: 'dashboards', dataExport: false },
 ];
 
 // A fictional person behind each embed_user_id, so "Built by" reads like a real user.
@@ -31,59 +32,73 @@ export const ALL_CLIENT_IDS = [101, 102, 103, 104, 105, 106, 107, 108, 109];
 // header inside the dashboard; tenant isolation comes from rockinfo_client_id.
 export const PORTAL = 'rockinfo_client_portal';
 
-// Analytics plans, cheapest first. Each capability maps to one embed-token field
-// (see tokenFor in ../server.mjs); `explore` is enforced by the host sidebar because the
-// dataset stays in the shared portal for Ask AI.
+// What a customer org buys (the plan sets the limit) versus what a person in it can do (the
+// role their admin assigns). Each capability maps to one embed-token field (see ../server.mjs);
+// `explore` is enforced by the host sidebar because the dataset stays in the shared portal for
+// Rocky AI.
+//   ai: Rocky AI for every user.  build: Creators get Explore and My reports.
+//   publish: who may publish Team reports: 'none' (no Team reports at all), 'creators' (every
+//   Creator) or 'publishers' (only roles the admin names Publisher).
 export const PLANS = [
   {
-    key: 'essentials', name: 'Essentials', price: 'Included',
-    pitch: 'Every user gets the standard dashboards and the reports their team publishes.',
-    caps: { ai: false, explore: false, org: 'viewer', personal: false, pdf: true, csv: false, schedules: false },
+    key: 'dashboards', name: 'Program Dashboards', price: 'Included',
+    pitch: 'Your certification program, measured from day one: Rockinfo dashboards, PDF export and scheduled email reports for every user.',
+    ai: false, build: false, publish: 'none', roles: ['viewer'],
   },
   {
-    key: 'insights', name: 'Insights', price: 'Add-on',
-    pitch: 'Adds Rocky AI and scheduled email reports, without building anything.',
-    caps: { ai: true, explore: false, org: 'viewer', personal: false, pdf: true, csv: false, schedules: true },
+    key: 'studio', name: 'Analytics Studio', price: 'Add-on · per Creator seat',
+    pitch: 'Everyone asks Rocky AI. Creators explore, build their own reports and publish them to the team. Viewers are always free.',
+    ai: true, build: true, publish: 'creators', roles: ['editor', 'viewer'],
   },
   {
-    key: 'selfservice', name: 'Self-service', price: 'Add-on',
-    pitch: 'Adds Explore and a private workspace to build their own reports.',
-    caps: { ai: true, explore: true, org: 'viewer', personal: true, pdf: true, csv: false, schedules: true },
-  },
-  {
-    key: 'enterprise', name: 'Enterprise', price: 'Premium',
-    pitch: 'Publishes self-built reports to the whole team and downloads raw data.',
-    caps: { ai: true, explore: true, org: 'editor', personal: true, pdf: true, csv: true, schedules: true },
+    key: 'enterprise', name: 'Studio Enterprise', price: 'Premium',
+    pitch: 'Analytics Studio with publishing controls: the admin names who publishes, so Team reports stay curated as more people build.',
+    ai: true, build: true, publish: 'publishers', roles: ['admin', 'editor', 'viewer'],
   },
 ];
 
-// Roles inside a tenant, most permissions first. A user gets what both the role and the
-// tenant's plan allow. Role keys are the embed_user_id suffix, so earlier personas
-// (adobe_admin, adobe_editor, ...) keep their personal dashboards.
+// Sold on top of any plan; gives raw rows to the people the admin chooses.
+export const ADDONS = [
+  {
+    key: 'dataExport', name: 'Data Export', price: 'Add-on · any plan',
+    pitch: 'Row-level CSV and Excel for the people the admin chooses, to reconcile vouchers or load a CRM.',
+    role: 'analyst',
+  },
+];
+
+// Roles inside a tenant, most permissions first. Keys are the embed_user_id suffix, so earlier
+// personas (adobe_admin, adobe_editor, ...) keep their reports and personal dashboards.
 export const ROLES = [
-  {
-    key: 'admin', title: 'Client admin', pitch: 'Everything the plan includes, and publishes reports to the whole team.',
-    caps: { ai: true, explore: true, org: 'editor', personal: true, pdf: true, csv: true, schedules: true },
-  },
-  {
-    key: 'editor', title: 'Program manager', pitch: 'Builds private reports in Explore.',
-    caps: { ai: true, explore: true, org: 'viewer', personal: true, pdf: true, csv: false, schedules: true },
-  },
-  {
-    key: 'analyst', title: 'Program analyst', pitch: 'Asks Rocky AI and schedules email reports.',
-    caps: { ai: true, explore: false, org: 'viewer', personal: false, pdf: true, csv: false, schedules: true },
-  },
-  {
-    key: 'viewer', title: 'Partner success viewer', pitch: 'Reads the dashboards and team reports.',
-    caps: { ai: false, explore: false, org: 'viewer', personal: false, pdf: true, csv: false, schedules: false },
-  },
+  { key: 'admin', title: 'Program manager', creator: true, publisher: true, pitch: 'Builds reports and decides what reaches the whole team.' },
+  { key: 'editor', title: 'Partner manager', creator: true, publisher: false, pitch: 'Builds reports with Rocky AI and Explore.' },
+  { key: 'analyst', title: 'Channel operations analyst', creator: false, export: true, pitch: 'Pulls the rows behind a report into finance and CRM tools.' },
+  { key: 'viewer', title: 'VP partner ecosystem', creator: false, pitch: 'Reads Rockinfo dashboards and team reports, and gets them by email.' },
 ];
 
-const capsFor = (plan, role) =>
-  Object.fromEntries(
-    Object.keys(plan).map((k) => [k, k === 'org' ? (plan.org === 'editor' && role.org === 'editor' ? 'editor' : 'viewer') : plan[k] && role[k]]),
-  );
-const sameCaps = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const canPublish = (plan, role) => plan.build && role.creator && (plan.publish === 'creators' || (plan.publish === 'publishers' && role.publisher));
+
+export function capsFor(plan, role, tenant) {
+  const build = plan.build && role.creator;
+  return {
+    ai: plan.ai,
+    explore: build,
+    personal: build,
+    // Program Dashboards has no Team reports at all, so the org workspace is hidden by Holistics.
+    org: plan.publish === 'none' ? 'no_access' : canPublish(plan, role) ? 'editor' : 'viewer',
+    pdf: true,
+    schedules: true,
+    csv: !!(tenant.dataExport && role.export),
+  };
+}
+
+// The seat a person holds: what the plan and their role add up to.
+export function seatFor(plan, role, tenant) {
+  if (plan.build && role.creator) {
+    if (!canPublish(plan, role)) return 'Creator, builds privately';
+    return plan.publish === 'publishers' ? 'Creator + Publisher' : 'Creator';
+  }
+  return tenant.dataExport && role.export ? 'Viewer + Data Export' : 'Viewer';
+}
 
 const INTERNAL_CAPS = { ai: true, explore: true, org: 'editor', personal: true, pdf: true, csv: true, schedules: true };
 
@@ -91,12 +106,10 @@ export function identities() {
   const list = [];
   for (const t of TENANTS) {
     const p = PLANS.find((x) => x.key === t.plan);
-    const seen = [];
-    for (const r of ROLES) {
-      const caps = capsFor(p.caps, r.caps);
-      // Skip a middle role the plan makes identical to one above it; admin and viewer always show.
-      if (r.key !== 'viewer' && seen.some((c) => sameCaps(c, caps))) continue;
-      seen.push(caps);
+    const keys = [...p.roles];
+    if (t.dataExport) keys.splice(keys.length - 1, 0, 'analyst');
+    for (const r of ROLES.filter((x) => keys.includes(x.key))) {
+      const seat = seatFor(p, r, t);
       list.push({
         id: `${t.slug}_${r.key}`,
         name: PEOPLE[`${t.slug}_${r.key}`],
@@ -104,10 +117,12 @@ export function identities() {
         tenantName: t.name,
         accent: t.accent,
         title: r.title,
-        role: r.pitch,
+        seat,
+        role: `${seat} · ${r.pitch}`,
         plan: p.key,
-        planName: p.name,
-        caps,
+        planName: p.name + (t.dataExport ? ' + Data Export' : ''),
+        dataExport: !!t.dataExport,
+        caps: capsFor(p, r, t),
         clientIds: [t.id],
         orgId: `client_${t.id}`,
         portal: PORTAL,
@@ -121,6 +136,7 @@ export function identities() {
     tenantName: 'Rockinfo (all customers)',
     accent: '#0B6E4F',
     title: 'Rockinfo internal admin',
+    seat: 'Internal',
     role: 'Sees every customer in the same portal',
     plan: 'internal',
     planName: 'Internal',

@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PLANS, identities, people } from './lib/tenants.mjs';
+import { ADDONS, PLANS, ROLES, identities, people } from './lib/tenants.mjs';
 import * as reportMeta from './lib/report-meta.mjs';
 import { DEFAULT_VIEW, SECTIONS, VIEWS, WORKSPACE_SECTIONS, canOpen, homeFor, viewsFor, workspaceView } from './lib/portal.mjs';
 
@@ -83,10 +83,12 @@ function config() {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
       title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds, views: viewsFor(i),
-      name: i.name, plan: i.plan, planName: i.planName, caps: i.caps, home: homeFor(i),
+      name: i.name, plan: i.plan, planName: i.planName, seat: i.seat, dataExport: !!i.dataExport, caps: i.caps, home: homeFor(i),
     })),
     people: people(),
     plans: PLANS,
+    addons: ADDONS,
+    roles: ROLES,
     sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub, native }) => ({ id, title, sub, native: !!native })) })),
     workspaceSections: WORKSPACE_SECTIONS,
     defaultView: DEFAULT_VIEW,

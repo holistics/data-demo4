@@ -19,8 +19,8 @@ from the tenant row (client name and colour), so no per-customer copies exist.
   `scripts/report-meta.mjs`, then polls the public `holistics/data-demo4` commit history every
   90 s without a credential and applies each `Embed user <id>` commit, so edits made in the embed
   show without a redeploy. `PEOPLE` in `lib/tenants.mjs` names the person behind each `embed_user_id`.
-- `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), each on one of four plans (`PLANS`: Enterprise, Self-service,
-  Insights, Essentials), user roles (`ROLES`, admin first) capped by that plan, and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
+- `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), each buying one plan (`PLANS`: Program Dashboards, Analytics Studio,
+  Studio Enterprise) and optionally the Data Export add-on (`ADDONS`), user roles (`ROLES`) turned into token fields by `capsFor`, and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
 
 ## Env
 
