@@ -400,6 +400,7 @@ Dashboard rockinfo_program_performance {
           uname: 'ps_type'
         },
         VizFieldFull {
+          label: 'Enrolments'
           ref: r(rockinfo_credentialing.enrolments)
           format {
             type: 'number'
@@ -408,6 +409,7 @@ Dashboard rockinfo_program_performance {
           uname: 'ps_enr'
         },
         VizFieldFull {
+          label: 'Completion Rate'
           ref: r(rockinfo_credentialing.completion_rate)
           format {
             type: 'number'
@@ -416,6 +418,7 @@ Dashboard rockinfo_program_performance {
           uname: 'ps_cr'
         },
         VizFieldFull {
+          label: 'Exam Attempts'
           ref: r(rockinfo_credentialing.exam_attempts)
           format {
             type: 'number'
@@ -424,6 +427,7 @@ Dashboard rockinfo_program_performance {
           uname: 'ps_att'
         },
         VizFieldFull {
+          label: 'First-Attempt Pass'
           ref: r(rockinfo_credentialing.first_attempt_pass_rate)
           format {
             type: 'number'
@@ -432,6 +436,7 @@ Dashboard rockinfo_program_performance {
           uname: 'ps_fapr'
         },
         VizFieldFull {
+          label: 'Credentials'
           ref: r(rockinfo_credentialing.credentials_issued)
           format {
             type: 'number'
@@ -440,6 +445,7 @@ Dashboard rockinfo_program_performance {
           uname: 'ps_cred'
         },
         VizFieldFull {
+          label: 'Voucher Sales'
           ref: r(rockinfo_credentialing.voucher_sales)
           format {
             type: 'number'
@@ -494,11 +500,35 @@ Dashboard rockinfo_program_performance {
         column_styles: [
           ColumnStyle {
             key: 'ps_name'
-            width: 300
+            width: 320
           },
           ColumnStyle {
             key: 'ps_type'
-            width: 150
+            width: 140
+          },
+          ColumnStyle {
+            key: 'ps_enr'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'ps_cr'
+            width: 120
+          },
+          ColumnStyle {
+            key: 'ps_att'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'ps_fapr'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'ps_cred'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'ps_sales'
+            width: 110
           }
         ]
         wrap_header_text: true
@@ -533,6 +563,7 @@ Dashboard rockinfo_program_performance {
           uname: 'p_cand'
         },
         VizFieldFull {
+          label: 'Pass Rate'
           ref: r(rockinfo_credentialing.pass_rate)
           format {
             type: 'number'
@@ -541,6 +572,7 @@ Dashboard rockinfo_program_performance {
           uname: 'p_pass'
         },
         VizFieldFull {
+          label: 'Vouchers Issued'
           ref: r(rockinfo_credentialing.vouchers_issued)
           format {
             type: 'number'
@@ -549,6 +581,7 @@ Dashboard rockinfo_program_performance {
           uname: 'p_vi'
         },
         VizFieldFull {
+          label: 'Redemption Rate'
           ref: r(rockinfo_credentialing.redemption_rate)
           format {
             type: 'number'
@@ -557,6 +590,7 @@ Dashboard rockinfo_program_performance {
           uname: 'p_rr'
         },
         VizFieldFull {
+          label: 'Voucher Sales'
           ref: r(rockinfo_credentialing.voucher_sales)
           format {
             type: 'number'
@@ -565,6 +599,7 @@ Dashboard rockinfo_program_performance {
           uname: 'p_sales'
         },
         VizFieldFull {
+          label: 'Deferred Revenue'
           ref: r(rockinfo_credentialing.deferred_revenue)
           format {
             type: 'number'
@@ -619,7 +654,7 @@ Dashboard rockinfo_program_performance {
         column_styles: [
           ColumnStyle {
             key: 'p_name'
-            width: 250
+            width: 230
           },
           ColumnStyle {
             key: 'p_type'
@@ -628,6 +663,30 @@ Dashboard rockinfo_program_performance {
           ColumnStyle {
             key: 'p_region'
             width: 130
+          },
+          ColumnStyle {
+            key: 'p_cand'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'p_pass'
+            width: 100
+          },
+          ColumnStyle {
+            key: 'p_vi'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'p_rr'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'p_sales'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'p_def'
+            width: 110
           }
         ]
         wrap_header_text: true
@@ -748,6 +807,7 @@ Dashboard rockinfo_program_performance {
           uname: 'c_name'
         },
         VizFieldFull {
+          label: 'Enrolments'
           ref: r(rockinfo_credentialing.enrolments)
           format {
             type: 'number'
@@ -756,6 +816,7 @@ Dashboard rockinfo_program_performance {
           uname: 'c_enr'
         },
         VizFieldFull {
+          label: 'Completions'
           ref: r(rockinfo_credentialing.course_completions)
           format {
             type: 'number'
@@ -764,6 +825,7 @@ Dashboard rockinfo_program_performance {
           uname: 'c_comp'
         },
         VizFieldFull {
+          label: 'Completion Rate'
           ref: r(rockinfo_credentialing.completion_rate)
           format {
             type: 'number'
@@ -772,6 +834,7 @@ Dashboard rockinfo_program_performance {
           uname: 'c_cr'
         },
         VizFieldFull {
+          label: 'Avg Score'
           ref: r(rockinfo_credentialing.avg_course_score)
           format {
             type: 'number'
@@ -809,7 +872,7 @@ Dashboard rockinfo_program_performance {
         column_styles: [
           ColumnStyle {
             key: 'c_prog'
-            width: 280
+            width: 270
           },
           ColumnStyle {
             key: 'c_step'
@@ -817,7 +880,23 @@ Dashboard rockinfo_program_performance {
           },
           ColumnStyle {
             key: 'c_name'
-            width: 340
+            width: 360
+          },
+          ColumnStyle {
+            key: 'c_enr'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'c_comp'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'c_cr'
+            width: 120
+          },
+          ColumnStyle {
+            key: 'c_score'
+            width: 100
           }
         ]
         wrap_header_text: true
@@ -844,7 +923,7 @@ Dashboard rockinfo_program_performance {
             ref: r(rockinfo_credentialing.pass_rate)
             format {
               type: 'number'
-              pattern: '#,##0%'
+              pattern: '#,##0.0%'
             }
           }
           settings {
@@ -956,7 +1035,7 @@ Dashboard rockinfo_program_performance {
         }
         series {
           field: VizFieldFull {
-            label: 'Credentials Expiring'
+            label: 'Expiring'
             ref: r(rockinfo_credentialing.credentials_issued)
             format {
               type: 'number'
@@ -1003,10 +1082,12 @@ Dashboard rockinfo_program_performance {
           uname: 'e_partner'
         },
         VizFieldFull {
+          label: 'Credential'
           ref: r(rockinfo_credentials.credential_code)
           uname: 'e_code'
         },
         VizFieldFull {
+          label: 'Expires'
           ref: r(rockinfo_credentials.expires_at)
           uname: 'e_exp'
         },
@@ -1039,11 +1120,11 @@ Dashboard rockinfo_program_performance {
         column_styles: [
           ColumnStyle {
             key: 'e_id'
-            width: 110
+            width: 100
           },
           ColumnStyle {
             key: 'e_name'
-            width: 160
+            width: 150
           },
           ColumnStyle {
             key: 'e_email'
@@ -1051,15 +1132,23 @@ Dashboard rockinfo_program_performance {
           },
           ColumnStyle {
             key: 'e_prog'
-            width: 230
+            width: 220
           },
           ColumnStyle {
             key: 'e_partner'
-            width: 180
+            width: 160
+          },
+          ColumnStyle {
+            key: 'e_code'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'e_exp'
+            width: 110
           },
           ColumnStyle {
             key: 'e_days'
-            width: 90
+            width: 80
           }
         ]
         wrap_header_text: true
@@ -1409,6 +1498,7 @@ Dashboard rockinfo_program_performance {
           uname: 'b_region'
         },
         VizFieldFull {
+          label: 'Expiring in 90 Days'
           ref: r(rockinfo_credentialing.vouchers_expiring_90d)
           format {
             type: 'number'
@@ -1417,6 +1507,7 @@ Dashboard rockinfo_program_performance {
           uname: 'b_n'
         },
         VizFieldFull {
+          label: 'Value at Risk'
           ref: r(rockinfo_credentialing.breakage_at_risk_90d)
           format {
             type: 'number'
@@ -1476,6 +1567,22 @@ Dashboard rockinfo_program_performance {
           ColumnStyle {
             key: 'b_region'
             width: 140
+          },
+          ColumnStyle {
+            key: 'b_n'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'b_usd'
+            width: 160
+          },
+          ColumnStyle {
+            key: 'b_out'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'b_def'
+            width: 140
           }
         ]
         wrap_header_text: true
@@ -1492,14 +1599,6 @@ Dashboard rockinfo_program_performance {
         VizFieldFull {
           ref: r(rockinfo_partners.partner_name)
           uname: 'vp_name'
-        },
-        VizFieldFull {
-          ref: r(rockinfo_partners.partner_tier)
-          uname: 'vp_tier'
-        },
-        VizFieldFull {
-          ref: r(rockinfo_partners.partner_region)
-          uname: 'vp_region'
         },
         VizFieldFull {
           label: 'Issued'
@@ -1538,6 +1637,7 @@ Dashboard rockinfo_program_performance {
           uname: 'vp_e'
         },
         VizFieldFull {
+          label: 'Redemption Rate'
           ref: r(rockinfo_credentialing.redemption_rate)
           format {
             type: 'number'
@@ -1611,20 +1711,47 @@ Dashboard rockinfo_program_performance {
         column_styles: [
           ColumnStyle {
             key: 'vp_name'
-            width: 220
+            width: 240
           },
           ColumnStyle {
-            key: 'vp_tier'
+            key: 'vp_i'
             width: 90
           },
           ColumnStyle {
-            key: 'vp_region'
-            width: 120
+            key: 'vp_r'
+            width: 95
+          },
+          ColumnStyle {
+            key: 'vp_o'
+            width: 105
+          },
+          ColumnStyle {
+            key: 'vp_e'
+            width: 90
+          },
+          ColumnStyle {
+            key: 'vp_rr'
+            width: 115
+          },
+          ColumnStyle {
+            key: 'vp_sales'
+            width: 110
+          },
+          ColumnStyle {
+            key: 'vp_rec'
+            width: 115
+          },
+          ColumnStyle {
+            key: 'vp_def'
+            width: 105
+          },
+          ColumnStyle {
+            key: 'vp_brk'
+            width: 100
           }
         ]
         wrap_header_text: true
         pagination_size: 10
-        show_sum_row: true
       }
     }
   }
@@ -1667,6 +1794,7 @@ Dashboard rockinfo_program_performance {
           uname: 've_sales'
         },
         VizFieldFull {
+          label: 'Deferred Revenue'
           ref: r(rockinfo_credentialing.deferred_revenue)
           format {
             type: 'number'
@@ -1823,7 +1951,7 @@ Dashboard rockinfo_program_performance {
           ref: r(rockinfo_credentialing.cohort_conversion)
           format {
             type: 'number'
-            pattern: '#,##0%'
+            pattern: '#,##0.0%'
           }
           uname: 'cv'
         }
@@ -1942,7 +2070,7 @@ Dashboard rockinfo_program_performance {
           ref: r(rockinfo_credentialing.voucher_cohort_redemption)
           format {
             type: 'number'
-            pattern: '#,##0%'
+            pattern: '#,##0.0%'
           }
           uname: 'cv'
         }
@@ -2062,7 +2190,7 @@ Dashboard rockinfo_program_performance {
     tab overview: CanvasLayout {
       label: 'Overview'
       width: 1220
-      height: 1880
+      height: 1900
       grid_size: 20
       auto_expand_vertically: true
       mobile {
@@ -2114,10 +2242,10 @@ Dashboard rockinfo_program_performance {
         position: pos(560, 600, 640, 400)
       }
       block t_program_scorecard {
-        position: pos(20, 1020, 1180, 300)
+        position: pos(20, 1020, 1180, 320)
       }
       block t_partner_board {
-        position: pos(20, 1340, 1180, 500)
+        position: pos(20, 1360, 1180, 500)
       }
       default_zoom: 'fit_to_width'
     }
@@ -2125,7 +2253,7 @@ Dashboard rockinfo_program_performance {
     tab learning: CanvasLayout {
       label: 'Learning & Certification'
       width: 1220
-      height: 2420
+      height: 2450
       grid_size: 20
       auto_expand_vertically: true
       mobile {
@@ -2168,13 +2296,13 @@ Dashboard rockinfo_program_performance {
         position: pos(620, 930, 580, 400)
       }
       block s_act_now {
-        position: pos(20, 1350, 1180, 80)
+        position: pos(20, 1350, 1180, 100)
       }
       block c_expiry_forecast {
-        position: pos(20, 1440, 1180, 360)
+        position: pos(20, 1470, 1180, 360)
       }
       block t_expiring {
-        position: pos(20, 1820, 1180, 560)
+        position: pos(20, 1850, 1180, 560)
       }
       default_zoom: 'fit_to_width'
     }
