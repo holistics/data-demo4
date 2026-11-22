@@ -19,7 +19,7 @@ export const PORTAL = 'rockinfo_client_portal';
 
 const PERSONAS = [
   { key: 'editor', title: 'Program manager', role: 'Client editor: explore, build dashboards, ask AI' },
-  { key: 'viewer', title: 'Partner success viewer', role: 'Viewer: dashboards only, AI off' },
+  { key: 'viewer', title: 'Partner success viewer', role: 'Viewer: dashboards and Ask AI, cannot build' },
 ];
 
 export function identities() {

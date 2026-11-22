@@ -59,7 +59,7 @@ function config() {
   };
 }
 
-function embedToken(identityId) {
+function embedToken(identityId, view) {
   const identity = identities().find((i) => i.id === identityId);
   if (!identity) return [400, { error: 'Unknown identity.' }];
   if (!env.HOLISTICS_EMBED_KEY_ID || !env.HOLISTICS_EMBED_SECRET) {
@@ -75,12 +75,15 @@ function embedToken(identityId) {
       enable_personal_workspace: isEditor,
       org_workspace_role: isEditor ? 'editor' : 'viewer',
     },
-    settings: { ai: { enabled: isEditor } },
+    // Ask AI for every customer persona; it answers only from the user's own rows.
+    settings: { ai: { enabled: true } },
     exp: Math.floor(Date.now() / 1000) + 60 * 60,
   };
   const token = signHS256(payload, env.HOLISTICS_EMBED_SECRET);
   // payload is returned for the demo's "What the token says" panel; it holds no secret
-  return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}?_token=${token}`, payload }];
+  // `/ai` opens the portal on Ask AI instead of its initial dashboard.
+  const path = view === 'ai' ? '/ai' : '';
+  return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}`, payload }];
 }
 
 createServer(async (req, res) => {
@@ -95,7 +98,7 @@ createServer(async (req, res) => {
     if (url.pathname === '/api/embed-token' && req.method === 'POST') {
       let body;
       try { body = await readBody(req); } catch { return json(res, 400, { error: 'Invalid JSON body.' }); }
-      const [status, data] = embedToken(body.identity_id);
+      const [status, data] = embedToken(body.identity_id, body.view);
       return json(res, status, data);
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') return json(res, 405, { error: 'Method not allowed' });
