@@ -50,14 +50,21 @@ Each customer tenant has the same two personas; only the client ID changes.
 
 | Persona | `embed_org_id` | `rockinfo_client_id` | Workspace role | Sidebar |
 | --- | --- | --- | --- | --- |
-| Program manager (client editor) | `client_<id>` | `[<id>]` | `editor` + personal | Rocky AI, dashboards, Datasets (Explore) |
-| Partner success viewer | `client_<id>` | `[<id>]` | `viewer`, no personal | Rocky AI, dashboards; no Datasets |
+| Program manager (client editor) | `client_<id>` | `[<id>]` | `editor` + personal | Rocky AI, dashboards, Team reports, My reports, Datasets (Explore) |
+| Partner success viewer | `client_<id>` | `[<id>]` | `viewer`, no personal | Rocky AI, dashboards, Team reports; no Datasets |
 | Rockinfo internal admin, all clients | `rockinfo_internal` | `[101, 102, 103, 104, 105, 106, 107, 108, 109]` | `editor` + personal | Everything |
 
 Tenants in the embed host: Adobe `101`, Lenovo `102`, Nutanix `105`, F5 `106`, Cloudinary `109`
 (`embed-host/lib/tenants.mjs`). The host hides Datasets from viewers and refuses to sign a viewer
 token for it (`editorsOnly` in `embed-host/lib/portal.mjs`). The dataset is still a portal object,
 so this is a host-side guard, not a Holistics permission.
+
+**Team reports** are dashboards a tenant's editors saved to their Shared workspace
+(`embed_org_id`). The host lists them from the iframe's `embed:loaded` event (`workspace: 'org'`)
+and opens one as `/objects/<uname>`; every user in that org, viewers included, sees them. Seeded
+reports: Adobe (Partner Voucher Watchlist, Recertification Pipeline), Lenovo (Partner Enablement
+Scorecard, Regional Certification Coverage), Nutanix (Exam Performance), F5 (Voucher Sales by
+Channel), Cloudinary (Learning Engagement).
 
 Show the Adobe editor, then the Lenovo editor: the same dashboard re-brands itself (name, industry, colour) and shows
 only that client's programs, partners and AI answers. The internal admin sees "All Rockinfo clients".
