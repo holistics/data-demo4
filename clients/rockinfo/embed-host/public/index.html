@@ -6,7 +6,7 @@
     <title>Rockinfo Analytics</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230B6E4F'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>R</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -32,41 +32,56 @@
 
       <main class="main">
         <header class="topbar">
-          <div class="tenant-badge" id="tenantBadge">
-            <span class="tenant-dot"></span>
-            <div>
-              <p class="tenant-name" id="tenantName">Loading…</p>
-              <p class="tenant-role" id="tenantRole"></p>
-            </div>
+          <div class="page-title">
+            <h1>Analytics</h1>
+            <p>Program performance, learning, credentials and vouchers for your organisation.</p>
           </div>
-          <div class="controls">
-            <label class="field">
-              <span>Signed in as</span>
-              <select id="identitySelect" aria-label="Signed-in identity"></select>
-            </label>
-            <button class="ghost" id="payloadToggle" type="button" aria-expanded="false">What the token says</button>
+          <div class="user-menu">
+            <button class="user-button" id="userButton" type="button" aria-haspopup="menu" aria-expanded="false">
+              <span class="avatar" id="userAvatar"></span>
+              <span class="user-text">
+                <span class="user-name" id="userName">Loading…</span>
+                <span class="user-sub" id="userSub"></span>
+              </span>
+              <svg class="chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="user-dropdown" id="userDropdown" role="menu" hidden></div>
           </div>
         </header>
 
-        <section class="customers" aria-label="Rockinfo customers">
-          <p class="customers-label">Switch customer</p>
-          <ul class="customer-list" id="customerList"></ul>
+        <section class="toolbar" aria-label="Embed actions">
+          <button class="tool" id="payloadToggle" type="button" aria-expanded="false">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 6l-4 4 4 4M13 6l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            View embed payload
+          </button>
+          <a class="tool" id="openPortal" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M11 3h6v6M17 3l-8 8M15 12v4a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Open embed portal in new tab
+          </a>
+          <p class="scope" id="scopeNote"></p>
         </section>
 
         <section class="stage">
           <div class="frame-wrap">
-            <div class="state" id="state">Choose an identity to load the portal.</div>
+            <div class="state" id="state">Choose a user to load the portal.</div>
             <iframe id="embedFrame" title="Rockinfo analytics portal" allow="clipboard-write; fullscreen"></iframe>
           </div>
-          <aside class="payload" id="payloadPanel" hidden>
-            <h2>Signed on Rockinfo's server</h2>
-            <p>The browser only sends who is signed in. The server sets the customer's row-level filter and what the user may do. Every customer gets the same portal and dashboard; it brands itself from the tenant's own data.</p>
-            <dl class="payload-facts" id="payloadFacts"></dl>
-            <pre id="payloadJson"></pre>
-          </aside>
         </section>
       </main>
     </div>
+
+    <div class="scrim" id="scrim" hidden></div>
+    <aside class="drawer" id="payloadPanel" aria-label="Embed payload" aria-hidden="true">
+      <header class="drawer-head">
+        <h2>Embed Payload</h2>
+        <button class="icon-button" id="payloadClose" type="button" aria-label="Close embed payload">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <p class="drawer-note">Signed on Rockinfo's server for the user above. The browser never sees the embed secret, so nobody can switch tenant by editing the URL.</p>
+      <dl class="payload-facts" id="payloadFacts"></dl>
+      <pre class="code" id="payloadJson"></pre>
+    </aside>
     <script type="module" src="/app.js"></script>
   </body>
 </html>
