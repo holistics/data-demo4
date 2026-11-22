@@ -64,6 +64,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   - `rockinfo_partner_detail`: drill-through destination (Partner)
   - `rockinfo_candidate_record`: drill-through destination (Candidate ID), the single-record view
 - `embeds/rockinfo_client_portal.embed.aml`: the one portal every client embeds, with AI enabled.
+- `ai/rockinfo_context.aml`: everything Holistics AI knows about Rockinfo (vocabulary, tenant rules,
+  metric definitions). `settings/ai/context.aml` only routes to it.
 
 ## Demo capabilities
 
