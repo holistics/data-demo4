@@ -3,14 +3,41 @@ Dashboard rockinfo_program_performance {
   description: 'Client-facing program dashboard embedded in the Rockinfo platform. Every number is scoped to the signed-in client by row-level permission.'
   owner: 'vincent@holistics.io'
 
-  block t_header: TextBlock {
-    content: @md
-<div style="padding: 4px 8px">
-
-## Program Performance
-
-Live view of your candidates, learning, exams, credentials and vouchers. Right-click any number to **view the underlying records**, or click a partner or candidate to **drill through** to its detail page.
-</div>;;
+  block t_header: VizBlock {
+    label: 'Client header'
+    viz: MarkdownViz {
+      dataset: rockinfo_credentialing
+      values: [
+        VizFieldFull {
+          label: 'Client'
+          ref: r(rockinfo_credentialing.portal_client_name)
+        },
+        VizFieldFull {
+          label: 'Color'
+          ref: r(rockinfo_credentialing.portal_brand_color)
+        },
+        VizFieldFull {
+          label: 'Industry'
+          ref: r(rockinfo_credentialing.portal_client_industry)
+        },
+        VizFieldFull {
+          label: 'Candidates'
+          ref: r(rockinfo_credentialing.total_candidates)
+        }
+      ]
+      content: @md <div style="display:flex;align-items:center;gap:16px;height:100%;padding:4px 8px;font-family:Inter,ui-sans-serif,system-ui,sans-serif;border-left:6px solid {{ rows[0].values.`Color`.raw }}">
+      <div style="width:52px;height:52px;border-radius:12px;background:{{ rows[0].values.`Color`.raw }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:none">{{ rows[0].values.`Client`.raw | slice: 0 }}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">{{ rows[0].values.`Client` }} &middot; {{ rows[0].values.`Industry` }}</div>
+        <div style="font-size:24px;font-weight:700;color:#111827;line-height:1.25">Certification Program Performance</div>
+        <div style="font-size:13px;color:#4B5563">SUBCertification Program Performance</div>
+      </div>
+      <div style="font-size:11px;color:#9CA3AF;text-align:right;flex:none">Powered by Rockinfo<br/>Analytics</div>
+    </div>;;
+    }
+    settings {
+      hide_label: true
+    }
   }
   block f_date: FilterBlock {
     label: 'Activity Date'
@@ -1137,43 +1164,43 @@ Vouchers grouped by **when they were sold**. Each cell is the cumulative share r
     FilterInteraction {
       from: 'f_v_partner'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_candidate_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_candidate_cohort', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'f_v_channel'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_candidate_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_candidate_cohort', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'f_cohort_window'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'f_partner_type'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'f_segment'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'f_milestone'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     },
     FilterInteraction {
       from: 'f_grain'
       to: [
-        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 't_course_funnel', 't_expiring', 't_header', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
       ]
     }
   ]

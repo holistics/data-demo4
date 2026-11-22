@@ -44,6 +44,14 @@ Model rockinfo_clients {
     description: 'Rockinfo subscription plan of the client.'
   }
 
+  dimension brand_color {
+    label: 'Brand Color'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.brand_color }};;
+    description: 'Hex accent colour of the client, used by the dashboard header so one dashboard brands itself per tenant.'
+  }
+
   // Cohort controls live on the tenant model so they always sit on the row-level permission anchor.
   param cohort_grain {
     label: 'Cohort Granularity'
