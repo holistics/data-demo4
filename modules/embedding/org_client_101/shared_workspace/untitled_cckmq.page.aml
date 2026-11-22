@@ -1,0 +1,418 @@
+Dashboard untitled_cckmq {
+  title: 'Candidate & Voucher Cohorts'
+  description: 'Adobe program team: share of each registration cohort reaching a chosen milestone (started, completed, sat an exam, certified) by periods since registering, and how fast partner-bought vouchers are redeemed. Cohort Granularity and Milestone re-cut the view.'
+  owner: 'embed_b74cd12e3cf8ea51d0@holistics.io'
+  block title: TextBlock {
+    content: @md
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6">Adobe team report &middot; Shared workspace</div>
+
+      # Candidate &amp; Voucher Cohorts
+
+      How fast each month's new candidates reach a milestone, and how fast partner-bought vouchers get used.
+    ;;
+  }
+
+  block t_cohort_intro: TextBlock {
+    content: @md
+<div style="padding: 2px 6px">
+
+#### Candidate journey cohort
+
+<span style="opacity:.75">Candidates grouped by <b>when they registered</b>. Each cell is the share of that cohort that has reached the selected <b>milestone</b> by that many periods after registering. Read across a row for time-to-milestone; read down a column to see whether newer cohorts move faster.</span>
+</div>;;
+  }
+
+  block f_grain: FilterBlock {
+    label: 'Cohort Granularity'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_clients.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_milestone: FilterBlock {
+    label: 'Cohort Milestone'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_clients.cohort_milestone)
+    }
+    default {
+      operator: 'is'
+      value: 'Certified'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  block f_cohort_window: FilterBlock {
+    label: 'Periods Shown'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_credentialing, rockinfo_candidate_milestones.period_number)
+    }
+    default {
+      operator: 'between'
+      value: [0, 12]
+    }
+  }
+
+  block f_partner_type: FilterBlock {
+    label: 'Partner Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_type)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_segment: FilterBlock {
+    label: 'Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.segment)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_date: FilterBlock {
+    label: 'Activity Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_dates.date_day)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block f_region: FilterBlock {
+    label: 'Candidate Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.region)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block p_candidate_cohort: VizBlock {
+    label: 'Cumulative % of each registration cohort reaching the milestone'
+    description: 'Rows: the period candidates registered. Columns: periods since registering. Cells: cumulative share of that cohort that has reached the milestone chosen in Cohort Milestone.'
+    viz: PivotTable {
+      dataset: rockinfo_credentialing
+      rows: [
+        VizFieldFull {
+          label: 'Registered'
+          ref: r(rockinfo_credentialing, rockinfo_candidates.cohort_period)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'cr'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Periods after'
+          ref: r(rockinfo_credentialing, rockinfo_candidate_milestones.period_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'cc'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: '%'
+          ref: r(rockinfo_credentialing.cohort_conversion)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+          uname: 'cv'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'cv'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: 'rgba(46, 158, 91, 0.02)'
+              }
+              mid {
+                value: 0.4
+                color: 'rgba(46, 158, 91, 0.28)'
+              }
+              max {
+                value: 0.85
+                color: 'rgba(46, 158, 91, 0.62)'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'cr'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'cc'
+            direction: 'asc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'cr'
+            width: 130
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 25
+      }
+    }
+  }
+
+  block t_voucher_cohort_intro: TextBlock {
+    content: @md
+<div style="padding: 2px 6px">
+
+#### Voucher redemption cohort
+
+<span style="opacity:.75">Vouchers grouped by <b>when they were sold</b>. Each cell is the cumulative share redeemed by that many periods after sale. Slow rows flag partner stock that is drifting towards breakage.</span>
+</div>;;
+  }
+
+  block f_v_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_v_channel: FilterBlock {
+    label: 'Sales Channel'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_vouchers.sales_channel)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block p_voucher_cohort: VizBlock {
+    label: 'Cumulative % of each sales cohort redeemed'
+    description: 'Rows: the period vouchers were sold. Columns: periods since the sale. Cells: cumulative share of those vouchers redeemed. The gap to 100% is breakage plus stock still outstanding.'
+    viz: PivotTable {
+      dataset: rockinfo_credentialing
+      filter {
+        field: r(rockinfo_credentialing, rockinfo_vouchers.voucher_period_number)
+        operator: 'between'
+        value: [0, 12]
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Sold'
+          ref: r(rockinfo_credentialing, rockinfo_vouchers.voucher_cohort_period)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'cr'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Periods after'
+          ref: r(rockinfo_credentialing, rockinfo_vouchers.voucher_period_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'cc'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: '%'
+          ref: r(rockinfo_credentialing.voucher_cohort_redemption)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+          uname: 'cv'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'cv'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: 'rgba(46, 158, 91, 0.02)'
+              }
+              mid {
+                value: 0.4
+                color: 'rgba(46, 158, 91, 0.28)'
+              }
+              max {
+                value: 0.85
+                color: 'rgba(46, 158, 91, 0.62)'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'cr'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'cc'
+            direction: 'asc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'cr'
+            width: 130
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 25
+      }
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_v_partner'
+      to: [
+        CustomMapping { block: ['p_candidate_cohort'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_v_channel'
+      to: [
+        CustomMapping { block: ['p_candidate_cohort'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cohort_window'
+      to: [
+        CustomMapping { block: ['p_voucher_cohort'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_partner_type'
+      to: [
+        CustomMapping { block: ['p_voucher_cohort'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_segment'
+      to: [
+        CustomMapping { block: ['p_voucher_cohort'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_milestone'
+      to: [
+        CustomMapping { block: ['p_voucher_cohort'] disabled: true }
+      ]
+    }
+  ]
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 1890
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 120)
+    }
+    block t_cohort_intro {
+      position: pos(20, 140, 1260, 110)
+    }
+    block f_grain {
+      position: pos(20, 270, 240, 80)
+    }
+    block f_milestone {
+      position: pos(280, 270, 240, 80)
+    }
+    block f_cohort_window {
+      position: pos(540, 270, 240, 80)
+    }
+    block f_partner_type {
+      position: pos(780, 270, 240, 80)
+    }
+    block f_segment {
+      position: pos(1040, 270, 240, 80)
+    }
+    block f_date {
+      position: pos(20, 370, 300, 80)
+    }
+    block f_region {
+      position: pos(340, 370, 300, 80)
+    }
+    block p_candidate_cohort {
+      position: pos(20, 470, 1260, 560)
+    }
+    block t_voucher_cohort_intro {
+      position: pos(20, 1060, 1260, 110)
+    }
+    block f_v_partner {
+      position: pos(20, 1190, 300, 80)
+    }
+    block f_v_channel {
+      position: pos(340, 1190, 300, 80)
+    }
+    block p_voucher_cohort {
+      position: pos(20, 1290, 1260, 560)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: DynamicPageTheme {
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
+  }
+  settings {
+    autorun_on_open: true
+    timezone: 'America/New_York'
+  }
+}
