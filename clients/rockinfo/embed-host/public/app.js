@@ -13,6 +13,13 @@ let defaultView = 'ai';
 // Team (org) and personal dashboards come from the iframe's embed:loaded event, per identity.
 let workspaceSections = [];
 let plans = [];
+// Who built each workspace report and when: report-meta.json is generated from git at image
+// build (scripts/report-meta.mjs); reports saved since then are recorded here in the browser.
+let reportMeta = {};
+let localMeta = {};
+const seenOrg = new Map();
+try { localMeta = JSON.parse(localStorage.getItem('rockinfo.reportMeta') || '{}'); } catch {}
+const saveLocalMeta = () => { try { localStorage.setItem('rockinfo.reportMeta', JSON.stringify(localMeta)); } catch {} };
 let workspaceItems = { org: [], personal: [] };
 let embedOrigin = '';
 const isWs = (id) => /^ws:[a-z0-9_]+(\.[a-z0-9_]+)?$/.test(id || '');
@@ -37,10 +44,30 @@ const viewFromHash = () => {
 const wsItem = (id) => {
   for (const k of Object.keys(workspaceItems)) {
     const d = workspaceItems[k].find((x) => `ws:${x.uname}` === id);
-    if (d) return { id, title: d.title, sub: k === 'org' ? 'Team report · built by your organisation' : 'My report · personal workspace' };
+    if (d) return { id, title: d.title, sub: metaLine(d.uname, k) };
   }
   return { id, title: 'Team report', sub: 'Built by your organisation' };
 };
+
+const fmtTime = (iso) =>
+  new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+function personLabel(embedUserId) {
+  const u = users.find((x) => x.id === embedUserId);
+  return u ? `${u.title} (${u.tenantName})` : 'your team';
+}
+
+// "Built by Client admin (Adobe) · Created 22 Nov 2026, 10:50 pm · Last updated …"
+function metaLine(uname, workspace) {
+  const m = reportMeta[uname] || localMeta[uname];
+  const kind = workspace === 'org' ? 'Team report' : 'My report';
+  if (!m) return workspace === 'org' ? `${kind} · built by your organisation` : `${kind} · your personal workspace`;
+  const parts = [kind, `Built by ${personLabel(m.createdBy)}`, `Created ${fmtTime(m.createdAt)}`];
+  if (m.updatedAt && m.updatedAt !== m.createdAt) {
+    parts.push(`Last updated ${fmtTime(m.updatedAt)}${m.updatedBy && m.updatedBy !== m.createdBy ? ` by ${personLabel(m.updatedBy)}` : ''}`);
+  }
+  return parts.join(' · ');
+}
 
 function navLink(id, title, sub, iconKey) {
   const a = document.createElement('a');
@@ -394,6 +421,18 @@ window.addEventListener('message', (e) => {
   const dashboards = e.data.payload?.objects?.dashboards || [];
   const pick = (w) => dashboards.filter((d) => d.workspace === w && d.uname).map(({ uname, title }) => ({ uname, title: title || uname }));
   workspaceItems = { org: pick('org'), personal: pick('personal') };
+  // A report that appears since the last load for this tenant was just saved by this user.
+  const key = current.tenantSlug;
+  const before = seenOrg.get(key);
+  const now = new Date().toISOString();
+  // Org reports only: personal lists differ per persona, so a switch would look like new saves.
+  for (const d of workspaceItems.org) {
+    if (before && !before.has(d.uname) && !reportMeta[d.uname] && !localMeta[d.uname]) {
+      localMeta[d.uname] = { createdBy: current.id, createdAt: now, updatedAt: now };
+    }
+  }
+  saveLocalMeta();
+  seenOrg.set(key, new Set(workspaceItems.org.map((d) => d.uname)));
   renderNav();
   setView(view);
 });
@@ -431,6 +470,10 @@ try {
   sections = cfg.sections;
   defaultView = cfg.defaultView;
   workspaceSections = cfg.workspaceSections || [];
+  try {
+    const m = await fetch('/report-meta.json');
+    if (m.ok) reportMeta = (await m.json()).reports || {};
+  } catch {}
   plans = cfg.plans || [];
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
   setView(viewFromHash());

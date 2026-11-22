@@ -40,7 +40,7 @@ const INDEX_HTML = readFileSync(join(PUBLIC, 'index.html'), 'utf8')
 // Email subscriptions go to public demo inboxes (synthetic data only).
 const MAIL_DOMAIN = env.SUBSCRIPTION_MAIL_DOMAIN || 'mailinator.com';
 const mailboxFor = (identityId) => `rockinfo-${identityId.replace(/_/g, '-')}`;
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json' };
 
 const b64url = (buf) => Buffer.from(buf).toString('base64url');
 

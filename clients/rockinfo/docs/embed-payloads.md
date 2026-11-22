@@ -72,6 +72,11 @@ reports: Adobe (Partner Voucher Watchlist, Recertification Pipeline), Lenovo (Pa
 Scorecard, Regional Certification Coverage), Nutanix (Exam Performance), F5 (Voucher Sales by
 Channel), Cloudinary (Learning Engagement).
 
+The page subtitle of a team report reads "Built by … · Created … · Last updated …". Holistics
+exposes none of this to the embed, so `embed-host/scripts/report-meta.mjs` reads it from the
+`Embed user <id> (Org: …)` commits at image build. A report saved after the build is recorded in
+the viewer's browser (built by the current persona, now) until the next deploy.
+
 Show the Adobe client admin, then the Lenovo client admin: the same dashboard re-brands itself (name, industry, colour) and shows
 only that client's programs, partners and AI answers. The internal admin sees "All Rockinfo clients".
 
