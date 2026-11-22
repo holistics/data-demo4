@@ -178,7 +178,8 @@ function renderPayload(payload) {
 }
 
 async function load(user) {
-  const switched = current?.id !== user.id;
+  // First load keeps a #ws: deep link; only a real persona switch drops another org's report.
+  const switched = !!current && current.id !== user.id;
   current = user;
   if (switched) workspaceItems = { org: [], personal: [] };
   document.documentElement.style.setProperty('--tenant', user.accent);
