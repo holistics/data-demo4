@@ -29,14 +29,17 @@ const viewFromHash = () => {
 function renderNav() {
   const nav = $('analyticsNav');
   nav.innerHTML = '';
+  const allowed = new Set(current?.views || VIEWS.keys());
   for (const s of sections) {
+    const items = s.items.filter((item) => allowed.has(item.id));
+    if (!items.length) continue;
     const group = document.createElement('div');
     group.className = 'nav-group';
     const label = document.createElement('p');
     label.className = 'nav-section';
     label.textContent = s.label;
     group.appendChild(label);
-    for (const item of s.items) {
+    for (const item of items) {
       const a = document.createElement('a');
       a.className = 'nav-item view-link' + (s.key === 'ai' ? ' home' : '');
       a.href = `#${item.id}`;
@@ -140,6 +143,13 @@ async function load(user) {
   $('userName').textContent = user.title;
   $('userSub').textContent = user.tenantName;
   renderMenu();
+  // Viewers have no Datasets entry; switching to one from Explore falls back to the default view.
+  if (!user.views.includes(view)) {
+    setView(defaultView);
+    history.replaceState(null, '', `#${defaultView}`);
+  }
+  renderNav();
+  setView(view);
   inflight?.abort();
   inflight = new AbortController();
   setState(`Signing a token for ${user.tenantName}…`);
@@ -236,7 +246,6 @@ try {
   sections = cfg.sections;
   defaultView = cfg.defaultView;
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
-  renderNav();
   setView(viewFromHash());
   load(users[0]);
 } catch (e) {

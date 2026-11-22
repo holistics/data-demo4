@@ -46,16 +46,20 @@ function holisticsEmbedUrl(user, client) {
 
 Every persona uses `embed_portal: 'rockinfo_client_portal'`. Only the identity changes.
 
-| Persona | `embed_org_id` | `rockinfo_client_id` | Workspace role |
-| --- | --- | --- | --- |
-| Adobe program manager (client editor) | `client_101` | `[101]` | `editor` + personal |
-| Lenovo partner manager (viewer) | `client_102` | `[102]` | `viewer` |
-| Nutanix | `client_105` | `[105]` | `editor` |
-| F5 | `client_106` | `[106]` | `editor` |
-| Cloudinary | `client_109` | `[109]` | `editor` |
-| Rockinfo internal admin, all clients | `rockinfo_internal` | `[101, 102, 103, 104, 105, 106, 107, 108, 109]` | `editor` |
+Each customer tenant has the same two personas; only the client ID changes.
 
-Show Adobe, then Lenovo: the same dashboard re-brands itself (name, industry, colour) and shows
+| Persona | `embed_org_id` | `rockinfo_client_id` | Workspace role | Sidebar |
+| --- | --- | --- | --- | --- |
+| Program manager (client editor) | `client_<id>` | `[<id>]` | `editor` + personal | Rocky AI, dashboards, Datasets (Explore) |
+| Partner success viewer | `client_<id>` | `[<id>]` | `viewer`, no personal | Rocky AI, dashboards; no Datasets |
+| Rockinfo internal admin, all clients | `rockinfo_internal` | `[101, 102, 103, 104, 105, 106, 107, 108, 109]` | `editor` + personal | Everything |
+
+Tenants in the embed host: Adobe `101`, Lenovo `102`, Nutanix `105`, F5 `106`, Cloudinary `109`
+(`embed-host/lib/tenants.mjs`). The host hides Datasets from viewers and refuses to sign a viewer
+token for it (`editorsOnly` in `embed-host/lib/portal.mjs`). The dataset is still a portal object,
+so this is a host-side guard, not a Holistics permission.
+
+Show the Adobe editor, then the Lenovo editor: the same dashboard re-brands itself (name, industry, colour) and shows
 only that client's programs, partners and AI answers. The internal admin sees "All Rockinfo clients".
 
 ## What the token controls

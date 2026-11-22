@@ -39,6 +39,8 @@ export const SECTIONS = [
   {
     key: 'datasets',
     label: 'Datasets',
+    // Explore is for people who can build; viewers get dashboards and Rocky AI only.
+    editorsOnly: true,
     items: [
       {
         id: 'rockinfo_credentialing',
@@ -51,5 +53,14 @@ export const SECTIONS = [
 
 for (const s of SECTIONS) for (const i of s.items) i.path ??= `/objects/${i.id}`;
 
-export const VIEWS = new Map(SECTIONS.flatMap((s) => s.items.map((i) => [i.id, { ...i, section: s.key }])));
+export const VIEWS = new Map(
+  SECTIONS.flatMap((s) => s.items.map((i) => [i.id, { ...i, section: s.key, editorsOnly: !!s.editorsOnly }])),
+);
+
+// Sidebar entries this identity may open: viewers never see editor-only sections.
+export const canOpen = (identity, viewId) => {
+  const v = VIEWS.get(viewId);
+  return !!v && (!v.editorsOnly || identity.access === 'editor');
+};
+export const viewsFor = (identity) => [...VIEWS.keys()].filter((id) => canOpen(identity, id));
 export const DEFAULT_VIEW = 'ai';

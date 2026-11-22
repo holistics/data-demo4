@@ -11,7 +11,7 @@ import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { identities } from './lib/tenants.mjs';
-import { DEFAULT_VIEW, SECTIONS, VIEWS } from './lib/portal.mjs';
+import { DEFAULT_VIEW, SECTIONS, VIEWS, canOpen, viewsFor } from './lib/portal.mjs';
 
 // Optional secrets.env next to this file (KEY=VALUE lines), for builds that bake
 // the credential into the image. Never commit it; real env vars win.
@@ -79,7 +79,7 @@ function config() {
   return {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
-      title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds,
+      title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds, views: viewsFor(i),
     })),
     sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub }) => ({ id, title, sub })) })),
     defaultView: DEFAULT_VIEW,
@@ -91,6 +91,7 @@ function embedToken(identityId, view) {
   if (!identity) return [400, { error: 'Unknown identity.' }];
   const target = VIEWS.get(view || DEFAULT_VIEW);
   if (!target) return [400, { error: 'Unknown view.' }];
+  if (!canOpen(identity, view || DEFAULT_VIEW)) return [403, { error: 'This role cannot open that view.' }];
   if (!env.HOLISTICS_EMBED_KEY_ID || !env.HOLISTICS_EMBED_SECRET) {
     return [500, { error: 'Embed credential is not configured on this deployment.' }];
   }
