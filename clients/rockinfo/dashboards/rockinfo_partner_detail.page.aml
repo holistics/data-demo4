@@ -334,15 +334,13 @@ Dashboard rockinfo_partner_detail {
     }
   }
   block t_p_candidates: VizBlock {
-    label: 'Candidates from this partner - click a candidate ID to open the Candidate Record'
+    label: 'Candidates from this partner - click a candidate to open the Candidate Record'
     viz: DataTable {
       dataset: rockinfo_credentialing
       fields: [
         VizFieldFull {
-          ref: r(rockinfo_candidates.candidate_id)
-        },
-        VizFieldFull {
-          ref: r(rockinfo_candidates.candidate_name)
+          label: 'Candidate'
+          ref: r(rockinfo_candidates.candidate_label)
         },
         VizFieldFull {
           ref: r(rockinfo_candidates.segment)

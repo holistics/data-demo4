@@ -62,7 +62,7 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
     scorecard; heat-scaled partner tables; *Act now* lists for recertification outreach and vouchers
     expiring in 90 days, which ignore the Activity Date filter because they are point in time)
   - `rockinfo_partner_detail`: drill-through destination (Partner)
-  - `rockinfo_candidate_record`: drill-through destination (Candidate ID), the single-record view
+  - `rockinfo_candidate_record`: drill-through destination (Candidate: searchable "Name (#ID)" picker), the single-record view
 - `embeds/rockinfo_client_portal.embed.aml`: the one portal every client embeds, with AI enabled.
 - `ai/rockinfo_context.aml`: everything Holistics AI knows about Rockinfo (vocabulary, tenant rules,
   metric definitions). `settings/ai/context.aml` only routes to it.
@@ -73,7 +73,7 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   the header renders that client's name, industry and brand colour from data. No per-client copies.
 - **View underlying data**: right-click any KPI or table value for record-level views
   (candidates, enrolments, attempts, credentials, vouchers).
-- **Drill-through**: click a partner to open Partner Detail; click a Candidate ID to open the Candidate Record.
+- **Drill-through**: click a partner to open Partner Detail; click a candidate ("Name (#ID)") to open the Candidate Record, or search one by name or ID in its picker.
   Both pages name the selected partner or candidate in the header, and say "All partners" or prompt for a pick when none is chosen.
 - **Dynamic cohorts**: Cohort Granularity (Week, Month, Quarter, Year) and Cohort Milestone
   (Started a course, Completed a course, Sat an exam, Certified) re-cut the candidate journey
