@@ -46,17 +46,31 @@ function holisticsEmbedUrl(user, client) {
 
 Every persona uses `embed_portal: 'rockinfo_client_portal'`. Only the identity changes.
 
-Each customer tenant has one persona per analytics plan; only the client ID changes. Plans and
-their capabilities live in `PLANS` in `embed-host/lib/tenants.mjs`, and the host's
-**Plans & permissions** page renders the same matrix.
+Each customer tenant is on one analytics plan and has several user roles. A user gets what both
+the plan and the role allow. Plans (`PLANS`), roles (`ROLES`) and each tenant's plan (`TENANTS`)
+live in `embed-host/lib/tenants.mjs`; the host's **Plans & permissions** page renders the plan
+matrix. The persona menu lists tenants from the most expensive plan down, and roles inside a
+tenant from most to least permission. A middle role the plan makes identical to one above it is
+left out; the homepage opens as the Adobe client admin.
 
-| Plan | Persona (`embed_user_id`) | `org_workspace_role` | Personal | Ask AI | Explore | PDF | CSV | Schedules |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Essentials (included) | Partner success viewer (`<slug>_viewer`) | `viewer` | no | no | no | yes | no | no |
-| Insights (add-on) | Program analyst (`<slug>_analyst`) | `viewer` | no | yes | no | yes | no | yes |
-| Self-service (add-on) | Program manager (`<slug>_editor`) | `viewer` | yes | yes | yes | yes | no | yes |
-| Enterprise (premium) | Client admin (`<slug>_admin`) | `editor` | yes | yes | yes | yes | yes | yes |
-| Internal | Rockinfo internal admin, `embed_org_id: rockinfo_internal`, all nine clients | `editor` | yes | yes | yes | yes | yes | yes |
+| Tenant | Plan | Personas (`embed_user_id`), admin first |
+| --- | --- | --- |
+| Adobe | Enterprise (premium) | `adobe_admin`, `adobe_editor`, `adobe_analyst`, `adobe_viewer` |
+| Lenovo | Self-service (add-on) | `lenovo_admin`, `lenovo_analyst`, `lenovo_viewer` |
+| Nutanix | Insights (add-on) | `nutanix_admin`, `nutanix_viewer` |
+| F5 | Essentials (included) | `f5_admin`, `f5_viewer` |
+| Cloudinary | Essentials (included) | `cloudinary_admin`, `cloudinary_viewer` |
+| Rockinfo | Internal | `rockinfo_internal_admin`, `embed_org_id: rockinfo_internal`, all nine clients |
+
+| Role (`<slug>_<key>`) | `org_workspace_role` | Personal | Ask AI | Explore | PDF | CSV | Schedules |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Client admin (`admin`) | `editor` | yes | yes | yes | yes | yes | yes |
+| Program manager (`editor`) | `viewer` | yes | yes | yes | yes | no | yes |
+| Program analyst (`analyst`) | `viewer` | no | yes | no | yes | no | yes |
+| Partner success viewer (`viewer`) | `viewer` | no | no | no | yes | no | no |
+
+Each cell is then capped by the tenant's plan: only Enterprise allows `editor` and CSV, only
+Self-service and up allow Explore and Personal, and only Insights and up allow Ask AI and schedules.
 
 Every client persona uses `embed_org_id: client_<id>` and `rockinfo_client_id: [<id>]`.
 Tenants in the embed host: Adobe `101`, Lenovo `102`, Nutanix `105`, F5 `106`, Cloudinary `109`.
@@ -65,9 +79,9 @@ without them and refuses to sign those views (`requires` in `embed-host/lib/port
 dataset is still a portal object because Ask AI needs it, so Explore is a host-side guard, not a
 Holistics permission.
 
-**Team reports** are dashboards a tenant's Enterprise users (org `editor`) saved to their Shared workspace
+**Team reports** are dashboards a tenant's admin saved (org `editor`, so only Enterprise tenants can publish new ones) to their Shared workspace
 (`embed_org_id`). The host lists them from the iframe's `embed:loaded` event (`workspace: 'org'`)
-and opens one as `/objects/<uname>`; every user in that org, on every plan, sees them. Seeded
+and opens one as `/objects/<uname>`; every user in that org sees them. Seeded
 reports: Adobe (Partner Voucher Watchlist, Recertification Pipeline), Lenovo (Partner Enablement
 Scorecard, Regional Certification Coverage), Nutanix (Exam Performance), F5 (Voucher Sales by
 Channel), Cloudinary (Learning Engagement).
