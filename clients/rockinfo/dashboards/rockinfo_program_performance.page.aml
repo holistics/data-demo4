@@ -2318,13 +2318,16 @@ Dashboard rockinfo_program_performance {
 </style>
 <div class="rkg">
 <h3>Beyond the dashboard</h3>
-<p class="sub">Some of these depend on your Rockinfo Analytics plan and your role. If you do not see one, ask your Rockinfo account manager.</p>
-<ul>
-<li><b>Ask Rocky AI.</b> Ask in plain English, e.g. <i>Which partners have the most unredeemed vouchers older than 6 months?</i> Answers use the same definitions as these dashboards.</li>
-<li><b>Team reports.</b> Reports your colleagues built and shared with everyone in your organisation, listed under Team reports.</li>
-<li><b>Explore and My reports.</b> Build your own charts from the same governed data and keep them in My reports, or share them as a Team report.</li>
-<li><b>Downloads and schedules.</b> Save a dashboard as PDF, download table rows, or get a dashboard in your inbox every week or month.</li>
-</ul>
+<p class="sub">What you can do depends on your organisation's Rockinfo Analytics plan and on your role. Ask your Rockinfo account manager to change either.</p>
+<table><thead><tr><th>Feature</th><th>What it does</th><th class="c">Program Dashboards<br/><span style="text-transform:none;letter-spacing:0">included</span></th><th class="c">Analytics Studio<br/><span style="text-transform:none;letter-spacing:0">add-on</span></th><th class="c">Studio Enterprise<br/><span style="text-transform:none;letter-spacing:0">premium</span></th></tr></thead><tbody>
+<tr><td class="t">Rockinfo dashboards</td><td>Program Performance, Partner Detail and Candidate Record, plus your Team reports.</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">PDF and scheduled emails</td><td>Save a dashboard as PDF, or get it in your inbox every week or month.</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">Ask Rocky AI</td><td>Ask in plain English, e.g. <i>Which partners have the most unredeemed vouchers older than 6 months?</i> For every user, Viewers included.</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">Explore and My reports</td><td>Creators build their own charts from the same governed data and keep them in My reports.</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">Publish to Team reports</td><td>Share a report with everyone in your organisation.</td><td class="c no">&ndash;</td><td class="c">Every Creator</td><td class="c">Publishers your admin names</td></tr>
+<tr><td class="t">Data Export</td><td>CSV or Excel of the rows behind a table, for the users your admin chooses.</td><td class="c" colspan="3">Add-on on any plan</td></tr>
+</tbody></table>
+<p style="margin:12px 0 0"><b>Roles.</b> <b>Viewer</b> (free, unlimited): opens dashboards and Team reports, and asks Rocky AI on Analytics Studio or Studio Enterprise. <b>Creator</b> (paid seat): also builds in Explore and keeps My reports. <b>Publisher</b> (Studio Enterprise): decides what goes to Team reports; other Creators build privately until a Publisher shares their work.</p>
 </div>;;
   }
 
@@ -2959,7 +2962,7 @@ Dashboard rockinfo_program_performance {
     tab how_to_use: CanvasLayout {
       label: 'How to use'
       width: 1220
-      height: 1920
+      height: 2200
       grid_size: 20
       auto_expand_vertically: true
       mobile {
@@ -2981,13 +2984,13 @@ Dashboard rockinfo_program_performance {
         position: pos(620, 780, 580, 380)
       }
       block h_more {
-        position: pos(20, 1180, 1180, 320)
+        position: pos(20, 1180, 1180, 600)
       }
       block h_first {
-        position: pos(20, 1520, 580, 380)
+        position: pos(20, 1800, 580, 380)
       }
       block h_help {
-        position: pos(620, 1520, 580, 380)
+        position: pos(620, 1800, 580, 380)
       }
       default_zoom: 'fit_to_width'
     }
