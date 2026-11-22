@@ -81,5 +81,7 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   how quickly partner-bought vouchers get redeemed.
 - **Self-service and AI**: the dataset is in the portal, so client editors can explore, build
   their own dashboards and ask AI, always through the same governed metrics and the same permission.
+- **Plans**: four packages per client (Essentials, Insights, Self-service, Enterprise) differ only in
+  embed-token fields; the embed host's Plans & permissions page shows what each can and cannot do.
 
 See `docs/embed-payloads.md` for the token payloads and `docs/call-prep.md` for the call brief.

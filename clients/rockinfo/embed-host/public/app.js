@@ -12,6 +12,7 @@ const VIEWS = new Map();
 let defaultView = 'ai';
 // Team (org) and personal dashboards come from the iframe's embed:loaded event, per identity.
 let workspaceSections = [];
+let plans = [];
 let workspaceItems = { org: [], personal: [] };
 let embedOrigin = '';
 const isWs = (id) => /^ws:[a-z0-9_]+(\.[a-z0-9_]+)?$/.test(id || '');
@@ -19,6 +20,7 @@ let view;
 let inflight;
 
 const ICONS = {
+  about: '<path d="M3 6.5L10 3l7 3.5-7 3.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 8.5v4c0 1.2 1.8 2.5 4 2.5s4-1.3 4-2.5v-4" fill="none" stroke="currentColor" stroke-width="1.6"/>',
   ai: '<path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/>',
   dashboards: '<path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   team: '<path d="M4 3.5h8l4 4V16.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 13v-2M10 13V9M13 13v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
@@ -69,7 +71,7 @@ function navGroup(labelText) {
 
 function renderWorkspaceSections(nav) {
   for (const ws of workspaceSections) {
-    if (ws.editorsOnly && !current?.editor) continue;
+    if (ws.requires && !current?.caps?.[ws.requires]) continue;
     const items = workspaceItems[ws.key] || [];
     if (!items.length && !ws.empty) continue;
     const group = navGroup(ws.label);
@@ -187,14 +189,21 @@ async function load(user) {
   $('userName').textContent = user.title;
   $('userSub').textContent = user.tenantName;
   renderMenu();
-  // Viewers have no Datasets entry; switching to one from Explore falls back to the default view.
+  // A plan without this view (e.g. Essentials on Rocky AI) falls back to its own home view.
   if (isWs(view) ? switched : !user.views.includes(view)) {
-    setView(defaultView);
-    history.replaceState(null, '', `#${defaultView}`);
+    setView(user.home);
+    history.replaceState(null, '', `#${user.home}`);
   }
   renderNav();
   setView(view);
   inflight?.abort();
+  const native = VIEWS.get(view)?.native;
+  $('frameWrap').hidden = !!native;
+  $('plansView').hidden = !native;
+  if (native) {
+    renderPlans();
+    return;
+  }
   inflight = new AbortController();
   setState(`Signing a token for ${user.tenantName}…`);
   frame.classList.add('loading');
@@ -245,6 +254,120 @@ function setView(next) {
     if (on) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
+}
+
+// ---------- Plans & permissions (host-native page, no embed token) ----------
+const CAP_ROWS = [
+  { label: 'Standard dashboards', note: 'Built and maintained by Rockinfo', field: 'embed_portal', cell: () => 'yes' },
+  { label: 'Team reports: view', note: 'Reports their own org published', field: 'org_workspace_role: viewer', cell: (c) => (c.org !== 'no_access' ? 'yes' : 'no') },
+  { label: 'Team reports: publish', note: 'Build once, share with every user in the org', field: 'org_workspace_role: editor', cell: (c) => (c.org === 'editor' ? 'yes' : 'no'), money: true },
+  { label: 'Rocky AI', note: 'Plain-English questions on their own data', field: 'settings.ai.enabled', cell: (c) => (c.ai ? 'yes' : 'no'), money: true },
+  { label: 'Explore the dataset', note: 'Drag-and-drop charts on governed metrics', field: 'datasets in portal + host sidebar', cell: (c) => (c.explore ? 'yes' : 'no'), money: true },
+  { label: 'My reports', note: 'Private self-built dashboards', field: 'enable_personal_workspace', cell: (c) => (c.personal ? 'yes' : 'no'), money: true },
+  { label: 'PDF / PNG export', note: 'Download a dashboard', field: 'allow_dashboard_export', cell: (c) => (c.pdf ? 'yes' : 'no') },
+  { label: 'Scheduled email reports', note: 'Dashboards delivered to their inbox', field: 'allow_data_subscribe', cell: (c) => (c.schedules ? 'yes' : 'no'), money: true },
+  { label: 'Raw data download', note: 'CSV / Excel of the rows behind a chart', field: 'allow_raw_data_export', cell: (c) => (c.csv ? 'yes' : 'no'), money: true },
+  { label: 'Tenant isolation', note: 'Only their own organisation’s rows, always', field: 'user_attributes.rockinfo_client_id', cell: () => 'yes' },
+];
+
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+};
+
+function personaFor(planKey) {
+  const slug = current.tenantSlug === 'rockinfo' ? users[0].tenantSlug : current.tenantSlug;
+  return users.find((u) => u.tenantSlug === slug && u.plan === planKey);
+}
+
+function tryButton(planKey) {
+  const u = personaFor(planKey);
+  const b = el('button', 'plan-try', u.id === current.id ? 'You are signed in as this plan' : `Try as ${u.tenantName} ${u.title.toLowerCase()}`);
+  b.type = 'button';
+  b.disabled = u.id === current.id;
+  b.addEventListener('click', () => load(u));
+  return b;
+}
+
+function renderPlans() {
+  const root = $('plansView');
+  root.innerHTML = '';
+  const intro = el('section', 'plans-intro');
+  intro.append(
+    el('h2', null, 'Package analytics the way you sell your platform'),
+    el('p', null, 'One portal, one governed dataset and one token per user. The plan only changes a few fields in the signed embed token, so Rockinfo can price self-service and AI as add-ons without building anything per customer. Switch persona to feel each plan.'),
+  );
+  root.appendChild(intro);
+
+  const cards = el('section', 'plan-cards');
+  for (const p of plans) {
+    const card = el('article', 'plan-card' + (current.plan === p.key ? ' current' : ''));
+    const head = el('div', 'plan-head');
+    head.append(el('h3', null, p.name), el('span', 'plan-price', p.price));
+    card.append(head, el('p', 'plan-persona', p.title), el('p', 'plan-pitch', p.pitch), tryButton(p.key));
+    cards.appendChild(card);
+  }
+  root.appendChild(cards);
+
+  const tableWrap = el('section', 'plan-matrix-wrap');
+  tableWrap.appendChild(el('h2', null, 'What each plan can and cannot do'));
+  const table = el('table', 'plan-matrix');
+  const thead = el('thead');
+  const hr = el('tr');
+  hr.appendChild(el('th', null, 'Capability'));
+  for (const p of plans) hr.appendChild(el('th', current.plan === p.key ? 'current' : null, p.name));
+  hr.appendChild(el('th', 'field', 'Token field'));
+  thead.appendChild(hr);
+  const tbody = el('tbody');
+  for (const r of CAP_ROWS) {
+    const tr = el('tr', r.money ? 'money' : null);
+    const th = el('th');
+    th.append(el('span', 'cap-label', r.label), el('span', 'cap-note', r.note));
+    tr.appendChild(th);
+    for (const p of plans) {
+      const v = r.cell(p.caps);
+      const td = el('td', `cell ${v}` + (current.plan === p.key ? ' current' : ''));
+      td.textContent = v === 'yes' ? '✓' : '—';
+      td.setAttribute('aria-label', v === 'yes' ? 'Included' : 'Not included');
+      tr.appendChild(td);
+    }
+    tr.appendChild(el('td', 'field', r.field));
+    tbody.appendChild(tr);
+  }
+  table.append(thead, tbody);
+  tableWrap.appendChild(table);
+  tableWrap.appendChild(el('p', 'plan-legend', 'Rows marked $ are the levers Rockinfo can charge for.'));
+  root.appendChild(tableWrap);
+
+  const money = el('section', 'plan-money');
+  money.appendChild(el('h2', null, 'Self-built reports: what to give away, what to charge for'));
+  const grid = el('div', 'money-grid');
+  const col = (title, cls, items) => {
+    const c = el('div', `money-col ${cls}`);
+    c.appendChild(el('h3', null, title));
+    const ul = el('ul');
+    for (const t of items) ul.appendChild(el('li', null, t));
+    c.appendChild(ul);
+    return c;
+  };
+  grid.append(
+    col('Included for every user', 'free', [
+      'Viewing every team report their org publishes, so self-built content reaches all seats.',
+      'Rockinfo’s standard dashboards and PDF export.',
+      'Tenant isolation: the same row-level security on every plan.',
+    ]),
+    col('Charge for building', 'paid', [
+      'Explore and My reports (Self-service): power users answer their own questions.',
+      'Publishing to the team (Enterprise): one person builds, the whole org benefits.',
+      'Rocky AI and scheduled email reports (Insights and up).',
+      'Raw data download (Enterprise): the data leaves the platform, so price it accordingly.',
+    ]),
+  );
+  money.appendChild(grid);
+  money.appendChild(el('p', 'plan-legend', 'Explore is hidden from the sidebar for Essentials and Insights. The dataset stays in the shared portal because Rocky AI needs it, so a separate portal per plan would be the hard enforcement.'));
+  root.appendChild(money);
 }
 
 let toastTimer;
@@ -302,6 +425,7 @@ try {
   sections = cfg.sections;
   defaultView = cfg.defaultView;
   workspaceSections = cfg.workspaceSections || [];
+  plans = cfg.plans || [];
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
   setView(viewFromHash());
   load(users[0]);
