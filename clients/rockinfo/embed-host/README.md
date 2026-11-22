@@ -29,18 +29,8 @@ from the tenant row (client name and colour), so no per-customer copies exist.
 HOLISTICS_EMBED_KEY_ID=... HOLISTICS_EMBED_SECRET=... node server.mjs   # http://localhost:8080
 ```
 
-## Deploy (proto, https://docs.pages.holistics.dev/)
+## Deploy
 
-1. In 1Password, vault **Prototypes**, create item `rockinfo-embed` with fields
-   `HOLISTICS_EMBED_KEY_ID`, `HOLISTICS_EMBED_SECRET` and `DEMO_PASSWORD`.
-2. Build and deploy:
-
-```sh
-docker buildx build --platform linux/amd64 -t ghcr.io/holistics/rockinfo-embed:latest --push .
-proto deploy --image ghcr.io/holistics/rockinfo-embed:latest --name rockinfo-embed --port 8080 \
-  --secret HOLISTICS_EMBED_KEY_ID --secret HOLISTICS_EMBED_SECRET --secret DEMO_PASSWORD
-```
-
-The site is `https://rockinfo-embed.pages.holistics.dev`. It stays live while the
-deploy PR on `holistics/prototypes-deploy` is open.
-
+Follow `../docs/deploy.md`. It covers the baked-key image build, `proto deploy --image`,
+and verification. The site is `https://rockinfo-embed.pages.holistics.dev`, and it stays
+live while `holistics/prototypes-deploy#203` is open.
