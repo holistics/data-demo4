@@ -46,35 +46,36 @@ function holisticsEmbedUrl(user, client) {
 
 Every persona uses `embed_portal: 'rockinfo_client_portal'`. Only the identity changes.
 
-Each customer tenant is on one analytics plan and has several user roles. A user gets what both
-the plan and the role allow. Plans (`PLANS`), roles (`ROLES`) and each tenant's plan (`TENANTS`)
-live in `embed-host/lib/tenants.mjs`; the host's **Plans & permissions** page renders the plan
-matrix. The persona menu lists tenants from the most expensive plan down, and roles inside a
-tenant from most to least permission. A middle role the plan makes identical to one above it is
-left out; the homepage opens as the Adobe client admin.
+Each customer buys one plan, optionally plus the Data Export add-on; its admin gives each person a
+role. Plans (`PLANS`), the add-on (`ADDONS`), roles (`ROLES`) and each tenant's purchase
+(`TENANTS`) live in `embed-host/lib/tenants.mjs`; `capsFor` turns plan + role + add-on into token
+fields and the host's **Plans & permissions** page renders the same model.
 
-| Tenant | Plan | Personas (`embed_user_id`), admin first |
+| Plan | Rocky AI | Explore, My reports | Publish to Team reports | Team reports |
+| --- | --- | --- | --- | --- |
+| Program Dashboards (included) | no | no | no | hidden (`org_workspace_role: no_access`) |
+| Analytics Studio (add-on, per Creator seat) | every user | Creators | every Creator | everyone sees |
+| Studio Enterprise (premium) | every user | Creators | named Publishers only | everyone sees |
+
+Every plan includes Rockinfo dashboards, PDF export and scheduled emails. **Data Export** (add-on,
+any plan) gives `allow_raw_data_export` to the roles the admin chooses.
+
+| Tenant | Purchase | Personas (`embed_user_id`) and seat |
 | --- | --- | --- |
-| Adobe | Enterprise (premium) | `adobe_admin`, `adobe_editor`, `adobe_analyst`, `adobe_viewer` |
-| Lenovo | Enterprise (premium) | `lenovo_admin`, `lenovo_editor`, `lenovo_analyst`, `lenovo_viewer` |
-| Nutanix | Self-service (add-on) | `nutanix_admin`, `nutanix_analyst`, `nutanix_viewer` |
-| F5 | Insights (add-on) | `f5_admin`, `f5_viewer` |
-| Cloudinary | Essentials (included) | `cloudinary_admin`, `cloudinary_viewer` |
+| Adobe | Studio Enterprise + Data Export | `adobe_admin` Creator + Publisher, `adobe_editor` Creator (private), `adobe_analyst` Viewer + Data Export, `adobe_viewer` Viewer |
+| Lenovo | Studio Enterprise + Data Export | same four roles as Adobe |
+| F5 | Analytics Studio + Data Export | `f5_editor` Creator, `f5_analyst` Viewer + Data Export, `f5_viewer` Viewer |
+| Nutanix | Analytics Studio | `nutanix_editor` Creator, `nutanix_viewer` Viewer |
+| Cloudinary | Program Dashboards | `cloudinary_viewer` Viewer |
 | Rockinfo | Internal | `rockinfo_internal_admin`, `embed_org_id: rockinfo_internal`, all nine clients |
 
-| Role (`<slug>_<key>`) | `org_workspace_role` | Personal | Ask AI | Explore | PDF | CSV | Schedules |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Client admin (`admin`) | `editor` | yes | yes | yes | yes | yes | yes |
-| Program manager (`editor`) | `viewer` | yes | yes | yes | yes | no | yes |
-| Program analyst (`analyst`) | `viewer` | no | yes | no | yes | no | yes |
-| Partner success viewer (`viewer`) | `viewer` | no | no | no | yes | no | no |
-
-Each cell is then capped by the tenant's plan: only Enterprise allows `editor` and CSV, only
-Self-service and up allow Explore and Personal, and only Insights and up allow Ask AI and schedules.
+Role keys stay the `embed_user_id` suffix so earlier reports keep their authors: `admin` Program
+manager (Creator, Publisher), `editor` Partner manager (Creator), `analyst` Channel operations
+analyst (Viewer, exports), `viewer` VP partner ecosystem (Viewer).
 
 Every client persona uses `embed_org_id: client_<id>` and `rockinfo_client_id: [<id>]`.
 Tenants in the embed host: Adobe `101`, Lenovo `102`, Nutanix `105`, F5 `106`, Cloudinary `109`.
-Plans without Ask AI open on Program Performance. The host hides Rocky AI and Datasets from plans
+Plans without Rocky AI open on Program Performance. The host hides Rocky AI and Datasets from people
 without them and refuses to sign those views (`requires` in `embed-host/lib/portal.mjs`). The
 dataset is still a portal object because Ask AI needs it, so Explore is a host-side guard, not a
 Holistics permission.
