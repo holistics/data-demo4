@@ -35,7 +35,7 @@ function renderCustomers(active) {
 
 function renderPayload(payload) {
   const facts = [
-    ['Portal (and theme)', payload.embed_portal],
+    ['Portal', payload.embed_portal],
     ['Row-level filter', `rockinfo_client_id = [${payload.user_attributes.rockinfo_client_id.join(', ')}]`],
     ['Workspace', `${payload.embed_org_id} · ${payload.permissions.org_workspace_role}`],
     ['AI', payload.settings.ai.enabled ? 'On' : 'Off'],
