@@ -4,8 +4,8 @@
 //
 //   node scripts/report-meta.mjs <demo4 repo root> > <build dir>/public/report-meta.json
 //
-// Run it in the image build (docs/deploy.md). Reports saved after the build show what the host
-// recorded in the browser until the next deploy.
+// Run it in the image build (docs/deploy.md). The server (lib/report-meta.mjs) then follows newer
+// commits from the public GitHub repo, so saves after the build show without a redeploy.
 import { execFileSync } from 'node:child_process';
 import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -48,4 +48,6 @@ for (const org of readdirSync(base).filter((d) => d.startsWith('org_client_'))) 
     }
   }
 }
-process.stdout.write(JSON.stringify({ generatedAt: new Date().toISOString(), reports: out }, null, 2) + '\n');
+// The newest commit under modules/embedding: the server's live sync applies only commits after it.
+const head = git('log', '-1', '--format=%H', '--', 'modules/embedding').trim() || null;
+process.stdout.write(JSON.stringify({ generatedAt: new Date().toISOString(), head, reports: out }, null, 2) + '\n');

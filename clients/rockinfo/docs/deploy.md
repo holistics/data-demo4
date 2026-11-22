@@ -66,6 +66,10 @@ rm -f $B/secrets.env
 proto deploy --image ghcr.io/vinwoon/rockinfo-embed:<tag> --name rockinfo-embed --port 8080 -y
 ```
 
+The baked `report-meta.json` is only the starting point: the server keeps it current from the
+public GitHub history of `holistics/data-demo4` (`lib/report-meta.mjs`), so a report edited in the
+embed does not need a redeploy. Check `curl -s $U/api/report-meta` for `syncedAt`.
+
 Docker runs on OrbStack (`open -ga OrbStack`). GHCR login uses the GitHub token in proto's
 config (`~/Library/Application Support/proto/config.json`, key `github_token`).
 

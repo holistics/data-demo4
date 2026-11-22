@@ -10,7 +10,8 @@ import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PLANS, identities } from './lib/tenants.mjs';
+import { PLANS, identities, people } from './lib/tenants.mjs';
+import * as reportMeta from './lib/report-meta.mjs';
 import { DEFAULT_VIEW, SECTIONS, VIEWS, WORKSPACE_SECTIONS, canOpen, homeFor, viewsFor, workspaceView } from './lib/portal.mjs';
 
 // Optional secrets.env next to this file (KEY=VALUE lines), for builds that bake
@@ -33,6 +34,8 @@ const ASSET_VERSION = createHash('sha256')
   .update(readFileSync(join(PUBLIC, 'styles.css')))
   .digest('hex')
   .slice(0, 10);
+// Team report metadata: baked at build, then kept current from public git history.
+reportMeta.start(join(PUBLIC, 'report-meta.json'));
 const INDEX_HTML = readFileSync(join(PUBLIC, 'index.html'), 'utf8')
   .replace('href="/styles.css"', `href="/styles.css?v=${ASSET_VERSION}"`)
   .replace('src="/app.js"', `src="/app.js?v=${ASSET_VERSION}"`);
@@ -80,8 +83,9 @@ function config() {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
       title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds, views: viewsFor(i),
-      plan: i.plan, planName: i.planName, caps: i.caps, home: homeFor(i),
+      name: i.name, plan: i.plan, planName: i.planName, caps: i.caps, home: homeFor(i),
     })),
+    people: people(),
     plans: PLANS,
     sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub, native }) => ({ id, title, sub, native: !!native })) })),
     workspaceSections: WORKSPACE_SECTIONS,
@@ -147,6 +151,7 @@ createServer(async (req, res) => {
       return res.end('Password required');
     }
     if (url.pathname === '/api/config' && req.method === 'GET') return json(res, 200, config());
+    if (url.pathname === '/api/report-meta' && req.method === 'GET') return json(res, 200, reportMeta.snapshot());
     if (url.pathname === '/api/embed-token' && req.method === 'POST') {
       let body;
       try { body = await readBody(req); } catch { return json(res, 400, { error: 'Invalid JSON body.' }); }

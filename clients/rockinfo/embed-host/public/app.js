@@ -13,9 +13,11 @@ let defaultView = 'ai';
 // Team (org) and personal dashboards come from the iframe's embed:loaded event, per identity.
 let workspaceSections = [];
 let plans = [];
-// Who built each workspace report and when: report-meta.json is generated from git at image
-// build (scripts/report-meta.mjs); reports saved since then are recorded here in the browser.
+// Who built each workspace report and when: /api/report-meta serves git history (baked at build,
+// then kept current by the server); a report this browser just saw appear is recorded here until then.
 let reportMeta = {};
+// Every possible report author (embed_user_id -> name, role title, tenant), including hidden roles.
+let people = {};
 let localMeta = {};
 const seenOrg = new Map();
 try { localMeta = JSON.parse(localStorage.getItem('rockinfo.reportMeta') || '{}'); } catch {}
@@ -53,11 +55,18 @@ const fmtTime = (iso) =>
   new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 
 function personLabel(embedUserId) {
-  const u = users.find((x) => x.id === embedUserId);
-  return u ? `${u.title} (${u.tenantName})` : 'your team';
+  const p = people[embedUserId];
+  return p ? `${p.name} (${p.title}, ${p.tenantName})` : 'your team';
 }
 
-// "Built by Client admin (Adobe) · Created 22 Nov 2026, 10:50 pm · Last updated …"
+async function refreshReportMeta() {
+  try {
+    const m = await fetch('/api/report-meta', { cache: 'no-store' });
+    if (m.ok) reportMeta = (await m.json()).reports || {};
+  } catch {}
+}
+
+// "Built by Maya Chen (Client admin, Adobe) · Created 22 Nov 2026, 10:50 pm · Last updated …"
 function metaLine(uname, workspace) {
   const m = reportMeta[uname] || localMeta[uname];
   const kind = workspace === 'org' ? 'Team report' : 'My report';
@@ -169,7 +178,7 @@ function renderMenu() {
       text.className = 'menu-text';
       const t1 = document.createElement('span');
       t1.className = 'menu-title';
-      t1.textContent = u.title;
+      t1.textContent = u.name ? `${u.name} · ${u.title}` : u.title;
       const t2 = document.createElement('span');
       t2.className = 'menu-sub';
       t2.textContent = u.role;
@@ -215,8 +224,8 @@ async function load(user) {
   current = user;
   document.documentElement.style.setProperty('--tenant', user.accent);
   $('userAvatar').textContent = initials(user.tenantName);
-  $('userName').textContent = user.title;
-  $('userSub').textContent = user.tenantName;
+  $('userName').textContent = user.name || user.title;
+  $('userSub').textContent = `${user.title} · ${user.tenantName}`;
   renderMenu();
   // A plan without this view (e.g. Essentials on Rocky AI) falls back to its own home view.
   if (isWs(view) ? switched : !user.views.includes(view)) {
@@ -313,7 +322,7 @@ const tenantsOn = (planKey) => [...new Set(users.filter((u) => u.plan === planKe
 function tryButton(planKey) {
   const u = personaFor(planKey);
   const here = current.plan === planKey;
-  const b = el('button', 'plan-try', here ? 'Your tenant is on this plan' : `Try as ${u.tenantName} ${u.title.toLowerCase()}`);
+  const b = el('button', 'plan-try', here ? 'Your tenant is on this plan' : `Try as ${u.name ? `${u.name}, ` : ''}${u.tenantName} ${u.title.toLowerCase()}`);
   b.type = 'button';
   b.disabled = here;
   // Land on the plan's home view so the embed loads and its Team reports appear.
@@ -436,6 +445,11 @@ window.addEventListener('message', (e) => {
   seenOrg.set(key, new Set(workspaceItems.org.map((d) => d.uname)));
   renderNav();
   setView(view);
+  // Pick up edits saved since the page loaded (the server follows git), then redraw.
+  refreshReportMeta().then(() => {
+    renderNav();
+    setView(view);
+  });
 });
 
 window.addEventListener('hashchange', () => {
@@ -471,10 +485,8 @@ try {
   sections = cfg.sections;
   defaultView = cfg.defaultView;
   workspaceSections = cfg.workspaceSections || [];
-  try {
-    const m = await fetch('/report-meta.json');
-    if (m.ok) reportMeta = (await m.json()).reports || {};
-  } catch {}
+  people = cfg.people || {};
+  await refreshReportMeta();
   plans = cfg.plans || [];
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
   setView(viewFromHash());
