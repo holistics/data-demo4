@@ -29,7 +29,7 @@ svg { width: 16px; height: 16px; flex-shrink: 0; }
 .poc-banner { margin: 0; padding: 8px 16px; text-align: center; font-size: 13px; background: #fff4d6; color: #5c4400; border-bottom: 1px solid #f0dca0; }
 .poc-banner strong { font-weight: 700; }
 .shell { display: grid; grid-template-columns: 232px 1fr; flex: 1; min-height: 0; }
-.sidebar { background: #15171c; color: #d5d8de; padding: 20px 14px; display: flex; flex-direction: column; gap: 24px; }
+.sidebar { background: #15171c; color: #d5d8de; padding: 20px 14px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; }
 .brand { display: block; padding: 4px 6px; }
 .brand img { display: block; height: 34px; width: auto; }
 .nav { display: flex; flex-direction: column; gap: 2px; }
@@ -109,6 +109,9 @@ iframe.loading { opacity: .25; }
 }
 
 .nav-item.home { font-weight: 600; font-size: 15px; padding: 10px; }
+.analytics-nav { gap: 14px; }
+.nav-group { display: flex; flex-direction: column; gap: 2px; }
+.nav-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nav-item.module { color: #9ea3ad; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: min(560px, calc(100vw - 32px)); margin: 0; padding: 10px 16px; border-radius: 10px; background: #15171c; color: #fff; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,.25); z-index: 40; }
 .toast[hidden] { display: none; }
