@@ -70,7 +70,7 @@ export const WORKSPACE_SECTIONS = [
   { key: 'org', label: 'Team reports', empty: 'No team reports yet. Editors build one in Explore and save it to the Shared workspace.' },
   { key: 'personal', label: 'My reports', editorsOnly: true },
 ];
-const UNAME = /^[a-z0-9_]{1,120}$/;
+const UNAME = /^[a-z0-9_]+(\.[a-z0-9_]+)?$/;
 export const workspaceView = (viewId) => {
   const m = /^ws:(.+)$/.exec(viewId || '');
   return m && UNAME.test(m[1]) ? { id: viewId, title: m[1], path: `/objects/${m[1]}` } : null;
