@@ -33,7 +33,7 @@ function holisticsEmbedUrl(user, client) {
       org_workspace_role: user.role === 'client_editor' ? 'editor' : 'viewer',
     },
     settings: {
-      ai: { enabled: user.role !== 'viewer' },
+      ai: { enabled: true },                 // required: the portal lands on Ask AI
     },
     exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
   };
@@ -65,7 +65,8 @@ only that client's programs, partners and AI answers. The internal admin sees "A
 | Which rows | `user_attributes.rockinfo_client_id` → dataset permission `client_access` |
 | Which content | `embed_portal` → objects listed in `rockinfo_client_portal` |
 | Who can build | `permissions.org_workspace_role`, `permissions.enable_personal_workspace` |
-| AI on or off | `settings.ai.enabled` |
+| AI on or off | `settings.ai.enabled` (keep `true`: the portal's `initial_object` is `'ai'`) |
+| Landing page | portal `initial_object: 'ai'`; append `/objects/rockinfo_program_performance` to the embed URL to open the dashboard instead |
 | Session length | `exp` |
 
 User-built dashboards are saved as AML in the Git-connected project, so client-made reports

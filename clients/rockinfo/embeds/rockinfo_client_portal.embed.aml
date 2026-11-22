@@ -10,7 +10,8 @@ EmbedPortal rockinfo_client_portal {
     rockinfo_candidate_record,    // drill-through destination
     rockinfo_credentialing,       // governed dataset for Explore, client-built dashboards and AI
   ]
-  initial_object: rockinfo_program_performance
+  // Land on Ask AI; the token must set settings.ai.enabled: true.
+  initial_object: 'ai'
   required_permissions: [
     rockinfo_credentialing.permission.client_access,
   ]
