@@ -87,6 +87,17 @@ reports: Adobe (Partner Voucher Watchlist, Recertification Pipeline), Lenovo (Pa
 Scorecard, Regional Certification Coverage), Nutanix (Exam Performance), F5 (Voucher Sales by
 Channel), Cloudinary (Learning Engagement).
 
+**My reports** are dashboards a Creator saved to their Personal workspace
+(`enable_personal_workspace`, path `modules/embedding/org_client_<id>/personal_workspace/user_<embed_user_id>/`).
+Holistics lists only the viewer's own (`workspace: 'personal'`), so nobody else in the org, admin
+included, sees them. The sidebar shows **Team reports** only when `org_workspace_role` is not
+`no_access` (hidden on Program Dashboards) and **My reports** only for Creators, with an empty
+state when they have none. Seeded My reports: Daniel Okafor `adobe_editor` (My Partners: Exam
+Readiness), Maya Chen `adobe_admin` (Draft: Program Health Check), Laura Martín `lenovo_editor`
+(My Region: Partner Pipeline), Sofia Rossi `nutanix_editor` (Recertification Follow-ups). Create
+more with `embed-host/scripts/create-org-dashboard.mjs <identity> --personal`, then write the
+AML into the generated file.
+
 The page subtitle of a team report reads "Built by … · Created … · Last updated …". Holistics
 exposes none of this to the embed, so `embed-host/scripts/report-meta.mjs` reads it from the
 `Embed user <id> (Org: …)` commits at image build. A report saved after the build is recorded in
