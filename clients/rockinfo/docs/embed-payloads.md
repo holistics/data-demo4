@@ -22,7 +22,7 @@ const EMBED_SECRET = process.env.HOLISTICS_EMBED_SECRET;
 // user: the signed-in Rockinfo user; client: their organisation (tenant)
 function holisticsEmbedUrl(user, client) {
   const payload = {
-    embed_portal: 'rockinfo_client_portal',
+    embed_portal: client.portal || 'rockinfo_client_portal', // e.g. rockinfo_portal_adobe
     embed_org_id: `client_${client.id}`,     // workspace boundary per Rockinfo client
     embed_user_id: `user_${user.id}`,        // stable per person, for personal dashboards
     user_attributes: {
@@ -44,15 +44,18 @@ function holisticsEmbedUrl(user, client) {
 
 ## Test identities for the call
 
-| Persona | `embed_org_id` | `rockinfo_client_id` | Workspace role | AI |
+| Persona | `embed_portal` | `embed_org_id` | `rockinfo_client_id` | Workspace role |
 | --- | --- | --- | --- | --- |
-| Program manager at Apex Cloud Academy (client editor) | `client_101` | `[101]` | `editor` + personal | on |
-| Registrar at Meridian Nursing Council (viewer) | `client_102` | `[102]` | `viewer` | off |
-| Rockinfo internal admin, all clients | `rockinfo_internal` | `[101, 102, 103, 104, 105]` | `editor` | on |
+| Adobe program manager (client editor) | `rockinfo_portal_adobe` | `client_101` | `[101]` | `editor` + personal |
+| Lenovo partner manager (viewer) | `rockinfo_portal_lenovo` | `client_102` | `[102]` | `viewer` |
+| Nutanix | `rockinfo_portal_nutanix` | `client_105` | `[105]` | `editor` |
+| F5 | `rockinfo_portal_f5` | `client_106` | `[106]` | `editor` |
+| Cloudinary | `rockinfo_portal_cloudinary` | `client_109` | `[109]` | `editor` |
+| Rockinfo internal admin, all clients | `rockinfo_client_portal` | `rockinfo_internal` | `[101, 102, 103, 104, 105, 106, 107, 108, 109]` | `editor` |
 
-Show 101, then 102, with the same portal: different totals, programs, partners and AI answers.
-Then try a forged override (for example `rockinfo_client_id: [999]`): it returns no rows,
-because the attribute only matches existing tenants.
+Show Adobe, then Lenovo: different theme, programs, partners and AI answers from one
+governed dataset. Then send the Lenovo portal with `rockinfo_client_id: [101]`: it shows
+Adobe's data in Lenovo's theme, which proves the token, not the portal, decides data access.
 
 ## What the token controls
 

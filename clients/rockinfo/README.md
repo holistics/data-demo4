@@ -2,7 +2,7 @@
 
 Prospect: Rockinfo (rockinfo.com), a credentialing platform spanning Candidate, Learning,
 Certification, Vouchers and Credentials modules. Rockinfo would embed Holistics in its app so
-each **client** (a certification body, nursing council, institute) sees only its own data,
+each **client** (a technology vendor running certification programs) sees only its own data,
 and client editors can self-serve with governed metrics and AI.
 
 ## The data (synthetic)
@@ -13,26 +13,36 @@ Data runs from Jan 2024 to 21 Nov 2026. Generated deterministically by
 
 | Table | Rows | Grain |
 | --- | ---: | --- |
-| clients | 5 | Tenant (client organisation) |
-| programs | 16 | Certification, Micro-credential, CPD, Learning Path |
-| courses | 49 | Course inside a program |
-| exams | 14 | Paid exam per certification program |
-| partners | 62 | Training partners, resellers, corporate, academic, plus Direct per client |
-| candidates | 26,000 | Learner, one acquisition partner |
-| enrolments | 65,604 | Candidate x course |
-| exam_attempts | 16,199 | Exam sitting (first attempt and retakes), booked with a voucher |
-| credentials | 15,136 | Credential issued, including recertifications |
-| vouchers | 21,785 | Exam voucher: redeemed, unredeemed (deferred revenue) or expired (breakage) |
+| clients | 9 | Tenant: Rockinfo's published customers |
+| programs | 25 | Certification, Micro-credential, Learning Path |
+| courses | 73 | Course inside a program |
+| exams | 20 | Paid exam per certification program |
+| partners | 106 | Training partners, resellers, corporate, academic, plus Direct per client |
+| candidates | 28,100 | Learner, one acquisition partner |
+| enrolments | 69,488 | Candidate x course |
+| exam_attempts | 17,003 | Exam sitting (first attempt and retakes), booked with a voucher |
+| credentials | 16,806 | Credential issued, including recertifications |
+| vouchers | 23,386 | Exam voucher: redeemed, unredeemed (deferred revenue) or expired (breakage) |
 
 Clients and test IDs for the embed token:
 
-| `rockinfo_client_id` | Client | HQ |
+Tenants are Rockinfo's customers from the logo strip on rockinfo.com. Programs and all numbers
+are synthetic and say nothing about any vendor's real certification results.
+
+| `rockinfo_client_id` | Client | Themed portal |
 | ---: | --- | --- |
-| 101 | Apex Cloud Academy | United States |
-| 102 | Meridian Nursing Council | Australia |
-| 103 | Northstar Project Institute | United Kingdom |
-| 104 | Harbor Safety Board | United States |
-| 105 | Lumen Financial Standards | Singapore |
+| 101 | Adobe | `rockinfo_portal_adobe` |
+| 102 | Lenovo | `rockinfo_portal_lenovo` (dark theme) |
+| 103 | SonicWall | neutral portal only |
+| 104 | Axway | neutral portal only |
+| 105 | Nutanix | `rockinfo_portal_nutanix` |
+| 106 | F5 | `rockinfo_portal_f5` |
+| 107 | Gigamon | neutral portal only |
+| 108 | RStudio | neutral portal only |
+| 109 | Cloudinary | `rockinfo_portal_cloudinary` |
+
+`rockinfo_client_portal` is the neutral portal for any client and for Rockinfo internal users.
+A themed portal changes only the look: data scope always comes from the token's `rockinfo_client_id`.
 
 Reseed: `NEON_DEMO_DATABASE_URL=... python database/seed_rockinfo.py --out /tmp/rockinfo --load`.
 Holistics reads through the read-only role `holistics_reader`. Its credentials are in
@@ -49,7 +59,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts
   - `rockinfo_partner_detail`: drill-through destination (Partner)
   - `rockinfo_candidate_record`: drill-through destination (Candidate ID), the single-record view
-- `embeds/rockinfo_client_portal.embed.aml`: the portal Rockinfo embeds, with AI enabled.
+- `themes/` and `dashboards/customers/`: one theme per showcase customer and `.extend()` copies of the 3 dashboards with that theme.
+- `embeds/`: `rockinfo_client_portal` (neutral) and `rockinfo_portal_<slug>` per showcase customer, all with AI enabled.
 
 ## Demo capabilities
 

@@ -2,7 +2,7 @@
 """Deterministic synthetic seed for the Rockinfo embedded-analytics PoC.
 
 Models a credentialing platform that serves several client organisations
-(certification bodies, councils, institutes). Each client is one embedded tenant.
+(Rockinfo's customers: technology vendors running certification programs). Each client is one embedded tenant.
 
 Usage:
   python seed_rockinfo.py --out <dir>             # write DDL + CSVs only
@@ -31,41 +31,59 @@ REGIONS = {
     'ANZ': ['Australia', 'New Zealand'],
 }
 
+# Tenants are Rockinfo's published customers (logos on rockinfo.com). All programs and
+# numbers are synthetic and do not describe any vendor's real certification results.
 # client_id, name, code, industry, hq_country, candidate target, region weights, programs
 # program: name, type, recert_months (None = no expiry), exam fee USD (0 = no paid exam),
 #          exam pass base, course topics
+GLOBAL = {'North America': .40, 'Latin America': .08, 'EMEA': .25, 'APAC': .20, 'ANZ': .07}
 CLIENTS = [
-    (101, 'Apex Cloud Academy', 'APX', 'Technology vendor certification', 'United States', 7000,
-     {'North America': .45, 'Latin America': .10, 'EMEA': .20, 'APAC': .20, 'ANZ': .05}, [
-         ('Cloud Practitioner', 'Certification', 36, 150, .78, ['Cloud Concepts', 'Core Services', 'Billing and Pricing']),
-         ('Cloud Solutions Architect', 'Certification', 36, 300, .64, ['Resilient Design', 'High-Performing Architectures', 'Secure Workloads', 'Cost Optimisation']),
-         ('Cloud Security Specialist', 'Certification', 24, 350, .58, ['Identity and Access', 'Threat Detection', 'Data Protection']),
-         ('Data Engineering Path', 'Learning Path', None, 0, 0, ['Data Ingestion', 'Pipelines', 'Data Warehousing']),
-     ]),
-    (102, 'Meridian Nursing Council', 'MNC', 'Healthcare licensing and CPD', 'Australia', 5000,
-     {'ANZ': .85, 'APAC': .10, 'EMEA': .05}, [
-         ('Registered Nurse CPD', 'CPD', 12, 0, 0, ['Clinical Governance', 'Infection Control', 'Ethics in Practice']),
-         ('Critical Care Endorsement', 'Certification', 36, 420, .61, ['Advanced Assessment', 'Ventilation Management', 'Critical Pharmacology', 'Deteriorating Patient']),
-         ('Medication Safety', 'Micro-credential', 24, 95, .82, ['Safe Administration', 'High-Risk Medicines']),
-     ]),
-    (103, 'Northstar Project Institute', 'NPI', 'Professional certification', 'United Kingdom', 6000,
-     {'EMEA': .50, 'North America': .15, 'APAC': .20, 'ANZ': .10, 'Latin America': .05}, [
-         ('Project Foundations', 'Certification', 36, 200, .74, ['Project Lifecycle', 'Scope and Schedule', 'Stakeholders']),
-         ('Agile Practitioner', 'Certification', 36, 275, .69, ['Agile Principles', 'Scrum in Practice', 'Scaling Agile']),
-         ('Programme Management Professional', 'Certification', 36, 450, .55, ['Benefits Realisation', 'Programme Governance', 'Portfolio Alignment', 'Risk at Scale']),
-     ]),
-    (104, 'Harbor Safety Board', 'HSB', 'Workplace safety certification', 'United States', 4500,
-     {'North America': .90, 'Latin America': .10}, [
-         ('Site Safety Supervisor', 'Certification', 24, 180, .70, ['Hazard Identification', 'Incident Response', 'Safety Leadership']),
-         ('Working at Heights', 'Micro-credential', 12, 60, .86, ['Fall Protection', 'Rescue Planning']),
-         ('Hazardous Materials Handling', 'Certification', 24, 140, .72, ['Classification', 'Storage and Transport', 'Spill Response']),
-     ]),
-    (105, 'Lumen Financial Standards', 'LFS', 'Financial services certification', 'Singapore', 3500,
-     {'APAC': .60, 'ANZ': .15, 'EMEA': .15, 'North America': .10}, [
-         ('Certified Financial Planner', 'Certification', 24, 480, .52, ['Financial Planning Process', 'Investment Planning', 'Retirement and Estate', 'Tax Planning']),
-         ('AML Compliance Specialist', 'Certification', 24, 320, .63, ['Money Laundering Typologies', 'KYC and CDD', 'Transaction Monitoring']),
-         ('ESG Investing Certificate', 'Micro-credential', 36, 210, .76, ['ESG Foundations', 'Sustainable Portfolios']),
-     ]),
+    (101, 'Adobe', 'ADB', 'Creative and experience software', 'United States', 5200, GLOBAL, [
+        ('Adobe Certified Professional - Photoshop', 'Certification', 36, 80, .80, ['Design Fundamentals', 'Layers and Masks', 'Output and Export']),
+        ('Adobe Certified Expert - Experience Manager', 'Certification', 24, 225, .58, ['Sites Architecture', 'Components and Templates', 'Assets and Workflows', 'Deployment']),
+        ('Adobe Analytics Business Practitioner', 'Certification', 24, 225, .63, ['Implementation Basics', 'Workspace Analysis', 'Segmentation']),
+        ('Creative Cloud Onboarding Path', 'Learning Path', None, 0, 0, ['Getting Started', 'Collaboration', 'Libraries and Assets']),
+    ]),
+    (102, 'Lenovo', 'LNV', 'Devices and data center infrastructure', 'Hong Kong', 4200,
+     {'North America': .25, 'Latin America': .10, 'EMEA': .25, 'APAC': .35, 'ANZ': .05}, [
+        ('Lenovo Data Center Technical Specialist', 'Certification', 24, 150, .66, ['ThinkSystem Servers', 'Storage Portfolio', 'XClarity Management']),
+        ('Lenovo ThinkSystem Sales Associate', 'Micro-credential', 12, 50, .84, ['Portfolio Positioning', 'Solution Selling']),
+        ('Lenovo Partner Enablement Path', 'Learning Path', None, 0, 0, ['Partner Programs', 'Quoting and Configuration', 'Services Attach']),
+    ]),
+    (103, 'SonicWall', 'SNW', 'Network security', 'United States', 3000, GLOBAL, [
+        ('SonicWall Network Security Administrator (SNSA)', 'Certification', 24, 150, .70, ['Firewall Setup', 'Security Services', 'VPN Configuration']),
+        ('SonicWall Network Security Professional (SNSP)', 'Certification', 24, 250, .57, ['Advanced Threat Protection', 'High Availability', 'Troubleshooting', 'Deep Packet Inspection']),
+        ('SonicWall Cloud Edge Specialist', 'Micro-credential', 12, 75, .82, ['Zero Trust Access', 'Cloud Edge Deployment']),
+    ]),
+    (104, 'Axway', 'AXW', 'API management and B2B integration', 'France', 1800,
+     {'EMEA': .60, 'North America': .25, 'APAC': .10, 'Latin America': .05}, [
+        ('Axway Amplify API Management Associate', 'Certification', 36, 200, .68, ['API Gateway Basics', 'Policy Design', 'API Lifecycle']),
+        ('Axway B2B Integration Specialist', 'Certification', 36, 250, .62, ['B2Bi Architecture', 'Trading Partner Setup', 'Monitoring']),
+    ]),
+    (105, 'Nutanix', 'NTX', 'Hybrid multicloud infrastructure', 'United States', 4800, GLOBAL, [
+        ('Nutanix Certified Associate', 'Certification', 24, 99, .78, ['HCI Concepts', 'Prism Basics', 'Cluster Operations']),
+        ('Nutanix Certified Professional - Multicloud Infrastructure', 'Certification', 24, 199, .61, ['Cluster Deployment', 'Data Protection', 'Networking', 'Performance Tuning']),
+        ('Nutanix Certified Master - Multicloud Infrastructure', 'Certification', 24, 299, .50, ['Design Methodology', 'Business Continuity', 'Multicloud Architecture']),
+    ]),
+    (106, 'F5', 'F5N', 'Application delivery and security', 'United States', 3600, GLOBAL, [
+        ('F5 Certified BIG-IP Administrator', 'Certification', 24, 135, .69, ['BIG-IP Basics', 'Traffic Management', 'Troubleshooting']),
+        ('F5 Certified Technology Specialist - LTM', 'Certification', 24, 180, .60, ['LTM Architecture', 'Profiles and iRules', 'Security Policies']),
+        ('NGINX Fundamentals', 'Micro-credential', 36, 60, .85, ['Web Server Basics', 'Reverse Proxy and Load Balancing']),
+    ]),
+    (107, 'Gigamon', 'GGM', 'Network observability', 'United States', 1500,
+     {'North America': .55, 'EMEA': .25, 'APAC': .15, 'ANZ': .05}, [
+        ('Gigamon Certified Professional', 'Certification', 24, 200, .64, ['Visibility Fabric', 'GigaSMART Applications', 'Deployment Scenarios']),
+        ('Deep Observability Fundamentals', 'Learning Path', None, 0, 0, ['Observability Concepts', 'Traffic Intelligence']),
+    ]),
+    (108, 'RStudio', 'RST', 'Data science tools', 'United States', 2400, GLOBAL, [
+        ('RStudio Certified Instructor', 'Certification', 36, 150, .62, ['Teaching Methods', 'Tidyverse Proficiency', 'Shiny Proficiency']),
+        ('Shiny Fundamentals', 'Micro-credential', 24, 50, .83, ['Reactive Programming', 'Deploying Apps']),
+        ('Data Science with R Path', 'Learning Path', None, 0, 0, ['R Basics', 'Data Wrangling', 'Visualisation', 'Modelling']),
+    ]),
+    (109, 'Cloudinary', 'CLD', 'Media and image management', 'United States', 1600, GLOBAL, [
+        ('Cloudinary Certified Developer', 'Certification', 24, 100, .72, ['Upload and Delivery', 'Transformations', 'Media Optimisation']),
+        ('Cloudinary Media Optimization Fundamentals', 'Micro-credential', 24, 0, 0, ['Image Formats', 'Responsive Delivery']),
+    ]),
 ]
 
 PARTNER_STEMS = ['Skyline', 'Bluegate', 'Northwind', 'Crestview', 'Summit', 'Ironbark', 'Harbourline', 'Keystone',
@@ -76,8 +94,7 @@ PARTNER_STEMS = ['Skyline', 'Bluegate', 'Northwind', 'Crestview', 'Summit', 'Iro
 PARTNER_SUFFIX = {
     'Training Partner': ['Learning', 'Academy', 'Training', 'Skills'],
     'Reseller': ['Solutions', 'Distribution', 'Digital'],
-    'Corporate Account': {101: ['Technologies', 'Systems'], 102: ['Health', 'Hospitals'], 103: ['Consulting', 'Group'],
-                          104: ['Construction', 'Energy'], 105: ['Bank', 'Capital']},
+    'Corporate Account': ['Technologies', 'Systems', 'Group', 'Networks'],
     'Academic': ['University', 'College', 'Polytechnic'],
 }
 TIER_DISCOUNT = {'Platinum': 25, 'Gold': 15, 'Silver': 10, 'Direct': 0}
@@ -311,7 +328,7 @@ def build():
                         # recertification decision near expiry
                         if expires - timedelta(days=75) > AS_OF:
                             break
-                        p_recert = 0.66 if prow['program_type'] != 'CPD' else 0.8
+                        p_recert = 0.66 if prow['program_type'] != 'Micro-credential' else 0.72
                         if R.random() > p_recert:
                             break
                         issued = expires - timedelta(days=R.randint(0, 75))
@@ -419,7 +436,12 @@ def load(out, schema):
                         cp.write(line)
         for t in ['programs', 'courses', 'exams', 'partners', 'candidates', 'enrolments', 'exam_attempts', 'credentials', 'vouchers']:
             cur.execute(f'create index on {schema}.{t} (client_id)')
-        cur.execute(f'analyze')
+        cur.execute("select 1 from pg_roles where rolname = 'holistics_reader'")
+        if cur.fetchone():
+            cur.execute(f'grant usage on schema {schema} to holistics_reader')
+            cur.execute(f'grant select on all tables in schema {schema} to holistics_reader')
+            cur.execute(f'alter default privileges in schema {schema} grant select on tables to holistics_reader')
+        cur.execute('analyze')
         con.commit()
         for name in DDL:
             cur.execute(f'select count(*) from {schema}.{name}')

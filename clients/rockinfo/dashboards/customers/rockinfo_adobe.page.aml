@@ -1,0 +1,16 @@
+// Adobe copies of the Rockinfo dashboards: same blocks and metrics, Adobe theme.
+// Data scope still comes only from the token's rockinfo_client_id (101).
+Dashboard rockinfo_program_performance_adobe = rockinfo_program_performance.extend({
+  title: 'Adobe - Certification Program Performance'
+  theme: rockinfo_adobe
+})
+
+Dashboard rockinfo_partner_detail_adobe = rockinfo_partner_detail.extend({
+  title: 'Adobe - Partner Detail'
+  theme: rockinfo_adobe
+})
+
+Dashboard rockinfo_candidate_record_adobe = rockinfo_candidate_record.extend({
+  title: 'Adobe - Candidate Record'
+  theme: rockinfo_adobe
+})

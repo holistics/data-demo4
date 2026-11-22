@@ -1,0 +1,96 @@
+// F5-branded theme for the Rockinfo PoC portal rockinfo_portal_f5.
+// Brand-inspired palette for demo purposes only.
+ColorPalette rockinfo_f5_palette {
+  title: "Rockinfo - F5"
+  categorical {
+    colors: [
+      "#E4002B",
+      "#222222",
+      "#0E7C86",
+      "#F29111",
+      "#8C1B2F",
+      "#6FA8DC",
+      "#9E9E9E",
+      "#FF6F61"
+    ]
+  }
+}
+
+PageTheme rockinfo_f5 {
+  title: "Rockinfo - F5"
+  color {
+    data: rockinfo_f5_palette
+  }
+  background {
+    bg_color: "#F7F7F7"
+  }
+  canvas {
+    background {
+      bg_color: "#F7F7F7"
+    }
+    border {
+      border_width: 0
+      border_radius: 0
+      border_style: "none"
+    }
+  }
+  block {
+    label {
+      font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+      font_size: 14
+      font_color: "#222222"
+      font_weight: "semibold"
+    }
+    text {
+      font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+      font_size: 13
+      font_color: "#666666"
+      font_weight: "normal"
+    }
+    background {
+      bg_color: "#FFFFFF"
+    }
+    border {
+      border_width: 1
+      border_radius: 8
+      border_color: "#E2E2E2"
+      border_style: "solid"
+    }
+    padding: 12
+    shadow: "none"
+  }
+  viz {
+    table {
+      general {
+        bg_color: "#FFFFFF"
+        hover_color: "#FCE5EA"
+        banding_color: "#F5F5F5"
+        cell_padding: 8
+        font_color: "#222222"
+        font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+        font_size: 13
+        border_color: "#E2E2E2"
+        border_width: 1
+        grid_color: "#E2E2E2"
+      }
+      header {
+        bg_color: "#E4002B"
+        font_color: "#FFFFFF"
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: "#666666"
+      }
+    }
+    metric_kpi {
+      alignment: "center"
+      value {
+        font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+        font_size: 30
+        font_color: "#E4002B"
+        font_weight: "bold"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+// Nutanix copies of the Rockinfo dashboards: same blocks and metrics, Nutanix theme.
+// Data scope still comes only from the token's rockinfo_client_id (105).
+Dashboard rockinfo_program_performance_nutanix = rockinfo_program_performance.extend({
+  title: 'Nutanix - Certification Program Performance'
+  theme: rockinfo_nutanix
+})
+
+Dashboard rockinfo_partner_detail_nutanix = rockinfo_partner_detail.extend({
+  title: 'Nutanix - Partner Detail'
+  theme: rockinfo_nutanix
+})
+
+Dashboard rockinfo_candidate_record_nutanix = rockinfo_candidate_record.extend({
+  title: 'Nutanix - Candidate Record'
+  theme: rockinfo_nutanix
+})
