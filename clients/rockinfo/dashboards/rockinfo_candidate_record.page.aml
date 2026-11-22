@@ -89,6 +89,7 @@ Dashboard rockinfo_candidate_record {
   }
   block t_c_learning: VizBlock {
     label: 'Learning history'
+    description: 'Every course this candidate enrolled in, with status, progress and final score.'
     viz: DataTable {
       dataset: rockinfo_credentialing
       fields: [
@@ -125,6 +126,7 @@ Dashboard rockinfo_candidate_record {
   }
   block t_c_exams: VizBlock {
     label: 'Exam attempts'
+    description: 'Every exam sitting: attempt number (1 = first attempt, 2+ = retake), score and result, and the voucher used to book it.'
     viz: DataTable {
       dataset: rockinfo_credentialing
       fields: [
@@ -161,6 +163,7 @@ Dashboard rockinfo_candidate_record {
   }
   block t_c_credentials: VizBlock {
     label: 'Credentials'
+    description: 'Credentials earned, with status today and days until expiry. Renewal? shows whether a credential renews an earlier one.'
     viz: DataTable {
       dataset: rockinfo_credentialing
       fields: [
