@@ -2,7 +2,6 @@
 // tokens server-side. No dependencies. Env:
 //   HOLISTICS_EMBED_KEY_ID, HOLISTICS_EMBED_SECRET  demo4 embed credential (secrets)
 //   DEMO_PASSWORD   optional; turns on HTTP Basic auth (any username)
-//   THEMED_PORTALS  'off' uses rockinfo_client_portal for every customer
 //   HOLISTICS_HOST  default https://demo4.holistics.io
 //   PORT            default 8080
 import { createServer } from 'node:http';
@@ -10,7 +9,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { identities, resolvePortal } from './lib/tenants.mjs';
+import { identities } from './lib/tenants.mjs';
 
 const env = process.env;
 const PORT = Number(env.PORT || 8080);
@@ -55,7 +54,7 @@ function config() {
   return {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
-      title: i.title, role: i.role, portal: resolvePortal(i, env), clientIds: i.clientIds,
+      title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds,
     })),
   };
 }
@@ -68,7 +67,7 @@ function embedToken(identityId) {
   }
   const isEditor = identity.access === 'editor';
   const payload = {
-    embed_portal: resolvePortal(identity, env),
+    embed_portal: identity.portal,
     embed_org_id: identity.orgId,
     embed_user_id: identity.id,
     user_attributes: { rockinfo_client_id: identity.clientIds },
