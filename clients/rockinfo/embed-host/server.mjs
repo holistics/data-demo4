@@ -117,7 +117,12 @@ function embedToken(identityId, view) {
     MAIL_DOMAIN === 'mailinator.com'
       ? `https://www.mailinator.com/v4/public/inboxes.jsp?to=${mailboxFor(identity.id)}`
       : null;
-  return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}`, payload, mailboxUrl }];
+  // Collapse the Holistics portal's own left nav: the Rockinfo sidebar is the navigation.
+  // Holistics offers only expanded or collapsed, so a small toggle icon stays top-left.
+  return [
+    200,
+    { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}&left_panel_state=collapsed`, payload, mailboxUrl },
+  ];
 }
 
 createServer(async (req, res) => {
