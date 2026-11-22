@@ -20,10 +20,11 @@ EmbedPortal rockinfo_client_portal {
   default_user_attributes: {
     rockinfo_client_id: '__ALL__'
   }
+  // Rocky AI is Rockinfo's own name for its assistant (rockinfo.com/rocky-ai).
   ai {
     customization {
       global {
-        assistant_name: 'Rockinfo Insights'
+        assistant_name: 'Rocky AI'
       }
       chat_page {
         intro {
