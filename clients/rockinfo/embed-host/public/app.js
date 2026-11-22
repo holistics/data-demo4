@@ -5,7 +5,7 @@ const dropdown = $('userDropdown');
 const userButton = $('userButton');
 let users = [];
 let current;
-let view = 'dashboards';
+let view = 'ai';
 let inflight;
 
 const initials = (name) => name.split(/[\s()]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
