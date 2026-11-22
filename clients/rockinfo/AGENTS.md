@@ -30,18 +30,23 @@ on `rockinfo_clients.client_id` against the Number user attribute `rockinfo_clie
 holistics aml validate clients/rockinfo/models/*.model.aml clients/rockinfo/datasets/*.aml \
   clients/rockinfo/dashboards/*.page.aml clients/rockinfo/embeds/*.embed.aml \
   clients/rockinfo/themes/*.theme.aml -u rockinfo_client_id:number
+holistics aml validate settings/ai/context.aml clients/rockinfo/ai/*.aml
 ```
 
 Then run a real query for changed logic.
 
-**AI context.** Holistics AI gets Rockinfo behaviour from the *Route Context — Rockinfo* block
-in `settings/ai/context.aml` (vocabulary, bound models, tenant rules). The portal's own
-`ai { }` block covers assistant name, intro and placeholder only.
+**AI context.** Holistics AI gets all Rockinfo behaviour from the const `rockinfo_context_routing`
+in `ai/rockinfo_context.aml` (vocabulary, bound models, tenant rules, metric definitions).
+`settings/ai/context.aml` holds only the routing-table row and the `${rockinfo_context_routing}`
+include. The portal's own `ai { }` block covers assistant name, intro and placeholder only.
 
-- Change `context.aml` only when the operator asks. Portal, landing-page, dashboard and
-  embed-host changes do not need it.
-- When you change vocabulary, models, tenants or what clients are, list the route lines that
-  now drift and ask the operator before finishing.
+- Edit Rockinfo AI context in `ai/rockinfo_context.aml`, never in `settings/ai/context.aml`.
+  Keep it inline text: the runtime AI cannot read repo files.
+- Change it only when the operator asks; it changes live AI answers. Portal, landing-page,
+  dashboard and embed-host changes do not need it.
+- When you change vocabulary, models, metrics, tenants or what clients are, list the lines in
+  `ai/rockinfo_context.aml` that now drift and ask the operator before finishing.
+- Validate it with `settings/ai/context.aml` after every edit (below).
 
 **Deploy.** AML and the embed host deploy separately; ship both when a change spans them. Follow
 `docs/deploy.md` for commands, credentials and verification.

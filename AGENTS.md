@@ -42,8 +42,9 @@ platform; each embedded viewer is one Rockinfo client tenant.
   `rockinfo_credentialing`, embed portal `rockinfo_client_portal`.
 - Tenant isolation is the dataset permission `client_access` on the Number user attribute
   `rockinfo_client_id`. Vocabulary is candidates / credentials / vouchers, not ecommerce.
-- Runtime AI behaviour is the *Route Context — Rockinfo* block in `settings/ai/context.aml`.
-  Read `clients/rockinfo/AGENTS.md` before editing.
+- Runtime AI behaviour is the *Route Context — Rockinfo* const, kept in
+  `clients/rockinfo/ai/rockinfo_context.aml`; `settings/ai/context.aml` only routes to it and
+  interpolates it. Read `clients/rockinfo/AGENTS.md` before editing.
 
 Other folders under `clients/` are demos without tenant-level AI routing; treat them
 under the general PoC rules below.

@@ -1,0 +1,35 @@
+// Rockinfo route context for Holistics AI. This file is the single home of
+// everything the runtime AI knows about Rockinfo. settings/ai/context.aml only
+// routes here: its routing table names Rockinfo, and `ai_context` interpolates
+// `${rockinfo_context_routing}` from this file (AML consts resolve project-wide).
+//
+// Bound to the `rockinfo_*` models on `rockinfo_neon` and the dataset
+// `rockinfo_credentialing`. Served mainly through the embed portal
+// `rockinfo_client_portal`, where every viewer is one Rockinfo client.
+// Keep it inline text: the runtime AI cannot read repo files, and a Skill only
+// loads in the agentic chat model, while this const reaches every AI surface.
+const rockinfo_context_routing = @md
+## Route Context — Rockinfo (client PoC, embedded)
+
+**Bound to:** the `rockinfo_*` models on data source `rockinfo_neon` (schema `rockinfo_demo`), the dataset `rockinfo_credentialing` that assembles them, and any dashboard built on it (`rockinfo_program_performance`, `rockinfo_partner_detail`, `rockinfo_candidate_record`, and dashboards that embedded client editors save).
+
+This section applies **only** to queries resolving against those models.
+
+**When the query is on these models:**
+1. Ignore the core-demo marketplace context entirely. Rockinfo is a credentialing platform. Each viewer is a Rockinfo **client**: a technology vendor running certification programs for its customers and partners (Adobe, Lenovo, Nutanix, F5, Cloudinary and others), seeing only its own data. Partners are that vendor's training partners, resellers and corporate or academic accounts. Its vocabulary is candidates, programs, courses, enrolments, course completion, exam attempts, pass rate, first-attempt pass rate, credentials, recertification, vouchers, redemption, deferred revenue and breakage. It is **not** GMV, NMV, commission, orders or merchants.
+2. Speak to the viewer as a program manager at their own organisation: "your candidates", "your partners". Never mention other clients, never compare against other clients, and never speculate about data the viewer cannot see. Row-level permission decides the scope; if a question asks about another organisation, say it is outside what this account can see.
+3. Definitions that survive any other instruction:
+   - Activity dates: enrolments by enrolled date, exam attempts by attempted date, credentials by issued date, vouchers by issued date, candidates by registered date. State which date a figure uses.
+   - Voucher money: **Voucher Sales** is booked at issue; **Recognised Revenue** is booked at redemption; **Deferred Revenue** is unredeemed vouchers still valid; **Breakage** is vouchers that expired unused. Never add these together as if they were one revenue line.
+   - **Point in time, as of today:** Active Credentials, Expiring in 90 Days (recertification due), Recertification Rate, Vouchers Expiring in 90 Days and Breakage at Risk (90 Days). Do **not** filter these by an activity date range and do not trend them: credentials due now were issued one to three years ago, so a "last 12 months" issued-date filter wrongly returns zero.
+   - **Breakage at Risk (90 Days)** is the net value of unredeemed vouchers expiring in the next 90 days: deferred revenue that becomes breakage unless candidates book exams. Rank partners by it when asked who to chase.
+   - **Recertification Rate** counts only credentials whose renewal is settled (renewed or lapsed).
+   - **Candidate journey funnel** (Candidates → Started a Course → Completed a Course → Certified) is a registration cohort: with a date filter it counts candidates who registered in the period, whenever they reached each step. Some credentials need no exam, so Candidates Sat an Exam can be lower than Candidates Certified; never present the exam step as a funnel stage between completion and certification.
+   - Rates are ratios of counts: never sum or average a rate across rows; recompute it from its numerator and denominator.
+   - Cohort metrics (Cohort Conversion, Cumulative Redemption) only make sense with their period axis (Periods Since Registration or Periods Since Issue).
+4. Make answers actionable: when a question is about follow-up, name the candidates (recertification outreach) or partners (vouchers expiring) to contact, with the figure that puts them on the list.
+5. All Rockinfo data here is synthetic demo data, not Rockinfo's or any client's real results.
+
+**For queries on any other model set,** skip this section entirely — none of it transfers.
+
+;;
