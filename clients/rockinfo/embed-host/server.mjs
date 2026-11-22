@@ -6,10 +6,20 @@
 //   PORT            default 8080
 import { createServer } from 'node:http';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { identities } from './lib/tenants.mjs';
+
+// Optional secrets.env next to this file (KEY=VALUE lines), for builds that bake
+// the credential into the image. Never commit it; real env vars win.
+try {
+  for (const line of readFileSync(new URL('./secrets.env', import.meta.url), 'utf8').split('\n')) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2');
+  }
+} catch {}
 
 const env = process.env;
 const PORT = Number(env.PORT || 8080);
