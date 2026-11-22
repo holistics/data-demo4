@@ -1711,11 +1711,11 @@ Dashboard rockinfo_program_performance {
         column_styles: [
           ColumnStyle {
             key: 'vp_name'
-            width: 240
+            width: 210
           },
           ColumnStyle {
             key: 'vp_i'
-            width: 90
+            width: 85
           },
           ColumnStyle {
             key: 'vp_r'
@@ -1727,23 +1727,23 @@ Dashboard rockinfo_program_performance {
           },
           ColumnStyle {
             key: 'vp_e'
-            width: 90
+            width: 85
           },
           ColumnStyle {
             key: 'vp_rr'
-            width: 115
-          },
-          ColumnStyle {
-            key: 'vp_sales'
             width: 110
           },
           ColumnStyle {
+            key: 'vp_sales'
+            width: 100
+          },
+          ColumnStyle {
             key: 'vp_rec'
-            width: 115
+            width: 110
           },
           ColumnStyle {
             key: 'vp_def'
-            width: 105
+            width: 100
           },
           ColumnStyle {
             key: 'vp_brk'

@@ -17,13 +17,15 @@ Data store: "Database" (unspecified: confirm the engine).
 ## Demo flow (25 min)
 
 1. **Framing (2 min)**: one governed model → many client tenants → dashboards, self-service and AI on top.
-2. **Program Performance → Overview** as Adobe (101): KPIs, monthly activity, partner leaderboard.
+2. **Program Performance → Overview** as Adobe (101): KPIs with year-over-year change, candidate journey
+   funnel (where candidates drop off), program scorecard, partner leaderboard.
    Right-click Recognised Revenue → View Underlying Data → voucher records.
 3. **Drill-through**: click a partner → Partner Detail (orders for invoice reconciliation) →
    click a Candidate ID → Candidate Record. This is the "single record" view from their brief.
-4. **Learning & Certification**: course completion, pass rate by attempt, credential status,
-   the recertification outreach list (expiring in 90 days).
-5. **Vouchers & Revenue**: sales vs recognised vs deferred vs breakage; outstanding age; partner reconciliation.
+4. **Learning & Certification**: course completion, pass rate by attempt, the renewal pipeline
+   (credentials expiring by month) and the recertification outreach list (expiring in 90 days).
+5. **Vouchers & Revenue**: sales vs recognised vs deferred vs breakage; deferred revenue by age; the
+   *Act now* list of partners holding vouchers that expire in 90 days; partner reconciliation.
 6. **Cohorts**: candidate journey cohort. Switch Milestone from Certified to Sat an exam, and
    Granularity from Month to Quarter. Filter Partner Type to Corporate Account. Then the voucher
    redemption cohort: how fast partner stock is used.
