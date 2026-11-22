@@ -5,12 +5,53 @@ const dropdown = $('userDropdown');
 const userButton = $('userButton');
 let users = [];
 let current;
-const VIEWS = {
-  ai: ['Rocky AI', 'Ask anything about your own candidates, exams, credentials and vouchers.'],
-  dashboards: ['Dashboards', 'Program performance, learning, credentials and vouchers for your organisation.'],
-};
-let view = VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : 'ai';
+// Sidebar entries come from /api/config: AI, then each dashboard, then each dataset.
+// Each one opens a single portal object on its own; the hash keeps it across reloads.
+let sections = [];
+const VIEWS = new Map();
+let defaultView = 'ai';
+let view;
 let inflight;
+
+const ICONS = {
+  ai: '<path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/>',
+  dashboards: '<path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  datasets: '<ellipse cx="10" cy="5" rx="6" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V5M4 10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+};
+
+// Old links used #dashboards for the main dashboard.
+const viewFromHash = () => {
+  const h = location.hash.slice(1);
+  if (h === 'dashboards') return 'rockinfo_program_performance';
+  return VIEWS.has(h) ? h : defaultView;
+};
+
+function renderNav() {
+  const nav = $('analyticsNav');
+  nav.innerHTML = '';
+  for (const s of sections) {
+    const group = document.createElement('div');
+    group.className = 'nav-group';
+    const label = document.createElement('p');
+    label.className = 'nav-section';
+    label.textContent = s.label;
+    group.appendChild(label);
+    for (const item of s.items) {
+      const a = document.createElement('a');
+      a.className = 'nav-item view-link' + (s.key === 'ai' ? ' home' : '');
+      a.href = `#${item.id}`;
+      a.dataset.view = item.id;
+      a.title = item.sub;
+      a.innerHTML = `<svg viewBox="0 0 20 20" aria-hidden="true">${ICONS[s.key] || ICONS.dashboards}</svg>`;
+      const text = document.createElement('span');
+      text.className = 'nav-label';
+      text.textContent = item.title;
+      a.appendChild(text);
+      group.appendChild(a);
+    }
+    nav.appendChild(group);
+  }
+}
 
 const initials = (name) => name.split(/[\s()]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 
@@ -136,8 +177,10 @@ function setDrawer(open) {
 
 function setView(next) {
   view = next;
-  $('pageTitle').textContent = VIEWS[view][0];
-  $('pageSub').textContent = VIEWS[view][1];
+  const item = VIEWS.get(view);
+  $('pageTitle').textContent = item.title;
+  $('pageSub').textContent = item.sub;
+  document.title = `Rockinfo · ${item.title}`;
   for (const a of document.querySelectorAll('.view-link')) {
     const on = a.dataset.view === view;
     a.classList.toggle('active', on);
@@ -150,7 +193,7 @@ let toastTimer;
 for (const b of document.querySelectorAll('.module')) {
   b.addEventListener('click', () => {
     const t = $('toast');
-    t.textContent = `${b.textContent} is a Rockinfo app module, outside this analytics PoC. Try Rocky AI or Dashboards.`;
+    t.textContent = `${b.textContent} is a Rockinfo app module, outside this analytics PoC. Try Rocky AI, a dashboard or a dataset.`;
     t.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => (t.hidden = true), 3500);
@@ -158,13 +201,12 @@ for (const b of document.querySelectorAll('.module')) {
 }
 
 window.addEventListener('hashchange', () => {
-  const next = location.hash.slice(1);
-  if (VIEWS[next] && next !== view) {
+  const next = viewFromHash();
+  if (next !== view) {
     setView(next);
     if (current) load(current);
   }
 });
-setView(view);
 
 $('payloadToggle').addEventListener('click', () => setDrawer(!$('payloadPanel').classList.contains('open')));
 $('payloadClose').addEventListener('click', () => setDrawer(false));
@@ -188,6 +230,11 @@ try {
   const cfg = await res.json();
   if (!res.ok) throw new Error(cfg.error || `HTTP ${res.status}`);
   users = cfg.users;
+  sections = cfg.sections;
+  defaultView = cfg.defaultView;
+  for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
+  renderNav();
+  setView(viewFromHash());
   load(users[0]);
 } catch (e) {
   setState(`Could not load config: ${e.message}`, true);

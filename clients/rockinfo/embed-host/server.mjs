@@ -11,6 +11,7 @@ import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { identities } from './lib/tenants.mjs';
+import { DEFAULT_VIEW, SECTIONS, VIEWS } from './lib/portal.mjs';
 
 // Optional secrets.env next to this file (KEY=VALUE lines), for builds that bake
 // the credential into the image. Never commit it; real env vars win.
@@ -80,12 +81,16 @@ function config() {
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
       title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds,
     })),
+    sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub }) => ({ id, title, sub })) })),
+    defaultView: DEFAULT_VIEW,
   };
 }
 
 function embedToken(identityId, view) {
   const identity = identities().find((i) => i.id === identityId);
   if (!identity) return [400, { error: 'Unknown identity.' }];
+  const target = VIEWS.get(view || DEFAULT_VIEW);
+  if (!target) return [400, { error: 'Unknown view.' }];
   if (!env.HOLISTICS_EMBED_KEY_ID || !env.HOLISTICS_EMBED_SECRET) {
     return [500, { error: 'Embed credential is not configured on this deployment.' }];
   }
@@ -111,8 +116,8 @@ function embedToken(identityId, view) {
   };
   const token = signHS256(payload, env.HOLISTICS_EMBED_SECRET);
   // payload is returned for the demo's "What the token says" panel; it holds no secret
-  // Rockinfo Insights opens the full-page Ask AI view; Dashboards opens the main dashboard.
-  const path = view === 'dashboards' ? '/objects/rockinfo_program_performance' : '/ai';
+  // Each sidebar entry opens one portal object on its own: Rocky AI, a dashboard or a dataset.
+  const path = target.path;
   const mailboxUrl =
     MAIL_DOMAIN === 'mailinator.com'
       ? `https://www.mailinator.com/v4/public/inboxes.jsp?to=${mailboxFor(identity.id)}`

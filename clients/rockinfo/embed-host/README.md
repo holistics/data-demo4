@@ -9,8 +9,11 @@ from the tenant row (client name and colour), so no per-customer copies exist.
   embed tokens at `POST /api/embed-token`. The browser sends only an identity ID.
   Tenant, portal, row-level filter, workspace role and AI are resolved on the
   server from `lib/tenants.mjs`. Ask AI is on for every persona and answers only
-  from that customer's rows. The portal lands on Ask AI (`initial_object: 'ai'`); the
-  Dashboards tab loads `/objects/rockinfo_program_performance`.
+  from that customer's rows. The sidebar has three sections, in order: AI (Rocky AI, `/ai`),
+  Dashboards (one entry per dashboard) and Datasets (one entry per dataset). Each entry opens
+  that one object on its own at `/objects/<name>`.
+- `lib/portal.mjs`: the sidebar entries. Keep it in step with the `objects` in
+  `../embeds/rockinfo_client_portal.embed.aml`; the server signs only views listed here.
 - `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), two personas per customer (editor and
   viewer, both with Ask AI) and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
 
