@@ -12,6 +12,18 @@ export const TENANTS = [
   { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', plan: 'essentials' },
 ];
 
+// A fictional person behind each embed_user_id, so "Built by" reads like a real user.
+// Keyed by the full id and covering every role, including roles a plan hides from the menu,
+// because their earlier reports still name them. The ids themselves never change.
+export const PEOPLE = {
+  adobe_admin: 'Maya Chen', adobe_editor: 'Daniel Okafor', adobe_analyst: 'Priya Raman', adobe_viewer: 'Tom Becker',
+  lenovo_admin: 'Wei Zhang', lenovo_editor: 'Laura Martín', lenovo_analyst: 'Kenji Sato', lenovo_viewer: 'Aisha Bello',
+  nutanix_admin: 'Rahul Mehta', nutanix_editor: 'Sofia Rossi', nutanix_analyst: 'James Carter', nutanix_viewer: 'Linh Tran',
+  f5_admin: 'Emma Larsen', f5_editor: 'Carlos Mendes', f5_analyst: 'Hana Kim', f5_viewer: 'Noah Fischer',
+  cloudinary_admin: 'Olivia Grant', cloudinary_editor: 'Yusuf Demir', cloudinary_analyst: 'Chloé Dubois', cloudinary_viewer: 'Ben Walker',
+  rockinfo_internal_admin: 'Sam Rivera',
+};
+
 // Every seeded tenant: Adobe, Lenovo, SonicWall, Axway, Nutanix, F5, Gigamon, RStudio, Cloudinary.
 export const ALL_CLIENT_IDS = [101, 102, 103, 104, 105, 106, 107, 108, 109];
 
@@ -87,6 +99,7 @@ export function identities() {
       seen.push(caps);
       list.push({
         id: `${t.slug}_${r.key}`,
+        name: PEOPLE[`${t.slug}_${r.key}`],
         tenantSlug: t.slug,
         tenantName: t.name,
         accent: t.accent,
@@ -103,6 +116,7 @@ export function identities() {
   }
   list.push({
     id: 'rockinfo_internal_admin',
+    name: PEOPLE.rockinfo_internal_admin,
     tenantSlug: 'rockinfo',
     tenantName: 'Rockinfo (all customers)',
     accent: '#0B6E4F',
@@ -116,4 +130,15 @@ export function identities() {
     portal: PORTAL,
   });
   return list;
+}
+
+// Every person who may appear as a report author: name, role title and tenant.
+export function people() {
+  const out = {};
+  for (const t of TENANTS) for (const r of ROLES) {
+    const id = `${t.slug}_${r.key}`;
+    out[id] = { name: PEOPLE[id], title: r.title, tenantName: t.name };
+  }
+  out.rockinfo_internal_admin = { name: PEOPLE.rockinfo_internal_admin, title: 'Rockinfo internal admin', tenantName: 'Rockinfo' };
+  return out;
 }

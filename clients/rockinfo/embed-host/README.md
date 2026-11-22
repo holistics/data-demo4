@@ -14,6 +14,11 @@ from the tenant row (client name and colour), so no per-customer copies exist.
   that one object on its own at `/objects/<name>`.
 - `lib/portal.mjs`: the sidebar entries. Keep it in step with the `objects` in
   `../embeds/rockinfo_client_portal.embed.aml`; the server signs only views listed here. A section's `requires` names a plan capability (`ai`, `explore`, `personal`); plans without it never see or sign that view. `plans` is a host-native page (no token). `WORKSPACE_SECTIONS` adds Team reports (org workspace) and My reports (personal), filled from the iframe's `embed:loaded` event and opened as view `ws:<uname>`.
+- `lib/report-meta.mjs`: Team report and My report metadata (built by, created, last updated) for
+  `GET /api/report-meta`. It starts from `public/report-meta.json`, baked at build by
+  `scripts/report-meta.mjs`, then polls the public `holistics/data-demo4` commit history every
+  90 s without a credential and applies each `Embed user <id>` commit, so edits made in the embed
+  show without a redeploy. `PEOPLE` in `lib/tenants.mjs` names the person behind each `embed_user_id`.
 - `lib/tenants.mjs`: customers (Adobe 101, Lenovo 102, Nutanix 105, F5 106, Cloudinary 109), each on one of four plans (`PLANS`: Enterprise, Self-service,
   Insights, Essentials), user roles (`ROLES`, admin first) capped by that plan, and a Rockinfo internal admin (all nine seeded tenants, 101–109). Everyone uses `rockinfo_client_portal`.
 
