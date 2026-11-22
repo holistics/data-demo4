@@ -1,0 +1,66 @@
+Model rockinfo_clients {
+  type: 'table'
+  label: 'Client'
+  description: 'One row per Rockinfo client organisation (the embedded tenant). Row-level permission anchors on Client ID.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."clients"'
+
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Tenant key. Matches the rockinfo_client_id user attribute passed in the embed token.'
+  }
+  dimension client_name {
+    label: 'Client'
+    type: 'text'
+    definition: @sql {{ #SOURCE.client_name }};;
+    description: 'Client organisation name. Embedded users only ever see their own client.'
+  }
+  dimension client_code {
+    label: 'Client Code'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_code }};;
+    description: 'Short code used as a prefix on vouchers and credentials.'
+  }
+  dimension industry {
+    label: 'Industry'
+    type: 'text'
+    definition: @sql {{ #SOURCE.industry }};;
+    description: 'Industry the client certifies for.'
+  }
+  dimension hq_country {
+    label: 'Client HQ Country'
+    type: 'text'
+    definition: @sql {{ #SOURCE.hq_country }};;
+    description: 'Country of the client headquarters.'
+  }
+  dimension plan_tier {
+    label: 'Plan Tier'
+    type: 'text'
+    definition: @sql {{ #SOURCE.plan_tier }};;
+    description: 'Rockinfo subscription plan of the client.'
+  }
+
+  dimension brand_color {
+    label: 'Brand Color'
+    type: 'text'
+    hidden: true
+    definition: @sql {{ #SOURCE.brand_color }};;
+    description: 'Hex accent colour of the client, used by the dashboard header so one dashboard brands itself per tenant.'
+  }
+
+  // Cohort controls live on the tenant model so they always sit on the row-level permission anchor.
+  param cohort_grain {
+    label: 'Cohort Granularity'
+    type: 'text'
+    allowed_values: ['Week', 'Month', 'Quarter', 'Year']
+  }
+  param cohort_milestone {
+    label: 'Cohort Milestone'
+    type: 'text'
+    allowed_values: ['Started a course', 'Completed a course', 'Sat an exam', 'Certified']
+  }
+}

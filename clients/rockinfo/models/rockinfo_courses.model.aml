@@ -1,0 +1,47 @@
+Model rockinfo_courses {
+  type: 'table'
+  label: 'Course'
+  description: 'One row per course (learning module) inside a program.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."courses"'
+
+  dimension course_id {
+    label: 'Course ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.course_id }};;
+    description: 'Course key.'
+  }
+  dimension program_id {
+    label: 'Program ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.program_id }};;
+    description: 'Parent program. Join key only.'
+  }
+  dimension course_name {
+    label: 'Course'
+    type: 'text'
+    definition: @sql {{ #SOURCE.course_name }};;
+    description: 'Course name, prefixed with its program.'
+  }
+  dimension course_sequence {
+    label: 'Course Sequence'
+    type: 'number'
+    definition: @sql {{ #SOURCE.course_sequence }};;
+    description: 'Position of the course in its program learning path, starting at 1.'
+  }
+  dimension modality {
+    label: 'Modality'
+    type: 'text'
+    definition: @sql {{ #SOURCE.modality }};;
+    description: 'Self-paced, Virtual instructor-led or Blended.'
+  }
+  dimension duration_hours {
+    label: 'Duration (hours)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.duration_hours }};;
+    description: 'Nominal learning hours for the course.'
+  }
+}

@@ -1,0 +1,60 @@
+Model rockinfo_candidate_milestones {
+  type: 'query'
+  label: 'Candidate Milestone'
+  description: 'One row per candidate per journey milestone, at the first time the candidate reached it. Powers the candidate journey cohort.'
+  data_source_name: 'rockinfo_neon'
+  query: @sql
+    select candidate_id, client_id, 'Registered' as milestone, 0 as milestone_order, registered_at as event_at from "rockinfo_demo"."candidates"
+    union all
+    select candidate_id, min(client_id), 'Started a course', 1, min(enrolled_at) from "rockinfo_demo"."enrolments" group by candidate_id
+    union all
+    select candidate_id, min(client_id), 'Completed a course', 2, min(completed_at) from "rockinfo_demo"."enrolments" where completed_at is not null group by candidate_id
+    union all
+    select candidate_id, min(client_id), 'Sat an exam', 3, min(attempted_at) from "rockinfo_demo"."exam_attempts" group by candidate_id
+    union all
+    select candidate_id, min(client_id), 'Certified', 4, min(issued_at) from "rockinfo_demo"."credentials" group by candidate_id
+  ;;
+  models: []
+
+  dimension milestone_key {
+    label: 'Milestone Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.candidate_id }}::text || '-' || {{ #SOURCE.milestone_order }}::text;;
+    description: 'Candidate and milestone key.'
+  }
+  dimension candidate_id {
+    label: 'Candidate ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.candidate_id }};;
+    description: 'Join key only.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension milestone {
+    label: 'Milestone'
+    type: 'text'
+    definition: @sql {{ #SOURCE.milestone }};;
+    description: 'Registered, Started a course, Completed a course, Sat an exam or Certified.'
+  }
+  dimension milestone_order {
+    label: 'Milestone Order'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.milestone_order }};;
+    description: 'Order of the milestone in the journey, 0 to 4.'
+  }
+  dimension event_at {
+    label: 'Milestone Reached At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.event_at }};;
+    description: 'First time the candidate reached this milestone.'
+  }
+}
