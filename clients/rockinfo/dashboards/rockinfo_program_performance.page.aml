@@ -2318,16 +2318,13 @@ Dashboard rockinfo_program_performance {
 </style>
 <div class="rkg">
 <h3>Beyond the dashboard</h3>
-<p class="sub">What you can do depends on your Rockinfo Analytics plan. Ask your account manager to change plans.</p>
-<table><thead><tr><th>Feature</th><th>What it does</th><th class="c">Essentials</th><th class="c">Insights</th><th class="c">Self-service</th><th class="c">Enterprise</th></tr></thead><tbody>
-<tr><td class="t">Dashboards and Team reports</td><td>Open these dashboards and the reports your admin shares with the whole team.</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
-<tr><td class="t">Download PDF</td><td>Save any dashboard as a PDF for a meeting or a board pack.</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
-<tr><td class="t">Ask Rocky AI</td><td>Ask in plain English, e.g. <i>Which partners have the most unredeemed vouchers older than 6 months?</i> Answers use the same definitions as the dashboards.</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
-<tr><td class="t">Scheduled emails</td><td>Get a dashboard in your inbox every week or month.</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
-<tr><td class="t">Explore and My reports</td><td>Build your own charts from the governed data and keep them in My reports.</td><td class="c no">&ndash;</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
-<tr><td class="t">Publish Team reports</td><td>Share a report you built with everyone in your organisation.</td><td class="c no">&ndash;</td><td class="c no">&ndash;</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td></tr>
-<tr><td class="t">Export CSV</td><td>Download the rows behind a table for your own spreadsheets.</td><td class="c no">&ndash;</td><td class="c no">&ndash;</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td></tr>
-</tbody></table>
+<p class="sub">Some of these depend on your Rockinfo Analytics plan and your role. If you do not see one, ask your Rockinfo account manager.</p>
+<ul>
+<li><b>Ask Rocky AI.</b> Ask in plain English, e.g. <i>Which partners have the most unredeemed vouchers older than 6 months?</i> Answers use the same definitions as these dashboards.</li>
+<li><b>Team reports.</b> Reports your colleagues built and shared with everyone in your organisation, listed under Team reports.</li>
+<li><b>Explore and My reports.</b> Build your own charts from the same governed data and keep them in My reports, or share them as a Team report.</li>
+<li><b>Downloads and schedules.</b> Save a dashboard as PDF, download table rows, or get a dashboard in your inbox every week or month.</li>
+</ul>
 </div>;;
   }
 
@@ -2962,7 +2959,7 @@ Dashboard rockinfo_program_performance {
     tab how_to_use: CanvasLayout {
       label: 'How to use'
       width: 1220
-      height: 1840
+      height: 1920
       grid_size: 20
       auto_expand_vertically: true
       mobile {
@@ -2972,10 +2969,10 @@ Dashboard rockinfo_program_performance {
         position: pos(20, 20, 1180, 120)
       }
       block h_welcome {
-        position: pos(20, 160, 1180, 160)
+        position: pos(20, 160, 1180, 200)
       }
       block h_tabs {
-        position: pos(20, 340, 1180, 420)
+        position: pos(20, 380, 1180, 380)
       }
       block h_read {
         position: pos(20, 780, 580, 380)
@@ -2984,13 +2981,13 @@ Dashboard rockinfo_program_performance {
         position: pos(620, 780, 580, 380)
       }
       block h_more {
-        position: pos(20, 1180, 1180, 440)
+        position: pos(20, 1180, 1180, 320)
       }
       block h_first {
-        position: pos(20, 1640, 580, 300)
+        position: pos(20, 1520, 580, 380)
       }
       block h_help {
-        position: pos(620, 1640, 580, 300)
+        position: pos(620, 1520, 580, 380)
       }
       default_zoom: 'fit_to_width'
     }
@@ -2998,7 +2995,7 @@ Dashboard rockinfo_program_performance {
     tab glossary: CanvasLayout {
       label: 'Glossary'
       width: 1220
-      height: 4120
+      height: 3220
       grid_size: 20
       auto_expand_vertically: true
       mobile {
@@ -3008,25 +3005,25 @@ Dashboard rockinfo_program_performance {
         position: pos(20, 20, 1180, 120)
       }
       block g_intro {
-        position: pos(20, 160, 1180, 120)
+        position: pos(20, 160, 1180, 140)
       }
       block g_core {
-        position: pos(20, 300, 1180, 620)
+        position: pos(20, 320, 1180, 500)
       }
       block g_learning {
-        position: pos(20, 940, 1180, 480)
+        position: pos(20, 840, 1180, 360)
       }
       block g_exams {
-        position: pos(20, 1440, 1180, 700)
+        position: pos(20, 1220, 1180, 480)
       }
       block g_vouchers {
-        position: pos(20, 2160, 1180, 820)
+        position: pos(20, 1720, 1180, 600)
       }
       block g_status {
-        position: pos(20, 3000, 1180, 640)
+        position: pos(20, 2340, 1180, 440)
       }
       block g_cohort {
-        position: pos(20, 3660, 1180, 440)
+        position: pos(20, 2800, 1180, 400)
       }
       default_zoom: 'fit_to_width'
     }
