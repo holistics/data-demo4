@@ -99,7 +99,9 @@ function embedToken(identityId, view) {
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
-    if (url.pathname === '/healthz') return json(res, 200, { ok: true });
+    // Kubernetes probes hit `/` without credentials; answer them before the password gate.
+    const isProbe = (req.headers['user-agent'] || '').startsWith('kube-probe/');
+    if (url.pathname === '/healthz' || isProbe) return json(res, 200, { ok: true });
     if (!authorized(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Rockinfo demo", charset="UTF-8"' });
       return res.end('Password required');
