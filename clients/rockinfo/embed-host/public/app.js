@@ -6,7 +6,7 @@ const userButton = $('userButton');
 let users = [];
 let current;
 const VIEWS = {
-  ai: ['Rockinfo Insights', 'Ask questions about your own candidates, exams, credentials and vouchers.'],
+  ai: ['Rocky AI', 'Ask anything about your own candidates, exams, credentials and vouchers.'],
   dashboards: ['Dashboards', 'Program performance, learning, credentials and vouchers for your organisation.'],
 };
 let view = VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : 'ai';
@@ -72,7 +72,8 @@ function renderPayload(payload) {
     ['Portal', payload.embed_portal],
     ['Row-level filter', `rockinfo_client_id = [${ids.join(', ')}]`],
     ['Workspace', `${payload.embed_org_id} · ${payload.permissions.org_workspace_role}`],
-    ['AI', payload.settings.ai.enabled ? 'On' : 'Off'],
+    ['Rocky AI', payload.settings.ai.enabled ? 'On' : 'Off'],
+    ['Email subscriptions', payload.settings.allow_data_subscribe ? `On → ${payload.embed_user_email}` : 'Off'],
     ['Expires', new Date(payload.exp * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })],
   ];
   $('payloadFacts').innerHTML = '';
@@ -110,6 +111,8 @@ async function load(user) {
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
     renderPayload(data.payload);
     $('openPortal').href = data.embedUrl;
+    $('openMailbox').href = data.mailboxUrl || '#';
+    $('mailboxLabel').textContent = `Open ${data.payload.embed_user_email} mailbox`;
     const reveal = () => {
       frame.classList.remove('loading');
       setState('');
@@ -141,6 +144,17 @@ function setView(next) {
     if (on) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
+}
+
+let toastTimer;
+for (const b of document.querySelectorAll('.module')) {
+  b.addEventListener('click', () => {
+    const t = $('toast');
+    t.textContent = `${b.textContent} is a Rockinfo app module, outside this analytics PoC. Try Rocky AI or Dashboards.`;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.hidden = true), 3500);
+  });
 }
 
 window.addEventListener('hashchange', () => {
