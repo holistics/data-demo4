@@ -1,0 +1,37 @@
+// Nutanix (rockinfo_client_id 105) portal. Same governed dataset and permission as
+// rockinfo_client_portal; only the theme differs. The token must still pass
+// rockinfo_client_id: [105] - the portal choice never widens data access.
+EmbedPortal rockinfo_portal_nutanix {
+  description: 'Nutanix certification analytics on Rockinfo, scoped by row-level permission.'
+  objects: [
+    rockinfo_program_performance_nutanix,
+    rockinfo_partner_detail_nutanix,
+    rockinfo_candidate_record_nutanix,
+    rockinfo_credentialing,
+  ]
+  initial_object: rockinfo_program_performance_nutanix
+  required_permissions: [
+    rockinfo_credentialing.permission.client_access,
+  ]
+  default_user_attributes: {
+    rockinfo_client_id: '105'
+  }
+  ai {
+    customization {
+      global {
+        assistant_name: 'Nutanix Certification Insights'
+      }
+      chat_page {
+        intro {
+          header: 'Ask about your Nutanix candidates, exams, credentials and vouchers.'
+          body: @md
+            ## 🎓 Completion, pass rates and time-to-certify by program
+            ## 🔁 Who is due for recertification, and who lapsed
+            ## 🎟️ Voucher redemption, deferred revenue and breakage by partner
+          ;;
+        }
+        prompt_placeholder: 'e.g. Which partners have the most unredeemed vouchers older than 6 months?'
+      }
+    }
+  }
+}

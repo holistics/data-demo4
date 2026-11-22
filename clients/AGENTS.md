@@ -19,6 +19,7 @@ modelling decisions, not just styling.
 |---|---|---|
 | `dabble/` | `dabble_neon`, own `dabble_*` models | Own data source + `context.aml` routing |
 | `brainstorm-apac/` | own seeded Postgres, own models | Own data source, RLS contract |
+| `rockinfo/` | `rockinfo_neon` (Neon), `rockinfo_demo.*`, own `rockinfo_*` models | Own data source, embed portal with tenant RLS |
 | `maman/` | `demo_bigquery`, `maman_demo.*`, own `maman_*` models | Own mock BigQuery data, shared metric partials |
 | `fanserv/` | `demo_finance_extended` | Finance dataset, not ecommerce |
 | `iceye/` | `demo_finance` + `demo_finance_extended`, and one ecommerce re-skin | Client has non-ecommerce data, so it stays grouped here whole |

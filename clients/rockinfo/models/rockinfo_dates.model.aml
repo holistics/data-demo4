@@ -1,0 +1,18 @@
+Model rockinfo_dates {
+  type: 'query'
+  label: 'Date'
+  description: 'Shared calendar. Every activity table links here by its activity date, so one date filter moves all metrics together.'
+  data_source_name: 'rockinfo_neon'
+  query: @sql
+    select d::date as date_day from generate_series(date '2023-10-01', date '2027-12-31', interval '1 day') d
+  ;;
+  models: []
+
+  dimension date_day {
+    label: 'Date'
+    type: 'date'
+    primary_key: true
+    definition: @sql {{ #SOURCE.date_day }};;
+    description: 'Calendar date. Enrolments use enrolled date, exam attempts attempted date, credentials issued date, vouchers issued date and candidates registered date.'
+  }
+}

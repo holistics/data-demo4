@@ -1,0 +1,96 @@
+// Adobe-branded theme for the Rockinfo PoC portal rockinfo_portal_adobe.
+// Brand-inspired palette for demo purposes only.
+ColorPalette rockinfo_adobe_palette {
+  title: "Rockinfo - Adobe"
+  categorical {
+    colors: [
+      "#EB1000",
+      "#2C2C2C",
+      "#FF7B5A",
+      "#7A1F12",
+      "#B3B3B3",
+      "#FFB199",
+      "#5C5C5C",
+      "#D7373F"
+    ]
+  }
+}
+
+PageTheme rockinfo_adobe {
+  title: "Rockinfo - Adobe"
+  color {
+    data: rockinfo_adobe_palette
+  }
+  background {
+    bg_color: "#FAFAFA"
+  }
+  canvas {
+    background {
+      bg_color: "#FAFAFA"
+    }
+    border {
+      border_width: 0
+      border_radius: 0
+      border_style: "none"
+    }
+  }
+  block {
+    label {
+      font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+      font_size: 14
+      font_color: "#2C2C2C"
+      font_weight: "semibold"
+    }
+    text {
+      font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+      font_size: 13
+      font_color: "#6E6E6E"
+      font_weight: "normal"
+    }
+    background {
+      bg_color: "#FFFFFF"
+    }
+    border {
+      border_width: 1
+      border_radius: 8
+      border_color: "#E6E6E6"
+      border_style: "solid"
+    }
+    padding: 12
+    shadow: "none"
+  }
+  viz {
+    table {
+      general {
+        bg_color: "#FFFFFF"
+        hover_color: "#FDE7E5"
+        banding_color: "#F7F7F7"
+        cell_padding: 8
+        font_color: "#2C2C2C"
+        font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+        font_size: 13
+        border_color: "#E6E6E6"
+        border_width: 1
+        grid_color: "#E6E6E6"
+      }
+      header {
+        bg_color: "#EB1000"
+        font_color: "#FFFFFF"
+        font_size: 12
+        font_weight: "semibold"
+      }
+      sub_title {
+        font_color: "#6E6E6E"
+      }
+    }
+    metric_kpi {
+      alignment: "center"
+      value {
+        font_family: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+        font_size: 30
+        font_color: "#EB1000"
+        font_weight: "bold"
+      }
+    }
+  }
+}

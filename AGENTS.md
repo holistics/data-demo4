@@ -33,6 +33,18 @@ US markets, migrating off AWS QuickSight.
   `dabble_trading_context`, `dabble_trading_measurement_rules`,
   `dabble_executive_readout`.
 
+## Client PoC — Rockinfo (embedded)
+
+**Rockinfo** (`clients/rockinfo/`) is an embedded-analytics PoC for a credentialing
+platform; each embedded viewer is one Rockinfo client tenant.
+
+- Data source `rockinfo_neon`, schema `"rockinfo_demo"."*"`; models `rockinfo_*`, dataset
+  `rockinfo_credentialing`, embed portal `rockinfo_client_portal`.
+- Tenant isolation is the dataset permission `client_access` on the Number user attribute
+  `rockinfo_client_id`. Vocabulary is candidates / credentials / vouchers, not ecommerce.
+- Runtime AI behaviour is the *Route Context — Rockinfo* block in `settings/ai/context.aml`.
+  Read `clients/rockinfo/AGENTS.md` before editing.
+
 Other folders under `clients/` are demos without tenant-level AI routing; treat them
 under the general PoC rules below.
 

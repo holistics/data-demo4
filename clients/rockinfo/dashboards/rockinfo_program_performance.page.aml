@@ -1,0 +1,1417 @@
+Dashboard rockinfo_program_performance {
+  title: 'Program Performance'
+  description: 'Client-facing program dashboard embedded in the Rockinfo platform. Every number is scoped to the signed-in client by row-level permission.'
+  owner: 'vincent@holistics.io'
+
+  block t_header: TextBlock {
+    content: @md
+<div style="padding: 4px 8px">
+
+## Program Performance
+
+Live view of your candidates, learning, exams, credentials and vouchers. Right-click any number to **view the underlying records**, or click a partner or candidate to **drill through** to its detail page.
+</div>;;
+  }
+  block f_date: FilterBlock {
+    label: 'Activity Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_dates.date_day)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+  block f_program: FilterBlock {
+    label: 'Program'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_programs.program_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_region: FilterBlock {
+    label: 'Candidate Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.region)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block k_candidates: VizBlock {
+    label: 'New Candidates'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.total_candidates)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_completions: VizBlock {
+    label: 'Course Completions'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.course_completions)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_pass_rate: VizBlock {
+    label: 'Exam Pass Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.pass_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block k_credentials: VizBlock {
+    label: 'Credentials Issued'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.credentials_issued)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_active_creds: VizBlock {
+    label: 'Active Credentials (today)'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.active_credentials)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_expiring: VizBlock {
+    label: 'Expiring in 90 Days'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.expiring_90d)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_recognised: VizBlock {
+    label: 'Recognised Revenue'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.recognised_revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+    }
+  }
+  block k_redemption: VizBlock {
+    label: 'Voucher Redemption Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.redemption_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block c_activity_trend: VizBlock {
+    label: 'Monthly activity'
+    viz: LineChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(rockinfo_dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.enrolments)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.exam_attempts)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.credentials_issued)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block c_creds_by_program: VizBlock {
+    label: 'Credentials issued by program'
+    viz: BarChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        ref: r(rockinfo_programs.program_name)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.credentials_issued)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block t_partner_board: VizBlock {
+    label: 'Partner leaderboard - click a partner to drill through'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_name)
+          uname: 'p_name'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_type)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_region)
+        },
+        VizFieldFull {
+          label: 'New Candidates'
+          ref: r(rockinfo_credentialing.total_candidates)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'p_cand'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.pass_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_issued)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.redemption_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.voucher_sales)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+          uname: 'p_sales'
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'p_sales'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block c_candidates_region: VizBlock {
+    label: 'New candidates by region and segment'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        ref: r(rockinfo_candidates.region)
+      }
+      legend: VizFieldFull {
+        ref: r(rockinfo_candidates.segment)
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.total_candidates)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block k_completion_rate: VizBlock {
+    label: 'Course Completion Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.completion_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block k_avg_score: VizBlock {
+    label: 'Avg Course Score'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.avg_course_score)
+        format {
+          type: 'number'
+          pattern: '#,##0.0'
+        }
+      }
+    }
+  }
+  block k_fapr: VizBlock {
+    label: 'First-Attempt Pass Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.first_attempt_pass_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block k_recert_rate: VizBlock {
+    label: 'Recertification Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.recertification_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block t_course_funnel: VizBlock {
+    label: 'Course completion by program and course'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_programs.program_name)
+        },
+        VizFieldFull {
+          label: 'Step'
+          ref: r(rockinfo_courses.course_sequence)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_courses.course_name)
+          uname: 'c_name'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.enrolments)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.course_completions)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.completion_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.avg_course_score)
+          format {
+            type: 'number'
+            pattern: '#,##0.0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'c_name'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block c_pass_by_attempt: VizBlock {
+    label: 'Pass rate by exam and attempt'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        ref: r(rockinfo_exams.exam_name)
+      }
+      legend: VizFieldFull {
+        label: 'Attempt'
+        ref: r(rockinfo_exam_attempts.attempt_number)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.pass_rate)
+            format {
+              type: 'number'
+              pattern: '#,##0.0%'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block c_cred_status: VizBlock {
+    label: 'Credential status today'
+    viz: PieChart {
+      dataset: rockinfo_credentialing
+      legend: r(rockinfo_credentials.credential_status)
+      series {
+        field: r(rockinfo_credentialing.credentials_issued)
+      }
+      settings {
+        display_as_donut: true
+      }
+    }
+  }
+  block t_expiring: VizBlock {
+    label: 'Recertification outreach - expiring in the next 90 days'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      filter {
+        field: r(rockinfo_credentials.credential_status)
+        operator: 'is'
+        value: 'Expiring within 90 days'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_candidates.candidate_id)
+          uname: 'e_id'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.candidate_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.email)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_programs.program_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.credential_code)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.expires_at)
+          uname: 'e_exp'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.days_to_expiry)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'e_exp'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block c_recert_trend: VizBlock {
+    label: 'New vs renewed credentials'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(rockinfo_dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.newly_certified)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.recertifications)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block k_sales: VizBlock {
+    label: 'Voucher Sales'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.voucher_sales)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+    }
+  }
+  block k_recognised_v: VizBlock {
+    label: 'Recognised Revenue'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.recognised_revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+    }
+  }
+  block k_deferred: VizBlock {
+    label: 'Deferred Revenue'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.deferred_revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+    }
+  }
+  block k_breakage: VizBlock {
+    label: 'Breakage'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.breakage)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+    }
+  }
+  block k_issued: VizBlock {
+    label: 'Vouchers Issued'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.vouchers_issued)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_redeemed: VizBlock {
+    label: 'Vouchers Redeemed'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.vouchers_redeemed)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_outstanding: VizBlock {
+    label: 'Vouchers Outstanding'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.vouchers_outstanding)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+  block k_avg_disc: VizBlock {
+    label: 'Avg Discount'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.avg_discount)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+    }
+  }
+  block c_voucher_trend: VizBlock {
+    label: 'Voucher sales by month and status'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        label: 'Issue Month'
+        ref: r(rockinfo_dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(rockinfo_vouchers.voucher_status)
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.voucher_sales)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block c_outstanding_age: VizBlock {
+    label: 'Outstanding vouchers by age'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      filter {
+        field: r(rockinfo_vouchers.voucher_status)
+        operator: 'is'
+        value: 'Unredeemed'
+      }
+      x_axis: VizFieldFull {
+        ref: r(rockinfo_vouchers.outstanding_age_band)
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.vouchers_outstanding)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.deferred_revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+
+      }
+    }
+  }
+  block t_voucher_partners: VizBlock {
+    label: 'Voucher reconciliation by partner - click a partner to drill through'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_tier)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_region)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_issued)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_redeemed)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_outstanding)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_expired)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.redemption_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.voucher_sales)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+          uname: 'vp_sales'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.recognised_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.deferred_revenue)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.breakage)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'vp_sales'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block t_voucher_exam: VizBlock {
+    label: 'Vouchers by exam'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_exams.exam_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exams.list_price_usd)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_issued)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 've_issued'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.redemption_rate)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.voucher_sales)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 've_issued'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+  block t_cohort_intro: TextBlock {
+    content: @md
+<div style="padding: 4px 8px">
+
+### Candidate journey cohort
+
+Candidates grouped by **when they registered**. Each cell is the share of that cohort that has reached the selected **milestone** by that many periods after registering. Switch the **granularity** and **milestone** to re-cut the same cohort; partner, segment and region filters change *who is in the cohort*.
+</div>;;
+  }
+  block f_grain: FilterBlock {
+    label: 'Cohort Granularity'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_clients.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block f_milestone: FilterBlock {
+    label: 'Cohort Milestone'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_clients.cohort_milestone)
+    }
+    default {
+      operator: 'is'
+      value: 'Certified'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block f_cohort_window: FilterBlock {
+    label: 'Lifecycle Window (Periods)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_credentialing, rockinfo_candidate_milestones.period_number)
+    }
+    default {
+      operator: 'between'
+      value: [0, 12]
+    }
+  }
+  block f_partner_type: FilterBlock {
+    label: 'Partner Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_type)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_segment: FilterBlock {
+    label: 'Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.segment)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block p_candidate_cohort: VizBlock {
+    label: 'Candidate journey cohort - cumulative % reaching the selected milestone'
+    viz: PivotTable {
+      dataset: rockinfo_credentialing
+      rows: [
+        VizFieldFull {
+          label: 'Registration Cohort'
+          ref: r(rockinfo_credentialing, rockinfo_candidates.cohort_period)
+          format {
+            type: 'date'
+            pattern: 'yyyy-MM-dd'
+          }
+          uname: 'cr'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Period'
+          ref: r(rockinfo_credentialing, rockinfo_candidate_milestones.period_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'cc'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Conversion'
+          ref: r(rockinfo_credentialing.cohort_conversion)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+          uname: 'cv'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'cv'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 0.4
+                color: '#C7E3D4'
+              }
+              max {
+                value: 0.9
+                color: '#2E8B57'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'cr'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'cc'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 25
+      }
+    }
+  }
+  block t_voucher_cohort_intro: TextBlock {
+    content: @md
+<div style="padding: 4px 8px">
+
+### Voucher redemption cohort
+
+Vouchers grouped by **when they were sold**. Each cell is the cumulative share redeemed by that many periods after sale. Slow curves flag partners sitting on stock that will turn into breakage.
+</div>;;
+  }
+  block f_v_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_v_channel: FilterBlock {
+    label: 'Sales Channel'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_vouchers.sales_channel)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block p_voucher_cohort: VizBlock {
+    label: 'Voucher redemption cohort - cumulative % redeemed'
+    viz: PivotTable {
+      dataset: rockinfo_credentialing
+      filter {
+        field: r(rockinfo_credentialing, rockinfo_vouchers.voucher_period_number)
+        operator: 'between'
+        value: [0, 12]
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Issue Cohort'
+          ref: r(rockinfo_credentialing, rockinfo_vouchers.voucher_cohort_period)
+          format {
+            type: 'date'
+            pattern: 'yyyy-MM-dd'
+          }
+          uname: 'cr'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Period'
+          ref: r(rockinfo_credentialing, rockinfo_vouchers.voucher_period_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'cc'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Redeemed'
+          ref: r(rockinfo_credentialing.voucher_cohort_redemption)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+          uname: 'cv'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'cv'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FFFFFF'
+              }
+              mid {
+                value: 0.4
+                color: '#C7E3D4'
+              }
+              max {
+                value: 0.9
+                color: '#2E8B57'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'cr'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'cc'
+            direction: 'asc'
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 25
+      }
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_program'
+      to: [
+        CustomMapping { block: ['p_candidate_cohort'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_v_partner'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_candidate_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_v_channel'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_candidate_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cohort_window'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_partner_type'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_segment'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_milestone'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 'p_voucher_cohort', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_grain'
+      to: [
+        CustomMapping { block: ['c_activity_trend', 'c_candidates_region', 'c_cred_status', 'c_creds_by_program', 'c_outstanding_age', 'c_pass_by_attempt', 'c_recert_trend', 'c_voucher_trend', 'k_active_creds', 'k_avg_disc', 'k_avg_score', 'k_breakage', 'k_candidates', 'k_completion_rate', 'k_completions', 'k_credentials', 'k_deferred', 'k_expiring', 'k_fapr', 'k_issued', 'k_outstanding', 'k_pass_rate', 'k_recert_rate', 'k_recognised', 'k_recognised_v', 'k_redeemed', 'k_redemption', 'k_sales', 't_course_funnel', 't_expiring', 't_partner_board', 't_voucher_exam', 't_voucher_partners'] disabled: true }
+      ]
+    }
+  ]
+
+  view: TabLayout {
+    tab overview: CanvasLayout {
+      label: 'Overview'
+      width: 1220
+      height: 1380
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block t_header {
+        position: pos(20, 20, 1180, 100)
+      }
+      block f_date {
+        position: pos(20, 140, 280, 80)
+      }
+      block f_program {
+        position: pos(320, 140, 280, 80)
+      }
+      block f_partner {
+        position: pos(620, 140, 280, 80)
+      }
+      block f_region {
+        position: pos(920, 140, 280, 80)
+      }
+      block k_candidates {
+        position: pos(20, 240, 280, 140)
+      }
+      block k_completions {
+        position: pos(320, 240, 280, 140)
+      }
+      block k_pass_rate {
+        position: pos(620, 240, 280, 140)
+      }
+      block k_credentials {
+        position: pos(920, 240, 280, 140)
+      }
+      block k_active_creds {
+        position: pos(20, 400, 280, 140)
+      }
+      block k_expiring {
+        position: pos(320, 400, 280, 140)
+      }
+      block k_recognised {
+        position: pos(620, 400, 280, 140)
+      }
+      block k_redemption {
+        position: pos(920, 400, 280, 140)
+      }
+      block c_activity_trend {
+        position: pos(20, 560, 760, 360)
+      }
+      block c_creds_by_program {
+        position: pos(800, 560, 400, 360)
+      }
+      block t_partner_board {
+        position: pos(20, 940, 760, 400)
+      }
+      block c_candidates_region {
+        position: pos(800, 940, 400, 400)
+      }
+      default_zoom: 'fit_to_width'
+    }
+
+    tab learning: CanvasLayout {
+      label: 'Learning & Certification'
+      width: 1220
+      height: 1640
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block t_header {
+        position: pos(20, 20, 1180, 100)
+      }
+      block f_date {
+        position: pos(20, 140, 280, 80)
+      }
+      block f_program {
+        position: pos(320, 140, 280, 80)
+      }
+      block f_partner {
+        position: pos(620, 140, 280, 80)
+      }
+      block f_region {
+        position: pos(920, 140, 280, 80)
+      }
+      block k_completion_rate {
+        position: pos(20, 240, 280, 140)
+      }
+      block k_avg_score {
+        position: pos(320, 240, 280, 140)
+      }
+      block k_fapr {
+        position: pos(620, 240, 280, 140)
+      }
+      block k_recert_rate {
+        position: pos(920, 240, 280, 140)
+      }
+      block t_course_funnel {
+        position: pos(20, 400, 580, 400)
+      }
+      block c_pass_by_attempt {
+        position: pos(620, 400, 580, 400)
+      }
+      block c_cred_status {
+        position: pos(20, 820, 380, 360)
+      }
+      block c_recert_trend {
+        position: pos(420, 820, 780, 360)
+      }
+      block t_expiring {
+        position: pos(20, 1200, 1180, 400)
+      }
+      default_zoom: 'fit_to_width'
+    }
+
+    tab vouchers: CanvasLayout {
+      label: 'Vouchers & Revenue'
+      width: 1220
+      height: 1720
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block t_header {
+        position: pos(20, 20, 1180, 100)
+      }
+      block f_date {
+        position: pos(20, 140, 280, 80)
+      }
+      block f_program {
+        position: pos(320, 140, 280, 80)
+      }
+      block f_partner {
+        position: pos(620, 140, 280, 80)
+      }
+      block f_region {
+        position: pos(920, 140, 280, 80)
+      }
+      block k_sales {
+        position: pos(20, 240, 280, 140)
+      }
+      block k_recognised_v {
+        position: pos(320, 240, 280, 140)
+      }
+      block k_deferred {
+        position: pos(620, 240, 280, 140)
+      }
+      block k_breakage {
+        position: pos(920, 240, 280, 140)
+      }
+      block k_issued {
+        position: pos(20, 400, 280, 140)
+      }
+      block k_redeemed {
+        position: pos(320, 400, 280, 140)
+      }
+      block k_outstanding {
+        position: pos(620, 400, 280, 140)
+      }
+      block k_avg_disc {
+        position: pos(920, 400, 280, 140)
+      }
+      block c_voucher_trend {
+        position: pos(20, 560, 760, 360)
+      }
+      block c_outstanding_age {
+        position: pos(800, 560, 400, 360)
+      }
+      block t_voucher_partners {
+        position: pos(20, 940, 1180, 420)
+      }
+      block t_voucher_exam {
+        position: pos(20, 1380, 1180, 300)
+      }
+      default_zoom: 'fit_to_width'
+    }
+
+    tab cohorts: CanvasLayout {
+      label: 'Cohorts'
+      width: 1220
+      height: 1760
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block t_cohort_intro {
+        position: pos(20, 20, 1180, 120)
+      }
+      block f_grain {
+        position: pos(20, 160, 220, 80)
+      }
+      block f_milestone {
+        position: pos(260, 160, 220, 80)
+      }
+      block f_cohort_window {
+        position: pos(500, 160, 220, 80)
+      }
+      block f_partner_type {
+        position: pos(740, 160, 220, 80)
+      }
+      block f_segment {
+        position: pos(980, 160, 220, 80)
+      }
+      block f_date {
+        position: pos(20, 260, 280, 80)
+      }
+      block f_region {
+        position: pos(320, 260, 280, 80)
+      }
+      block p_candidate_cohort {
+        position: pos(20, 360, 1180, 560)
+      }
+      block t_voucher_cohort_intro {
+        position: pos(20, 940, 1180, 100)
+      }
+      block f_v_partner {
+        position: pos(20, 1060, 280, 80)
+      }
+      block f_v_channel {
+        position: pos(320, 1060, 280, 80)
+      }
+      block p_voucher_cohort {
+        position: pos(20, 1160, 1180, 560)
+      }
+      default_zoom: 'fit_to_width'
+    }
+
+  }
+  settings {
+    timezone: 'America/New_York'
+  }
+}

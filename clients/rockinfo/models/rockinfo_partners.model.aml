@@ -1,0 +1,53 @@
+Model rockinfo_partners {
+  type: 'table'
+  label: 'Partner'
+  description: 'One row per channel partner of a client: training partners, resellers, corporate accounts, academic institutions, plus one Direct channel per client.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."partners"'
+
+  dimension partner_id {
+    label: 'Partner ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.partner_id }};;
+    description: 'Partner key.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension partner_name {
+    label: 'Partner'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner_name }};;
+    description: 'Partner name. The Direct channel is named after the client.'
+  }
+  dimension partner_type {
+    label: 'Partner Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner_type }};;
+    description: 'Direct, Training Partner, Reseller, Corporate Account or Academic.'
+  }
+  dimension partner_tier {
+    label: 'Partner Tier'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner_tier }};;
+    description: 'Platinum, Gold, Silver or Direct. Tier sets the voucher discount (25, 15, 10 and 0 percent).'
+  }
+  dimension partner_region {
+    label: 'Partner Region'
+    type: 'text'
+    definition: @sql coalesce({{ #SOURCE.region }}, 'Global');;
+    description: 'Region the partner operates in. The Direct channel is Global.'
+  }
+  dimension partner_country {
+    label: 'Partner Country'
+    type: 'text'
+    definition: @sql {{ #SOURCE.country }};;
+    description: 'Country of the partner.'
+  }
+}

@@ -1,0 +1,71 @@
+Model rockinfo_candidates {
+  type: 'table'
+  label: 'Candidate'
+  description: 'One row per candidate (learner) registered with a client. Each candidate belongs to one acquisition partner.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."candidates"'
+
+  dimension candidate_id {
+    label: 'Candidate ID'
+    type: 'number'
+    primary_key: true
+    definition: @sql {{ #SOURCE.candidate_id }};;
+    description: 'Candidate key. Use for distinct candidate counts and as the drill-through key to the Candidate Record.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension partner_id {
+    label: 'Partner ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.partner_id }};;
+    description: 'Acquisition partner. Join key only.'
+  }
+  dimension candidate_name {
+    label: 'Candidate'
+    type: 'text'
+    definition: @sql {{ #SOURCE.candidate_name }};;
+    description: 'Synthetic candidate name.'
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    definition: @sql {{ #SOURCE.email }};;
+    description: 'Synthetic candidate email.'
+  }
+  dimension region {
+    label: 'Candidate Region'
+    type: 'text'
+    definition: @sql {{ #SOURCE.region }};;
+    description: 'Region the candidate is based in.'
+  }
+  dimension country {
+    label: 'Candidate Country'
+    type: 'text'
+    definition: @sql {{ #SOURCE.country }};;
+    description: 'Country the candidate is based in.'
+  }
+  dimension segment {
+    label: 'Segment'
+    type: 'text'
+    definition: @sql {{ #SOURCE.segment }};;
+    description: 'Individual, Employer-sponsored (corporate partner) or Student (academic partner).'
+  }
+  dimension registered_at {
+    label: 'Registered At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.registered_at }};;
+    description: 'When the candidate registered.'
+  }
+  dimension registered_date {
+    label: 'Registered Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.registered_at }}::date;;
+    description: 'Date the candidate registered. Starting point of the candidate cohort.'
+  }
+}

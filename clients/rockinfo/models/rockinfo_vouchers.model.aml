@@ -1,0 +1,139 @@
+Model rockinfo_vouchers {
+  type: 'table'
+  label: 'Voucher'
+  description: 'One row per exam voucher sold. Partners buy vouchers in bulk orders; the web store sells single vouchers. Revenue is recognised when a voucher is redeemed and breakage when it expires unused.'
+  data_source_name: 'rockinfo_neon'
+  table_name: '"rockinfo_demo"."vouchers"'
+
+  dimension voucher_id {
+    label: 'Voucher ID'
+    type: 'number'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.voucher_id }};;
+    description: 'Voucher key.'
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key only.'
+  }
+  dimension partner_id {
+    label: 'Partner ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.partner_id }};;
+    description: 'Purchasing partner. Join key only.'
+  }
+  dimension exam_id {
+    label: 'Exam ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.exam_id }};;
+    description: 'Exam the voucher is valid for. Join key only.'
+  }
+  dimension order_id {
+    label: 'Order ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.order_id }};;
+    description: 'Purchase order the voucher belongs to. Use for invoice reconciliation.'
+  }
+  dimension sales_channel {
+    label: 'Sales Channel'
+    type: 'text'
+    definition: @sql {{ #SOURCE.sales_channel }};;
+    description: 'Partner order (bulk) or Web store (single purchase).'
+  }
+  dimension voucher_code {
+    label: 'Voucher Code'
+    type: 'text'
+    definition: @sql {{ #SOURCE.voucher_code }};;
+    description: 'Voucher code given to the candidate.'
+  }
+  dimension voucher_type {
+    label: 'Voucher Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.voucher_type }};;
+    description: 'Standard or Retake (50 percent extra discount).'
+  }
+  dimension issued_at {
+    label: 'Issued At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.issued_at }};;
+    description: 'When the voucher was sold.'
+  }
+  dimension issued_date {
+    label: 'Issued Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.issued_at }}::date;;
+    description: 'Date the voucher was sold. Activity date for voucher metrics.'
+  }
+  dimension expires_at {
+    label: 'Voucher Expires On'
+    type: 'date'
+    definition: @sql {{ #SOURCE.expires_at }};;
+    description: 'Date the voucher expires, 12 months after issue.'
+  }
+  dimension redeemed_at {
+    label: 'Redeemed At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.redeemed_at }};;
+    description: 'When the voucher was redeemed against an exam booking.'
+  }
+  dimension redeemed_date {
+    label: 'Redeemed Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.redeemed_at }}::date;;
+    description: 'Date the voucher was redeemed. Use to trend recognised revenue.'
+  }
+  dimension voucher_status {
+    label: 'Voucher Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+    description: 'Redeemed, Unredeemed (still valid, deferred revenue) or Expired (breakage).'
+  }
+  dimension list_price_usd {
+    label: 'List Price (USD)'
+    type: 'number'
+    format: '[$$]#,###0'
+    definition: @sql {{ #SOURCE.list_price_usd }};;
+    description: 'Undiscounted voucher price.'
+  }
+  dimension discount_pct {
+    label: 'Discount %'
+    type: 'number'
+    definition: @sql {{ #SOURCE.discount_pct }};;
+    description: 'Discount applied: partner tier discount, plus 50 points on retake vouchers, capped at 60.'
+  }
+  dimension net_price_usd {
+    label: 'Net Price (USD)'
+    type: 'number'
+    format: '[$$]#,###0.00'
+    definition: @sql {{ #SOURCE.net_price_usd }};;
+    description: 'Price paid after discount, in USD.'
+  }
+  dimension days_to_redeem {
+    label: 'Days to Redeem'
+    type: 'number'
+    definition: @sql ({{ #SOURCE.redeemed_at }}::date - {{ #SOURCE.issued_at }}::date);;
+    description: 'Days between sale and redemption. Empty if not redeemed.'
+  }
+  dimension days_outstanding {
+    label: 'Days Outstanding'
+    type: 'number'
+    definition: @sql case when {{ #SOURCE.status }} = 'Unredeemed' then current_date - {{ #SOURCE.issued_at }}::date end;;
+    description: 'Age in days of a still-valid unredeemed voucher. Empty otherwise.'
+  }
+  dimension outstanding_age_band {
+    label: 'Outstanding Age'
+    type: 'text'
+    definition: @sql case when {{ #SOURCE.status }} <> 'Unredeemed' then null
+      when current_date - {{ #SOURCE.issued_at }}::date <= 90 then '0-90 days'
+      when current_date - {{ #SOURCE.issued_at }}::date <= 180 then '91-180 days'
+      when current_date - {{ #SOURCE.issued_at }}::date <= 270 then '181-270 days'
+      else '271-365 days' end;;
+    description: 'Age band of unredeemed vouchers, to spot stock at risk of expiring.'
+  }
+}
