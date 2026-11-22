@@ -106,11 +106,14 @@ async function load(user) {
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
     renderPayload(data.payload);
     $('openPortal').href = data.embedUrl;
-    frame.onload = () => {
+    const reveal = () => {
       frame.classList.remove('loading');
       setState('');
     };
+    frame.onload = reveal;
     frame.src = data.embedUrl;
+    // The embed's own spinner takes over; don't wait on onload, which a heavy SPA can delay.
+    setTimeout(reveal, 1500);
   } catch (e) {
     if (e.name === 'AbortError') return;
     setState(e.message, true);
