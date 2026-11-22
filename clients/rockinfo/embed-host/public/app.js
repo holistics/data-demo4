@@ -10,12 +10,18 @@ let current;
 let sections = [];
 const VIEWS = new Map();
 let defaultView = 'ai';
+// Team (org) and personal dashboards come from the iframe's embed:loaded event, per identity.
+let workspaceSections = [];
+let workspaceItems = { org: [], personal: [] };
+let embedOrigin = '';
+const isWs = (id) => /^ws:[a-z0-9_]+$/.test(id || '');
 let view;
 let inflight;
 
 const ICONS = {
   ai: '<path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/>',
   dashboards: '<path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  team: '<path d="M4 3.5h8l4 4V16.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 13v-2M10 13V9M13 13v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
   datasets: '<ellipse cx="10" cy="5" rx="6" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V5M4 10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
 };
 
@@ -23,40 +29,75 @@ const ICONS = {
 const viewFromHash = () => {
   const h = location.hash.slice(1);
   if (h === 'dashboards') return 'rockinfo_program_performance';
-  return VIEWS.has(h) ? h : defaultView;
+  return VIEWS.has(h) || isWs(h) ? h : defaultView;
 };
+
+const wsItem = (id) => {
+  for (const k of Object.keys(workspaceItems)) {
+    const d = workspaceItems[k].find((x) => `ws:${x.uname}` === id);
+    if (d) return { id, title: d.title, sub: k === 'org' ? 'Team report · built by your organisation' : 'My report · personal workspace' };
+  }
+  return { id, title: 'Team report', sub: 'Built by your organisation' };
+};
+
+function navLink(id, title, sub, iconKey) {
+  const a = document.createElement('a');
+  a.className = 'nav-item view-link' + (iconKey === 'ai' ? ' home' : '');
+  a.href = `#${id}`;
+  a.dataset.view = id;
+  a.title = sub;
+  a.innerHTML =
+    iconKey === 'ai'
+      ? '<img class="nav-icon" src="/assets/rocky-ai.png" alt="" width="22" height="22" />'
+      : `<svg viewBox="0 0 20 20" aria-hidden="true">${ICONS[iconKey] || ICONS.dashboards}</svg>`;
+  const text = document.createElement('span');
+  text.className = 'nav-label';
+  text.textContent = title;
+  a.appendChild(text);
+  return a;
+}
+
+function navGroup(labelText) {
+  const group = document.createElement('div');
+  group.className = 'nav-group';
+  const label = document.createElement('p');
+  label.className = 'nav-section';
+  label.textContent = labelText;
+  group.appendChild(label);
+  return group;
+}
+
+function renderWorkspaceSections(nav) {
+  for (const ws of workspaceSections) {
+    if (ws.editorsOnly && !current?.editor) continue;
+    const items = workspaceItems[ws.key] || [];
+    if (!items.length && !ws.empty) continue;
+    const group = navGroup(ws.label);
+    for (const d of items) group.appendChild(navLink(`ws:${d.uname}`, d.title, wsItem(`ws:${d.uname}`).sub, 'team'));
+    if (!items.length) {
+      const p = document.createElement('p');
+      p.className = 'nav-empty';
+      p.textContent = ws.empty;
+      group.appendChild(p);
+    }
+    nav.appendChild(group);
+  }
+}
 
 function renderNav() {
   const nav = $('analyticsNav');
   nav.innerHTML = '';
   const allowed = new Set(current?.views || VIEWS.keys());
   for (const s of sections) {
+    // Team and personal reports sit between the published dashboards and the datasets.
+    if (s.key === 'datasets') renderWorkspaceSections(nav);
     const items = s.items.filter((item) => allowed.has(item.id));
     if (!items.length) continue;
-    const group = document.createElement('div');
-    group.className = 'nav-group';
-    const label = document.createElement('p');
-    label.className = 'nav-section';
-    label.textContent = s.label;
-    group.appendChild(label);
-    for (const item of items) {
-      const a = document.createElement('a');
-      a.className = 'nav-item view-link' + (s.key === 'ai' ? ' home' : '');
-      a.href = `#${item.id}`;
-      a.dataset.view = item.id;
-      a.title = item.sub;
-      a.innerHTML =
-        s.key === 'ai'
-          ? '<img class="nav-icon" src="/assets/rocky-ai.png" alt="" width="22" height="22" />'
-          : `<svg viewBox="0 0 20 20" aria-hidden="true">${ICONS[s.key] || ICONS.dashboards}</svg>`;
-      const text = document.createElement('span');
-      text.className = 'nav-label';
-      text.textContent = item.title;
-      a.appendChild(text);
-      group.appendChild(a);
-    }
+    const group = navGroup(s.label);
+    for (const item of items) group.appendChild(navLink(item.id, item.title, item.sub, s.key));
     nav.appendChild(group);
   }
+  if (!sections.some((s) => s.key === 'datasets')) renderWorkspaceSections(nav);
 }
 
 const initials = (name) => name.split(/[\s()]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
@@ -137,14 +178,16 @@ function renderPayload(payload) {
 }
 
 async function load(user) {
+  const switched = current?.id !== user.id;
   current = user;
+  if (switched) workspaceItems = { org: [], personal: [] };
   document.documentElement.style.setProperty('--tenant', user.accent);
   $('userAvatar').textContent = initials(user.tenantName);
   $('userName').textContent = user.title;
   $('userSub').textContent = user.tenantName;
   renderMenu();
   // Viewers have no Datasets entry; switching to one from Explore falls back to the default view.
-  if (!user.views.includes(view)) {
+  if (isWs(view) ? switched : !user.views.includes(view)) {
     setView(defaultView);
     history.replaceState(null, '', `#${defaultView}`);
   }
@@ -165,6 +208,7 @@ async function load(user) {
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
     renderPayload(data.payload);
     $('openPortal').href = data.embedUrl;
+    embedOrigin = new URL(data.embedUrl).origin;
     $('openMailbox').href = data.mailboxUrl || '#';
     $('mailboxLabel').textContent = `Open ${data.payload.embed_user_email} mailbox`;
     const reveal = () => {
@@ -190,7 +234,7 @@ function setDrawer(open) {
 
 function setView(next) {
   view = next;
-  const item = VIEWS.get(view);
+  const item = VIEWS.get(view) || wsItem(view);
   $('pageTitle').textContent = item.title;
   $('pageSub').textContent = item.sub;
   document.title = `Rockinfo · ${item.title}`;
@@ -212,6 +256,17 @@ for (const b of document.querySelectorAll('.module')) {
     toastTimer = setTimeout(() => (t.hidden = true), 3500);
   });
 }
+
+// Holistics lists every dashboard this identity can open, tagged org or personal.
+window.addEventListener('message', (e) => {
+  if (!embedOrigin || e.origin !== embedOrigin || e.source !== frame.contentWindow) return;
+  if (e.data?.eventName !== 'embed:loaded') return;
+  const dashboards = e.data.payload?.objects?.dashboards || [];
+  const pick = (w) => dashboards.filter((d) => d.workspace === w && d.uname).map(({ uname, title }) => ({ uname, title: title || uname }));
+  workspaceItems = { org: pick('org'), personal: pick('personal') };
+  renderNav();
+  setView(view);
+});
 
 window.addEventListener('hashchange', () => {
   const next = viewFromHash();
@@ -245,6 +300,7 @@ try {
   users = cfg.users;
   sections = cfg.sections;
   defaultView = cfg.defaultView;
+  workspaceSections = cfg.workspaceSections || [];
   for (const s of sections) for (const item of s.items) VIEWS.set(item.id, item);
   setView(viewFromHash());
   load(users[0]);

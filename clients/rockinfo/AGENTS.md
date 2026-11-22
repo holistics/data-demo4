@@ -23,6 +23,9 @@ on `rockinfo_clients.client_id` against the Number user attribute `rockinfo_clie
   derived from rockinfo.com; sources cited in the file). Never add per-client themes; keep header
   text colours `inherit` so both modes read.
 - Test isolation with an embedded identity, never as an admin or analyst.
+- Team reports are client-owned dashboards in `modules/embedding/org_client_<id>/shared_workspace/`.
+  Create one only through the embed as that tenant's editor (Holistics registers only files it
+  created), then edit its AML in place; never add, rename or move files there by hand.
 
 **Validate after every AML edit** from the repo root:
 

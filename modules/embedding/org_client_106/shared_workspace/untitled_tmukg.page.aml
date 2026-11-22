@@ -1,26 +1,284 @@
 Dashboard untitled_tmukg {
-  title: 'Untitled'
+  title: 'Voucher Sales by Channel'
+  description: 'F5 commercial team: voucher sales, recognised and deferred revenue and breakage by sales channel and voucher type.'
   owner: 'embed_6dc13000085160293e@holistics.io'
   block title: TextBlock {
-    content: @md # Your title goes here ;;
+    content: @md
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6">F5 team report &middot; Shared workspace</div>
+
+      # Voucher Sales by Channel
+
+      How F5 sells exam vouchers, which channels redeem, and how much revenue is still deferred.
+    ;;
   }
-  explicit_interactions: []
+  block f_date: FilterBlock {
+    label: 'Activity Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_dates.date_day)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+  block f_channel: FilterBlock {
+    label: 'Sales Channel'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_vouchers.sales_channel)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_vtype: FilterBlock {
+    label: 'Voucher Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_vouchers.voucher_type)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block k1: VizBlock {
+    label: 'Voucher Sales'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.voucher_sales)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k2: VizBlock {
+    label: 'Recognised Revenue'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.recognised_revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k3: VizBlock {
+    label: 'Deferred Revenue'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.deferred_revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block k4: VizBlock {
+    label: 'Redemption Rate'
+    viz: MetricKpi {
+      dataset: rockinfo_credentialing
+      value: VizFieldFull {
+        label: ' '
+        ref: r(rockinfo_credentialing.redemption_rate)
+        format {
+          type: 'number'
+          pattern: '#,##0.0%'
+        }
+      }
+      settings {
+        alignment: 'left'
+      }
+    }
+  }
+  block c1: VizBlock {
+    label: 'Voucher sales by month'
+    viz: LineChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(rockinfo_dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.voucher_sales)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.recognised_revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        x_axis_label: ' '
+        show_data_points: true
+      }
+    }
+  }
+  block t1: VizBlock {
+    label: 'Channel and voucher type'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_vouchers.sales_channel)
+          uname: 't1_d0'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_vouchers.voucher_type)
+          uname: 't1_d1'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_issued)
+          uname: 't1_m0'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.voucher_sales)
+          uname: 't1_m1'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.avg_discount)
+          uname: 't1_m2'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.redemption_rate)
+          uname: 't1_m3'
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.recognised_revenue)
+          uname: 't1_m4'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.deferred_revenue)
+          uname: 't1_m5'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.breakage)
+          uname: 't1_m6'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 't1_m1'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 5000
+        show_row_number: true
+      }
+    }
+  }
+
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 800
+    height: 1280
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(20, 20, 1260, 60)
+      position: pos(20, 20, 1260, 100)
+    }
+    block f_date {
+      position: pos(20, 140, 300, 80)
+    }
+    block f_channel {
+      position: pos(340, 140, 300, 80)
+    }
+    block f_vtype {
+      position: pos(660, 140, 300, 80)
+    }
+    block k1 {
+      position: pos(20, 240, 300, 120)
+    }
+    block k2 {
+      position: pos(340, 240, 300, 120)
+    }
+    block k3 {
+      position: pos(660, 240, 300, 120)
+    }
+    block k4 {
+      position: pos(980, 240, 300, 120)
+    }
+    block c1 {
+      position: pos(20, 380, 1260, 380)
+    }
+    block t1 {
+      position: pos(20, 780, 1260, 480)
     }
     mobile {
       mode: 'auto'
     }
   }
   theme: DynamicPageTheme {
-    light: H.themes.vanilla
-    dark: H.themes.charcoal
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
   }
   settings {
     autorun_on_open: true
