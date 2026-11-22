@@ -101,6 +101,7 @@ Dashboard rockinfo_partner_detail {
   }
   block k_p_candidates: VizBlock {
     label: 'New Candidates'
+    description: 'Candidates this partner brought in who registered in the selected period.'
     viz: MetricKpi {
       dataset: rockinfo_credentialing
       value: VizFieldFull {
@@ -115,6 +116,7 @@ Dashboard rockinfo_partner_detail {
   }
   block k_p_pass: VizBlock {
     label: 'Exam Pass Rate'
+    description: 'Exams passed divided by exam attempts sat by this partner candidates, first attempts and retakes together.'
     viz: MetricKpi {
       dataset: rockinfo_credentialing
       value: VizFieldFull {
@@ -129,6 +131,7 @@ Dashboard rockinfo_partner_detail {
   }
   block k_p_sales: VizBlock {
     label: 'Voucher Sales'
+    description: 'Net value of vouchers this partner bought in the period, after its tier discount, USD.'
     viz: MetricKpi {
       dataset: rockinfo_credentialing
       value: VizFieldFull {
@@ -143,6 +146,7 @@ Dashboard rockinfo_partner_detail {
   }
   block k_p_redemption: VizBlock {
     label: 'Voucher Redemption Rate'
+    description: 'Share of the vouchers this partner bought that have been used to book an exam.'
     viz: MetricKpi {
       dataset: rockinfo_credentialing
       value: VizFieldFull {
@@ -157,6 +161,7 @@ Dashboard rockinfo_partner_detail {
   }
   block k_p_deferred: VizBlock {
     label: 'Deferred Revenue'
+    description: 'Value (USD) of vouchers this partner bought that are not yet used or expired.'
     viz: MetricKpi {
       dataset: rockinfo_credentialing
       value: VizFieldFull {
@@ -171,6 +176,7 @@ Dashboard rockinfo_partner_detail {
   }
   block k_p_risk: VizBlock {
     label: 'Breakage at Risk (90 days)'
+    description: 'Value (USD) of this partner unused vouchers that expire in the next 90 days. Point in time: ignores the Activity Date filter.'
     viz: MetricKpi {
       dataset: rockinfo_credentialing
       value: VizFieldFull {
@@ -185,6 +191,7 @@ Dashboard rockinfo_partner_detail {
   }
   block c_p_vouchers: VizBlock {
     label: 'Vouchers by issue month and current status'
+    description: 'Vouchers this partner bought, by month of sale, coloured by what has happened to them since.'
     viz: ColumnChart {
       dataset: rockinfo_credentialing
       x_axis: VizFieldFull {
@@ -235,6 +242,7 @@ Dashboard rockinfo_partner_detail {
   }
   block t_p_orders: VizBlock {
     label: 'Voucher orders - for invoice reconciliation'
+    description: 'One row per purchase order: vouchers issued, redeemed, outstanding and expired, and the matching revenue. Match it line by line against the partner invoice.'
     viz: DataTable {
       dataset: rockinfo_credentialing
       fields: [
@@ -335,6 +343,7 @@ Dashboard rockinfo_partner_detail {
   }
   block t_p_candidates: VizBlock {
     label: 'Candidates from this partner - click a candidate to open the Candidate Record'
+    description: 'Candidates acquired through this partner. Click a candidate to open the Candidate Record.'
     viz: DataTable {
       dataset: rockinfo_credentialing
       fields: [

@@ -57,7 +57,10 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
 - `datasets/rockinfo_credentialing.dataset.aml`: one governed dataset with 33 metrics, the
   `client_access` permission, dynamic cohort fields, and View Underlying Data record layouts.
 - `dashboards/`:
-  - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts
+  - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts,
+    How to use (onboarding guide written as Rockinfo to its clients' new users, including what each plan
+    unlocks) and Glossary (terms, statuses and every metric, with the exact definition interpolated from
+    the dataset so it cannot drift)
     (KPIs compare the period with the same period a year earlier; candidate journey funnel; program
     scorecard; heat-scaled partner tables; *Act now* lists for recertification outreach and vouchers
     expiring in 90 days, which ignore the Activity Date filter because they are point in time)
@@ -69,6 +72,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
 
 ## Demo capabilities
 
+- **Self-explaining dashboards**: every KPI, chart and table on all three dashboards carries a block
+  `description`, shown as an info icon on its title. Keep it in client language when adding a block.
 - **One dashboard, every tenant**: the same portal and dashboards show each client only its own data, and
   the header renders that client's name, industry and brand colour from data. No per-client copies.
 - **View underlying data**: right-click any KPI or table value for record-level views
