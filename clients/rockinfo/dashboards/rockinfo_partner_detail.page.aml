@@ -3,14 +3,41 @@ Dashboard rockinfo_partner_detail {
   description: 'Drill-through destination for one channel partner: vouchers, orders and candidates.'
   owner: 'vincent@holistics.io'
 
-  block t_p_header: TextBlock {
-    content: @md
-<div style="padding: 4px 8px">
-
-## Partner Detail
-
-Drill-through destination. Opened from any partner name on the Program Performance dashboard, already filtered to that partner.
-</div>;;
+  block t_p_header: VizBlock {
+    label: 'Client header'
+    viz: MarkdownViz {
+      dataset: rockinfo_credentialing
+      values: [
+        VizFieldFull {
+          label: 'Client'
+          ref: r(rockinfo_credentialing.portal_client_name)
+        },
+        VizFieldFull {
+          label: 'Color'
+          ref: r(rockinfo_credentialing.portal_brand_color)
+        },
+        VizFieldFull {
+          label: 'Industry'
+          ref: r(rockinfo_credentialing.portal_client_industry)
+        },
+        VizFieldFull {
+          label: 'Candidates'
+          ref: r(rockinfo_credentialing.total_candidates)
+        }
+      ]
+      content: @md <div style="display:flex;align-items:center;gap:16px;height:100%;padding:4px 8px;font-family:Inter,ui-sans-serif,system-ui,sans-serif;border-left:6px solid {{ rows[0].values.`Color`.raw }}">
+      <div style="width:52px;height:52px;border-radius:12px;background:{{ rows[0].values.`Color`.raw }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:none">{{ rows[0].values.`Client`.raw | slice: 0 }}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6B7280">{{ rows[0].values.`Client` }} &middot; {{ rows[0].values.`Industry` }}</div>
+        <div style="font-size:24px;font-weight:700;color:#111827;line-height:1.25">Partner Detail</div>
+        <div style="font-size:13px;color:#4B5563">SUBPartner Detail</div>
+      </div>
+      <div style="font-size:11px;color:#9CA3AF;text-align:right;flex:none">Powered by Rockinfo<br/>Analytics</div>
+    </div>;;
+    }
+    settings {
+      hide_label: true
+    }
   }
   block f_partner: FilterBlock {
     label: 'Partner'

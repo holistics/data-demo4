@@ -17,7 +17,7 @@ Data store: "Database" (unspecified: confirm the engine).
 ## Demo flow (25 min)
 
 1. **Framing (2 min)**: one governed model → many client tenants → dashboards, self-service and AI on top.
-2. **Program Performance → Overview** as Adobe (101, `rockinfo_portal_adobe`): KPIs, monthly activity, partner leaderboard.
+2. **Program Performance → Overview** as Adobe (101): KPIs, monthly activity, partner leaderboard.
    Right-click Recognised Revenue → View Underlying Data → voucher records.
 3. **Drill-through**: click a partner → Partner Detail (orders for invoice reconciliation) →
    click a Candidate ID → Candidate Record. This is the "single record" view from their brief.
@@ -27,8 +27,8 @@ Data store: "Database" (unspecified: confirm the engine).
 6. **Cohorts**: candidate journey cohort. Switch Milestone from Certified to Sat an exam, and
    Granularity from Month to Quarter. Filter Partner Type to Corporate Account. Then the voucher
    redemption cohort: how fast partner stock is used.
-7. **Tenant switch**: token for Lenovo (102, `rockinfo_portal_lenovo`, dark theme). Different
-   programs, partners and branding, no Adobe data anywhere, AI included. These are Rockinfo's
+7. **Tenant switch**: token for Lenovo (102). Same portal and dashboard, re-branded from data,
+   different programs and partners, no Adobe data anywhere, AI included. These are Rockinfo's
    own customers, with synthetic numbers: say so up front.
 8. **Self-service**: as a client editor, build a chart in Explore and save it to the org workspace.
 9. **Code**: dataset AML, permission block, Git.

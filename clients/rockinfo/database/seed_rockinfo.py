@@ -86,6 +86,10 @@ CLIENTS = [
     ]),
 ]
 
+# Brand accent per tenant, used by the dashboard's data-driven header (demo styling only).
+BRAND_COLORS = {101: '#EB1000', 102: '#E2231A', 103: '#FF791A', 104: '#E5323B', 105: '#024DA1',
+                106: '#E4002B', 107: '#F26722', 108: '#4D8DC9', 109: '#3448C5'}
+
 PARTNER_STEMS = ['Skyline', 'Bluegate', 'Northwind', 'Crestview', 'Summit', 'Ironbark', 'Harbourline', 'Keystone',
                  'Silverleaf', 'Redwood', 'Atlas', 'Pinnacle', 'Evergreen', 'Cobalt', 'Granite', 'Brightpath',
                  'Westbrook', 'Lakeside', 'Orion', 'Vantage', 'Clearwater', 'Highgate', 'Riverstone', 'Copperfield',
@@ -169,7 +173,8 @@ def build():
     for cid, cname, code, industry, hq, n_cand, rweights, progs in CLIENTS:
         plan = R.choice(['Enterprise', 'Enterprise', 'Growth'])
         T['clients'].append(dict(client_id=cid, client_name=cname, client_code=code, industry=industry,
-                                 hq_country=hq, plan_tier=plan, go_live_date=START - timedelta(days=R.randint(60, 400))))
+                                 hq_country=hq, plan_tier=plan, go_live_date=START - timedelta(days=R.randint(60, 400)),
+                                 brand_color=BRAND_COLORS[cid]))
         # programs, courses, exams
         prog_rows = []
         for pname, ptype, recert, fee, pass_base, topics in progs:
@@ -381,7 +386,7 @@ def make_voucher(T, nid, orders, cid, code, partner, exam, issued, vtype, order=
 
 DDL = {
     'clients': '''client_id integer primary key, client_name text not null, client_code text not null,
-        industry text, hq_country text, plan_tier text, go_live_date date''',
+        industry text, hq_country text, plan_tier text, go_live_date date, brand_color text''',
     'programs': '''program_id integer primary key, client_id integer not null, program_name text not null,
         program_type text not null, recert_cycle_months integer, exam_fee_usd numeric(10,2), launched_on date''',
     'courses': '''course_id integer primary key, client_id integer not null, program_id integer not null,

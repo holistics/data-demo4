@@ -29,20 +29,21 @@ Clients and test IDs for the embed token:
 Tenants are Rockinfo's customers from the logo strip on rockinfo.com. Programs and all numbers
 are synthetic and say nothing about any vendor's real certification results.
 
-| `rockinfo_client_id` | Client | Themed portal |
-| ---: | --- | --- |
-| 101 | Adobe | `rockinfo_portal_adobe` |
-| 102 | Lenovo | `rockinfo_portal_lenovo` (dark theme) |
-| 103 | SonicWall | neutral portal only |
-| 104 | Axway | neutral portal only |
-| 105 | Nutanix | `rockinfo_portal_nutanix` |
-| 106 | F5 | `rockinfo_portal_f5` |
-| 107 | Gigamon | neutral portal only |
-| 108 | RStudio | neutral portal only |
-| 109 | Cloudinary | `rockinfo_portal_cloudinary` |
+| `rockinfo_client_id` | Client |
+| ---: | --- |
+| 101 | Adobe |
+| 102 | Lenovo |
+| 103 | SonicWall |
+| 104 | Axway |
+| 105 | Nutanix |
+| 106 | F5 |
+| 107 | Gigamon |
+| 108 | RStudio |
+| 109 | Cloudinary |
 
-`rockinfo_client_portal` is the neutral portal for any client and for Rockinfo internal users.
-A themed portal changes only the look: data scope always comes from the token's `rockinfo_client_id`.
+Every client and Rockinfo internal users open the **same** portal, `rockinfo_client_portal`, and the
+same dashboards. The token's `rockinfo_client_id` decides the data, and the data-driven header brands
+the page with the client's name and colour (`rockinfo_clients.brand_color`).
 
 Reseed: `NEON_DEMO_DATABASE_URL=... python database/seed_rockinfo.py --out /tmp/rockinfo --load`.
 Holistics reads through the read-only role `holistics_reader`. Its credentials are in
@@ -59,12 +60,12 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts
   - `rockinfo_partner_detail`: drill-through destination (Partner)
   - `rockinfo_candidate_record`: drill-through destination (Candidate ID), the single-record view
-- `themes/` and `dashboards/customers/`: one theme per showcase customer and `.extend()` copies of the 3 dashboards with that theme.
-- `embeds/`: `rockinfo_client_portal` (neutral) and `rockinfo_portal_<slug>` per showcase customer, all with AI enabled.
+- `embeds/rockinfo_client_portal.embed.aml`: the one portal every client embeds, with AI enabled.
 
 ## Demo capabilities
 
-- **Tenant isolation**: the same portal shows different clients purely from the token's `rockinfo_client_id`.
+- **One dashboard, every tenant**: the same portal and dashboards show each client only its own data, and
+  the header renders that client's name, industry and brand colour from data. No per-client copies.
 - **View underlying data**: right-click any KPI or table value for record-level views
   (candidates, enrolments, attempts, credentials, vouchers).
 - **Drill-through**: click a partner to open Partner Detail; click a Candidate ID to open the Candidate Record.
