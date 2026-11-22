@@ -6,9 +6,9 @@
 // Each tenant is on one plan, most expensive first; the persona menu keeps this order.
 export const TENANTS = [
   { id: 101, slug: 'adobe', name: 'Adobe', accent: '#EB1000', plan: 'enterprise' },
-  { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', plan: 'selfservice' },
-  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', plan: 'insights' },
-  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', plan: 'essentials' },
+  { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', plan: 'enterprise' },
+  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', plan: 'selfservice' },
+  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', plan: 'insights' },
   { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', plan: 'essentials' },
 ];
 

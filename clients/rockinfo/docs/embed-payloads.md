@@ -56,9 +56,9 @@ left out; the homepage opens as the Adobe client admin.
 | Tenant | Plan | Personas (`embed_user_id`), admin first |
 | --- | --- | --- |
 | Adobe | Enterprise (premium) | `adobe_admin`, `adobe_editor`, `adobe_analyst`, `adobe_viewer` |
-| Lenovo | Self-service (add-on) | `lenovo_admin`, `lenovo_analyst`, `lenovo_viewer` |
-| Nutanix | Insights (add-on) | `nutanix_admin`, `nutanix_viewer` |
-| F5 | Essentials (included) | `f5_admin`, `f5_viewer` |
+| Lenovo | Enterprise (premium) | `lenovo_admin`, `lenovo_editor`, `lenovo_analyst`, `lenovo_viewer` |
+| Nutanix | Self-service (add-on) | `nutanix_admin`, `nutanix_analyst`, `nutanix_viewer` |
+| F5 | Insights (add-on) | `f5_admin`, `f5_viewer` |
 | Cloudinary | Essentials (included) | `cloudinary_admin`, `cloudinary_viewer` |
 | Rockinfo | Internal | `rockinfo_internal_admin`, `embed_org_id: rockinfo_internal`, all nine clients |
 
@@ -79,7 +79,7 @@ without them and refuses to sign those views (`requires` in `embed-host/lib/port
 dataset is still a portal object because Ask AI needs it, so Explore is a host-side guard, not a
 Holistics permission.
 
-**Team reports** are dashboards a tenant's admin saved (org `editor`, so only Enterprise tenants can publish new ones) to their Shared workspace
+**Team reports** are dashboards a tenant's admin saved (org `editor`, so only the Enterprise tenants Adobe and Lenovo can publish new ones) to their Shared workspace
 (`embed_org_id`). The host lists them from the iframe's `embed:loaded` event (`workspace: 'org'`)
 and opens one as `/objects/<uname>`; every user in that org sees them. Seeded
 reports: Adobe (Partner Voucher Watchlist, Recertification Pipeline), Lenovo (Partner Enablement
