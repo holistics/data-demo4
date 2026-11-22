@@ -182,8 +182,9 @@ function renderPayload(payload) {
 async function load(user) {
   // First load keeps a #ws: deep link; only a real persona switch drops another org's report.
   const switched = !!current && current.id !== user.id;
+  // Team reports belong to the tenant, so they survive a plan switch within it; My reports do not.
+  if (switched) workspaceItems = { org: current.tenantSlug === user.tenantSlug ? workspaceItems.org : [], personal: [] };
   current = user;
-  if (switched) workspaceItems = { org: [], personal: [] };
   document.documentElement.style.setProperty('--tenant', user.accent);
   $('userAvatar').textContent = initials(user.tenantName);
   $('userName').textContent = user.title;
@@ -287,7 +288,12 @@ function tryButton(planKey) {
   const b = el('button', 'plan-try', u.id === current.id ? 'You are signed in as this plan' : `Try as ${u.tenantName} ${u.title.toLowerCase()}`);
   b.type = 'button';
   b.disabled = u.id === current.id;
-  b.addEventListener('click', () => load(u));
+  // Land on the plan's home view so the embed loads and its Team reports appear.
+  b.addEventListener('click', () => {
+    setView(u.home);
+    history.replaceState(null, '', `#${u.home}`);
+    load(u);
+  });
   return b;
 }
 
