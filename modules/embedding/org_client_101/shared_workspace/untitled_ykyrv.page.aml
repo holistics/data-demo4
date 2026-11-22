@@ -106,6 +106,7 @@ Dashboard untitled_ykyrv {
     viz: ColumnChart {
       dataset: rockinfo_credentialing
       x_axis: VizFieldFull {
+        label: 'Days since sale'
         ref: r(rockinfo_vouchers.outstanding_age_band)
       }
       y_axis {
@@ -117,11 +118,46 @@ Dashboard untitled_ykyrv {
               pattern: '#,###0'
             }
           }
+          settings {
+            point {
+              value: '0-90 days'
+              color: '#3B82F6'
+            }
+            point {
+              value: '91-180 days'
+              color: '#3B82F6'
+            }
+            point {
+              value: '181-270 days'
+              color: '#F5A524'
+            }
+            point {
+              value: '271-365 days'
+              color: '#DC1F34'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
         }
       }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Youngest (days)'
+            ref: r(rockinfo_vouchers.days_outstanding)
+            aggregation: 'min'
+          }
+        }
+      ]
       settings {
-        legend_label: 'top'
-        x_axis_label: ' '
+        legend_label: 'hidden'
+        // Order buckets by age, not alphabetically.
+        sort {
+          type: 'tooltip'
+          field_index: 0
+          direction: 'asc'
+        }
       }
     }
   }
