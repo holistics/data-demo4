@@ -1434,10 +1434,6 @@ Dashboard rockinfo_program_performance {
         label: 'Days since sale'
         ref: r(rockinfo_vouchers.outstanding_age_band)
       }
-      // Point colours apply only to legend values, so the band is also the legend.
-      legend: VizFieldFull {
-        ref: r(rockinfo_vouchers.outstanding_age_band)
-      }
       y_axis {
         series {
           field: VizFieldFull {
@@ -1467,7 +1463,6 @@ Dashboard rockinfo_program_performance {
           }
         }
         settings {
-          stack_series_by: 'value'
           show_data_label_by: 'value'
         }
       }
