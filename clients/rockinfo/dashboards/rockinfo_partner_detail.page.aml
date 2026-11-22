@@ -251,6 +251,7 @@ Dashboard rockinfo_partner_detail {
           uname: 'o_exam'
         },
         VizFieldFull {
+          label: 'Issued'
           ref: r(rockinfo_credentialing.vouchers_issued)
           format {
             type: 'number'
@@ -258,6 +259,7 @@ Dashboard rockinfo_partner_detail {
           }
         },
         VizFieldFull {
+          label: 'Redeemed'
           ref: r(rockinfo_credentialing.vouchers_redeemed)
           format {
             type: 'number'
@@ -265,6 +267,7 @@ Dashboard rockinfo_partner_detail {
           }
         },
         VizFieldFull {
+          label: 'Outstanding'
           ref: r(rockinfo_credentialing.vouchers_outstanding)
           format {
             type: 'number'
@@ -272,6 +275,7 @@ Dashboard rockinfo_partner_detail {
           }
         },
         VizFieldFull {
+          label: 'Expired'
           ref: r(rockinfo_credentialing.vouchers_expired)
           format {
             type: 'number'
@@ -279,6 +283,7 @@ Dashboard rockinfo_partner_detail {
           }
         },
         VizFieldFull {
+          label: 'Sales'
           ref: r(rockinfo_credentialing.voucher_sales)
           format {
             type: 'number'
@@ -286,6 +291,7 @@ Dashboard rockinfo_partner_detail {
           }
         },
         VizFieldFull {
+          label: 'Recognised'
           ref: r(rockinfo_credentialing.recognised_revenue)
           format {
             type: 'number'
@@ -293,6 +299,7 @@ Dashboard rockinfo_partner_detail {
           }
         },
         VizFieldFull {
+          label: 'Deferred'
           ref: r(rockinfo_credentialing.deferred_revenue)
           format {
             type: 'number'
@@ -318,11 +325,10 @@ Dashboard rockinfo_partner_detail {
           },
           ColumnStyle {
             key: 'o_exam'
-            width: 320
+            width: 330
           }
         ]
         wrap_header_text: true
-        show_sum_row: true
         pagination_size: 10
       }
     }

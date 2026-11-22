@@ -58,6 +58,9 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   `client_access` permission, dynamic cohort fields, and View Underlying Data record layouts.
 - `dashboards/`:
   - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts
+    (KPIs compare the period with the same period a year earlier; candidate journey funnel; program
+    scorecard; heat-scaled partner tables; *Act now* lists for recertification outreach and vouchers
+    expiring in 90 days, which ignore the Activity Date filter because they are point in time)
   - `rockinfo_partner_detail`: drill-through destination (Partner)
   - `rockinfo_candidate_record`: drill-through destination (Candidate ID), the single-record view
 - `embeds/rockinfo_client_portal.embed.aml`: the one portal every client embeds, with AI enabled.
@@ -69,6 +72,7 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
 - **View underlying data**: right-click any KPI or table value for record-level views
   (candidates, enrolments, attempts, credentials, vouchers).
 - **Drill-through**: click a partner to open Partner Detail; click a Candidate ID to open the Candidate Record.
+  Both pages name the selected partner or candidate in the header, and say "All partners" or prompt for a pick when none is chosen.
 - **Dynamic cohorts**: Cohort Granularity (Week, Month, Quarter, Year) and Cohort Milestone
   (Started a course, Completed a course, Sat an exam, Certified) re-cut the candidate journey
   cohort. Partner Type, Segment and Region change who is in the cohort. The voucher cohort shows
