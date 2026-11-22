@@ -2,7 +2,7 @@
 
 Status at end of day 2026-11-22. Everything below is live on
 https://rockinfo-embed.pages.holistics.dev and in demo4 production (`master` pushed and published).
-Resume the session with `cy --resume 007184ae-e610-4b37-840f-6c1c158cbf1a`, or start fresh from
+Resume the session with `ncy --resume 007184ae-e610-4b37-840f-6c1c158cbf1a`, or start fresh from
 this file.
 
 ## What exists now
