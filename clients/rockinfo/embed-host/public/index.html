@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rockinfo Analytics</title>
+    <title>Rockinfo · Rocky AI</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230B6E4F'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>R</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -14,32 +14,28 @@
     <p class="poc-banner" role="note"><strong>Proof of concept · mock data.</strong> Every figure here is synthetic, generated for this PoC. It is not real data from Rockinfo or from any customer named.</p>
     <div class="shell">
       <aside class="sidebar">
-        <div class="brand">
-          <span class="brand-mark">R</span>
-          <div>
-            <p class="brand-name">Rockinfo</p>
-            <p class="brand-sub">Credentialing platform</p>
-          </div>
-        </div>
-        <nav class="nav" aria-label="Rockinfo modules">
-          <a class="nav-item" href="#">Candidates</a>
-          <a class="nav-item" href="#">Learning</a>
-          <a class="nav-item" href="#">Certification</a>
-          <a class="nav-item" href="#">Vouchers</a>
-          <a class="nav-item" href="#">Credentials</a>
-        </nav>
+        <a class="brand" href="#ai" aria-label="Rockinfo home">
+          <img src="/assets/rockinfo-logo-white.png" alt="Rockinfo" width="150" height="38" />
+        </a>
         <nav class="nav" aria-label="Analytics">
-          <p class="nav-section">Analytics</p>
+          <a class="nav-item view-link home" href="#ai" data-view="ai"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/></svg>Rocky AI<span class="nav-badge">Home</span></a>
           <a class="nav-item view-link" href="#dashboards" data-view="dashboards"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Dashboards</a>
-          <a class="nav-item view-link" href="#ai" data-view="ai"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6L10 2.5zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z" fill="currentColor"/></svg>Rockinfo Insights<span class="nav-badge">AI</span></a>
         </nav>
-        <p class="sidebar-foot">Analytics powered by Holistics, embedded per customer.</p>
+        <nav class="nav" aria-label="Rockinfo modules">
+          <p class="nav-section">Rockinfo modules</p>
+          <button class="nav-item module" type="button">Candidates</button>
+          <button class="nav-item module" type="button">Learning</button>
+          <button class="nav-item module" type="button">Certification</button>
+          <button class="nav-item module" type="button">Vouchers</button>
+          <button class="nav-item module" type="button">Credentials</button>
+        </nav>
+        <p class="sidebar-foot">Rocky AI and dashboards powered by Holistics, embedded per customer.</p>
       </aside>
 
       <main class="main">
         <header class="topbar">
           <div class="page-title">
-            <h1 id="pageTitle">Rockinfo Insights</h1>
+            <h1 id="pageTitle">Rocky AI</h1>
             <p id="pageSub">Ask questions about your own candidates, exams, credentials and vouchers.</p>
           </div>
           <div class="user-menu">
@@ -64,6 +60,10 @@
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M11 3h6v6M17 3l-8 8M15 12v4a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Open embed portal in new tab
           </a>
+          <a class="tool" id="openMailbox" href="#" target="_blank" rel="noopener" title="Scheduled email subscriptions for this user land here">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v10H3zM3 5l7 6 7-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span id="mailboxLabel">Open mailbox</span>
+          </a>
           <p class="scope" id="scopeNote"></p>
         </section>
 
@@ -77,6 +77,7 @@
     </div>
     </div>
 
+    <p class="toast" id="toast" role="status" hidden></p>
     <div class="scrim" id="scrim" hidden></div>
     <aside class="drawer" id="payloadPanel" aria-label="Embed payload" aria-hidden="true">
       <header class="drawer-head">

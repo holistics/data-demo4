@@ -5,7 +5,7 @@
 //   HOLISTICS_HOST  default https://demo4.holistics.io
 //   PORT            default 8080
 import { createServer } from 'node:http';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
@@ -25,6 +25,20 @@ const env = process.env;
 const PORT = Number(env.PORT || 8080);
 const HOST = env.HOLISTICS_HOST || 'https://demo4.holistics.io';
 const PUBLIC = fileURLToPath(new URL('./public/', import.meta.url));
+// Cloudflare caches .css/.js at the edge, so index.html points at versioned URLs
+// (?v=<content hash>) and every redeploy gets fresh assets.
+const ASSET_VERSION = createHash('sha256')
+  .update(readFileSync(join(PUBLIC, 'app.js')))
+  .update(readFileSync(join(PUBLIC, 'styles.css')))
+  .digest('hex')
+  .slice(0, 10);
+const INDEX_HTML = readFileSync(join(PUBLIC, 'index.html'), 'utf8')
+  .replace('href="/styles.css"', `href="/styles.css?v=${ASSET_VERSION}"`)
+  .replace('src="/app.js"', `src="/app.js?v=${ASSET_VERSION}"`);
+
+// Email subscriptions go to public demo inboxes (synthetic data only).
+const MAIL_DOMAIN = env.SUBSCRIPTION_MAIL_DOMAIN || 'mailinator.com';
+const mailboxFor = (identityId) => `rockinfo-${identityId.replace(/_/g, '-')}`;
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
 const b64url = (buf) => Buffer.from(buf).toString('base64url');
@@ -80,22 +94,35 @@ function embedToken(identityId, view) {
     embed_portal: identity.portal,
     embed_org_id: identity.orgId,
     embed_user_id: identity.id,
+    embed_user_email: `${mailboxFor(identity.id)}@${MAIL_DOMAIN}`,
     user_attributes: { rockinfo_client_id: identity.clientIds },
     permissions: {
       enable_personal_workspace: isEditor,
       org_workspace_role: isEditor ? 'editor' : 'viewer',
     },
     // Ask AI for every customer persona; it answers only from the user's own rows.
-    settings: { ai: { enabled: true } },
+    settings: {
+      ai: { enabled: true },
+      // Email subscriptions: users schedule dashboards to their own inbox.
+      allow_dashboard_export: true,
+      allow_data_subscribe: true,
+    },
     exp: Math.floor(Date.now() / 1000) + 60 * 60,
   };
   const token = signHS256(payload, env.HOLISTICS_EMBED_SECRET);
   // payload is returned for the demo's "What the token says" panel; it holds no secret
   // Rockinfo Insights opens the full-page Ask AI view; Dashboards opens the main dashboard.
   const path = view === 'dashboards' ? '/objects/rockinfo_program_performance' : '/ai';
+  const mailboxUrl =
+    MAIL_DOMAIN === 'mailinator.com'
+      ? `https://www.mailinator.com/v4/public/inboxes.jsp?to=${mailboxFor(identity.id)}`
+      : null;
   // Collapse the Holistics portal's own left nav: the Rockinfo sidebar is the navigation.
   // Holistics offers only expanded or collapsed, so a small toggle icon stays top-left.
-  return [200, { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}&left_panel_state=collapsed`, payload }];
+  return [
+    200,
+    { embedUrl: `${HOST}/embed/${env.HOLISTICS_EMBED_KEY_ID}${path}?_token=${token}&left_panel_state=collapsed`, payload, mailboxUrl },
+  ];
 }
 
 createServer(async (req, res) => {
@@ -117,12 +144,20 @@ createServer(async (req, res) => {
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') return json(res, 405, { error: 'Method not allowed' });
 
-    const rel = normalize(url.pathname === '/' ? '/index.html' : url.pathname).replace(/^(\.\.[/\\])+/, '');
+    if (url.pathname === '/' || url.pathname === '/index.html') {
+      res.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' });
+      return res.end(INDEX_HTML);
+    }
+    const rel = normalize(url.pathname).replace(/^(\.\.[/\\])+/, '');
     const file = join(PUBLIC, rel);
     if (!file.startsWith(PUBLIC)) return json(res, 404, { error: 'Not found' });
     try {
       const data = await readFile(file);
-      res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream' });
+      const versioned = url.searchParams.get('v') === ASSET_VERSION;
+      res.writeHead(200, {
+        'Content-Type': TYPES[extname(file)] || 'application/octet-stream',
+        'Cache-Control': versioned ? 'public, max-age=31536000, immutable' : 'no-cache',
+      });
       res.end(data);
     } catch {
       res.writeHead(404).end('Not found');
