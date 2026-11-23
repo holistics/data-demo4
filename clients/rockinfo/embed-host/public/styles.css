@@ -63,6 +63,8 @@ svg { width: 16px; height: 16px; flex-shrink: 0; }
 .menu-item.active { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .menu-text { display: flex; flex-direction: column; min-width: 0; }
 .menu-title { font-weight: 600; }
+.admin-tag { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; line-height: 16px; vertical-align: 1px; background: color-mix(in srgb, var(--tenant, #0b6e4f) 14%, transparent); color: var(--tenant, #0b6e4f); border: 1px solid color-mix(in srgb, var(--tenant, #0b6e4f) 40%, transparent); }
+.menu-item .admin-tag { color: var(--accent, var(--tenant)); background: color-mix(in srgb, var(--accent, var(--tenant)) 14%, transparent); border-color: color-mix(in srgb, var(--accent, var(--tenant)) 40%, transparent); }
 .menu-sub { font-size: 12px; color: var(--muted); }
 
 .toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 24px; flex-wrap: wrap; }
@@ -163,7 +165,7 @@ iframe.loading { opacity: .25; }
 /* Plans v2: add-on card, roles strip, grouped matrix */
 .plans-h { margin-bottom: -14px; }
 .plan-card.addon { border-style: dashed; }
-.role-chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
+.role-chips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
 .role-chip { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
 .role-chip h3 { margin: 0; font-size: 15px; }
 .role-chip p { color: var(--muted); font-size: 13px; }

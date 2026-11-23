@@ -51,22 +51,27 @@ role. Plans (`PLANS`), the add-on (`ADDONS`), roles (`ROLES`) and each tenant's 
 (`TENANTS`) live in `embed-host/lib/tenants.mjs`; `capsFor` turns plan + role + add-on into token
 fields and the host's **Plans & permissions** page renders the same model.
 
-| Plan | Rocky AI | Explore, My reports | Publish to Team reports | Team reports |
-| --- | --- | --- | --- | --- |
-| Program Dashboards (included) | no | no | no | hidden (`org_workspace_role: no_access`) |
-| Analytics Studio (add-on, per Creator seat) | every user | Creators | every Creator | everyone sees |
-| Studio Enterprise (premium) | every user | Creators | named Publishers only | everyone sees |
+| Plan | Rocky AI | Explore, My reports | Publish to Team reports | Team reports | Raw data (with Data Export) |
+| --- | --- | --- | --- | --- | --- |
+| Program Dashboards (included) | no | no | no | hidden (`org_workspace_role: no_access`) | everyone |
+| Analytics Studio (add-on, per Creator seat) | every user | Creators | every Creator | everyone sees | everyone |
+| Studio Enterprise (premium) | every user | Creators | named Publishers only | everyone sees | named by the admin |
 
 Every plan includes Rockinfo dashboards, PDF export and scheduled emails. **Data Export** (add-on,
-any plan) gives `allow_raw_data_export` to the roles the admin chooses.
+any plan) sets `allow_raw_data_export`: for every user below Studio Enterprise, and only for the
+people the admin names on Studio Enterprise (the control is what premium pays for).
+
+**Admin is a tag, not a role.** The first role a plan offers is that tenant's admin (`admin: true`
+in `identities()`): the person who assigns roles in Rockinfo's app. Holistics never sees it; it
+only receives the token fields the admin's choices produce.
 
 | Tenant | Purchase | Personas (`embed_user_id`) and seat |
 | --- | --- | --- |
-| Adobe | Studio Enterprise + Data Export | `adobe_admin` Creator + Publisher, `adobe_editor` Creator (private), `adobe_analyst` Viewer + Data Export, `adobe_viewer` Viewer |
+| Adobe | Studio Enterprise + Data Export | `adobe_admin` Admin, Creator + Publisher + Data Export; `adobe_editor` Creator (private); `adobe_analyst` Viewer + Data Export; `adobe_viewer` Viewer |
 | Lenovo | Studio Enterprise + Data Export | same four roles as Adobe |
-| F5 | Analytics Studio + Data Export | `f5_editor` Creator, `f5_analyst` Viewer + Data Export, `f5_viewer` Viewer |
-| Nutanix | Analytics Studio | `nutanix_editor` Creator, `nutanix_viewer` Viewer |
-| Cloudinary | Program Dashboards | `cloudinary_viewer` Viewer |
+| F5 | Analytics Studio + Data Export | `f5_editor` Admin, Creator + Data Export; `f5_viewer` Viewer + Data Export |
+| Nutanix | Analytics Studio | `nutanix_editor` Admin, Creator; `nutanix_viewer` Viewer |
+| Cloudinary | Program Dashboards | `cloudinary_viewer` Admin, Viewer |
 | Rockinfo | Internal | `rockinfo_internal_admin`, `embed_org_id: rockinfo_internal`, all nine clients |
 
 Role keys stay the `embed_user_id` suffix so earlier reports keep their authors: `admin` Program
