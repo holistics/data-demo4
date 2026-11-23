@@ -3,14 +3,13 @@
 // id; tenant, portal and permissions are resolved here, so nobody can switch tenant or
 // plan by editing the request.
 
-// Each tenant buys one plan, most expensive first (the persona menu keeps this order), and
-// optionally the Data Export add-on.
+// Each tenant buys one plan, most expensive first (the persona menu keeps this order).
 export const TENANTS = [
-  { id: 101, slug: 'adobe', name: 'Adobe', accent: '#EB1000', plan: 'enterprise', dataExport: true },
-  { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', plan: 'enterprise', dataExport: true },
-  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', plan: 'studio', dataExport: true },
-  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', plan: 'studio', dataExport: false },
-  { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', plan: 'dashboards', dataExport: false },
+  { id: 101, slug: 'adobe', name: 'Adobe', accent: '#EB1000', plan: 'enterprise' },
+  { id: 102, slug: 'lenovo', name: 'Lenovo', accent: '#E2231A', plan: 'enterprise' },
+  { id: 106, slug: 'f5', name: 'F5', accent: '#E4002B', plan: 'studio' },
+  { id: 105, slug: 'nutanix', name: 'Nutanix', accent: '#7855FA', plan: 'studio' },
+  { id: 109, slug: 'cloudinary', name: 'Cloudinary', accent: '#3448C5', plan: 'dashboards' },
 ];
 
 // A fictional person behind each embed_user_id, so "Built by" reads like a real user.
@@ -39,8 +38,8 @@ export const PORTAL = 'rockinfo_client_portal';
 //   ai: Rocky AI for every user.  build: Creators get Explore and My reports.
 //   publish: who may publish Team reports: 'none' (no Team reports at all), 'creators' (every
 //   Creator) or 'publishers' (only roles the admin names Publisher).
-//   exports: who gets raw-row download once the customer buys Data Export: 'everyone' (no
-//   control) or 'named' (Studio Enterprise: only the people the admin chooses).
+//   exports: who gets raw-row download: 'everyone' (no control) or 'named' (Studio Enterprise's
+//   Data protection: only the people the admin chooses).
 export const PLANS = [
   {
     key: 'dashboards', name: 'Program Dashboards', price: 'Included',
@@ -54,20 +53,14 @@ export const PLANS = [
   },
   {
     key: 'enterprise', name: 'Studio Enterprise', price: 'Premium',
-    pitch: 'Analytics Studio with controls: the admin names who publishes and who downloads raw data, so Team reports stay curated and rows leave only through trusted hands.',
+    pitch: 'Analytics Studio with governance: the admin names who publishes, and Data protection restricts raw-data download to named people, so rows leave only through trusted hands.',
     ai: true, build: true, publish: 'publishers', exports: 'named', roles: ['admin', 'editor', 'viewer'],
   },
 ];
 
-// Sold on top of any plan. Below Studio Enterprise it switches raw-row download on for everyone;
-// on Studio Enterprise the admin restricts it to named people (the `export` roles below).
-export const ADDONS = [
-  {
-    key: 'dataExport', name: 'Data Export', price: 'Add-on · any plan',
-    pitch: 'Row-level CSV and Excel to reconcile vouchers or load a CRM. On for everyone, or on Studio Enterprise only for the people the admin names.',
-    role: 'analyst',
-  },
-];
+// No add-ons: raw-row download is open on every plan, and restricting it (Data protection) is a
+// Studio Enterprise feature. Kept as an empty list so the Plans page renders no add-on cards.
+export const ADDONS = [];
 
 // Roles inside a tenant, most permissions first. Admin is not a role but a tag: the first role a
 // plan offers is that tenant's admin, who assigns everyone else's role (and, on Studio
@@ -92,8 +85,9 @@ export function capsFor(plan, role, tenant) {
     org: plan.publish === 'none' ? 'no_access' : canPublish(plan, role) ? 'editor' : 'viewer',
     pdf: true,
     schedules: true,
-    // Data Export: everyone below Studio Enterprise; on it, only the people the admin names.
-    csv: !!(tenant.dataExport && (plan.exports === 'everyone' || role.export)),
+    // Raw-row download: everyone below Studio Enterprise; with its Data protection, only the
+    // people the admin names.
+    csv: plan.exports === 'everyone' || !!role.export,
   };
 }
 
@@ -104,7 +98,7 @@ export function seatFor(plan, role, tenant) {
     if (!canPublish(plan, role)) seat = 'Creator, builds privately';
     else seat = plan.publish === 'publishers' ? 'Creator + Publisher' : 'Creator';
   }
-  // Only Studio Enterprise grants exports person by person, so only there does a seat name it.
+  // Only Data protection grants exports person by person, so only there does a seat name it.
   return plan.exports === 'named' && capsFor(plan, role, tenant).csv ? `${seat} + Data Export` : seat;
 }
 
@@ -116,7 +110,7 @@ export function identities() {
     const p = PLANS.find((x) => x.key === t.plan);
     const keys = [...p.roles];
     // A separate exporter persona only matters where the admin restricts exports.
-    if (t.dataExport && p.exports === 'named') keys.splice(keys.length - 1, 0, 'analyst');
+    if (p.exports === 'named') keys.splice(keys.length - 1, 0, 'analyst');
     for (const r of ROLES.filter((x) => keys.includes(x.key))) {
       const seat = seatFor(p, r, t);
       list.push({
@@ -130,9 +124,8 @@ export function identities() {
         seat,
         role: `${seat} · ${r.pitch}`,
         plan: p.key,
-        // Data Export is the norm; a customer without it is the one labelled.
-        planName: p.name + (t.dataExport ? '' : ' · no data export'),
-        dataExport: !!t.dataExport,
+        // Downloads are open by default; the premium restriction is what gets labelled.
+        planName: p.name + (p.exports === 'named' ? ' · data protection' : ''),
         caps: capsFor(p, r, t),
         clientIds: [t.id],
         orgId: `client_${t.id}`,

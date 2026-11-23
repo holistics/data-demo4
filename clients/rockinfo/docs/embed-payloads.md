@@ -46,35 +46,35 @@ function holisticsEmbedUrl(user, client) {
 
 Every persona uses `embed_portal: 'rockinfo_client_portal'`. Only the identity changes.
 
-Each customer buys one plan, optionally plus the Data Export add-on; its admin gives each person a
-role. Plans (`PLANS`), the add-on (`ADDONS`), roles (`ROLES`) and each tenant's purchase
-(`TENANTS`) live in `embed-host/lib/tenants.mjs`; `capsFor` turns plan + role + add-on into token
-fields and the host's **Plans & permissions** page renders the same model.
+Each customer buys one plan; its admin gives each person a role. Plans (`PLANS`), roles (`ROLES`)
+and each tenant's purchase (`TENANTS`) live in `embed-host/lib/tenants.mjs`; `capsFor` turns plan +
+role into token fields and the host's **Plans & permissions** page renders the same model.
 
-| Plan | Rocky AI | Explore, My reports | Publish to Team reports | Team reports | Raw data (with Data Export) |
+| Plan | Rocky AI | Explore, My reports | Publish to Team reports | Team reports | Raw data download |
 | --- | --- | --- | --- | --- | --- |
 | Program Dashboards (included) | no | no | no | hidden (`org_workspace_role: no_access`) | everyone |
 | Analytics Studio (add-on, per Creator seat) | every user | Creators | every Creator | everyone sees | everyone |
 | Studio Enterprise (premium) | every user | Creators | named Publishers only | everyone sees | named by the admin |
 
-Every plan includes Rockinfo dashboards, PDF export and scheduled emails. **Data Export** (add-on,
-any plan) sets `allow_raw_data_export`: for every user below Studio Enterprise, and only for the
-people the admin names on Studio Enterprise (the control is what premium pays for).
+Every plan includes Rockinfo dashboards, PDF export, scheduled emails and raw-row download
+(`allow_raw_data_export`) for every user. **Data protection** is the Studio Enterprise feature that
+restricts raw-row download to the people the admin names (in the demo: the admin and the Channel
+operations analyst); restricting rows is what premium pays for, not downloading them.
 
 **Admin is a tag, not a role.** The first role a plan offers is that tenant's admin (`admin: true`
 in `identities()`): the person who assigns roles in Rockinfo's app. Holistics never sees it; it
 only receives the token fields the admin's choices produce.
 
-Data Export is the norm, so the persona menu labels a customer **without** it ("· no data export")
-rather than one with it, and only Studio Enterprise seats say "+ Data Export" (a per-person grant).
+The persona menu labels the premium restriction ("Studio Enterprise · data protection"), not the
+download, and only Studio Enterprise seats say "+ Data Export" (a per-person grant).
 
 | Tenant | Purchase (menu label) | Personas (`embed_user_id`) and seat |
 | --- | --- | --- |
-| Adobe | Studio Enterprise | `adobe_admin` Admin, Creator + Publisher + Data Export; `adobe_editor` Creator (private); `adobe_analyst` Viewer + Data Export; `adobe_viewer` Viewer |
-| Lenovo | Studio Enterprise | same four roles as Adobe |
-| F5 | Analytics Studio (exports on for everyone) | `f5_editor` Admin, Creator; `f5_viewer` Viewer |
-| Nutanix | Analytics Studio · no data export | `nutanix_editor` Admin, Creator; `nutanix_viewer` Viewer |
-| Cloudinary | Program Dashboards · no data export | `cloudinary_viewer` Admin, Viewer |
+| Adobe | Studio Enterprise · data protection | `adobe_admin` Admin, Creator + Publisher + Data Export; `adobe_editor` Creator (private); `adobe_analyst` Viewer + Data Export; `adobe_viewer` Viewer |
+| Lenovo | Studio Enterprise · data protection | same four roles as Adobe |
+| F5 | Analytics Studio | `f5_editor` Admin, Creator; `f5_viewer` Viewer |
+| Nutanix | Analytics Studio | `nutanix_editor` Admin, Creator; `nutanix_viewer` Viewer |
+| Cloudinary | Program Dashboards | `cloudinary_viewer` Admin, Viewer |
 | Rockinfo | Internal | `rockinfo_internal_admin`, `embed_org_id: rockinfo_internal`, all nine clients |
 
 Role keys stay the `embed_user_id` suffix so earlier reports keep their authors: `admin` Program

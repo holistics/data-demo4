@@ -333,7 +333,8 @@ const CAP_GROUPS = [
     { label: 'Publish to Team reports', note: 'One person builds, the whole org benefits', field: 'org_workspace_role: editor', cell: (p) => WHO[p.publish] || WHO.none, money: true },
   ] },
   { group: 'Take data out', rows: [
-    { label: 'Raw data download', note: 'CSV / Excel of the rows behind a chart (Data Export add-on)', field: 'allow_raw_data_export', cell: (p) => (p.exports === 'named' ? 'Named by admin' : WHO.all), money: true },
+    { label: 'Raw data download', note: 'CSV / Excel of the rows behind a chart', field: 'allow_raw_data_export', cell: (p) => (p.exports === 'named' ? 'Named by admin' : WHO.all) },
+    { label: 'Data protection', note: 'The admin restricts raw-data download to named people', field: 'allow_raw_data_export per user', cell: (p) => (p.exports === 'named' ? 'Admin' : WHO.none), money: true },
   ] },
 ];
 
@@ -381,15 +382,6 @@ function renderPlans() {
     card.append(head, el('p', 'plan-persona', `Demo customers: ${tenantsOn(p.key)}`), el('p', 'plan-pitch', p.pitch), tryButton(first, `Try as ${first.name}, ${first.tenantName} ${first.seat.toLowerCase()}`));
     cards.appendChild(card);
   }
-  for (const a of addons) {
-    const card = el('article', 'plan-card addon' + (current.dataExport ? ' current' : ''));
-    const head = el('div', 'plan-head');
-    head.append(el('h3', null, a.name), el('span', 'plan-price', a.price));
-    const buyers = [...new Set(users.filter((u) => u.dataExport).map((u) => u.tenantName))].join(', ');
-    const u = users.find((x) => x.caps.csv && !x.admin && x.plan !== 'internal');
-    card.append(head, el('p', 'plan-persona', `Demo customers: ${buyers}`), el('p', 'plan-pitch', a.pitch), tryButton(u, `Try as ${u.name}, ${u.tenantName} ${u.title.toLowerCase()}`));
-    cards.appendChild(card);
-  }
   root.appendChild(cards);
 
   // 2. What each person can do.
@@ -408,8 +400,8 @@ function renderPlans() {
     chip('Viewer', 'Free, unlimited', 'Reads Rockinfo dashboards and team reports, gets them by email, and asks Rocky AI on Analytics Studio.'),
     chip('Creator', 'Paid seat', 'Everything a Viewer has, plus Explore and My reports. On Analytics Studio every Creator publishes to the team.'),
     chip('Publisher', 'Studio Enterprise', 'A Creator the admin trusts to publish. Other Creators build privately until a Publisher shares their work.'),
-    chip('+ Data Export', 'Add-on', 'Raw-row download. Below Studio Enterprise it is on for everyone; on Studio Enterprise only for the people the admin names.'),
-    chip('Admin tag', 'One per organisation', 'Not a role: marks who assigns roles. On Studio Enterprise the admin also names Publishers and who may download data.'),
+    chip('+ Data Export', 'Studio Enterprise', 'Raw-row download is open to everyone on the other plans. With Data protection, only the people the admin names get it.'),
+    chip('Admin tag', 'One per organisation', 'Not a role: marks who assigns roles. On Studio Enterprise the admin also names Publishers and, through Data protection, who may download data.'),
   );
   rolesSec.appendChild(chips);
   root.appendChild(rolesSec);
@@ -471,7 +463,7 @@ function renderPlans() {
     col('Charge for: authorship, control and data leaving', 'paid', [
       'Creator seats (Analytics Studio): Explore, My reports and publishing. One Creator lights up the whole org.',
       'Publishing controls (Studio Enterprise): large customers pay to keep Team reports curated.',
-      'Data Export (add-on): rows leave the platform, so it is priced separately. Smaller plans switch it on for everyone; Studio Enterprise pays for the control to restrict it to named people.',
+      'Data protection (Studio Enterprise): raw-row download is open on every other plan; large and regulated customers pay to restrict it to named people.',
     ]),
   );
   money.appendChild(grid);
