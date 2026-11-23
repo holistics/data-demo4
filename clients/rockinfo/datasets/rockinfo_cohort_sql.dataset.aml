@@ -1,0 +1,72 @@
+// The hand-built SQL cohort's own dataset, kept apart from rockinfo_credentialing
+// so the two can be compared honestly. It shares no metrics with the governed
+// dataset: this is all the conventional build gives you. Only rockinfo_clients
+// is joined, for the same tenant permission.
+Dataset rockinfo_cohort_sql {
+  label: 'Rockinfo - Cohort (hand-built SQL, for comparison)'
+  description: '''
+The candidate journey cohort built the conventional way, for comparison with Rockinfo - Credentialing Analytics.
+
+One SQL query with the cohort logic baked in: registration month, months since registration and cohort size were computed inside it and frozen. Every attribute you can filter by (partner type, segment, region) is a column the query had to SELECT in advance.
+
+Unfiltered it returns exactly what the governed dataset returns. Filter it and the cohort size cannot change, because the cohort was decided before the filter existed. Granularity is monthly only.
+'''
+  data_source_name: 'rockinfo_neon'
+  owner: 'vincent@holistics.io'
+
+  models: [
+    rockinfo_clients,
+    rockinfo_cohort_sql_fact,
+  ]
+
+  relationships: [
+    relationship(rockinfo_cohort_sql_fact.client_id > rockinfo_clients.client_id, true),
+  ]
+
+  // Same tenant isolation as rockinfo_credentialing.
+  permission client_access {
+    field: r(rockinfo_clients.client_id)
+    operator: 'matches_user_attribute'
+    value: 'rockinfo_client_id'
+  }
+
+  metric sql_cohort_size {
+    label: 'Cohort Size (SQL)'
+    type: 'number'
+    definition: @aql max(rockinfo_cohort_sql_fact.cohort_size_col);;
+    description: 'Cohort size as the query computed it, carried on every row. Filtering a column does not change it, so it stops matching the candidates counted above it.'
+    format: '#,###0'
+  }
+  metric sql_reached {
+    label: 'Reached Milestone (SQL)'
+    type: 'number'
+    definition: @aql count_distinct(rockinfo_cohort_sql_fact.candidate_id) | where(rockinfo_cohort_sql_fact.milestone != 'Registered');;
+    description: 'Candidates first reaching the milestone in that month. Filter Milestone (SQL column) to choose one.'
+    format: '#,###0'
+  }
+  metric sql_reached_cumulative {
+    label: 'Reached Milestone, cumulative (SQL)'
+    type: 'number'
+    definition: @aql running_total(sql_reached, rockinfo_cohort_sql_fact.month_number, fill_missing: true);;
+    description: 'Running total of Reached Milestone (SQL) across months since registration.'
+    format: '#,###0'
+  }
+  metric sql_cohort_conversion {
+    label: 'Cohort Conversion (SQL)'
+    type: 'number'
+    definition: @aql safe_divide(sql_reached_cumulative, sql_cohort_size);;
+    description: 'Cumulative reached divided by the frozen cohort size.'
+    format: '#,##0.0%'
+  }
+
+  view {
+    group cohort {
+      metric sql_cohort_size
+      metric sql_reached
+      metric sql_reached_cumulative
+      metric sql_cohort_conversion
+    }
+    model rockinfo_cohort_sql_fact {
+    }
+  }
+}

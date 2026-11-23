@@ -1,0 +1,123 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// THE CONVENTIONAL APPROACH (for comparison only)
+//
+// The candidate journey cohort built the way most teams build it: one SQL
+// query with the cohort logic baked in. Registration month, months since
+// registration and cohort size are computed inside the query, and every
+// attribute anyone might slice by (partner type, segment, region) is a column
+// the query had to SELECT in advance.
+//
+// Unfiltered it matches rockinfo_credentialing exactly. The gap opens on the
+// first question it was not written for:
+// - Filter Partner Type: the milestone rows narrow, but cohort_size was frozen
+//   over every candidate, so conversion collapses instead of re-basing.
+// - Change granularity: impossible. Month is hard-coded; week, quarter or year
+//   means another query.
+// Every Rockinfo dashboard uses rockinfo_credentialing; this model only feeds
+// the "semantic layer vs hand-built SQL" personal cohort reports.
+// ═══════════════════════════════════════════════════════════════════════════
+Model rockinfo_cohort_sql_fact {
+  type: 'query'
+  label: 'Cohort Fact (hand-built SQL)'
+  description: 'Hand-built cohort fact table, the conventional analyst approach. Grain: one row per candidate per journey milestone reached (Registered included), with registration month, months since registration and a pre-computed cohort size carried on every row. Filtering a column slices the rows but never the cohort size.'
+  data_source_name: 'rockinfo_neon'
+  owner: 'vincent@holistics.io'
+
+  query: @sql
+    with milestones as (
+      select candidate_id, 'Registered' as milestone, registered_at as event_at from "rockinfo_demo"."candidates"
+      union all
+      select candidate_id, 'Started a course', min(enrolled_at) from "rockinfo_demo"."enrolments" group by candidate_id
+      union all
+      select candidate_id, 'Completed a course', min(completed_at) from "rockinfo_demo"."enrolments" where completed_at is not null group by candidate_id
+      union all
+      select candidate_id, 'Sat an exam', min(attempted_at) from "rockinfo_demo"."exam_attempts" group by candidate_id
+      union all
+      select candidate_id, 'Certified', min(issued_at) from "rockinfo_demo"."credentials" group by candidate_id
+    ),
+    cohorts as (
+      -- frozen here: every candidate of the client who registered that month,
+      -- whatever filter is applied to the report later
+      select client_id, date_trunc('month', registered_at)::date as cohort_month, count(*) as cohort_size
+      from "rockinfo_demo"."candidates"
+      group by 1, 2
+    )
+    select
+      c.client_id,
+      c.candidate_id,
+      date_trunc('month', c.registered_at)::date as cohort_month,
+      m.milestone,
+      (date_part('year', m.event_at) - date_part('year', c.registered_at)) * 12
+        + (date_part('month', m.event_at) - date_part('month', c.registered_at)) as month_number,
+      p.partner_type,
+      c.segment,
+      c.region,
+      co.cohort_size
+    from "rockinfo_demo"."candidates" c
+    join milestones m on m.candidate_id = c.candidate_id
+    join cohorts co on co.client_id = c.client_id and co.cohort_month = date_trunc('month', c.registered_at)::date
+    left join "rockinfo_demo"."partners" p on p.partner_id = c.partner_id
+  ;;
+  models: []
+
+  dimension row_key {
+    label: 'Row Key'
+    type: 'text'
+    primary_key: true
+    hidden: true
+    definition: @sql {{ #SOURCE.candidate_id }}::text || '-' || {{ #SOURCE.milestone }};;
+  }
+  dimension client_id {
+    label: 'Client ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.client_id }};;
+    description: 'Owning client. Join key for tenant isolation only.'
+  }
+  dimension candidate_id {
+    label: 'Candidate ID'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.candidate_id }};;
+  }
+  dimension cohort_month {
+    label: 'Registration Month (SQL)'
+    type: 'date'
+    definition: @sql {{ #SOURCE.cohort_month }};;
+    description: 'Month the candidate registered, computed in the query. Always monthly: another granularity needs another query.'
+  }
+  dimension month_number {
+    label: 'Months Since Registration (SQL)'
+    type: 'number'
+    definition: @sql {{ #SOURCE.month_number }};;
+    description: 'Calendar months between registration and the milestone, computed in the query.'
+  }
+  dimension milestone {
+    label: 'Milestone (SQL column)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.milestone }};;
+    description: 'Registered, Started a course, Completed a course, Sat an exam or Certified.'
+  }
+  dimension partner_type {
+    label: 'Partner Type (SQL column)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner_type }};;
+    description: 'An output column of the query. Filtering it removes rows; it cannot change the cohort size that was computed before the filter existed.'
+  }
+  dimension segment {
+    label: 'Segment (SQL column)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.segment }};;
+  }
+  dimension region {
+    label: 'Candidate Region (SQL column)'
+    type: 'text'
+    definition: @sql {{ #SOURCE.region }};;
+  }
+  dimension cohort_size_col {
+    label: 'Cohort Size Column'
+    type: 'number'
+    hidden: true
+    definition: @sql {{ #SOURCE.cohort_size }};;
+  }
+}
