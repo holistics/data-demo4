@@ -35,6 +35,8 @@ const ICONS = {
   dashboards: '<path d="M3 17h14M6 14V9M10 14V5M14 14v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   team: '<path d="M4 3.5h8l4 4V16.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 13v-2M10 13V9M13 13v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
   personal: '<path d="M4 3.5h8l4 4V16.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="10" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.8 14.5c.6-1.5 1.8-2.2 3.2-2.2s2.6.7 3.2 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+  guide: '<circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 8a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2v.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="14" r=".9" fill="currentColor"/>',
+  glossary: '<path d="M4 4.5c2-.8 4-.8 6 .5 2-1.3 4-1.3 6-.5V16c-2-.8-4-.8-6 .5-2-1.3-4-1.3-6-.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 5v11.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
   datasets: '<ellipse cx="10" cy="5" rx="6" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V5M4 10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>',
 };
 
@@ -142,7 +144,7 @@ function renderNav() {
     const items = s.items.filter((item) => allowed.has(item.id));
     if (!items.length) continue;
     const group = navGroup(s.label);
-    for (const item of items) group.appendChild(navLink(item.id, item.title, item.sub, s.key));
+    for (const item of items) group.appendChild(navLink(item.id, item.title, item.sub, item.icon || s.key));
     nav.appendChild(group);
   }
   if (!sections.some((s) => s.key === 'datasets')) renderWorkspaceSections(nav);

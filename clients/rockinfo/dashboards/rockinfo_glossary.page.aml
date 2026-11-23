@@ -1,0 +1,306 @@
+Dashboard rockinfo_glossary {
+  title: 'Glossary'
+  description: 'Definitions of every term and metric on the Rockinfo dashboards. Exact definitions are read live from the governed metrics. Opened from the Rocky section of the Rockinfo left menu.'
+  owner: 'vincent@holistics.io'
+
+  block g_intro: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Glossary <span class="accent">&middot;</span> the words on these dashboards</h3>
+<p class="sub" style="margin:0">Every number in Rockinfo Analytics comes from one governed set of definitions, so a KPI card, a table, an export and a Rocky AI answer always agree. Hover the <b>&#9432;</b> next to any chart title for its definition in place; come here for the full list. The <i>Exact definition</i> column is read live from the metric itself, so it never drifts from what the numbers compute.</p>
+</div>;;
+  }
+
+  block g_core: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>The building blocks</h3>
+<p class="sub">How your certification business is laid out in the data.</p>
+<table><thead><tr><th>Term</th><th>What it means</th></tr></thead><tbody>
+<tr><td class="t">Client</td><td>Your organisation. You only ever see your own data; other Rockinfo clients never appear, in dashboards, exports or AI answers.</td></tr>
+<tr><td class="t">Program</td><td>Something a candidate can earn: <span class="tag">Certification</span><span class="tag">Micro-credential</span><span class="tag">CPD</span><span class="tag">Learning Path</span>. Most certifications end in a paid exam; some credentials need no exam.</td></tr>
+<tr><td class="t">Course</td><td>A learning module inside a program. Courses run in a set order (<b>Step</b> 1, 2, 3 &hellip;) and are Self-paced, Virtual instructor-led or Blended.</td></tr>
+<tr><td class="t">Candidate</td><td>A learner registered with you. Each candidate comes in through one partner (or Direct) and has a segment and a region.</td></tr>
+<tr><td class="t">Enrolment</td><td>One candidate in one course. Status is Completed, In progress (active in the last 120 days) or Withdrawn.</td></tr>
+<tr><td class="t">Exam attempt</td><td>One sitting of an exam. <b>Attempt 1</b> is the first attempt; 2 and 3 are <b>retakes</b>. Result is Pass or Fail against the exam passing score.</td></tr>
+<tr><td class="t">Credential</td><td>What a candidate receives on certifying, with a public credential number for verification. Most expire after a set number of months and must be renewed (<b>recertification</b>).</td></tr>
+<tr><td class="t">Partner</td><td>Who brought the candidate or bought the vouchers: <span class="tag">Training Partner</span><span class="tag">Reseller</span><span class="tag">Corporate Account</span><span class="tag">Academic</span><span class="tag">Direct</span>. Direct is your own channel and is named after you.</td></tr>
+<tr><td class="t">Voucher</td><td>A prepaid code that books one exam. Partners buy them in bulk orders; candidates also buy single vouchers in the web store. A voucher is valid for 12 months from sale.</td></tr>
+</tbody></table>
+</div>;;
+  }
+
+  block g_learning: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Candidates and learning</h3>
+<p class="sub">Where candidates come in and how far they get through the courses.</p>
+<table><thead><tr><th>Term</th><th>In plain words</th><th>Exact definition</th></tr></thead><tbody>
+<tr><td class="t">New Candidates</td><td>People who signed up in the period.</td><td class="x">${rockinfo_credentialing.metric.total_candidates.description}</td></tr>
+<tr><td class="t">Course Enrolments</td><td>Times a candidate started a course.</td><td class="x">${rockinfo_credentialing.metric.enrolments.description}</td></tr>
+<tr><td class="t">Course Completions</td><td>Of those enrolments, how many were finished.</td><td class="x">${rockinfo_credentialing.metric.course_completions.description}</td></tr>
+<tr><td class="t">Course Completion Rate</td><td>Out of every 100 enrolments, how many finished.</td><td class="x">${rockinfo_credentialing.metric.completion_rate.description}</td></tr>
+<tr><td class="t">Avg Course Score</td><td>Typical final score on a completed course.</td><td class="x">${rockinfo_credentialing.metric.avg_course_score.description}</td></tr>
+<tr><td class="t">Active Learners</td><td>People studying right now.</td><td class="x">${rockinfo_credentialing.metric.active_learners.description}</td></tr>
+</tbody></table>
+</div>;;
+  }
+
+  block g_exams: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Exams and credentials</h3>
+<p class="sub">Whether candidates pass, earn a credential and keep it current.</p>
+<table><thead><tr><th>Term</th><th>In plain words</th><th>Exact definition</th></tr></thead><tbody>
+<tr><td class="t">Exam Attempts</td><td>Exams sat, including retakes.</td><td class="x">${rockinfo_credentialing.metric.exam_attempts.description}</td></tr>
+<tr><td class="t">Exam Pass Rate</td><td>Out of every 100 sittings, how many passed.</td><td class="x">${rockinfo_credentialing.metric.pass_rate.description}</td></tr>
+<tr><td class="t">First-Attempt Pass Rate</td><td>How many pass first time. Low means candidates reach the exam under-prepared.</td><td class="x">${rockinfo_credentialing.metric.first_attempt_pass_rate.description}</td></tr>
+<tr><td class="t">Credentials Issued</td><td>Credentials handed out, new and renewed.</td><td class="x">${rockinfo_credentialing.metric.credentials_issued.description}</td></tr>
+<tr><td class="t">Newly Certified</td><td>People certified for the very first time.</td><td class="x">${rockinfo_credentialing.metric.newly_certified.description}</td></tr>
+<tr><td class="t">Recertifications</td><td>Credentials renewed by someone already certified.</td><td class="x">${rockinfo_credentialing.metric.recertifications.description}</td></tr>
+<tr><td class="t">Recertification Rate</td><td>When a credential came up for renewal, how often the holder renewed.</td><td class="x">${rockinfo_credentialing.metric.recertification_rate.description}</td></tr>
+<tr><td class="t">Active Credentials</td><td>Credentials that are valid today.</td><td class="x">${rockinfo_credentialing.metric.active_credentials.description}</td></tr>
+<tr><td class="t">Due for Recertification (90 days)</td><td>People to contact now, before their credential lapses.</td><td class="x">${rockinfo_credentialing.metric.expiring_90d.description}</td></tr>
+</tbody></table>
+</div>;;
+  }
+
+  block g_vouchers: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Vouchers and revenue</h3>
+<p class="sub">Voucher money is <b>received</b> at sale, <b>earned</b> when a candidate uses the voucher, and <b>kept as breakage</b> if it expires unused. So Voucher Sales = Recognised + Deferred + Breakage.</p>
+<table><thead><tr><th>Term</th><th>In plain words</th><th>Exact definition</th></tr></thead><tbody>
+<tr><td class="t">Vouchers Issued</td><td>Vouchers sold.</td><td class="x">${rockinfo_credentialing.metric.vouchers_issued.description}</td></tr>
+<tr><td class="t">Vouchers Redeemed</td><td>Vouchers used to book an exam.</td><td class="x">${rockinfo_credentialing.metric.vouchers_redeemed.description}</td></tr>
+<tr><td class="t">Vouchers Outstanding</td><td>Vouchers sold and still waiting to be used.</td><td class="x">${rockinfo_credentialing.metric.vouchers_outstanding.description}</td></tr>
+<tr><td class="t">Vouchers Expired</td><td>Vouchers that ran out unused.</td><td class="x">${rockinfo_credentialing.metric.vouchers_expired.description}</td></tr>
+<tr><td class="t">Voucher Redemption Rate</td><td>Out of every 100 vouchers sold, how many were used.</td><td class="x">${rockinfo_credentialing.metric.redemption_rate.description}</td></tr>
+<tr><td class="t">Voucher Sales</td><td>Money taken for vouchers.</td><td class="x">${rockinfo_credentialing.metric.voucher_sales.description}</td></tr>
+<tr><td class="t">Recognised Revenue</td><td>Money earned: the exam has been booked.</td><td class="x">${rockinfo_credentialing.metric.recognised_revenue.description}</td></tr>
+<tr><td class="t">Deferred Revenue</td><td>Money taken for exams not booked yet. You still owe the candidate an exam.</td><td class="x">${rockinfo_credentialing.metric.deferred_revenue.description}</td></tr>
+<tr><td class="t">Breakage</td><td>Money kept from vouchers nobody used.</td><td class="x">${rockinfo_credentialing.metric.breakage.description}</td></tr>
+<tr><td class="t">Breakage at Risk (90 days)</td><td>Deferred revenue about to become breakage. Chase these partners now.</td><td class="x">${rockinfo_credentialing.metric.breakage_at_risk_90d.description}</td></tr>
+<tr><td class="t">Avg Discount</td><td>How far below list price vouchers sold, on average.</td><td class="x">${rockinfo_credentialing.metric.avg_discount.description}</td></tr>
+</tbody></table>
+</div>;;
+  }
+
+  block g_status: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Statuses and categories</h3>
+<p class="sub">The values you will see in filters, table columns and chart legends.</p>
+<table><thead><tr><th>Term</th><th>What it means</th></tr></thead><tbody>
+<tr><td class="t">Credential status</td><td><b>Active</b> valid &middot; <b>Expiring</b> within 90 days &middot; <b>Expired</b> lapsed without renewal &middot; <b>Renewed</b> replaced by a recertification &middot; <b>Revoked</b> withdrawn.</td></tr>
+<tr><td class="t">Voucher status</td><td><b>Redeemed</b> used for an exam &middot; <b>Unredeemed</b> still valid (deferred revenue) &middot; <b>Expired</b> unused past 12 months (breakage).</td></tr>
+<tr><td class="t">Voucher type</td><td><b>Standard</b>, or <b>Retake</b>: an extra 50-point discount for a candidate re-sitting an exam (total discount capped at 60%).</td></tr>
+<tr><td class="t">Sales channel</td><td><b>Partner order</b> bulk purchase by a partner &middot; <b>Web store</b> single purchase by a candidate.</td></tr>
+<tr><td class="t">Partner tier</td><td><b>Platinum</b> 25% &middot; <b>Gold</b> 15% &middot; <b>Silver</b> 10% &middot; <b>Direct</b> 0% voucher discount.</td></tr>
+<tr><td class="t">Segment</td><td><b>Individual</b> &middot; <b>Employer-sponsored</b> (via a corporate account) &middot; <b>Student</b> (via an academic partner).</td></tr>
+<tr><td class="t">Activity Date</td><td>The date filter. Each number uses its own natural date: registered for candidates, enrolled for courses, sat for exams, issued for credentials, sold for vouchers. Default: last 12 months.</td></tr>
+<tr><td class="t">vs last year</td><td>The arrow on a KPI card compares the selected period with the same period one year earlier.</td></tr>
+<tr><td class="t">Point in time</td><td><b>Act now</b> lists, <i>Due for Recertification</i>, <i>Breakage at Risk</i> and the renewal pipeline describe today, so they ignore the Activity Date filter.</td></tr>
+</tbody></table>
+</div>;;
+  }
+
+  block g_cohort: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Cohorts</h3>
+<p class="sub">Used on the Cohorts tab to see how fast groups of candidates, or batches of vouchers, move.</p>
+<table><thead><tr><th>Term</th><th>What it means</th></tr></thead><tbody>
+<tr><td class="t">Cohort</td><td>A group that started together: candidates who <b>registered</b> in the same month (or week, quarter, year), or vouchers <b>sold</b> in the same period.</td></tr>
+<tr><td class="t">Milestone</td><td>The step you are tracking: <span class="tag">Started a course</span><span class="tag">Completed a course</span><span class="tag">Sat an exam</span><span class="tag">Certified</span>. Each candidate reaches each milestone once.</td></tr>
+<tr><td class="t">Periods after</td><td>How many weeks, months, quarters or years after joining the cohort. 0 is the period they joined.</td></tr>
+<tr><td class="t">Cell %</td><td>Candidate cohort: ${rockinfo_credentialing.metric.cohort_conversion.description}<br/>Voucher cohort: ${rockinfo_credentialing.metric.voucher_cohort_redemption.description}</td></tr>
+<tr><td class="t">How to read it</td><td>Read <b>across a row</b> to see how long one cohort takes to get there. Read <b>down a column</b> to see whether newer cohorts move faster than older ones.</td></tr>
+</tbody></table>
+</div>;;
+  }
+
+  view: CanvasLayout {
+    label: 'Glossary'
+    width: 1220
+    height: 3080
+    grid_size: 20
+    auto_expand_vertically: true
+    mobile {
+      mode: 'auto'
+    }
+    block g_intro {
+      position: pos(20, 20, 1180, 140)
+    }
+    block g_core {
+      position: pos(20, 180, 1180, 500)
+    }
+    block g_learning {
+      position: pos(20, 700, 1180, 360)
+    }
+    block g_exams {
+      position: pos(20, 1080, 1180, 480)
+    }
+    block g_vouchers {
+      position: pos(20, 1580, 1180, 600)
+    }
+    block g_status {
+      position: pos(20, 2200, 1180, 440)
+    }
+    block g_cohort {
+      position: pos(20, 2660, 1180, 400)
+    }
+    default_zoom: 'fit_to_width'
+  }
+  theme: DynamicPageTheme {
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
+  }
+}

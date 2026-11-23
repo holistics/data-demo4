@@ -4,15 +4,30 @@
 
 export const SECTIONS = [
   {
-    key: 'ai',
-    label: 'AI',
-    requires: 'ai',
+    // Rocky: the assistant plus the help pages. Rocky AI needs a plan with AI; the guide and
+    // glossary open for everyone.
+    key: 'rocky',
+    label: 'Rocky',
     items: [
       {
         id: 'ai',
         title: 'Rocky AI',
         sub: 'Ask anything about your own candidates, exams, credentials and vouchers.',
         path: '/ai',
+        requires: 'ai',
+        icon: 'ai',
+      },
+      {
+        id: 'rockinfo_how_to_use',
+        title: 'How to use',
+        sub: 'Where to start, how to read the dashboards, and what your plan and role include.',
+        icon: 'guide',
+      },
+      {
+        id: 'rockinfo_glossary',
+        title: 'Glossary',
+        sub: 'What every term and metric on these dashboards means.',
+        icon: 'glossary',
       },
     ],
   },
@@ -67,7 +82,7 @@ export const SECTIONS = [
 for (const s of SECTIONS) for (const i of s.items) i.path ??= `/objects/${i.id}`;
 
 export const VIEWS = new Map(
-  SECTIONS.flatMap((s) => s.items.map((i) => [i.id, { ...i, section: s.key, requires: s.requires }])),
+  SECTIONS.flatMap((s) => s.items.map((i) => [i.id, { ...i, section: s.key, requires: i.requires ?? s.requires }])),
 );
 
 // Sidebar entries this identity's plan may open (`requires` names a plan capability).
