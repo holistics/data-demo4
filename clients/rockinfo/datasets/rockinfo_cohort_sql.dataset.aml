@@ -40,8 +40,8 @@ Unfiltered it returns exactly what the governed dataset returns. Filter it and t
   metric sql_reached {
     label: 'Reached Milestone (SQL)'
     type: 'number'
-    definition: @aql count_distinct(rockinfo_cohort_sql_fact.candidate_id) | where(rockinfo_cohort_sql_fact.milestone != 'Registered');;
-    description: 'Candidates first reaching the milestone in that month. Filter Milestone (SQL column) to choose one.'
+    definition: @aql count(rockinfo_cohort_sql_fact.row_key) | where(rockinfo_cohort_sql_fact.milestone != 'Registered');;
+    description: 'Candidates first reaching the milestone in that month (one row per candidate per milestone, so a plain count; running_total does not accumulate count_distinct). Filter Milestone (SQL column) to choose one.'
     format: '#,###0'
   }
   metric sql_reached_cumulative {
