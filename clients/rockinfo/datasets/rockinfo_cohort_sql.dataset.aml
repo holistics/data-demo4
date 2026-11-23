@@ -40,8 +40,13 @@ Unfiltered it returns exactly what the governed dataset returns. Filter it and t
   metric sql_reached {
     label: 'Reached Milestone (SQL)'
     type: 'number'
-    definition: @aql count(rockinfo_cohort_sql_fact.row_key) | where(rockinfo_cohort_sql_fact.milestone != 'Registered');;
-    description: 'Candidates first reaching the milestone in that month (one row per candidate per milestone, so a plain count; running_total does not accumulate count_distinct). Filter Milestone (SQL column) to choose one.'
+    definition: @aql case(
+        when: 'Started a course' in rockinfo_clients.cohort_milestone, then: count(rockinfo_cohort_sql_fact.row_key) | where(rockinfo_cohort_sql_fact.milestone == 'Started a course')
+      , when: 'Completed a course' in rockinfo_clients.cohort_milestone, then: count(rockinfo_cohort_sql_fact.row_key) | where(rockinfo_cohort_sql_fact.milestone == 'Completed a course')
+      , when: 'Sat an exam' in rockinfo_clients.cohort_milestone, then: count(rockinfo_cohort_sql_fact.row_key) | where(rockinfo_cohort_sql_fact.milestone == 'Sat an exam')
+      , else: count(rockinfo_cohort_sql_fact.row_key) | where(rockinfo_cohort_sql_fact.milestone == 'Certified')
+    );;
+    description: 'Candidates first reaching the milestone chosen in Cohort Milestone (Certified when none is chosen) in that month. One row per candidate per milestone, so a plain count; running_total does not accumulate count_distinct.'
     format: '#,###0'
   }
   metric sql_reached_cumulative {

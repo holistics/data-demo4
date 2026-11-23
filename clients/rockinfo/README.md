@@ -56,6 +56,10 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   registered, started, completed, sat an exam, certified) and `rockinfo_dates` (shared calendar).
 - `datasets/rockinfo_credentialing.dataset.aml`: one governed dataset with 33 metrics, the
   `client_access` permission, dynamic cohort fields, and View Underlying Data record layouts.
+- `datasets/rockinfo_cohort_sql.dataset.aml` over `models/rockinfo_cohort_sql_fact.model.aml`: the
+  candidate journey cohort as one hand-built SQL query (monthly only, cohort size frozen in the query),
+  same `client_access` permission. A comparison exhibit only: it feeds the *My Cohorts: Semantic Layer
+  vs Hand-built SQL* My reports and nothing else.
 - `dashboards/`:
   - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts
     (KPIs compare the period with the same period a year earlier; candidate journey funnel; program
@@ -85,6 +89,10 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   (Started a course, Completed a course, Sat an exam, Certified) re-cut the candidate journey
   cohort. Partner Type, Segment and Region change who is in the cohort. The voucher cohort shows
   how quickly partner-bought vouchers get redeemed.
+- **Semantic layer vs hand-built SQL**: every Creator (the admin and editor personas on Analytics Studio
+  and Studio Enterprise) has a My report, *My Cohorts: Semantic Layer vs Hand-built SQL*, that shows the
+  candidate journey cohort built both ways. Unfiltered they match. Filter Partner Type and the SQL version
+  divides by the frozen full cohort; switch granularity and only the semantic version follows.
 - **Self-service and AI**: the dataset is in the portal, so client editors can explore, build
   their own dashboards and ask AI, always through the same governed metrics and the same permission.
 - **Plans**: each client buys Program Dashboards (included), Analytics Studio (add-on, per Creator seat)
