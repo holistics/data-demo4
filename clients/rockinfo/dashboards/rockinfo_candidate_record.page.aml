@@ -87,6 +87,66 @@ Dashboard rockinfo_candidate_record {
       }
     }
   }
+  block f_program: FilterBlock {
+    label: 'Program'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_programs.program_name)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_enr_status: FilterBlock {
+    label: 'Enrolment Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_enrolments.status)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_enr_start: FilterBlock {
+    label: 'Enrolment Start Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_enrolments.enrolled_date)
+    }
+  }
+  block f_enr_end: FilterBlock {
+    label: 'Enrolment End (Completed) Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_enrolments.completed_date)
+    }
+  }
+  block f_exam_result: FilterBlock {
+    label: 'Exam Result'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_exam_attempts.result)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_cred_status: FilterBlock {
+    label: 'Credential Status'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_credentials.credential_status)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
   block t_c_learning: VizBlock {
     label: 'Learning history'
     description: 'Every course this candidate enrolled in, with status, progress and final score.'
@@ -99,6 +159,9 @@ Dashboard rockinfo_candidate_record {
         VizFieldFull {
           ref: r(rockinfo_enrolments.enrolled_date)
           uname: 'l_d'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.completed_date)
         },
         VizFieldFull {
           ref: r(rockinfo_enrolments.status)
@@ -204,10 +267,49 @@ Dashboard rockinfo_candidate_record {
     }
   }
 
+  interactions: [
+    FilterInteraction {
+      from: 'f_program'
+      to: [
+        CustomMapping { block: ['t_c_header'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_enr_status'
+      to: [
+        CustomMapping { block: ['t_c_header', 't_c_exams', 't_c_credentials'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_enr_start'
+      to: [
+        CustomMapping { block: ['t_c_header', 't_c_exams', 't_c_credentials'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_enr_end'
+      to: [
+        CustomMapping { block: ['t_c_header', 't_c_exams', 't_c_credentials'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_exam_result'
+      to: [
+        CustomMapping { block: ['t_c_header', 't_c_learning', 't_c_credentials'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_cred_status'
+      to: [
+        CustomMapping { block: ['t_c_header', 't_c_learning', 't_c_exams'] disabled: true }
+      ]
+    },
+  ]
+
   view: CanvasLayout {
     label: 'View 1'
     width: 1220
-    height: 1300
+    height: 1540
     grid_size: 20
     auto_expand_vertically: true
     mobile {
@@ -217,16 +319,34 @@ Dashboard rockinfo_candidate_record {
       position: pos(20, 20, 1180, 120)
     }
     block f_candidate {
-      position: pos(20, 160, 380, 80)
+      position: pos(20, 160, 580, 80)
+    }
+    block f_program {
+      position: pos(620, 160, 580, 80)
+    }
+    block f_enr_status {
+      position: pos(20, 260, 380, 80)
+    }
+    block f_enr_start {
+      position: pos(420, 260, 380, 80)
+    }
+    block f_enr_end {
+      position: pos(820, 260, 380, 80)
     }
     block t_c_learning {
-      position: pos(20, 260, 1180, 320)
+      position: pos(20, 360, 1180, 320)
+    }
+    block f_exam_result {
+      position: pos(20, 700, 380, 80)
     }
     block t_c_exams {
-      position: pos(20, 600, 1180, 300)
+      position: pos(20, 800, 1180, 300)
+    }
+    block f_cred_status {
+      position: pos(20, 1120, 380, 80)
     }
     block t_c_credentials {
-      position: pos(20, 920, 1180, 300)
+      position: pos(20, 1220, 1180, 300)
     }
     default_zoom: 'fit_to_width'
   }

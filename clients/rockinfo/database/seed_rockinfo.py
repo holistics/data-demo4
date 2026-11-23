@@ -111,8 +111,24 @@ LAST = ['Smith', 'Nguyen', 'Patel', 'Garcia', 'Chen', 'Williams', 'Brown', 'Sing
         'Taylor', 'Wilson', 'Khan', 'Mokoena', 'Okafor', 'Rossi', 'Muller', 'Lopez', 'Wong', 'Lee', 'Sato', 'Cohen',
         'Anderson', 'Thompson', 'Rahman', 'Reyes', 'Kumar', 'Fernandes', 'Walker', 'Hughes', 'Murphy', 'Oconnor',
         'Schmidt', 'Novak', 'Ali', 'Ito', 'Santos', 'Clarke']
+# Extra names used only to redraw a name already taken in the same tenant, so every
+# candidate in a tenant has a distinct name and the Candidate picker never repeats one.
+EXTRA_FIRST = ['Adele', 'Ahmed', 'Alejandro', 'Alina', 'Andre', 'Aria', 'Beatriz', 'Benjamin', 'Bilal', 'Camila',
+               'Chiara', 'Connor', 'Dalia', 'Dmitri', 'Elif', 'Emeka', 'Farah', 'Felix', 'Freya', 'Gabriel',
+               'Hana', 'Hugo', 'Ibrahim', 'Ines', 'Ivan', 'Jasmine', 'Javier', 'Joon', 'Kavya', 'Kenji',
+               'Laila', 'Lars', 'Leila', 'Malik', 'Maya', 'Mohammed', 'Naledi', 'Nikhil', 'Noor', 'Oscar',
+               'Paolo', 'Rania', 'Rohan', 'Rosa', 'Sakura', 'Sana', 'Sebastian', 'Sipho', 'Tariq', 'Tomas',
+               'Uma', 'Vikram', 'Wen', 'Xavier', 'Yara', 'Yusuf', 'Zainab', 'Zoe', 'Lina', 'Kofi']
+EXTRA_LAST = ['Abara', 'Adeyemi', 'Alvarez', 'Bauer', 'Becker', 'Bianchi', 'Castillo', 'Choi', 'Costa', 'Dubois',
+              'Dlamini', 'Eriksen', 'Fischer', 'Gomez', 'Gupta', 'Haddad', 'Hansen', 'Herrera', 'Ibrahim', 'Iyer',
+              'Jansen', 'Joshi', 'Kowalski', 'Larsen', 'Lim', 'Mendes', 'Mensah', 'Moreau', 'Nakamura', 'Ndlovu',
+              'Ortiz', 'Park', 'Perez', 'Petrov', 'Quinn', 'Ramos', 'Reddy', 'Romano', 'Sharma', 'Suzuki',
+              'Tan', 'Torres', 'Vargas', 'Vogel', 'Wagner', 'Yamamoto', 'Yilmaz', 'Zhang', 'Zhou', 'Osei']
+NAME_FIRST = sorted(set(FIRST + EXTRA_FIRST))
+NAME_LAST = sorted(set(LAST + EXTRA_LAST))
 
 R = random.Random(SEED)
+NAME_R = random.Random(SEED + 1)   # separate stream: redrawing names never shifts the rest of the data
 
 
 def wchoice(d):
@@ -231,6 +247,7 @@ def build():
 
         # candidates
         months = list(mw)
+        taken = set()
         for _ in range(n_cand):
             y, m = R.choices(months, weights=[mw[k] for k in months])[0]
             reg = rand_date(*month_bounds(y, m))
@@ -242,6 +259,9 @@ def build():
                 region = partner['region']
             segment = {'Corporate Account': 'Employer-sponsored', 'Academic': 'Student'}.get(partner['partner_type'], 'Individual')
             fn, ln = R.choice(FIRST), R.choice(LAST)
+            while (fn, ln) in taken:
+                fn, ln = NAME_R.choice(NAME_FIRST), NAME_R.choice(NAME_LAST)
+            taken.add((fn, ln))
             cand_id = nid('candidates', 100000)
             T['candidates'].append(dict(candidate_id=cand_id, client_id=cid, partner_id=partner['partner_id'],
                                         candidate_name=f'{fn} {ln}',

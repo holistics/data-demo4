@@ -52,6 +52,12 @@ Model rockinfo_enrolments {
     definition: @sql {{ #SOURCE.completed_at }};;
     description: 'When the course was completed. Empty while in progress or withdrawn.'
   }
+  dimension completed_date {
+    label: 'Completed Date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.completed_at }}::date;;
+    description: 'Date the course was completed. Empty while in progress or withdrawn.'
+  }
   dimension status {
     label: 'Enrolment Status'
     type: 'text'
