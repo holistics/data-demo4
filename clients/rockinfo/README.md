@@ -66,7 +66,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
     scorecard; heat-scaled partner tables; *Act now* lists for recertification outreach and vouchers
     expiring in 90 days, which ignore the Activity Date filter because they are point in time)
   - `rockinfo_partner_detail`: drill-through destination (Partner)
-  - `rockinfo_candidate_record`: drill-through destination (Candidate: searchable "Name (#ID)" picker), the single-record view
+  - `rockinfo_candidate_record`: drill-through destination (Candidate: searchable "Name (#ID)" picker, plus Program, Partner, Partner Type,
+    Segment, Region, Course, Enrolment Status, Exam Result and Credential Status), a Matching candidates list and the single-record view
   - `rockinfo_how_to_use` and `rockinfo_glossary`: the host's **Rocky** left-nav section, open to every
     plan. How to use is the onboarding guide written as Rockinfo to its clients' new users, including
     what each plan unlocks; Glossary lists terms, statuses and every metric, with the exact definition
@@ -84,6 +85,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
 - **View underlying data**: right-click any KPI or table value for record-level views
   (candidates, enrolments, attempts, credentials, vouchers).
 - **Drill-through**: click a partner to open Partner Detail; click a candidate ("Name (#ID)") to open the Candidate Record, or search one by name or ID in its picker.
+  A program, course, partner, segment or region also drills through to the Candidate Record's Matching candidates list.
+- **Drill-down** (dataset breakdown groups): Program → Course; Segment → Partner Type → Partner → Candidate; Region → Country.
   Both pages name the selected partner or candidate in the header, and say "All partners" or prompt for a pick when none is chosen.
 - **Dynamic cohorts**: Cohort Granularity (Week, Month, Quarter, Year) and Cohort Milestone
   (Started a course, Completed a course, Sat an exam, Certified) re-cut the candidate journey

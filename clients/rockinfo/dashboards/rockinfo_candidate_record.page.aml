@@ -1,6 +1,6 @@
 Dashboard rockinfo_candidate_record {
   title: 'Candidate Record'
-  description: 'Drill-through destination: one candidate across learning, exams and credentials.'
+  description: 'Drill-through destination: the candidates behind a program, course, partner, segment or region, and one candidate across learning, exams and credentials.'
   owner: 'vincent@holistics.io'
 
   block t_c_header: VizBlock {
@@ -96,6 +96,13 @@ Dashboard rockinfo_candidate_record {
     }
     settings {
       input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
     }
   }
   block f_enr_status: FilterBlock {
@@ -107,6 +114,13 @@ Dashboard rockinfo_candidate_record {
     }
     settings {
       input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
     }
   }
   block f_enr_start: FilterBlock {
@@ -134,6 +148,13 @@ Dashboard rockinfo_candidate_record {
     }
     settings {
       input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
     }
   }
   block f_cred_status: FilterBlock {
@@ -145,6 +166,149 @@ Dashboard rockinfo_candidate_record {
     }
     settings {
       input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block f_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    settings {
+      input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block f_partner_type: FilterBlock {
+    label: 'Partner Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_type)
+    }
+    settings {
+      input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block f_segment: FilterBlock {
+    label: 'Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.segment)
+    }
+    settings {
+      input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block f_region: FilterBlock {
+    label: 'Candidate Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.region)
+    }
+    settings {
+      input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block f_course: FilterBlock {
+    label: 'Course'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_courses.course_name)
+    }
+    settings {
+      input_type: 'multiple'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+  block t_c_list: VizBlock {
+    label: 'Matching candidates'
+    description: 'Candidates that match the filters above, e.g. everyone behind the partner, program or segment you drilled from. Pick one in the Candidate filter to see their full record.'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_candidates.candidate_label)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_partners.partner_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.segment)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.country)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.registered_date)
+          uname: 'cl_d'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.enrolments)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.course_completions)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.exam_attempts)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.credentials_issued)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'cl_d'
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
+      }
     }
   }
   block t_c_learning: VizBlock {
@@ -269,6 +433,36 @@ Dashboard rockinfo_candidate_record {
 
   interactions: [
     FilterInteraction {
+      from: 'f_partner'
+      to: [
+        CustomMapping { block: ['t_c_header'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_partner_type'
+      to: [
+        CustomMapping { block: ['t_c_header'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_segment'
+      to: [
+        CustomMapping { block: ['t_c_header'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_region'
+      to: [
+        CustomMapping { block: ['t_c_header'] disabled: true }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_course'
+      to: [
+        CustomMapping { block: ['t_c_header', 't_c_exams', 't_c_credentials'] disabled: true }
+      ]
+    },
+    FilterInteraction {
       from: 'f_program'
       to: [
         CustomMapping { block: ['t_c_header'] disabled: true }
@@ -309,7 +503,7 @@ Dashboard rockinfo_candidate_record {
   view: CanvasLayout {
     label: 'View 1'
     width: 1220
-    height: 1540
+    height: 2020
     grid_size: 20
     auto_expand_vertically: true
     mobile {
@@ -324,29 +518,47 @@ Dashboard rockinfo_candidate_record {
     block f_program {
       position: pos(620, 160, 580, 80)
     }
+    block f_partner {
+      position: pos(20, 260, 280, 80)
+    }
+    block f_partner_type {
+      position: pos(320, 260, 280, 80)
+    }
+    block f_segment {
+      position: pos(620, 260, 280, 80)
+    }
+    block f_region {
+      position: pos(920, 260, 280, 80)
+    }
+    block t_c_list {
+      position: pos(20, 360, 1180, 360)
+    }
+    block f_course {
+      position: pos(20, 740, 280, 80)
+    }
     block f_enr_status {
-      position: pos(20, 260, 380, 80)
+      position: pos(320, 740, 280, 80)
     }
     block f_enr_start {
-      position: pos(420, 260, 380, 80)
+      position: pos(620, 740, 280, 80)
     }
     block f_enr_end {
-      position: pos(820, 260, 380, 80)
+      position: pos(920, 740, 280, 80)
     }
     block t_c_learning {
-      position: pos(20, 360, 1180, 320)
+      position: pos(20, 840, 1180, 320)
     }
     block f_exam_result {
-      position: pos(20, 700, 380, 80)
+      position: pos(20, 1180, 380, 80)
     }
     block t_c_exams {
-      position: pos(20, 800, 1180, 300)
+      position: pos(20, 1280, 1180, 300)
     }
     block f_cred_status {
-      position: pos(20, 1120, 380, 80)
+      position: pos(20, 1600, 380, 80)
     }
     block t_c_credentials {
-      position: pos(20, 1220, 1180, 300)
+      position: pos(20, 1700, 1180, 300)
     }
     default_zoom: 'fit_to_width'
   }
