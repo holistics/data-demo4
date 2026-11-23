@@ -161,6 +161,15 @@ function setMenu(open) {
   userButton.setAttribute('aria-expanded', String(open));
 }
 
+// Admin is a tag, not a role: the person who assigns everyone else's role in their organisation.
+const adminTag = () => {
+  const t = document.createElement('span');
+  t.className = 'admin-tag';
+  t.textContent = 'Admin';
+  t.title = 'Assigns roles in this organisation; on Studio Enterprise also names Publishers and who can download data.';
+  return t;
+};
+
 function renderMenu() {
   dropdown.innerHTML = '';
   const groups = new Map();
@@ -189,6 +198,7 @@ function renderMenu() {
       const t1 = document.createElement('span');
       t1.className = 'menu-title';
       t1.textContent = u.name ? `${u.name} · ${u.title}` : u.title;
+      if (u.admin) t1.appendChild(adminTag());
       const t2 = document.createElement('span');
       t2.className = 'menu-sub';
       t2.textContent = u.role;
@@ -235,6 +245,7 @@ async function load(user) {
   document.documentElement.style.setProperty('--tenant', user.accent);
   $('userAvatar').textContent = initials(user.tenantName);
   $('userName').textContent = user.name || user.title;
+  if (user.admin) $('userName').appendChild(adminTag());
   $('userSub').textContent = `${user.title} · ${user.tenantName}`;
   renderMenu();
   // A plan without this view (e.g. Essentials on Rocky AI) falls back to its own home view.
@@ -322,7 +333,7 @@ const CAP_GROUPS = [
     { label: 'Publish to Team reports', note: 'One person builds, the whole org benefits', field: 'org_workspace_role: editor', cell: (p) => WHO[p.publish] || WHO.none, money: true },
   ] },
   { group: 'Take data out', rows: [
-    { label: 'Raw data download', note: 'CSV / Excel of the rows behind a chart', field: 'allow_raw_data_export', cell: () => 'Data Export add-on', money: true },
+    { label: 'Raw data download', note: 'CSV / Excel of the rows behind a chart (Data Export add-on)', field: 'allow_raw_data_export', cell: (p) => (p.exports === 'named' ? 'Named by admin' : WHO.all), money: true },
   ] },
 ];
 
@@ -375,7 +386,7 @@ function renderPlans() {
     const head = el('div', 'plan-head');
     head.append(el('h3', null, a.name), el('span', 'plan-price', a.price));
     const buyers = [...new Set(users.filter((u) => u.dataExport).map((u) => u.tenantName))].join(', ');
-    const u = users.find((x) => x.caps.csv && x.plan !== 'internal');
+    const u = users.find((x) => x.caps.csv && !x.admin && x.plan !== 'internal');
     card.append(head, el('p', 'plan-persona', `Demo customers: ${buyers}`), el('p', 'plan-pitch', a.pitch), tryButton(u, `Try as ${u.name}, ${u.tenantName} ${u.title.toLowerCase()}`));
     cards.appendChild(card);
   }
@@ -384,7 +395,7 @@ function renderPlans() {
   // 2. What each person can do.
   const rolesSec = el('section', 'role-strip');
   rolesSec.appendChild(el('h2', null, 'What each person can do'));
-  rolesSec.appendChild(el('p', 'plan-legend', 'The admin assigns roles; the plan sets the limit.'));
+  rolesSec.appendChild(el('p', 'plan-legend', 'Each organisation has an admin (a tag on one person, not a role) who assigns roles; the plan sets the limit.'));
   const chips = el('div', 'role-chips');
   const chip = (name, price, text) => {
     const c = el('div', 'role-chip');
@@ -397,7 +408,8 @@ function renderPlans() {
     chip('Viewer', 'Free, unlimited', 'Reads Rockinfo dashboards and team reports, gets them by email, and asks Rocky AI on Analytics Studio.'),
     chip('Creator', 'Paid seat', 'Everything a Viewer has, plus Explore and My reports. On Analytics Studio every Creator publishes to the team.'),
     chip('Publisher', 'Studio Enterprise', 'A Creator the admin trusts to publish. Other Creators build privately until a Publisher shares their work.'),
-    chip('+ Data Export', 'Add-on', 'Any role can be given raw-row download once the customer buys Data Export.'),
+    chip('+ Data Export', 'Add-on', 'Raw-row download. Below Studio Enterprise it is on for everyone; on Studio Enterprise only for the people the admin names.'),
+    chip('Admin tag', 'One per organisation', 'Not a role: marks who assigns roles. On Studio Enterprise the admin also names Publishers and who may download data.'),
   );
   rolesSec.appendChild(chips);
   root.appendChild(rolesSec);
@@ -459,7 +471,7 @@ function renderPlans() {
     col('Charge for: authorship, control and data leaving', 'paid', [
       'Creator seats (Analytics Studio): Explore, My reports and publishing. One Creator lights up the whole org.',
       'Publishing controls (Studio Enterprise): large customers pay to keep Team reports curated.',
-      'Data Export (add-on): rows leave the platform, so it is priced and granted separately.',
+      'Data Export (add-on): rows leave the platform, so it is priced separately. Smaller plans switch it on for everyone; Studio Enterprise pays for the control to restrict it to named people.',
     ]),
   );
   money.appendChild(grid);

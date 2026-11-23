@@ -87,7 +87,7 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
 - **Self-service and AI**: the dataset is in the portal, so client editors can explore, build
   their own dashboards and ask AI, always through the same governed metrics and the same permission.
 - **Plans**: each client buys Program Dashboards (included), Analytics Studio (add-on, per Creator seat)
-  or Studio Enterprise (premium, publishing controls), optionally plus the Data Export add-on; its admin
+  or Studio Enterprise (premium, publishing and export controls), optionally plus the Data Export add-on (everyone below premium, named people on premium); its admin (a tag, not a role)
   assigns Viewer, Creator or Publisher roles. All of it is embed-token fields; the embed host's Plans &
   permissions page shows who gets what.
 

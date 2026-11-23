@@ -39,37 +39,42 @@ export const PORTAL = 'rockinfo_client_portal';
 //   ai: Rocky AI for every user.  build: Creators get Explore and My reports.
 //   publish: who may publish Team reports: 'none' (no Team reports at all), 'creators' (every
 //   Creator) or 'publishers' (only roles the admin names Publisher).
+//   exports: who gets raw-row download once the customer buys Data Export: 'everyone' (no
+//   control) or 'named' (Studio Enterprise: only the people the admin chooses).
 export const PLANS = [
   {
     key: 'dashboards', name: 'Program Dashboards', price: 'Included',
     pitch: 'Your certification program, measured from day one: Rockinfo dashboards, PDF export and scheduled email reports for every user.',
-    ai: false, build: false, publish: 'none', roles: ['viewer'],
+    ai: false, build: false, publish: 'none', exports: 'everyone', roles: ['viewer'],
   },
   {
     key: 'studio', name: 'Analytics Studio', price: 'Add-on · per Creator seat',
     pitch: 'Everyone asks Rocky AI. Creators explore, build their own reports and publish them to the team. Viewers are always free.',
-    ai: true, build: true, publish: 'creators', roles: ['editor', 'viewer'],
+    ai: true, build: true, publish: 'creators', exports: 'everyone', roles: ['editor', 'viewer'],
   },
   {
     key: 'enterprise', name: 'Studio Enterprise', price: 'Premium',
-    pitch: 'Analytics Studio with publishing controls: the admin names who publishes, so Team reports stay curated as more people build.',
-    ai: true, build: true, publish: 'publishers', roles: ['admin', 'editor', 'viewer'],
+    pitch: 'Analytics Studio with controls: the admin names who publishes and who downloads raw data, so Team reports stay curated and rows leave only through trusted hands.',
+    ai: true, build: true, publish: 'publishers', exports: 'named', roles: ['admin', 'editor', 'viewer'],
   },
 ];
 
-// Sold on top of any plan; gives raw rows to the people the admin chooses.
+// Sold on top of any plan. Below Studio Enterprise it switches raw-row download on for everyone;
+// on Studio Enterprise the admin restricts it to named people (the `export` roles below).
 export const ADDONS = [
   {
     key: 'dataExport', name: 'Data Export', price: 'Add-on · any plan',
-    pitch: 'Row-level CSV and Excel for the people the admin chooses, to reconcile vouchers or load a CRM.',
+    pitch: 'Row-level CSV and Excel to reconcile vouchers or load a CRM. On for everyone, or on Studio Enterprise only for the people the admin names.',
     role: 'analyst',
   },
 ];
 
-// Roles inside a tenant, most permissions first. Keys are the embed_user_id suffix, so earlier
+// Roles inside a tenant, most permissions first. Admin is not a role but a tag: the first role a
+// plan offers is that tenant's admin, who assigns everyone else's role (and, on Studio
+// Enterprise, names Publishers and exporters). Keys are the embed_user_id suffix, so earlier
 // personas (adobe_admin, adobe_editor, ...) keep their reports and personal dashboards.
 export const ROLES = [
-  { key: 'admin', title: 'Program manager', creator: true, publisher: true, pitch: 'Builds reports and decides what reaches the whole team.' },
+  { key: 'admin', title: 'Program manager', creator: true, publisher: true, export: true, pitch: 'Builds reports and decides what reaches the whole team.' },
   { key: 'editor', title: 'Partner manager', creator: true, publisher: false, pitch: 'Builds reports with Rocky AI and Explore.' },
   { key: 'analyst', title: 'Channel operations analyst', creator: false, export: true, pitch: 'Pulls the rows behind a report into finance and CRM tools.' },
   { key: 'viewer', title: 'VP partner ecosystem', creator: false, pitch: 'Reads Rockinfo dashboards and team reports, and gets them by email.' },
@@ -87,17 +92,19 @@ export function capsFor(plan, role, tenant) {
     org: plan.publish === 'none' ? 'no_access' : canPublish(plan, role) ? 'editor' : 'viewer',
     pdf: true,
     schedules: true,
-    csv: !!(tenant.dataExport && role.export),
+    // Data Export: everyone below Studio Enterprise; on it, only the people the admin names.
+    csv: !!(tenant.dataExport && (plan.exports === 'everyone' || role.export)),
   };
 }
 
 // The seat a person holds: what the plan and their role add up to.
 export function seatFor(plan, role, tenant) {
+  let seat = 'Viewer';
   if (plan.build && role.creator) {
-    if (!canPublish(plan, role)) return 'Creator, builds privately';
-    return plan.publish === 'publishers' ? 'Creator + Publisher' : 'Creator';
+    if (!canPublish(plan, role)) seat = 'Creator, builds privately';
+    else seat = plan.publish === 'publishers' ? 'Creator + Publisher' : 'Creator';
   }
-  return tenant.dataExport && role.export ? 'Viewer + Data Export' : 'Viewer';
+  return capsFor(plan, role, tenant).csv ? `${seat} + Data Export` : seat;
 }
 
 const INTERNAL_CAPS = { ai: true, explore: true, org: 'editor', personal: true, pdf: true, csv: true, schedules: true };
@@ -107,10 +114,12 @@ export function identities() {
   for (const t of TENANTS) {
     const p = PLANS.find((x) => x.key === t.plan);
     const keys = [...p.roles];
-    if (t.dataExport) keys.splice(keys.length - 1, 0, 'analyst');
+    // A separate exporter persona only matters where the admin restricts exports.
+    if (t.dataExport && p.exports === 'named') keys.splice(keys.length - 1, 0, 'analyst');
     for (const r of ROLES.filter((x) => keys.includes(x.key))) {
       const seat = seatFor(p, r, t);
       list.push({
+        admin: r.key === p.roles[0],
         id: `${t.slug}_${r.key}`,
         name: PEOPLE[`${t.slug}_${r.key}`],
         tenantSlug: t.slug,
@@ -131,6 +140,7 @@ export function identities() {
   }
   list.push({
     id: 'rockinfo_internal_admin',
+    admin: true,
     name: PEOPLE.rockinfo_internal_admin,
     tenantSlug: 'rockinfo',
     tenantName: 'Rockinfo (all customers)',
