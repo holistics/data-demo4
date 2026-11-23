@@ -1,26 +1,371 @@
 Dashboard untitled_iulnq {
-  title: 'Untitled'
   owner: 'embed_159eb364d1d34d6fb1@holistics.io'
+  title: 'My Cohorts: Semantic Layer vs Hand-built SQL'
+  description: 'Daniel Okafor (Partner manager, Adobe), private: the candidate journey cohort built twice, on the governed dataset and as a conventional hand-built SQL query, to show what happens when a question arrives that the query was not written for.'
   block title: TextBlock {
-    content: @md # Your title goes here ;;
+    content: @md
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6">My report &middot; Personal workspace &middot; only Daniel Okafor can see this</div>
+
+      # My Cohorts: Semantic Layer vs Hand-built SQL
+
+      The same registration cohort built two ways. **Unfiltered they agree to the decimal.** Now filter **Partner Type** to *Corporate Account*, or switch **Cohort Granularity** to *Quarter*, and watch which one keeps up.
+    ;;
   }
-  explicit_interactions: []
+  block f_grain: FilterBlock {
+    label: 'Cohort Granularity'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_clients.cohort_grain)
+    }
+    default {
+      operator: 'is'
+      value: 'Month'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block f_milestone: FilterBlock {
+    label: 'Cohort Milestone'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_clients.cohort_milestone)
+    }
+    default {
+      operator: 'is'
+      value: 'Certified'
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+  block f_registered: FilterBlock {
+    label: 'Registered'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.registered_date)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+  block f_window: FilterBlock {
+    label: 'Periods Shown'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_credentialing, rockinfo_candidate_milestones.period_number)
+    }
+    default {
+      operator: 'between'
+      value: [0, 12]
+    }
+  }
+  block f_partner_type: FilterBlock {
+    label: 'Partner Type'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_type)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_segment: FilterBlock {
+    label: 'Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.segment)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block t_semantic: TextBlock {
+    content: @md
+      #### Semantic layer (Rockinfo - Credentialing Analytics)
+
+      <span style="opacity:.75">The filter chooses <b>who is in the cohort</b>, then measures that group. Cohort Size is a governed metric, so it re-bases to the filtered candidates, and granularity is a control, not a rewrite.</span>
+    ;;
+  }
+  block p_semantic: VizBlock {
+    label: 'Cumulative % of each registration cohort reaching the milestone: semantic layer'
+    description: 'Rows: the period candidates registered. Columns: periods since registering. Cells: cumulative share of that cohort that has reached the chosen milestone.'
+    viz: PivotTable {
+      dataset: rockinfo_credentialing
+      rows: [
+        VizFieldFull {
+          label: 'Registered'
+          ref: r(rockinfo_credentialing, rockinfo_candidates.cohort_period)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'sr'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Periods after'
+          ref: r(rockinfo_credentialing, rockinfo_candidate_milestones.period_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'sc'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: '%'
+          ref: r(rockinfo_credentialing.cohort_conversion)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+          uname: 'sv'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'sv'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: 'rgba(46, 158, 91, 0.02)'
+              }
+              mid {
+                value: 0.4
+                color: 'rgba(46, 158, 91, 0.28)'
+              }
+              max {
+                value: 0.85
+                color: 'rgba(46, 158, 91, 0.62)'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'sr'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'sc'
+            direction: 'asc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'sr'
+            width: 110
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 25
+      }
+    }
+  }
+  block t_sql: TextBlock {
+    content: @md
+      #### Hand-built SQL (the conventional approach)
+
+      <span style="opacity:.75">One query with registration month, months since registration and cohort size computed inside it. The filter can only <b>remove rows</b>; the cohort size was frozen before the filter existed, so a filtered cohort is divided by everyone. Granularity is hard-coded to month.</span>
+    ;;
+  }
+  block p_sql: VizBlock {
+    label: 'Cumulative % of each registration cohort reaching the milestone: hand-built SQL'
+    description: 'Same cohort from one hand-written SQL query (Rockinfo - Cohort, hand-built SQL). Monthly only; cohort size is a column computed inside the query.'
+    viz: PivotTable {
+      dataset: rockinfo_cohort_sql
+      rows: [
+        VizFieldFull {
+          label: 'Registered'
+          ref: r(rockinfo_cohort_sql_fact.cohort_month)
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'qr'
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          label: 'Months after'
+          ref: r(rockinfo_cohort_sql_fact.month_number)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'qc'
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: '%'
+          ref: r(rockinfo_cohort_sql.sql_cohort_conversion)
+          format {
+            type: 'number'
+            pattern: '#,##0.0%'
+          }
+          uname: 'qv'
+        }
+      ]
+      settings {
+        conditional_formats: [
+          ConditionalFormat {
+            key: 'qv'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: 'rgba(46, 158, 91, 0.02)'
+              }
+              mid {
+                value: 0.4
+                color: 'rgba(46, 158, 91, 0.28)'
+              }
+              max {
+                value: 0.85
+                color: 'rgba(46, 158, 91, 0.62)'
+              }
+            }
+          }
+        ]
+        sorts: [
+          SortSetting {
+            key: 'qr'
+            direction: 'asc'
+          },
+          SortSetting {
+            key: 'qc'
+            direction: 'asc'
+          }
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'qr'
+            width: 110
+          }
+        ]
+        frozen_columns: 1
+        wrap_header_text: false
+        pagination_size: 25
+      }
+    }
+  }
+  block t_why: TextBlock {
+    content: @md
+      #### What just happened
+
+      - **Partner Type = Corporate Account.** The semantic layer re-forms the cohort from corporate-sponsored candidates and measures them. The SQL report still divides by every candidate who registered that month, so its conversion looks far lower than it really is.
+      - **Cohort Granularity = Quarter.** The semantic report re-cuts rows and columns into quarters. The SQL report cannot: someone has to write, test and ship another query.
+      - **Why it matters.** Every new question against a hand-built query is a ticket to the data team. In the semantic layer, cohort membership, periods and cohort size are defined once, in code, and every filter, every client and every AI answer reuses them correctly.
+    ;;
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f_grain'
+      to: [
+        CustomMapping {
+          block: 'p_sql'
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_registered'
+      to: [
+        CustomMapping {
+          block: 'p_sql'
+          field: r(rockinfo_cohort_sql_fact.cohort_month)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_window'
+      to: [
+        CustomMapping {
+          block: 'p_sql'
+          field: r(rockinfo_cohort_sql_fact.month_number)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_partner_type'
+      to: [
+        CustomMapping {
+          block: 'p_sql'
+          field: r(rockinfo_cohort_sql_fact.partner_type)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_segment'
+      to: [
+        CustomMapping {
+          block: 'p_sql'
+          field: r(rockinfo_cohort_sql_fact.segment)
+        }
+      ]
+    }
+  ]
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 800
+    height: 1700
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(20, 20, 1260, 60)
+      position: pos(20, 20, 1260, 120)
+    }
+    block f_grain {
+      position: pos(20, 160, 200, 80)
+    }
+    block f_milestone {
+      position: pos(230, 160, 200, 80)
+    }
+    block f_registered {
+      position: pos(440, 160, 200, 80)
+    }
+    block f_window {
+      position: pos(650, 160, 200, 80)
+    }
+    block f_partner_type {
+      position: pos(860, 160, 200, 80)
+    }
+    block f_segment {
+      position: pos(1070, 160, 210, 80)
+    }
+    block t_semantic {
+      position: pos(20, 260, 1260, 90)
+    }
+    block p_semantic {
+      position: pos(20, 360, 1260, 440)
+    }
+    block t_sql {
+      position: pos(20, 820, 1260, 90)
+    }
+    block p_sql {
+      position: pos(20, 920, 1260, 440)
+    }
+    block t_why {
+      position: pos(20, 1380, 1260, 260)
     }
     mobile {
       mode: 'auto'
     }
   }
   theme: DynamicPageTheme {
-    light: H.themes.vanilla
-    dark: H.themes.charcoal
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
   }
   settings {
     autorun_on_open: true

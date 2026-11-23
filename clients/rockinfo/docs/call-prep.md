@@ -33,7 +33,11 @@ Data store: "Database" (unspecified: confirm the engine).
    different programs and partners, no Adobe data anywhere, AI included. These are Rockinfo's
    own customers, with synthetic numbers: say so up front.
 8. **Self-service and packaging**: as Maya Chen (Adobe program manager with the **Admin** tag, Creator + Publisher on Studio Enterprise; she decides who publishes and who may download rows), ask Rocky, save the answer and publish it to Team reports. Switch to Tom Becker (Adobe VP, Viewer) to see it arrive and ask Rocky a follow-up; to Priya Raman (Viewer + Data Export, one of the people Maya named) to download the rows, while Tom cannot; to Daniel Okafor (Creator) to open his own **My reports** (My Partners: Exam Readiness), which Maya cannot see, and show building privately without publishing rights; then to Ben Walker at Cloudinary (Program Dashboards) for the included tier, where Team reports and My reports are not in the sidebar at all. On the other plans every user can download raw rows (F5, Nutanix, Cloudinary); restricting that to named people is Studio Enterprise's **Data protection**. Close on **Plans & permissions**: give away what spreads usage, charge for authorship, control and data leaving.
-9. **Code**: dataset AML, permission block, Git.
+9. **Semantic layer vs hand-built SQL**: still as Daniel, open My reports → *My Cohorts: Semantic Layer
+   vs Hand-built SQL*. Both pivots agree. Filter Partner Type to Corporate Account: the semantic cohort
+   re-bases, while the SQL one still divides by every registrant. Then switch Granularity to Quarter;
+   only the semantic one follows. Every Creator persona has the same report in their My reports.
+10. **Code**: dataset AML, permission block, Git.
 
 ## Discovery questions
 
