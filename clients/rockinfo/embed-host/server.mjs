@@ -84,7 +84,7 @@ function config() {
     users: identities().map((i) => ({
       id: i.id, tenantSlug: i.tenantSlug, tenantName: i.tenantName, accent: i.accent,
       title: i.title, role: i.role, portal: i.portal, clientIds: i.clientIds, views: viewsFor(i),
-      name: i.name, plan: i.plan, planName: i.planName, seat: i.seat, admin: !!i.admin, dataExport: !!i.dataExport, caps: i.caps, home: homeFor(i),
+      name: i.name, plan: i.plan, planName: i.planName, seat: i.seat, admin: !!i.admin, caps: i.caps, home: homeFor(i),
     })),
     people: people(),
     plans: PLANS,

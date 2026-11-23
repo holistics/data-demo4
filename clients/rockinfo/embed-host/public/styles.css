@@ -127,7 +127,7 @@ iframe.loading { opacity: .25; }
 .plans > * { flex-shrink: 0; }
 .plans h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 8px; }
 .plans-intro p { color: var(--muted); max-width: 760px; }
-.plan-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.plan-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .plan-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
 .plan-card.current { border-color: var(--tenant); box-shadow: 0 0 0 1px var(--tenant); }
 .plan-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
