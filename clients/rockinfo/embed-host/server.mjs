@@ -38,7 +38,8 @@ const ASSET_VERSION = createHash('sha256')
 reportMeta.start(join(PUBLIC, 'report-meta.json'));
 const INDEX_HTML = readFileSync(join(PUBLIC, 'index.html'), 'utf8')
   .replace('href="/styles.css"', `href="/styles.css?v=${ASSET_VERSION}"`)
-  .replace('src="/app.js"', `src="/app.js?v=${ASSET_VERSION}"`);
+  .replace('src="/app.js"', `src="/app.js?v=${ASSET_VERSION}"`)
+  .replaceAll('href="/assets/rockinfo-mark.png"', `href="/assets/rockinfo-mark.png?v=${ASSET_VERSION}"`);
 
 // Email subscriptions go to public demo inboxes (synthetic data only).
 const MAIL_DOMAIN = env.SUBSCRIPTION_MAIL_DOMAIN || 'mailinator.com';
