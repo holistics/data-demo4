@@ -57,15 +57,16 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
 - `datasets/rockinfo_credentialing.dataset.aml`: one governed dataset with 33 metrics, the
   `client_access` permission, dynamic cohort fields, and View Underlying Data record layouts.
 - `dashboards/`:
-  - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts,
-    How to use (onboarding guide written as Rockinfo to its clients' new users, including what each plan
-    unlocks) and Glossary (terms, statuses and every metric, with the exact definition interpolated from
-    the dataset so it cannot drift)
+  - `rockinfo_program_performance`: Overview, Learning & Certification, Vouchers & Revenue, Cohorts
     (KPIs compare the period with the same period a year earlier; candidate journey funnel; program
     scorecard; heat-scaled partner tables; *Act now* lists for recertification outreach and vouchers
     expiring in 90 days, which ignore the Activity Date filter because they are point in time)
   - `rockinfo_partner_detail`: drill-through destination (Partner)
   - `rockinfo_candidate_record`: drill-through destination (Candidate: searchable "Name (#ID)" picker), the single-record view
+  - `rockinfo_how_to_use` and `rockinfo_glossary`: the host's **Rocky** left-nav section, open to every
+    plan. How to use is the onboarding guide written as Rockinfo to its clients' new users, including
+    what each plan unlocks; Glossary lists terms, statuses and every metric, with the exact definition
+    interpolated from the dataset so it cannot drift
 - `embeds/rockinfo_client_portal.embed.aml`: the one portal every client embeds, with AI enabled.
 - `ai/rockinfo_context.aml`: everything Holistics AI knows about Rockinfo (vocabulary, tenant rules,
   metric definitions). `settings/ai/context.aml` only routes to it.

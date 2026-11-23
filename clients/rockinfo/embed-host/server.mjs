@@ -90,7 +90,7 @@ function config() {
     plans: PLANS,
     addons: ADDONS,
     roles: ROLES,
-    sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub, native }) => ({ id, title, sub, native: !!native })) })),
+    sections: SECTIONS.map((s) => ({ key: s.key, label: s.label, items: s.items.map(({ id, title, sub, native, icon }) => ({ id, title, sub, native: !!native, icon })) })),
     workspaceSections: WORKSPACE_SECTIONS,
     defaultView: DEFAULT_VIEW,
   };

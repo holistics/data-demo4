@@ -1,0 +1,283 @@
+Dashboard rockinfo_how_to_use {
+  title: 'How to use'
+  description: 'Client guide to Rockinfo Analytics: where to start, how to read and dig into the dashboards, and what each plan and role can do. Opened from the Rocky section of the Rockinfo left menu.'
+  owner: 'vincent@holistics.io'
+
+  block h_welcome: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Welcome to Rockinfo Analytics <span class="accent">&middot;</span> start here</h3>
+<p style="margin:0 0 6px">Rockinfo Analytics shows how your certification program is performing: who is signing up, how far candidates get through your courses, how they do on exams, which credentials are due for renewal, and what your exam vouchers are worth. It lives inside your Rockinfo platform and uses the same sign-in.</p>
+<p class="sub" style="margin:0">&#128274; <b>Your data only.</b> Every chart, export and Rocky AI answer is limited to your organisation. Nobody at another Rockinfo client can see your numbers, and you cannot see theirs. &nbsp;&#9432; New to a term? Hover the info icon on any chart, or open <b>Glossary</b> under Rocky in the left menu.</p>
+</div>;;
+  }
+
+  block h_tabs: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Find your way</h3>
+<p class="sub">Program Performance has one tab per set of questions. Start on Overview; go to the others when something there needs a closer look.</p>
+<div class="grid">
+<div class="card"><b>&#128202; Overview</b><span>How is the program doing this year compared with last? The candidate journey funnel shows where people drop off; the program scorecard and partner leaderboard show which programs and partners drive results.</span></div>
+<div class="card"><b>&#127891; Learning &amp; Certification</b><span>Which courses do candidates stall on? How many pass first time? Who is due to recertify in the next 90 days, and how many renewals are coming each month?</span></div>
+<div class="card"><b>&#127915; Vouchers &amp; Revenue</b><span>What has been sold, earned, still owed (deferred) and lost to expiry (breakage)? Which partners hold vouchers about to expire? Reconcile each partner and exam.</span></div>
+<div class="card"><b>&#128200; Cohorts</b><span>How quickly do new candidates reach a milestone, and are newer groups getting there faster? How quickly do partners use the vouchers they buy?</span></div>
+<div class="card"><b>&#129309; Partner Detail</b><span>Opens when you click a partner name. One partner: candidates, pass rate, voucher orders for invoice reconciliation, and vouchers at risk.</span></div>
+<div class="card"><b>&#128100; Candidate Record</b><span>Opens when you click a candidate. One person: every course, exam attempt and credential. Search any candidate by name or ID at the top.</span></div>
+</div>
+</div>;;
+  }
+
+  block h_read: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Read a page in four steps</h3>
+<ol>
+<li><b>Set the filters at the top.</b> Activity Date starts at the last 12 months. Narrow by Program, Partner or Candidate Region; every chart on the tab follows.</li>
+<li><b>Scan the KPI cards.</b> The big number is the selected period; the arrow and % compare it with the same period last year. For most cards up is good; for Breakage, Deferred Revenue and Avg Discount, lower is usually better.</li>
+<li><b>Hover anything.</b> &#9432; next to a title explains the chart. Hovering a bar, line or cell shows its exact value.</li>
+<li><b>Act on the Act now lists.</b> They show who to contact today (credentials about to lapse, vouchers about to expire), so they ignore the date filter on purpose.</li>
+</ol>
+</div>;;
+  }
+
+  block h_dig: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Dig deeper</h3>
+<ul>
+<li><b>See the records behind a number.</b> Right-click any KPI, bar or table value &rarr; <i>View underlying data</i> to list the candidates, enrolments, exam attempts, credentials or vouchers it counts.</li>
+<li><b>Open a partner.</b> Click a partner name in any partner table to go to Partner Detail.</li>
+<li><b>Open a candidate.</b> Click a candidate (shown as <i>Name (#ID)</i>) to go to the Candidate Record, or search for one there by name or ID.</li>
+</ul>
+</div>;;
+  }
+
+  block h_more: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Beyond the dashboard</h3>
+<p class="sub">What you can do depends on your organisation's Rockinfo Analytics plan and on your role. Ask your Rockinfo account manager to change either.</p>
+<table><thead><tr><th>Feature</th><th>What it does</th><th class="c">Program Dashboards<br/><span style="text-transform:none;letter-spacing:0">included</span></th><th class="c">Analytics Studio<br/><span style="text-transform:none;letter-spacing:0">add-on</span></th><th class="c">Studio Enterprise<br/><span style="text-transform:none;letter-spacing:0">premium</span></th></tr></thead><tbody>
+<tr><td class="t">Rockinfo dashboards</td><td>Program Performance, Partner Detail and Candidate Record, plus your Team reports.</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">PDF and scheduled emails</td><td>Save a dashboard as PDF, or get it in your inbox every week or month.</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">Ask Rocky AI</td><td>Ask in plain English, e.g. <i>Which partners have the most unredeemed vouchers older than 6 months?</i> For every user, Viewers included.</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">Explore and My reports</td><td>Creators build their own charts from the same governed data and keep them in My reports.</td><td class="c no">&ndash;</td><td class="c yes">&#10003;</td><td class="c yes">&#10003;</td></tr>
+<tr><td class="t">Publish to Team reports</td><td>Share a report with everyone in your organisation.</td><td class="c no">&ndash;</td><td class="c">Every Creator</td><td class="c">Publishers your admin names</td></tr>
+<tr><td class="t">Raw data download</td><td>CSV or Excel of the rows behind a table.</td><td class="c">Everyone</td><td class="c">Everyone</td><td class="c">Named by your admin<br/><span style="opacity:.7">(Data protection)</span></td></tr>
+</tbody></table>
+<p style="margin:12px 0 0"><b>Roles.</b> <b>Viewer</b> (free, unlimited): opens dashboards and Team reports, and asks Rocky AI on Analytics Studio or Studio Enterprise. <b>Creator</b> (paid seat): also builds in Explore and keeps My reports. <b>Publisher</b> (Studio Enterprise): decides what goes to Team reports; other Creators build privately until a Publisher shares their work. <b>Admin</b> is a tag, not a role: your organisation's admin assigns everyone's role and, on Studio Enterprise, names Publishers and who may download raw data.</p>
+</div>;;
+  }
+
+  block h_first: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Your first 15 minutes</h3>
+<ol>
+<li>On <b>Overview</b>, find the step in the candidate journey funnel where most people drop off.</li>
+<li>Pick the program with the lowest First-Attempt Pass in the scorecard, then check its courses on <b>Learning &amp; Certification</b>.</li>
+<li>Open the <b>Recertification outreach</b> list on Learning &amp; Certification: these are the candidates to remind this quarter.</li>
+<li>On <b>Vouchers &amp; Revenue</b>, click the top partner in the <i>Act now</i> list to see which orders are about to expire.</li>
+<li>Ask Rocky AI one question you get asked every month.</li>
+</ol>
+</div>;;
+  }
+
+  block h_help: TextBlock {
+    content: @md
+<style>
+.rkg{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;padding:4px 8px;font-size:13px;line-height:1.55}
+.rkg h3{font-size:17px;font-weight:700;margin:2px 0 4px}
+.rkg .sub{opacity:.72;margin:0 0 12px}
+.rkg table{border-collapse:collapse;width:100%}
+.rkg th,.rkg td{border-bottom:1px solid rgba(128,128,128,.22);padding:8px 10px;vertical-align:top;text-align:left}
+.rkg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;font-weight:600}
+.rkg td.t{font-weight:600;white-space:nowrap;width:190px}
+.rkg td.x{opacity:.72;font-size:12px;width:42%}
+.rkg .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid rgba(128,128,128,.35);margin:0 4px 4px 0;white-space:nowrap}
+.rkg .accent{color:#DC1F34}
+.rkg .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rkg .card{border:1px solid rgba(128,128,128,.25);border-radius:14px;padding:12px 14px}
+.rkg .card b{display:block;font-size:14px;margin-bottom:4px}
+.rkg .card span{opacity:.75;font-size:12.5px}
+.rkg ol,.rkg ul{margin:4px 0 0 0;padding-left:20px}
+.rkg li{margin:0 0 7px}
+.rkg .yes{color:#4CB851;font-weight:700}
+.rkg .no{opacity:.4}
+.rkg td.c{text-align:center;width:13%}
+</style>
+<div class="rkg">
+<h3>Need a hand?</h3>
+<ul>
+<li><b>What does a number mean?</b> Hover its &#9432;, or open <b>Glossary</b> under Rocky in the left menu.</li>
+<li><b>Why does it not match my other report?</b> Check the Activity Date filter and which date the number uses (sold vs redeemed, enrolled vs completed). The Glossary lists each one.</li>
+<li><b>Ask Rocky AI</b> to explain a term or a change: <i>Why did pass rate drop last quarter?</i></li>
+<li><b>Still stuck?</b> Contact your Rockinfo customer success manager.</li>
+</ul>
+</div>;;
+  }
+
+  view: CanvasLayout {
+    label: 'How to use'
+    width: 1220
+    height: 2060
+    grid_size: 20
+    auto_expand_vertically: true
+    mobile {
+      mode: 'auto'
+    }
+    block h_welcome {
+      position: pos(20, 20, 1180, 200)
+    }
+    block h_tabs {
+      position: pos(20, 240, 1180, 380)
+    }
+    block h_read {
+      position: pos(20, 640, 580, 380)
+    }
+    block h_dig {
+      position: pos(620, 640, 580, 380)
+    }
+    block h_more {
+      position: pos(20, 1040, 1180, 600)
+    }
+    block h_first {
+      position: pos(20, 1660, 580, 380)
+    }
+    block h_help {
+      position: pos(620, 1660, 580, 380)
+    }
+    default_zoom: 'fit_to_width'
+  }
+  theme: DynamicPageTheme {
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
+  }
+}
