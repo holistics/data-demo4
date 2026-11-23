@@ -8,7 +8,7 @@ Dashboard untitled_sonum {
 
       # My Cohorts: Semantic Layer vs Hand-built SQL
 
-      The same registration cohort built two ways. **Unfiltered they agree to the decimal.** Now filter **Partner Type** to *Corporate Account*, or switch **Cohort Granularity** to *Quarter*, and watch which one keeps up.
+      The same registration cohort built two ways. **Unfiltered, the numbers agree.** Now filter **Partner Type** to *Corporate Account*, or switch **Cohort Granularity** to *Quarter*, and watch which one keeps up.
     ;;
   }
   block f_grain: FilterBlock {
@@ -320,44 +320,44 @@ Dashboard untitled_sonum {
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
-    height: 1700
+    height: 1760
     grid_size: 20
     auto_expand_vertically: true
     block title {
-      position: pos(20, 20, 1260, 120)
+      position: pos(20, 20, 1260, 150)
     }
     block f_grain {
-      position: pos(20, 160, 200, 80)
+      position: pos(20, 190, 200, 80)
     }
     block f_milestone {
-      position: pos(230, 160, 200, 80)
+      position: pos(230, 190, 200, 80)
     }
     block f_registered {
-      position: pos(440, 160, 200, 80)
+      position: pos(440, 190, 200, 80)
     }
     block f_window {
-      position: pos(650, 160, 200, 80)
+      position: pos(650, 190, 200, 80)
     }
     block f_partner_type {
-      position: pos(860, 160, 200, 80)
+      position: pos(860, 190, 200, 80)
     }
     block f_segment {
-      position: pos(1070, 160, 210, 80)
+      position: pos(1070, 190, 210, 80)
     }
     block t_semantic {
-      position: pos(20, 260, 1260, 90)
+      position: pos(20, 290, 1260, 100)
     }
     block p_semantic {
-      position: pos(20, 360, 1260, 440)
+      position: pos(20, 400, 1260, 440)
     }
     block t_sql {
-      position: pos(20, 820, 1260, 90)
+      position: pos(20, 860, 1260, 120)
     }
     block p_sql {
-      position: pos(20, 920, 1260, 440)
+      position: pos(20, 990, 1260, 440)
     }
     block t_why {
-      position: pos(20, 1380, 1260, 260)
+      position: pos(20, 1450, 1260, 260)
     }
     mobile {
       mode: 'auto'
