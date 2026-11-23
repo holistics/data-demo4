@@ -65,13 +65,16 @@ people the admin names on Studio Enterprise (the control is what premium pays fo
 in `identities()`): the person who assigns roles in Rockinfo's app. Holistics never sees it; it
 only receives the token fields the admin's choices produce.
 
-| Tenant | Purchase | Personas (`embed_user_id`) and seat |
+Data Export is the norm, so the persona menu labels a customer **without** it ("· no data export")
+rather than one with it, and only Studio Enterprise seats say "+ Data Export" (a per-person grant).
+
+| Tenant | Purchase (menu label) | Personas (`embed_user_id`) and seat |
 | --- | --- | --- |
-| Adobe | Studio Enterprise + Data Export | `adobe_admin` Admin, Creator + Publisher + Data Export; `adobe_editor` Creator (private); `adobe_analyst` Viewer + Data Export; `adobe_viewer` Viewer |
-| Lenovo | Studio Enterprise + Data Export | same four roles as Adobe |
-| F5 | Analytics Studio + Data Export | `f5_editor` Admin, Creator + Data Export; `f5_viewer` Viewer + Data Export |
-| Nutanix | Analytics Studio | `nutanix_editor` Admin, Creator; `nutanix_viewer` Viewer |
-| Cloudinary | Program Dashboards | `cloudinary_viewer` Admin, Viewer |
+| Adobe | Studio Enterprise | `adobe_admin` Admin, Creator + Publisher + Data Export; `adobe_editor` Creator (private); `adobe_analyst` Viewer + Data Export; `adobe_viewer` Viewer |
+| Lenovo | Studio Enterprise | same four roles as Adobe |
+| F5 | Analytics Studio (exports on for everyone) | `f5_editor` Admin, Creator; `f5_viewer` Viewer |
+| Nutanix | Analytics Studio · no data export | `nutanix_editor` Admin, Creator; `nutanix_viewer` Viewer |
+| Cloudinary | Program Dashboards · no data export | `cloudinary_viewer` Admin, Viewer |
 | Rockinfo | Internal | `rockinfo_internal_admin`, `embed_org_id: rockinfo_internal`, all nine clients |
 
 Role keys stay the `embed_user_id` suffix so earlier reports keep their authors: `admin` Program

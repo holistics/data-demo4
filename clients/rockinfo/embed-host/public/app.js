@@ -174,7 +174,7 @@ function renderMenu() {
   dropdown.innerHTML = '';
   const groups = new Map();
   for (const u of users) {
-    const g = u.plan === 'internal' ? u.tenantName : `${u.tenantName} · ${u.planName} plan`;
+    const g = u.plan === 'internal' ? u.tenantName : `${u.tenantName} · ${u.planName.replace(' · ', ' plan · ')}${u.planName.includes(' · ') ? '' : ' plan'}`;
     if (!groups.has(g)) groups.set(g, []);
     groups.get(g).push(u);
   }

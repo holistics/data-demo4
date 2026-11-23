@@ -104,7 +104,8 @@ export function seatFor(plan, role, tenant) {
     if (!canPublish(plan, role)) seat = 'Creator, builds privately';
     else seat = plan.publish === 'publishers' ? 'Creator + Publisher' : 'Creator';
   }
-  return capsFor(plan, role, tenant).csv ? `${seat} + Data Export` : seat;
+  // Only Studio Enterprise grants exports person by person, so only there does a seat name it.
+  return plan.exports === 'named' && capsFor(plan, role, tenant).csv ? `${seat} + Data Export` : seat;
 }
 
 const INTERNAL_CAPS = { ai: true, explore: true, org: 'editor', personal: true, pdf: true, csv: true, schedules: true };
@@ -129,7 +130,8 @@ export function identities() {
         seat,
         role: `${seat} · ${r.pitch}`,
         plan: p.key,
-        planName: p.name + (t.dataExport ? ' + Data Export' : ''),
+        // Data Export is the norm; a customer without it is the one labelled.
+        planName: p.name + (t.dataExport ? '' : ' · no data export'),
         dataExport: !!t.dataExport,
         caps: capsFor(p, r, t),
         clientIds: [t.id],
