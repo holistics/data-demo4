@@ -25,6 +25,9 @@ modelling decisions, not just styling.
 | `iceye/` | `demo_finance` + `demo_finance_extended`, and one ecommerce re-skin | Client has non-ecommerce data, so it stays grouped here whole |
 | `branded-themes/*` | `demo_ecommerce_version_2` | Theme + layout only |
 
+**New embedded-analytics PoC?** Use the `build-embedded-poc` skill (`.claude/skills/build-embedded-poc/`,
+which points to `holistics/onboarding-presales`). `rockinfo/` is its worked example.
+
 **Which side does a new demo go on?** Check the datasets it references. Ecommerce
 dataset only, with no models of its own → `branded-themes/`. Anything else → its own
 top-level `clients/<company>/`. If a client has a mix, keep **all** of that client's
