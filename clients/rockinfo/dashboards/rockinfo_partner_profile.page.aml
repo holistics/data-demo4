@@ -1,0 +1,421 @@
+// Partner Profile: object page for one channel partner, opened by drill-through on a
+// partner name anywhere in the portal. The key filter sits off-canvas, like the
+// ecommerce customer_profile page; lifetime figures, no date filter.
+Dashboard rockinfo_partner_profile {
+  title: 'Partner Profile'
+  description: 'Drill-through destination: one channel partner as a profile card (type, tier, candidate outcomes, voucher money) with its candidates and voucher history.'
+  owner: 'vincent@holistics.io'
+
+  block v_part_card: VizBlock {
+    label: 'Partner profile card'
+    viz: MarkdownViz {
+      dataset: rockinfo_credentialing
+      calculation p_name {
+        label: 'Profile Name'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: max(rockinfo_partners.partner_name)
+          , else: 'No partner selected'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_type {
+        label: 'Profile Type'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: max(rockinfo_partners.partner_type)
+          , else: 'Open this page from a partner in any list: right-click the name, then Drill through.'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_tier {
+        label: 'Profile Tier'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: max(rockinfo_partners.partner_tier)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_region {
+        label: 'Profile Region'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: max(rockinfo_partners.partner_region)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_country {
+        label: 'Profile Country'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: max(rockinfo_partners.partner_country)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_first_sale {
+        label: 'Profile First Sale'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: cast(min(rockinfo_vouchers.issued_date), 'text')
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_last_sale {
+        label: 'Profile Last Sale'
+        formula: @aql case(
+            when: count_distinct(rockinfo_partners.partner_id) == 1, then: cast(max(rockinfo_vouchers.issued_date), 'text')
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      values: [
+        VizFieldFull {
+          label: 'Name'
+          ref: 'p_name'
+        },
+        VizFieldFull {
+          label: 'Type'
+          ref: 'p_type'
+        },
+        VizFieldFull {
+          label: 'Tier'
+          ref: 'p_tier'
+        },
+        VizFieldFull {
+          label: 'Region'
+          ref: 'p_region'
+        },
+        VizFieldFull {
+          label: 'Country'
+          ref: 'p_country'
+        },
+        VizFieldFull {
+          label: 'First Sale'
+          ref: 'p_first_sale'
+        },
+        VizFieldFull {
+          label: 'Last Sale'
+          ref: 'p_last_sale'
+        },
+        VizFieldFull {
+          label: 'Client'
+          ref: r(rockinfo_credentialing.portal_client_name)
+        },
+        VizFieldFull {
+          label: 'Color'
+          ref: r(rockinfo_credentialing.portal_brand_color)
+        },
+        VizFieldFull {
+          label: 'Candidates'
+          ref: r(rockinfo_credentialing.total_candidates)
+        },
+        VizFieldFull {
+          label: 'Completions'
+          ref: r(rockinfo_credentialing.course_completions)
+        },
+        VizFieldFull {
+          label: 'Pass Rate'
+          ref: r(rockinfo_credentialing.pass_rate)
+        },
+        VizFieldFull {
+          label: 'FAPR'
+          ref: r(rockinfo_credentialing.first_attempt_pass_rate)
+        },
+        VizFieldFull {
+          label: 'Certified'
+          ref: r(rockinfo_credentialing.candidates_certified)
+        },
+        VizFieldFull {
+          label: 'Active Credentials'
+          ref: r(rockinfo_credentialing.active_credentials)
+        },
+        VizFieldFull {
+          label: 'Vouchers'
+          ref: r(rockinfo_credentialing.vouchers_issued)
+        },
+        VizFieldFull {
+          label: 'Redemption'
+          ref: r(rockinfo_credentialing.redemption_rate)
+        },
+        VizFieldFull {
+          label: 'Outstanding'
+          ref: r(rockinfo_credentialing.vouchers_outstanding)
+        },
+        VizFieldFull {
+          label: 'Discount'
+          ref: r(rockinfo_credentialing.avg_discount)
+        },
+        VizFieldFull {
+          label: 'Sales'
+          ref: r(rockinfo_credentialing.voucher_sales)
+        },
+        VizFieldFull {
+          label: 'Recognised'
+          ref: r(rockinfo_credentialing.recognised_revenue)
+        },
+        VizFieldFull {
+          label: 'Deferred'
+          ref: r(rockinfo_credentialing.deferred_revenue)
+        },
+        VizFieldFull {
+          label: 'Breakage'
+          ref: r(rockinfo_credentialing.breakage)
+        },
+        VizFieldFull {
+          label: 'At Risk'
+          ref: r(rockinfo_credentialing.breakage_at_risk_90d)
+        }
+      ]
+      content: @md <style>
+.rk-card{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden}
+.rk-head{background:{{ rows[0].values.`Color`.raw }};color:#fff;padding:28px 32px;display:flex;align-items:center;gap:20px}
+.rk-avatar{width:76px;height:76px;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:34px;flex:none}
+.rk-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;line-height:1.6}
+.rk-name{font-size:28px;font-weight:700;font-family:'Inter Tight',Inter,sans-serif;line-height:1.25}
+.rk-sub{font-size:14px;opacity:.85;line-height:1.6}
+.rk-badge{display:inline-block;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.rk-body{padding:8px 32px 24px}
+.rk-sec{margin-top:24px}
+.rk-sec-t{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.7;padding-bottom:10px;margin-bottom:16px;border-bottom:2px solid rgba(128,128,128,.2)}
+.rk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.rk-l{display:block;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-bottom:6px}
+.rk-v{display:block;font-size:17px;font-weight:600}
+.rk-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.rk-m{text-align:center;padding:18px 12px;border:1px solid rgba(128,128,128,.25);border-radius:10px}
+.rk-mv{font-size:28px;font-weight:700;margin-bottom:6px}
+.rk-ml{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;opacity:.6}
+@media (max-width:768px){.rk-grid{grid-template-columns:repeat(2,1fr)}.rk-head{padding:22px 20px}.rk-body{padding:4px 20px 20px}}
+</style>
+<div class="rk-card">
+<div class="rk-head">
+<div class="rk-avatar">&#129309;</div>
+<div style="flex:1;min-width:0">
+<div class="rk-kicker">{{ rows[0].values.`Client` }} · Partner profile</div>
+<div class="rk-name">{{ rows[0].values.`Name` }}</div>
+<div class="rk-sub">{{ rows[0].values.`Type` }}</div>
+</div>
+<div style="flex:none"><span class="rk-badge">{{ rows[0].values.`Tier` }}</span></div>
+</div>
+<div class="rk-body">
+<div class="rk-sec"><div class="rk-sec-t">Profile</div><div class="rk-grid">
+<div><span class="rk-l">Region</span><span class="rk-v">{{ rows[0].values.`Region` }}</span></div><div><span class="rk-l">Country</span><span class="rk-v">{{ rows[0].values.`Country` }}</span></div><div><span class="rk-l">First voucher sale</span><span class="rk-v">{{ rows[0].values.`First Sale` }}</span></div><div><span class="rk-l">Latest voucher sale</span><span class="rk-v">{{ rows[0].values.`Last Sale` }}</span></div>
+</div></div>
+<div class="rk-sec"><div class="rk-sec-t">Candidate outcomes</div><div class="rk-metrics">
+<div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Candidates` }}</div><div class="rk-ml">Candidates</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Completions` }}</div><div class="rk-ml">Courses completed</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Pass Rate` }}</div><div class="rk-ml">Pass rate</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`FAPR` }}</div><div class="rk-ml">First-attempt pass</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Certified` }}</div><div class="rk-ml">Certified</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Active Credentials` }}</div><div class="rk-ml">Valid credentials</div></div>
+</div></div>
+<div class="rk-sec"><div class="rk-sec-t">Vouchers</div><div class="rk-metrics">
+<div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Vouchers` }}</div><div class="rk-ml">Vouchers bought</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Redemption` }}</div><div class="rk-ml">Redemption rate</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Outstanding` }}</div><div class="rk-ml">Outstanding</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Discount` }}</div><div class="rk-ml">Avg discount</div></div>
+</div></div>
+<div class="rk-sec"><div class="rk-sec-t">Voucher money</div><div class="rk-metrics">
+<div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Sales` }}</div><div class="rk-ml">Voucher sales</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Recognised` }}</div><div class="rk-ml">Recognised revenue</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Deferred` }}</div><div class="rk-ml">Deferred revenue</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Breakage` }}</div><div class="rk-ml">Breakage</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`At Risk` }}</div><div class="rk-ml">At risk (90 days)</div></div>
+</div></div>
+</div>
+</div>;;
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block f_partner: FilterBlock {
+    label: 'Partner'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_partners.partner_name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'single'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+
+  block c_vouchers: VizBlock {
+    label: 'Vouchers by issue month and current status'
+    description: 'Vouchers this partner bought, by month of sale, coloured by what has happened to them since.'
+    viz: ColumnChart {
+      dataset: rockinfo_credentialing
+      x_axis: VizFieldFull {
+        label: 'Issue Month'
+        ref: r(rockinfo_dates.date_day)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(rockinfo_vouchers.voucher_status)
+      }
+      y_axis {
+        settings {
+          stack_series_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(rockinfo_credentialing.vouchers_issued)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            point {
+              value: 'Redeemed'
+              color: '#2E9E5B'
+            }
+            point {
+              value: 'Unredeemed'
+              color: '#F5A524'
+            }
+            point {
+              value: 'Expired'
+              color: '#DC1F34'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        x_axis_label: ' '
+      }
+    }
+  }
+
+  block t_candidates: VizBlock {
+    label: 'Candidates'
+    description: 'Candidates this partner brought in, newest first. Right-click a name and Drill through to open their Candidate Profile.'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_candidates.candidate_label)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.segment)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.country)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_candidates.registered_date)
+          uname: 'c_d'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.course_completions)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.exams_passed)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.credentials_issued)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'c_d'
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  block t_exams: VizBlock {
+    label: 'Vouchers by exam'
+    description: 'Every exam this partner bought vouchers for: bought, redeemed, outstanding, expired and the money behind them.'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_exams.exam_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_issued)
+          uname: 'v_n'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_redeemed)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_outstanding)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.vouchers_expired)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.redemption_rate)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.voucher_sales)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.deferred_revenue)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentialing.breakage)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'v_n'
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 1980
+    grid_size: 20
+    auto_expand_vertically: true
+    mobile {
+      mode: 'auto'
+    }
+    block v_part_card {
+      position: pos(20, 20, 1180, 860)
+    }
+    block f_partner {
+      position: pos(-340, 20, 300, 80)
+    }
+    block c_vouchers {
+      position: pos(20, 900, 1180, 340)
+    }
+    block t_candidates {
+      position: pos(20, 1260, 1180, 360)
+    }
+    block t_exams {
+      position: pos(20, 1640, 1180, 320)
+    }
+    default_zoom: 'fit_to_width'
+  }
+  theme: DynamicPageTheme {
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
+  }
+  settings {
+    timezone: 'America/New_York'
+  }
+}

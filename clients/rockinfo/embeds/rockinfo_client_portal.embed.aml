@@ -8,6 +8,8 @@ EmbedPortal rockinfo_client_portal {
     rockinfo_program_performance,
     rockinfo_partner_detail,      // drill-through destination
     rockinfo_candidate_record,    // drill-through destination
+    rockinfo_partner_profile,     // drill-through object page: one partner
+    rockinfo_candidate_profile,   // drill-through object page: one candidate
     rockinfo_how_to_use,          // Rocky section: client guide
     rockinfo_glossary,            // Rocky section: term and metric definitions
     rockinfo_credentialing,       // governed dataset for Explore, client-built dashboards and AI

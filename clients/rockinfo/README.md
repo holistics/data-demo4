@@ -66,6 +66,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
     scorecard; heat-scaled partner tables; *Act now* lists for recertification outreach and vouchers
     expiring in 90 days, which ignore the Activity Date filter because they are point in time)
   - `rockinfo_partner_detail`: drill-through destination (Partner)
+  - `rockinfo_partner_profile` / `rockinfo_candidate_profile`: object pages (profile card + detail tables, modelled on the
+    ecommerce `customer_profile` page), opened only by drill-through on a partner or candidate; not in the embed sidebar
   - `rockinfo_candidate_record`: drill-through destination (Candidate: searchable "Name (#ID)" picker, plus Program, Partner, Partner Type,
     Segment, Region, Course, Enrolment Status, Exam Result and Credential Status), a Matching candidates list and the single-record view
   - `rockinfo_how_to_use` and `rockinfo_glossary`: the host's **Rocky** left-nav section, open to every
@@ -84,7 +86,8 @@ Holistics reads through the read-only role `holistics_reader`. Its credentials a
   the header renders that client's name, industry and brand colour from data. No per-client copies.
 - **View underlying data**: right-click any KPI or table value for record-level views
   (candidates, enrolments, attempts, credentials, vouchers).
-- **Drill-through**: click a partner to open Partner Detail; click a candidate ("Name (#ID)") to open the Candidate Record, or search one by name or ID in its picker.
+- **Drill-through**: right-click a partner to open its Partner Profile or Partner Detail, or a candidate ("Name (#ID)") to open their
+  Candidate Profile or Candidate Record. Candidate Record also has a picker to search a candidate by name or ID.
   A program, course, partner, segment or region also drills through to the Candidate Record's Matching candidates list.
 - **Drill-down** (dataset breakdown groups): Program → Course; Segment → Partner Type → Partner → Candidate; Region → Country.
   Both pages name the selected partner or candidate in the header, and say "All partners" or prompt for a pick when none is chosen.

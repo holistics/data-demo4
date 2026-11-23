@@ -1,0 +1,427 @@
+// Candidate Profile: object page for one candidate, opened by drill-through on a
+// candidate ("Name (#ID)") anywhere in the portal. The key filter sits off-canvas,
+// like the ecommerce customer_profile page; lifetime figures, no date filter.
+Dashboard rockinfo_candidate_profile {
+  title: 'Candidate Profile'
+  description: 'Drill-through destination: one candidate as a profile card (who they are, how they came in, where they are in the journey) with their learning, exams and credentials.'
+  owner: 'vincent@holistics.io'
+
+  block v_cand_card: VizBlock {
+    label: 'Candidate profile card'
+    viz: MarkdownViz {
+      dataset: rockinfo_credentialing
+      calculation p_name {
+        label: 'Profile Name'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_candidates.candidate_name)
+          , else: 'No candidate selected'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_id {
+        label: 'Profile ID'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: concat('#', cast(max(rockinfo_candidates.candidate_id), 'text'))
+          , else: ''
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_email {
+        label: 'Profile Email'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_candidates.email)
+          , else: 'Open this page from a candidate in any list: right-click the name, then Drill through.'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_segment {
+        label: 'Profile Segment'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_candidates.segment)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_region {
+        label: 'Profile Region'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_candidates.region)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_country {
+        label: 'Profile Country'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_candidates.country)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_partner {
+        label: 'Profile Partner'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_partners.partner_name)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_partner_type {
+        label: 'Profile Partner Type'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: max(rockinfo_partners.partner_type)
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_registered {
+        label: 'Profile Registered'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) == 1, then: cast(max(rockinfo_candidates.registered_date), 'text')
+          , else: '-'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation p_stage {
+        label: 'Profile Stage'
+        formula: @aql case(
+            when: count_distinct(rockinfo_candidates.candidate_id) != 1, then: 'Candidate profile'
+          , when: active_credentials > 0, then: 'Certified'
+          , when: credentials_issued > 0, then: 'Credential lapsed'
+          , when: exam_attempts > 0, then: 'Sitting exams'
+          , when: enrolments > 0, then: 'Learning'
+          , else: 'Registered'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      values: [
+        VizFieldFull {
+          label: 'Name'
+          ref: 'p_name'
+        },
+        VizFieldFull {
+          label: 'ID'
+          ref: 'p_id'
+        },
+        VizFieldFull {
+          label: 'Email'
+          ref: 'p_email'
+        },
+        VizFieldFull {
+          label: 'Segment'
+          ref: 'p_segment'
+        },
+        VizFieldFull {
+          label: 'Region'
+          ref: 'p_region'
+        },
+        VizFieldFull {
+          label: 'Country'
+          ref: 'p_country'
+        },
+        VizFieldFull {
+          label: 'Partner'
+          ref: 'p_partner'
+        },
+        VizFieldFull {
+          label: 'Partner Type'
+          ref: 'p_partner_type'
+        },
+        VizFieldFull {
+          label: 'Registered'
+          ref: 'p_registered'
+        },
+        VizFieldFull {
+          label: 'Stage'
+          ref: 'p_stage'
+        },
+        VizFieldFull {
+          label: 'Client'
+          ref: r(rockinfo_credentialing.portal_client_name)
+        },
+        VizFieldFull {
+          label: 'Color'
+          ref: r(rockinfo_credentialing.portal_brand_color)
+        },
+        VizFieldFull {
+          label: 'Enrolments'
+          ref: r(rockinfo_credentialing.enrolments)
+        },
+        VizFieldFull {
+          label: 'Completions'
+          ref: r(rockinfo_credentialing.course_completions)
+        },
+        VizFieldFull {
+          label: 'Completion Rate'
+          ref: r(rockinfo_credentialing.completion_rate)
+        },
+        VizFieldFull {
+          label: 'Course Score'
+          ref: r(rockinfo_credentialing.avg_course_score)
+        },
+        VizFieldFull {
+          label: 'Exam Attempts'
+          ref: r(rockinfo_credentialing.exam_attempts)
+        },
+        VizFieldFull {
+          label: 'Pass Rate'
+          ref: r(rockinfo_credentialing.pass_rate)
+        },
+        VizFieldFull {
+          label: 'Exam Score'
+          ref: r(rockinfo_credentialing.avg_exam_score)
+        },
+        VizFieldFull {
+          label: 'Credentials'
+          ref: r(rockinfo_credentialing.credentials_issued)
+        },
+        VizFieldFull {
+          label: 'Active Credentials'
+          ref: r(rockinfo_credentialing.active_credentials)
+        },
+        VizFieldFull {
+          label: 'Expiring'
+          ref: r(rockinfo_credentialing.expiring_90d)
+        }
+      ]
+      content: @md <style>
+.rk-card{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:inherit;border:1px solid rgba(128,128,128,.25);border-radius:12px;overflow:hidden}
+.rk-head{background:{{ rows[0].values.`Color`.raw }};color:#fff;padding:28px 32px;display:flex;align-items:center;gap:20px}
+.rk-avatar{width:76px;height:76px;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:34px;flex:none}
+.rk-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;line-height:1.6}
+.rk-name{font-size:28px;font-weight:700;font-family:'Inter Tight',Inter,sans-serif;line-height:1.25}
+.rk-sub{font-size:14px;opacity:.85;line-height:1.6}
+.rk-badge{display:inline-block;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.rk-body{padding:8px 32px 24px}
+.rk-sec{margin-top:24px}
+.rk-sec-t{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.7;padding-bottom:10px;margin-bottom:16px;border-bottom:2px solid rgba(128,128,128,.2)}
+.rk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.rk-l{display:block;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-bottom:6px}
+.rk-v{display:block;font-size:17px;font-weight:600}
+.rk-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.rk-m{text-align:center;padding:18px 12px;border:1px solid rgba(128,128,128,.25);border-radius:10px}
+.rk-mv{font-size:28px;font-weight:700;margin-bottom:6px}
+.rk-ml{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;opacity:.6}
+@media (max-width:768px){.rk-grid{grid-template-columns:repeat(2,1fr)}.rk-head{padding:22px 20px}.rk-body{padding:4px 20px 20px}}
+</style>
+<div class="rk-card">
+<div class="rk-head">
+<div class="rk-avatar">&#127891;</div>
+<div style="flex:1;min-width:0">
+<div class="rk-kicker">{{ rows[0].values.`Client` }} · Candidate profile</div>
+<div class="rk-name">{{ rows[0].values.`Name` }} <span style="opacity:.7;font-weight:500;font-size:18px">{{ rows[0].values.`ID` }}</span></div>
+<div class="rk-sub">&#9993; {{ rows[0].values.`Email` }}</div>
+</div>
+<div style="flex:none"><span class="rk-badge">{{ rows[0].values.`Stage` }}</span></div>
+</div>
+<div class="rk-body">
+<div class="rk-sec"><div class="rk-sec-t">Profile</div><div class="rk-grid">
+<div><span class="rk-l">Segment</span><span class="rk-v">{{ rows[0].values.`Segment` }}</span></div><div><span class="rk-l">Region</span><span class="rk-v">{{ rows[0].values.`Region` }}</span></div><div><span class="rk-l">Country</span><span class="rk-v">{{ rows[0].values.`Country` }}</span></div><div><span class="rk-l">Registered</span><span class="rk-v">{{ rows[0].values.`Registered` }}</span></div>
+<div><span class="rk-l">Acquired via</span><span class="rk-v">{{ rows[0].values.`Partner` }}</span></div><div><span class="rk-l">Partner type</span><span class="rk-v">{{ rows[0].values.`Partner Type` }}</span></div>
+</div></div>
+<div class="rk-sec"><div class="rk-sec-t">Learning</div><div class="rk-metrics">
+<div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Enrolments` }}</div><div class="rk-ml">Enrolments</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Completions` }}</div><div class="rk-ml">Courses completed</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Completion Rate` }}</div><div class="rk-ml">Completion rate</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Course Score` }}</div><div class="rk-ml">Avg course score</div></div>
+</div></div>
+<div class="rk-sec"><div class="rk-sec-t">Exams and credentials</div><div class="rk-metrics">
+<div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Exam Attempts` }}</div><div class="rk-ml">Exam attempts</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Pass Rate` }}</div><div class="rk-ml">Pass rate</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Exam Score` }}</div><div class="rk-ml">Avg exam score</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Credentials` }}</div><div class="rk-ml">Credentials earned</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Active Credentials` }}</div><div class="rk-ml">Valid today</div></div><div class="rk-m"><div class="rk-mv">{{ rows[0].values.`Expiring` }}</div><div class="rk-ml">Expiring in 90 days</div></div>
+</div></div>
+</div>
+</div>;;
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block f_candidate: FilterBlock {
+    label: 'Candidate'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: rockinfo_credentialing
+      field: r(rockinfo_candidates.candidate_label)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'single'
+      drillthrough: Drillthrough {
+        enabled: true
+        sources: [
+          AutoDrillthroughSource {
+          }
+        ]
+      }
+    }
+  }
+
+  block t_learning: VizBlock {
+    label: 'Learning history'
+    description: 'Every course this candidate enrolled in: start and completion date, status, progress and final score.'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_courses.course_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.enrolled_date)
+          uname: 'l_d'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.completed_date)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.status)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.progress_pct)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.final_score)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_enrolments.days_to_complete)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'l_d'
+            direction: 'asc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  block t_exams: VizBlock {
+    label: 'Exam attempts'
+    description: 'Every exam sitting: attempt number (1 = first attempt, 2+ = retake), score, result and the voucher used.'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_exams.exam_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exam_attempts.attempted_date)
+          uname: 'x_d'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exam_attempts.attempt_number)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exam_attempts.score)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exam_attempts.result)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exam_attempts.delivery_mode)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_exam_attempts.voucher_id)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'x_d'
+            direction: 'asc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  block t_credentials: VizBlock {
+    label: 'Credentials'
+    description: 'Credentials earned, status today and days until expiry. Renewal? shows whether a credential renews an earlier one.'
+    viz: DataTable {
+      dataset: rockinfo_credentialing
+      fields: [
+        VizFieldFull {
+          ref: r(rockinfo_programs.program_name)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.credential_code)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.issued_date)
+          uname: 'cr_d'
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.expires_at)
+        },
+        VizFieldFull {
+          label: 'Days Left'
+          ref: r(rockinfo_credentials.days_to_expiry)
+        },
+        VizFieldFull {
+          label: 'Renewal?'
+          ref: r(rockinfo_credentials.is_recertification)
+        },
+        VizFieldFull {
+          ref: r(rockinfo_credentials.credential_status)
+        }
+      ]
+      settings {
+        sorts: [
+          SortSetting {
+            key: 'cr_d'
+            direction: 'asc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1220
+    height: 1720
+    grid_size: 20
+    auto_expand_vertically: true
+    mobile {
+      mode: 'auto'
+    }
+    block v_cand_card {
+      position: pos(20, 20, 1180, 720)
+    }
+    block f_candidate {
+      position: pos(-340, 20, 300, 80)
+    }
+    block t_learning {
+      position: pos(20, 760, 1180, 300)
+    }
+    block t_exams {
+      position: pos(20, 1080, 1180, 300)
+    }
+    block t_credentials {
+      position: pos(20, 1400, 1180, 300)
+    }
+    default_zoom: 'fit_to_width'
+  }
+  theme: DynamicPageTheme {
+    light: rockinfo_light_theme
+    dark: rockinfo_dark_theme
+  }
+  settings {
+    timezone: 'America/New_York'
+  }
+}
